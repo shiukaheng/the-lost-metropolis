@@ -1,25 +1,32 @@
-import logo from './logo.svg';
-import './App.css';
+import { BrowserRouter as Router, Routes, Route, NavLink } from "react-router-dom";
+import NavigationBar from "./components/NavigationBar"
+import AppContainer from "./components/AppContainer"
+import Home from "./components/Home"
+import Spaces from "./components/Spaces"
+import About from "./components/About"
+import tw from "tailwind-styled-components"
 
-function App() {
+const StyledNavLink = tw(NavLink)`text-m px-3 font-serif`
+
+// Different views: map and list
+
+
+
+export default function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+      <Router>
+          <AppContainer>
+          <NavigationBar>
+              <StyledNavLink to="/">home</StyledNavLink>
+              <StyledNavLink to="/spaces">spaces</StyledNavLink>
+              <StyledNavLink to="/about">about</StyledNavLink>
+          </NavigationBar>
+          <Routes>
+              <Route path="/" element={<Home/>}/>
+              <Route path="/spaces" element={<Spaces/>}/>
+              <Route path="/about" element={<About/>}/>
+          </Routes>
+          </AppContainer>
+      </Router>
+  )
 }
-
-export default App;
