@@ -1,8 +1,9 @@
 import React from 'react'
+import ShowcaseContent from './ShowcaseContent'
 
 function Home() {
     return (
-        <div>Hi from home!</div>
+        <ShowcaseContent />
     )
 }
 

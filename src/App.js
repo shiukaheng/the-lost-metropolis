@@ -2,11 +2,11 @@ import { BrowserRouter as Router, Routes, Route, NavLink } from "react-router-do
 import NavigationBar from "./components/NavigationBar"
 import AppContainer from "./components/AppContainer"
 import Home from "./components/Home"
-import Spaces from "./components/Spaces"
 import About from "./components/About"
 import tw from "tailwind-styled-components"
 
-const StyledNavLink = tw(NavLink)`text-m px-3 font-serif`
+// const StyledNavLink = tw(NavLink)`text-m px-3 font-serif` DESKTOP
+const StyledNavLink = tw(NavLink)`text-m pr-3 md:pr-0 font-serif font-bold`
 
 // Different views: map and list
 
@@ -17,13 +17,11 @@ export default function App() {
       <Router>
           <AppContainer>
           <NavigationBar>
-              <StyledNavLink to="/">home</StyledNavLink>
-              <StyledNavLink to="/spaces">spaces</StyledNavLink>
+              <StyledNavLink to="/">browse</StyledNavLink>
               <StyledNavLink to="/about">about</StyledNavLink>
           </NavigationBar>
           <Routes>
               <Route path="/" element={<Home/>}/>
-              <Route path="/spaces" element={<Spaces/>}/>
               <Route path="/about" element={<About/>}/>
           </Routes>
           </AppContainer>
