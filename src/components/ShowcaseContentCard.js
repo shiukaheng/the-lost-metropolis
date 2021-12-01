@@ -6,7 +6,7 @@ function ShowcaseContentCard({content}) {
                 <div className="text-2xl md:text-4xl font-serif font-bold mr-4">{content.title_english}</div>
                 <button className="border-black border px-4 rounded-full md:hover:opacity-50 transition-opacity duration-500 font-serif font-bold text-s md:text-xl h-8 md:h-9">explore</button>
             </div>
-            <div className="font-serif">
+            <div className="font-serif max-w-xl">
                 {content.description_english}
             </div>
         </div>
