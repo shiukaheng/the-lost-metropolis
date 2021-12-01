@@ -1,6 +1,6 @@
 export default function AppContainer(props) {
     return (
-        <div className="flex flex-col m-8">
+        <div className="m-20 flex flex-row flex-nowrap">
             {props.children}
         </div>
     )
