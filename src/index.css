@@ -1,3 +1,21 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+    * {
+        @apply font-serif;
+    }
+}
+
+.page-margins {
+    @apply p-8 pt-0 md:p-20 md:pl-0;
+}
+
+.secondary-button {
+    @apply border-black border px-4 rounded-full md:hover:opacity-50 transition-opacity duration-500 font-serif font-bold md:text-xl h-8 md:h-9;
+}
+
+.primary-button {
+    @apply  bg-black text-white px-4 rounded-full md:hover:opacity-50 transition-opacity duration-500 font-serif font-bold md:text-xl h-8 md:h-9;
+}
