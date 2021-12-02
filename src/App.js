@@ -6,9 +6,7 @@ import About from "./components/About"
 import tw from "tailwind-styled-components"
 import ShowcaseContentList from "./components/ShowcaseContentList";
 import ShowcaseContent from "./components/ShowcaseContent";
-
-// const StyledNavLink = tw(NavLink)`text-m px-3 font-serif` DESKTOP
-const StyledNavLink = tw(NavLink)`text-m pr-3 md:pr-0 font-serif font-bold`
+// import { useState } from "react";
 
 // Different views: map and list
 
@@ -32,6 +30,7 @@ const content_array = [
 ]
 
 export default function App() {
+    const StyledNavLink = tw(NavLink)`text-m mr-3 md:mr-0 font-serif font-bold md:hover:opacity-50 transition-opacity duration-500 `
     return (
         <Router>
             <AppContainer>
@@ -40,14 +39,15 @@ export default function App() {
                 <StyledNavLink to="/browse">browse</StyledNavLink>
                 <StyledNavLink to="/list">list</StyledNavLink>
                 <StyledNavLink to="/about">about</StyledNavLink>
+                {/* <button className="text-m mr-3 md:mr-0 font-serif font-bold md:hover:opacity-50 duration-500 text-left" onClick={()=>{setAnim(!anim)}}>test-anim</button> */}
             </NavigationBar>
-            <Routes>
-                <Route path="/" element={<Home/>}/>
-                <Route path="/browse" element={<ShowcaseContent content_array={content_array}/>}/>
-                <Route path="/browse/:id" element={<ShowcaseContent content_array={content_array}/>}/>
-                <Route path="/list" element={<ShowcaseContentList content_array={content_array}/>}/>
-                <Route path="/about" element={<About/>}/>
-            </Routes>
+                <Routes>
+                    <Route path="/" element={<Home/>}/>
+                    <Route path="/browse" element={<ShowcaseContent content_array={content_array}/>}/>
+                    <Route path="/browse/:id" element={<ShowcaseContent content_array={content_array}/>}/>
+                    <Route path="/list" element={<ShowcaseContentList content_array={content_array}/>}/>
+                    <Route path="/about" element={<About/>}/>
+                </Routes>
             </AppContainer>
         </Router>
   )

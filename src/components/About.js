@@ -2,7 +2,9 @@ import React from 'react'
 
 function About() {
     return (
-        <div>About the project...</div>
+        <div className="page-margins">
+            About the project...
+        </div>
     )
 }
 
