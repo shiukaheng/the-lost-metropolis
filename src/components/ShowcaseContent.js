@@ -33,11 +33,9 @@ function ShowcaseContent({content_array}) {
                 {/* Navigating between different scans.. Todo swipe left and right for mobile. Hidden left and right arrows. Can use same animation for desktop. */}
                 <div className="flex-row gap-2 justify-between hidden md:flex items-center md:pb-20 md:pr-20">
                     <ArrowLeftIcon className="h-5 cursor-pointer hover:opacity-50 transition-opacity duration-500" onClick={()=>{
-                        setActiveIndex((i) => {
-                            const index = (i + 1) % content_array.length
-                            updateUrl(index)
-                            return index
-                        });
+                        const proposedIndex = (activeIndex + 1) % content_array.length
+                        updateUrl(proposedIndex)
+                        setActiveIndex(proposedIndex);
                     }
                         }></ArrowLeftIcon>
                     <div className="flex flex-row gap-2">
@@ -45,14 +43,12 @@ function ShowcaseContent({content_array}) {
                     </div>
                     {/* <button className="border-black border px-4 rounded-full md:hover:opacity-50 transition-opacity duration-500 font-serif font-bold text-s md:text-xl h-8 md:h-9">show all</button> */}
                     <ArrowRightIcon className="h-5 cursor-pointer hover:opacity-50 transition-opacity duration-500" onClick={()=>{
-                        setActiveIndex((i) => {
-                            var proposedIndex = (i - 1) % content_array.length
-                            if (proposedIndex < 0) {
-                                proposedIndex = content_array.length - 1
-                            }
-                            updateUrl(proposedIndex);
-                            return proposedIndex
-                        });}
+                        var proposedIndex = (activeIndex - 1) % content_array.length
+                        if (proposedIndex < 0) {
+                            proposedIndex = content_array.length - 1
+                        }
+                        updateUrl(proposedIndex)
+                        setActiveIndex(proposedIndex);}
                         }></ArrowRightIcon>
                 </div>
             </div> 
