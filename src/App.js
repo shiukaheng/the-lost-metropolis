@@ -1,26 +1,33 @@
-import { BrowserRouter as Router, Routes, Route, NavLink } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import NavigationBar from "./components/NavigationBar"
 import AppContainer from "./components/AppContainer"
 import Home from "./components/Home"
 import About from "./components/About"
-import tw from "tailwind-styled-components"
-import ShowcaseContentList from "./components/ShowcaseContentList";
-import ShowcaseContent from "./components/ShowcaseContent";
-// import MultilangDiv from "./components/MultilangDiv";
+import ListView from "./components/ListView";
+import ShowcaseView from "./components/ShowcaseView";
+import { useNavigate } from 'react-router-dom';
 // import { CSSTransition, TransitionGroup } from "react-transition-group";
-import { useState, createContext, useContext } from "react";
+import { useState, createContext } from "react";
+import randomHexColor from "random-hex-color"
+import MagicDiv from "./components/MagicDiv";
+import Background from "./components/Background";
 
 // Different views: map and list
 
-const ThemeContext = createContext({
+const defaultTheme = {
     background: "white",
     foreground: "black",
-    backgroundVideo: null
-})
+    backgroundVideo: null,
+    transitionDuration: 0.5
+}
 
-const SettingsContext = createContext({
+const defaultSettings = {
     lang: "en"
-})
+}
+
+const ThemeContext = createContext(defaultTheme)
+
+const SettingsContext = createContext(defaultSettings)
 
 const content_array = [
     {
@@ -49,47 +56,57 @@ const content_array = [
     }
 ]
 
-function MultiLangNavLink({...props }) {
-    const Settings = useContext(SettingsContext)
-    const { lang } = Settings
-    const StyledNavLink = tw(NavLink)`nav-button`
-    return (
-        <StyledNavLink {...props}>
-            {props.text[lang]}
-        </StyledNavLink>
-    )
+function MultiLangNavLink({text, to, ...props}) {
+    const navigate = useNavigate();
+    return <MagicDiv mergeTransitions={true} className={"nav-button"} languageSpecificChildren={text} onClick={()=>{
+        navigate(to)
+    }}/>
 }
 
 function App() {
-    const [theme, setTheme] = useState({
-        background: "white",
-        foreground: "black"
-    })
-    const [language, setLanguage] = useState("en")
+    // Theme defines the background color and foreground color, as well as the background video. It is not persistent between sessions and is defined by what content the user is viewing.
+    const [theme, setTheme] = useState(defaultTheme)
+    // Settings defines user preferences persistent between sessions.
+    const [settings, setSettings] = useState(defaultSettings)
     return (
-        <SettingsContext.Provider value={{ lang: language }}>
+        <SettingsContext.Provider value={settings}>
             <ThemeContext.Provider value={theme}>
                 <Router>
-                    <AppContainer>
-                    <NavigationBar>
-                        <MultiLangNavLink text={{"en": "home", "zh": "首頁"}} to="/"/>
-                        <MultiLangNavLink text={{"en": "browse", "zh": "瀏覽"}} to="/browse"/>
-                        <MultiLangNavLink text={{"en": "list", "zh": "列表"}} to="/list"/>
-                        <MultiLangNavLink text={{"en": "about", "zh": "關於"}} to="/about"/>
-                        <button className="nav-button" onClick={()=>{setLanguage((language === "en") ? "zh" : "en")}}>中／eng</button>
-                    </NavigationBar>
-                        <Routes>
-                            <Route path="/" element={<Home/>}/>
-                            <Route path="/browse" element={<ShowcaseContent content_array={content_array}/>}/>
-                            <Route path="/browse/:id" element={<ShowcaseContent content_array={content_array}/>}/>
-                            <Route path="/list" element={<ShowcaseContentList content_array={content_array}/>}/>
-                            <Route path="/about" element={<About/>}/>
-                        </Routes>
-                    </AppContainer>
+                    <div className="absolute w-full h-full">
+                        <Background/>
+                        <AppContainer>
+                            <NavigationBar>
+                                <MultiLangNavLink text={{"en": "home", "zh": "首頁"}} to="/"/>
+                                <MultiLangNavLink text={{"en": "browse", "zh": "瀏覽"}} to="/browse"/>
+                                <MultiLangNavLink text={{"en": "list", "zh": "列表"}} to="/list"/>
+                                <MultiLangNavLink text={{"en": "about", "zh": "關於"}} to="/about"/>
+                                <MagicDiv mergeTransitions={true} className="nav-button" onClick={()=>{setSettings(
+                                    oldSettings => ({
+                                        ...oldSettings,
+                                        lang: oldSettings.lang === "en" ? "zh" : "en"
+                                    })
+                                )}}>中／eng</MagicDiv>
+                                <MagicDiv mergeTransitions={true} className="nav-button" onClick={()=>{setTheme(
+                                    oldTheme => ({
+                                        ...oldTheme,
+                                        foreground: randomHexColor(),
+                                        background: randomHexColor()
+                                    })
+                                )}}>?!</MagicDiv>
+                            </NavigationBar>
+                            <Routes>
+                                <Route path="/" element={<Home/>}/>
+                                <Route path="/browse" element={<ShowcaseView content_array={content_array}/>}/>
+                                <Route path="/browse/:id" element={<ShowcaseView content_array={content_array}/>}/>
+                                <Route path="/list" element={<ListView content_array={content_array}/>}/>
+                                <Route path="/about" element={<About/>}/>
+                            </Routes>
+                        </AppContainer>
+                    </div>
                 </Router>
             </ThemeContext.Provider>
         </SettingsContext.Provider>
   )
 }
 
-export { App, ThemeContext as ColorThemeContext, SettingsContext }
+export { App, ThemeContext, SettingsContext }

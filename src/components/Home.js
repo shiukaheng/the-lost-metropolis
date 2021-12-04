@@ -1,14 +1,15 @@
 import React from 'react'
-import MultilangDiv from './MultilangDiv'
+import MagicDiv from './MagicDiv'
 
 function Home() {
     return (
-        <div className="page-margins">
-            <MultilangDiv className="font-extrabold text-6xl text-center" languageSpecificChild={{
+        <MagicDiv className="page-margins">
+            <MagicDiv autoColor={false} className="font-extrabold text-5xl md:text-6xl text-center" languageSpecificChildren={{
                 en: "explore hong kong’s lost urban spaces",
                 zh: "探索香港失落的城市空間"
             }}/>
-        </div>
+        </MagicDiv>
+        // 3D model of the city with hover effect to shine light on buildings
     )
 }
 

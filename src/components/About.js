@@ -1,10 +1,11 @@
 import React from 'react'
+import MagicDiv from './MagicDiv'
 
 function About() {
     return (
-        <div className="page-margins">
+        <MagicDiv className="page-margins">
             tbd...
-        </div>
+        </MagicDiv>
     )
 }
 

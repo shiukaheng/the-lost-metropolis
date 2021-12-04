@@ -1,11 +1,13 @@
-import ShowcaseContentCard from './ShowcaseContentCard';
-import { useState } from 'react';
+import ShowcaseContentCard from './ShowcaseCard';
+import { useState, useContext } from 'react';
 import {ArrowLeftIcon, ArrowRightIcon} from '@heroicons/react/outline';
 import SwipeableViews from 'react-swipeable-views';
 import { useParams } from 'react-router';
 import { useNavigate } from 'react-router-dom';
+import { ThemeContext } from '../App';
 
-function ShowcaseContent({content_array}) {
+function ShowcaseView({content_array}) {
+    const theme = useContext(ThemeContext);
     const { id } = useParams();
     const navigate = useNavigate();
     // If id is not null, match the id to the content array and setActiveIndex to the index of the content array
@@ -37,9 +39,12 @@ function ShowcaseContent({content_array}) {
                         updateUrl(proposedIndex)
                         setActiveIndex(proposedIndex);
                     }
-                        }></ArrowLeftIcon>
-                    <div className="flex flex-row gap-2">
-                        <div className="font-serif font-bold">{activeIndex + 1}/{content_array.length}</div>
+                        } style={{
+                            color: theme.foreground,
+                            transition: `color ${theme.transitionDuration}s`
+                        }}></ArrowLeftIcon>
+                    <div className="flex flex-row gap-2" style={{color: theme.foreground, transition: `color ${theme.transitionDuration}s`}}>
+                        <div className="font-serif font-bold select-none">{activeIndex + 1}/{content_array.length}</div>
                     </div>
                     {/* <button className="border-black border px-4 rounded-full md:hover:opacity-50 transition-opacity duration-500 font-serif font-bold text-s md:text-xl h-8 md:h-9">show all</button> */}
                     <ArrowRightIcon className="h-5 cursor-pointer hover:opacity-50 transition-opacity duration-500" onClick={()=>{
@@ -49,11 +54,14 @@ function ShowcaseContent({content_array}) {
                         }
                         updateUrl(proposedIndex)
                         setActiveIndex(proposedIndex);}
-                        }></ArrowRightIcon>
+                        } style={{
+                            color: theme.foreground,
+                            transition: `color ${theme.transitionDuration}s`
+                        }}></ArrowRightIcon>
                 </div>
             </div> 
         </div>
     );
 }
 
-export default ShowcaseContent;
+export default ShowcaseView;
