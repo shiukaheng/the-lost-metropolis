@@ -1,5 +1,6 @@
 import { SettingsContext, ThemeContext } from "../App"
 import { useContext, useLayoutEffect, useRef, useState } from "react"
+import { formatRGBCSS } from "../utilities"
 
 // Dynamically color div css attributes based on theme
 function MagicDiv({ languageSpecificChildren, style, foregroundColorCSSProps=["color", "borderColor"], backgroundColorCSSProps=[], children, className, mergeTransitions=false, autoColor=true, ...props }) {
@@ -20,13 +21,13 @@ function MagicDiv({ languageSpecificChildren, style, foregroundColorCSSProps=["c
     return (
         <div {...props} className={className} style={
             autoColor ? {
-                ...(Object.assign({}, ...backgroundColorCSSProps.map((val) => ({[val]: theme.background})))),
-                ...(Object.assign({}, ...foregroundColorCSSProps.map((val) => ({[val]: theme.foreground})))),
+                ...(Object.assign({}, ...backgroundColorCSSProps.map((val) => ({[val]: formatRGBCSS(theme.backgroundColor)})))),
+                ...(Object.assign({}, ...foregroundColorCSSProps.map((val) => ({[val]: formatRGBCSS(theme.foregroundColor)})))),
                 transition: mergeTransitions ? existingTransition+", "+additionalTransition : additionalTransition,
                 ...style
             } : {...style}
         }>
-            {[languageSpecificChildren!==undefined ? languageSpecificChildren[settings.lang] : children].concat(mergeTransitions ? [<div ref={div} className={className} style={{display: "none"}} />] : [])}
+            {[languageSpecificChildren!==undefined ? languageSpecificChildren[settings.lang] : children].concat(mergeTransitions ? [<div ref={div} className={className} style={{display: "none"}} />].map((elem, index) => (Object.assign({}, elem, {key: index}))) : [])}
         </div>
     );
 }

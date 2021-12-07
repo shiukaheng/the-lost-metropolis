@@ -8,15 +8,14 @@ import ShowcaseView from "./components/ShowcaseView";
 import { useNavigate } from 'react-router-dom';
 // import { CSSTransition, TransitionGroup } from "react-transition-group";
 import { useState, createContext } from "react";
-import randomHexColor from "random-hex-color"
 import MagicDiv from "./components/MagicDiv";
 import Background from "./components/Background";
 
 // Different views: map and list
 
 const defaultTheme = {
-    background: "white",
-    foreground: "black",
+    backgroundColor: [0, 0, 0],
+    foregroundColor: [255, 255, 255],
     backgroundVideo: null,
     transitionDuration: 0.5
 }
@@ -89,8 +88,8 @@ function App() {
                                 <MagicDiv mergeTransitions={true} className="nav-button" onClick={()=>{setTheme(
                                     oldTheme => ({
                                         ...oldTheme,
-                                        foreground: randomHexColor(),
-                                        background: randomHexColor()
+                                        foregroundColor: [0, 0, 0],
+                                        backgroundColor: [255, 255, 255]
                                     })
                                 )}}>?!</MagicDiv>
                             </NavigationBar>

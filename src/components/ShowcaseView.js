@@ -5,6 +5,7 @@ import SwipeableViews from 'react-swipeable-views';
 import { useParams } from 'react-router';
 import { useNavigate } from 'react-router-dom';
 import { ThemeContext } from '../App';
+import { formatRGBCSS } from '../utilities';
 
 function ShowcaseView({content_array}) {
     const theme = useContext(ThemeContext);
@@ -40,10 +41,10 @@ function ShowcaseView({content_array}) {
                         setActiveIndex(proposedIndex);
                     }
                         } style={{
-                            color: theme.foreground,
+                            color: formatRGBCSS(theme.foregroundColor),
                             transition: `color ${theme.transitionDuration}s`
                         }}></ArrowLeftIcon>
-                    <div className="flex flex-row gap-2" style={{color: theme.foreground, transition: `color ${theme.transitionDuration}s`}}>
+                    <div className="flex flex-row gap-2" style={{color: formatRGBCSS(theme.foregroundColor), transition: `color ${theme.transitionDuration}s`}}>
                         <div className="font-serif font-bold select-none">{activeIndex + 1}/{content_array.length}</div>
                     </div>
                     {/* <button className="border-black border px-4 rounded-full md:hover:opacity-50 transition-opacity duration-500 font-serif font-bold text-s md:text-xl h-8 md:h-9">show all</button> */}
@@ -55,7 +56,7 @@ function ShowcaseView({content_array}) {
                         updateUrl(proposedIndex)
                         setActiveIndex(proposedIndex);}
                         } style={{
-                            color: theme.foreground,
+                            color: formatRGBCSS(theme.foregroundColor),
                             transition: `color ${theme.transitionDuration}s`
                         }}></ArrowRightIcon>
                 </div>
