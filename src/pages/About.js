@@ -1,11 +1,11 @@
 import React from 'react'
-import MagicDiv from '../components/MagicDiv'
+import GenericPage from '../components/GenericPage'
 
 function About() {
     return (
-        <MagicDiv className="page-margins">
+        <GenericPage>
             tbd...
-        </MagicDiv>
+        </GenericPage>
     )
 }
 

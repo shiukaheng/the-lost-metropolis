@@ -3,9 +3,14 @@ import { CSSTransition, SwitchTransition } from "react-transition-group";
 
 const AnimatedSwitch = ({...props}) => {
     const location = useLocation();
+    var path = location.pathname
+    // Prevent the animation from triggering when under navigating in the browse directory, since it already has a sliding animation
+    if (path.split("/")[1]==="browse") {
+        path = "browse"
+    }
     return (
     <SwitchTransition component={null}>
-      <CSSTransition key={location.key} classNames="page-transition" timeout={500}>
+      <CSSTransition key={location.pathname.split("/")[1]} classNames="page-transition" timeout={250}>
         <Routes location={location}>
           {props.children}
         </Routes>

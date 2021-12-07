@@ -2,6 +2,21 @@ import { Canvas, useFrame } from "@react-three/fiber"
 import { useRef } from "react"
 import * as THREE from 'three'
 
+// Function that creates an array of random 3d positions of length n, normally distriubted around the origin
+function randomPositions(n, scale=1) {
+      const positions = []
+  for (let i = 0; i < n; i++) {
+    positions.push(new THREE.Vector3(
+      (Math.random() - 0.5)*scale,
+      (Math.random() - 0.5)*scale,
+      (Math.random() - 0.5)*scale
+    ))
+  }
+  return positions
+}
+
+const positions = randomPositions(20, 5)
+
 function TestCube({...props}) {
     return (
         <mesh position={props.position} rotation={props.rotation} scale={props.scale}>
@@ -22,15 +37,19 @@ function RigFollowsMouse({rigRef}) {
 
 function HighlightViewport({...props}) {
     const rigRef = useRef(null)
-    return ( 
-        <Canvas>
+    return (
+        <div {...props}>
+            <Canvas>
             <RigFollowsMouse rigRef={rigRef}/>
             <group ref={rigRef}>
-                <TestCube/>
-                <TestCube position={[1.5,1.5,1]}/>
-                <TestCube position={[0,1.5,0]}/>
+                {
+                    positions.map((position, i) => (
+                        <TestCube key={i} position={position}/>
+                    ))
+                }
             </group>
-        </Canvas>
+            </Canvas>
+        </div>
     );
 }
 
