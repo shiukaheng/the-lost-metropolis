@@ -1,5 +1,5 @@
 import React from 'react'
-import MagicDiv from './MagicDiv'
+import MagicDiv from '../components/MagicDiv'
 
 function About() {
     return (

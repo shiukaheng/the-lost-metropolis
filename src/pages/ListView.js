@@ -4,7 +4,7 @@ import tw from 'tailwind-styled-components';
 import { useNavigate } from 'react-router-dom';
 import { useContext } from 'react';
 import { SettingsContext } from "../App";
-import MagicDiv from './MagicDiv';
+import MagicDiv from '../components/MagicDiv';
 
 const StyledRow = tw.tr`border-b border-t border-current md:hover:opacity-50 transition-opacity duration-500 cursor-pointer table-row`
 const StyledCell = tw.td`text-left font-serif md:text-lg font-semibold pt-2 pb-6 table-cell`

@@ -1,18 +1,17 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import NavigationBar from "./components/NavigationBar"
 import AppContainer from "./components/AppContainer"
-import Home from "./components/Home"
-import About from "./components/About"
-import ListView from "./components/ListView";
-import ShowcaseView from "./components/ShowcaseView";
 import { useNavigate } from 'react-router-dom';
-// import { CSSTransition, TransitionGroup } from "react-transition-group";
 import { useState, createContext } from "react";
 import MagicDiv from "./components/MagicDiv";
 import Background from "./components/Background";
 import AnimatedSwitch from "./components/AnimatedSwitch";
 
-// Different views: map and list
+// All pages
+import Home from "./pages/Home"
+import ShowcaseView from "./pages/ShowcaseView";
+import ListView from "./pages/ListView";
+import About from "./pages/About"
 
 const defaultTheme = {
     backgroundColor: [0, 0, 0],

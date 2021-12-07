@@ -1,4 +1,4 @@
-import ShowcaseContentCard from './ShowcaseCard';
+import ShowcaseContentCard from '../components/ShowcaseCard';
 import { useState, useContext } from 'react';
 import {ArrowLeftIcon, ArrowRightIcon} from '@heroicons/react/outline';
 import SwipeableViews from 'react-swipeable-views';
@@ -36,10 +36,12 @@ function ShowcaseView({content_array}) {
                 {/* Navigating between different scans.. Todo swipe left and right for mobile. Hidden left and right arrows. Can use same animation for desktop. */}
                 <div className="flex-row gap-2 justify-between hidden md:flex items-center md:pb-20 md:pr-20">
                     <ArrowLeftIcon className="h-5 cursor-pointer hover:opacity-50 transition-opacity duration-500" onClick={()=>{
-                        const proposedIndex = (activeIndex + 1) % content_array.length
+                        var proposedIndex = (activeIndex - 1) % content_array.length
+                        if (proposedIndex < 0) {
+                            proposedIndex = content_array.length - 1
+                        }
                         updateUrl(proposedIndex)
-                        setActiveIndex(proposedIndex);
-                    }
+                        setActiveIndex(proposedIndex);}
                         } style={{
                             color: formatRGBCSS(theme.foregroundColor),
                             transition: `color ${theme.transitionDuration}s`
@@ -48,13 +50,11 @@ function ShowcaseView({content_array}) {
                         <div className="font-serif font-bold select-none">{activeIndex + 1}/{content_array.length}</div>
                     </div>
                     {/* <button className="border-black border px-4 rounded-full md:hover:opacity-50 transition-opacity duration-500 font-serif font-bold text-s md:text-xl h-8 md:h-9">show all</button> */}
-                    <ArrowRightIcon className="h-5 cursor-pointer hover:opacity-50 transition-opacity duration-500" onClick={()=>{
-                        var proposedIndex = (activeIndex - 1) % content_array.length
-                        if (proposedIndex < 0) {
-                            proposedIndex = content_array.length - 1
-                        }
+                     <ArrowRightIcon className="h-5 cursor-pointer hover:opacity-50 transition-opacity duration-500" onClick={()=>{
+                        const proposedIndex = (activeIndex + 1) % content_array.length
                         updateUrl(proposedIndex)
-                        setActiveIndex(proposedIndex);}
+                        setActiveIndex(proposedIndex);
+                    }
                         } style={{
                             color: formatRGBCSS(theme.foregroundColor),
                             transition: `color ${theme.transitionDuration}s`
