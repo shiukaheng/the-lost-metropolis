@@ -1,53 +1,41 @@
 import { Canvas, useFrame } from "@react-three/fiber"
-import { useRef } from "react"
+import { useRef, useContext } from "react"
 import * as THREE from 'three'
+import { PotreeManager } from "./3d/PotreeManager"
+import { useContextBridge } from "@react-three/drei"
+import { CursorDataContext } from "../App"
 
-// Function that creates an array of random 3d positions of length n, normally distriubted around the origin
-function randomPositions(n, scale=1) {
-      const positions = []
-  for (let i = 0; i < n; i++) {
-    positions.push(new THREE.Vector3(
-      (Math.random() - 0.5)*scale,
-      (Math.random() - 0.5)*scale,
-      (Math.random() - 0.5)*scale
-    ))
-  }
-  return positions
-}
-
-const positions = randomPositions(20, 5)
-
-function TestCube({...props}) {
-    return (
-        <mesh position={props.position} rotation={props.rotation} scale={props.scale}>
-            <boxGeometry args={[1, 1, 1]}/>
-            <meshBasicMaterial color="hotpink" wireframe={true}/>
-        </mesh>
-    );
-}
-
-function RigFollowsMouse({rigRef}) {
+function FollowMouse({object, posOffsetIntensity=[1, 1], rotOffsetIntensity=[0, 0], lambda=2, captureMode="window"}) {
+    const cursorData = useContext(CursorDataContext)
     return useFrame((state, delta) => {
         const {mouse} = state
-        const rig = rigRef.current
+        const rig = object.current
         if (!rig) return
-        rig.position.set(THREE.MathUtils.damp(rig.position.x, mouse.x, 2, delta), THREE.MathUtils.damp(rig.position.y, mouse.y, 2, delta), 0)
+        var [x, y] = [0, 0]
+        if (captureMode === "canvas") {
+            [x, y] = [mouse.x, mouse.y]
+        } else if (captureMode === "window") {
+            [x, y] = [cursorData.x, cursorData.y]
+        }
+        rig.position.set(THREE.MathUtils.damp(rig.position.x, x*posOffsetIntensity[0], lambda, delta), THREE.MathUtils.damp(rig.position.y, y*posOffsetIntensity[1], lambda, delta), 0)
+        rig.rotation.set(THREE.MathUtils.damp(rig.rotation.x, -y*rotOffsetIntensity[0], lambda, delta), THREE.MathUtils.damp(rig.rotation.y, -x*rotOffsetIntensity[1], lambda, delta), 0)
     })
 }
 
-function HighlightViewport({...props}) {
+function HighlightViewport({children, posOffsetIntensity=[1, 1], rotOffsetIntensity=[0, 0], lambda=2, captureMode="window", ...props}) {
     const rigRef = useRef(null)
+    const ContextBridge = useContextBridge(CursorDataContext)
     return (
         <div {...props}>
             <Canvas>
-            <RigFollowsMouse rigRef={rigRef}/>
-            <group ref={rigRef}>
-                {
-                    positions.map((position, i) => (
-                        <TestCube key={i} position={position}/>
-                    ))
-                }
-            </group>
+                <ContextBridge>
+                    <PotreeManager pointBudget={1000000}>
+                        <FollowMouse object={rigRef} posOffsetIntensity={posOffsetIntensity} rotOffsetIntensity={rotOffsetIntensity} lambda={lambda} captureMode={captureMode}/>
+                        <group ref={rigRef}>
+                            {children}
+                        </group>
+                    </PotreeManager>
+                </ContextBridge>
             </Canvas>
         </div>
     );

@@ -1,8 +1,8 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Route } from "react-router-dom";
 import NavigationBar from "./components/NavigationBar"
 import AppContainer from "./components/AppContainer"
 import { useNavigate } from 'react-router-dom';
-import { useState, createContext } from "react";
+import { useState, createContext, useEffect } from "react";
 import MagicDiv from "./components/MagicDiv";
 import Background from "./components/Background";
 import AnimatedSwitch from "./components/AnimatedSwitch";
@@ -24,9 +24,26 @@ const defaultSettings = {
     lang: "en"
 }
 
+// const defaultSensorData = {
+//     relativeOrientationAvailable: false,
+//     relativeOrientationMatrix: null
+// }
+
+const defaultCursorData = {
+    x: 0,
+    y: 0
+}
+
 const ThemeContext = createContext(defaultTheme)
 
 const SettingsContext = createContext(defaultSettings)
+
+// const SensorDataContext = createContext(defaultSensorData)
+
+// const options = { frequency: 60, referenceFrame: 'device' };
+// const sensor = new RelativeOrientationSensor(options);
+
+const CursorDataContext = createContext(defaultCursorData)
 
 const content_array = [
     {
@@ -84,45 +101,63 @@ function App() {
     const [theme, setTheme] = useState(defaultTheme)
     // Settings defines user preferences persistent between sessions.
     const [settings, setSettings] = useState(defaultSettings)
+    const [cursorData, setCursorData] = useState(defaultCursorData)
+    // set cursorData with listener on body element
+    useEffect(() => {
+        const body = document.querySelector("body")
+        const mouseMoveHandler = (e) => {
+            const newData = {
+                x: (e.clientX/(window.innerWidth)-0.5)*2,
+                y: -(e.clientY/(window.innerHeight)-0.5)*2
+            }
+            setCursorData(newData)
+        }
+        body.addEventListener("mousemove", mouseMoveHandler)
+        return () => {
+            body.removeEventListener("mousemove", mouseMoveHandler)
+        }
+    }, [])
     return (
-        <SettingsContext.Provider value={settings}>
-            <ThemeContext.Provider value={theme}>
-                <Router>
-                    <div className="absolute w-full h-full">
-                        <Background/>
-                        <AppContainer>
-                            <NavigationBar>
-                                <MultiLangNavLink text={{"en": "home", "zh": "首頁"}} to="/"/>
-                                <MultiLangNavLink text={{"en": "browse", "zh": "瀏覽"}} to="/browse"/>
-                                <MultiLangNavLink text={{"en": "list", "zh": "列表"}} to="/list"/>
-                                <MultiLangNavLink text={{"en": "about", "zh": "關於"}} to="/about"/>
-                                <MagicDiv mergeTransitions={true} className="nav-button" onClick={()=>{setSettings(
-                                    oldSettings => ({
-                                        ...oldSettings,
-                                        lang: oldSettings.lang === "en" ? "zh" : "en"
-                                    })
-                                )}}>中／eng</MagicDiv>
-                                <MagicDiv mergeTransitions={true} className="nav-button" onClick={()=>{setTheme(
-                                    oldTheme => ({
-                                        ...oldTheme,
-                                        foregroundColor: oldTheme.backgroundColor,
-                                        backgroundColor: oldTheme.foregroundColor
-                                    })
-                                )}}>?!</MagicDiv>
-                            </NavigationBar>
-                            <AnimatedSwitch>
-                                <Route path="/" element={<Home/>}/>
-                                <Route path="/browse" element={<ShowcaseView content_array={content_array}/>}/>
-                                <Route path="/browse/:id" element={<ShowcaseView content_array={content_array}/>}/>
-                                <Route path="/list" element={<ListView content_array={content_array}/>}/>
-                                <Route path="/about" element={<About/>}/>
-                            </AnimatedSwitch>
-                        </AppContainer>
-                    </div>
-                </Router>
-            </ThemeContext.Provider>
-        </SettingsContext.Provider>
+        <CursorDataContext.Provider value={cursorData}>
+            <SettingsContext.Provider value={settings}>
+                <ThemeContext.Provider value={theme}>
+                    <Router>
+                        <div className="absolute w-full h-full">
+                            <Background/>
+                            <AppContainer>
+                                <NavigationBar>
+                                    <MultiLangNavLink text={{"en": "home", "zh": "首頁"}} to="/"/>
+                                    <MultiLangNavLink text={{"en": "browse", "zh": "瀏覽"}} to="/browse"/>
+                                    <MultiLangNavLink text={{"en": "list", "zh": "列表"}} to="/list"/>
+                                    <MultiLangNavLink text={{"en": "about", "zh": "關於"}} to="/about"/>
+                                    <MagicDiv mergeTransitions={true} className="nav-button" onClick={()=>{setSettings(
+                                        oldSettings => ({
+                                            ...oldSettings,
+                                            lang: oldSettings.lang === "en" ? "zh" : "en"
+                                        })
+                                    )}}>中／eng</MagicDiv>
+                                    <MagicDiv mergeTransitions={true} className="nav-button" onClick={()=>{setTheme(
+                                        oldTheme => ({
+                                            ...oldTheme,
+                                            foregroundColor: oldTheme.backgroundColor,
+                                            backgroundColor: oldTheme.foregroundColor
+                                        })
+                                    )}}>?!</MagicDiv>
+                                </NavigationBar>
+                                <AnimatedSwitch>
+                                    <Route path="/" element={<Home/>}/>
+                                    <Route path="/browse" element={<ShowcaseView content_array={content_array}/>}/>
+                                    <Route path="/browse/:id" element={<ShowcaseView content_array={content_array}/>}/>
+                                    <Route path="/list" element={<ListView content_array={content_array}/>}/>
+                                    <Route path="/about" element={<About/>}/>
+                                </AnimatedSwitch>
+                            </AppContainer>
+                        </div>
+                    </Router>
+                </ThemeContext.Provider>
+            </SettingsContext.Provider>
+        </CursorDataContext.Provider>
   )
 }
 
-export { App, ThemeContext, SettingsContext }
+export { App, ThemeContext, SettingsContext, CursorDataContext }
