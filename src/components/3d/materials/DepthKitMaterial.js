@@ -1,5 +1,8 @@
 import { extend } from "@react-three/fiber";
 import * as THREE from "three";
+import rgbdVert from "../shaders/rgbd.vert";
+import rgbdFrag from "../shaders/rgbd.frag";
+import { VERTS_TALL, VERTS_WIDE } from "../DepthKitObject";
 
 export default class DepthKitMaterial extends THREE.ShaderMaterial {
     constructor() {
