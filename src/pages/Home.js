@@ -8,7 +8,8 @@ function Home() {
     return (
         <GenericPage className="relative w-full h-full overflow-x-hidden flex flex-col gap-4">
             <HighlightViewport className="absolute w-full h-full overflow-hidden flex-grow">
-                <PotreeObject scale={[0.9, 0.9, 0.9]} rotation={[0, 0, 0]} position={[-10, -3 , 12]} baseUrl={"https://tlmhk.synology.me/data/BigShot/"}/>
+                <PotreeObject pointSizeType={0} pointSize={1} scale={[0.9, 0.9, 0.9]} rotation={[0, 0, 0]} position={[-10, -3 , 12]} baseUrl={"https://tlmhk.synology.me/data/BigShot/"}/>
+                {/* <PotreeObject pointSizeType={0} pointSize={1} baseUrl={"https://cdn.rawgit.com/potree/potree/develop/pointclouds/lion_takanawa/"}/> */}
             </HighlightViewport>
             <MagicDiv autoColor={false} className="absolute w-full h-full font-extrabold text-5xl md:text-6xl text-center pointer-events-none" languageSpecificChildren={{
                 en: "explore hong kong’s lost urban spaces",
