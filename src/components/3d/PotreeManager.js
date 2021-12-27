@@ -2,12 +2,13 @@ import { Potree } from '@pnext/three-loader';
 import { useFrame } from '@react-three/fiber';
 import { createContext, useEffect, useRef } from 'react';
 const PotreeContext = createContext(null)
-const defaultPointBudget = 10000000
+const defaultPointBudget = 100000
 
 function PotreeManager({pointBudget=defaultPointBudget, children, ...props}) {
     // Using useRef to maintain non-state variable across renders
     const {current: potree} = useRef(new Potree())
     const {current: pointClouds} = useRef([])
+    window.pointclouds = pointClouds
     useFrame((state, delta) => {
         potree.updatePointClouds(pointClouds, state.camera, state.gl)
     })
