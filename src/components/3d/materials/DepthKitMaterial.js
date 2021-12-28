@@ -4,7 +4,7 @@ import rgbdVert from "../shaders/rgbd.vert";
 import rgbdFrag from "../shaders/rgbd.frag";
 import { VERTS_TALL, VERTS_WIDE } from "../DepthKitObject";
 
-export default class DepthKitMaterial extends THREE.ShaderMaterial {
+class DepthKitMaterial extends THREE.ShaderMaterial {
     constructor() {
         super({
             uniforms: {
@@ -68,6 +68,7 @@ export default class DepthKitMaterial extends THREE.ShaderMaterial {
             transparent: true
         })
         this.side = THREE.DoubleSide
+        window.mat = this
     }
     get videoTexture() {
         return this.uniforms.map.value
@@ -161,4 +162,4 @@ export default class DepthKitMaterial extends THREE.ShaderMaterial {
     }
 }
 
-extend({DepthKitMaterial})
+export default DepthKitMaterial

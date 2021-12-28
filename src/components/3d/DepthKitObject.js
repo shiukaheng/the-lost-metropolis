@@ -1,26 +1,37 @@
-import { useLoader } from "@react-three/fiber";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { extend, useLoader } from "@react-three/fiber";
+import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
+import DepthKitMaterial from "./materials/DepthKitMaterial";
 
 //For building the geomtery
 const VERTS_WIDE = 256;
 const VERTS_TALL = 256;
 
 var geometry = undefined
+buildGeometry()
+
+extend({ DepthKitMaterial });
 
 function DepthKitObject({videoUrl="", metaUrl="", posterUrl="", autoplay=true, loop=false, muted=true, ...props}) {
     const mesh = useRef(null);
-    const [video, setVideo] = useState(null);
     // Create video element
-    useLayoutEffect(() => {
-        setVideo(document.createElement("video"));
+    function createVideoElement(videoUrl) {
+        const video = document.createElement("video");
         video.crossOrigin = "anonymous"
         video.setAttribute('crossorigin', 'anonymous');
         video.setAttribute('webkit-playsinline', 'webkit-playsinline');
         video.setAttribute('playsinline', 'playsinline');
-        video.src = videoUrl
-        video.load()
-    }, [videoUrl])
+        return video
+    }
+    const [video] = useState(createVideoElement(videoUrl))
+    // Change video source dynamically
+    useEffect(() => {
+        if (videoUrl) {
+            video.src = videoUrl
+            video.load()
+            window.video = video
+        }
+    }, [video, videoUrl])
     // Make poster url reactive 
     useEffect(() => {
         if (video) {
@@ -39,12 +50,13 @@ function DepthKitObject({videoUrl="", metaUrl="", posterUrl="", autoplay=true, l
     const metaInf = useLoader(THREE.FileLoader, metaUrl, (loader)=>{
         loader.setResponseType('json')
     })
-    const [geometry] = useState(()=>{
-        if (!geometry) {
-            buildGeometry()
-        }
-        return geometry
-    })
+    // TODO: make geometry dynamically generated again
+    // const [geometry] = useState(()=>{
+    //     if (!geometry) {
+    //         buildGeometry()
+    //     }
+    //     return geometry
+    // })
     return (
         <mesh ref={mesh} geometry={geometry} {...props}>
             <depthKitMaterial {...{
@@ -55,7 +67,8 @@ function DepthKitObject({videoUrl="", metaUrl="", posterUrl="", autoplay=true, l
                 focalLength: metaInf.depthFocalLength,
                 principalPoint: metaInf.depthPrincipalPoint,
                 imageDimensions: metaInf.depthImageSize,
-                crop: metaInf.crop
+                crop: metaInf.crop,
+                extrinsics: metaInf.extrinsics
             }}>
                 <videoTexture attach="videoTexture" args={[video]} minFilter={THREE.NearestFilter} magFilter={THREE.LinearFilter} format={THREE.RGBFormat} generateMipmaps={false}/>
             </depthKitMaterial>

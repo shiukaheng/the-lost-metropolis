@@ -1,5 +1,5 @@
 import { Canvas, useFrame } from "@react-three/fiber"
-import { useRef, useContext } from "react"
+import { useRef, useContext, useEffect, useLayoutEffect } from "react"
 import * as THREE from 'three'
 import { PotreeManager } from "./3d/PotreeManager"
 import { useContextBridge } from "@react-three/drei"
