@@ -11,7 +11,7 @@ varying vec3 vPos;
 
 void main() {
 
-    if ( visibility < 0.9 ) discard;
+    if ( visibility < 0.8 ) discard;
 
     vec4 color = texture2D(map, vUv);
     color.w = opacity;

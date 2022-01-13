@@ -4,6 +4,8 @@ import rgbdVert from "../shaders/rgbd.vert";
 import rgbdFrag from "../shaders/rgbd.frag";
 import { VERTS_TALL, VERTS_WIDE } from "../DepthKitObject";
 
+window.materials = []
+
 class DepthKitMaterial extends THREE.ShaderMaterial {
     constructor() {
         super({
@@ -68,7 +70,7 @@ class DepthKitMaterial extends THREE.ShaderMaterial {
             transparent: true
         })
         this.side = THREE.DoubleSide
-        window.mat = this
+        window.materials.push(this)
     }
     get videoTexture() {
         return this.uniforms.map.value
@@ -135,29 +137,29 @@ class DepthKitMaterial extends THREE.ShaderMaterial {
     get extrinsics() {
         return {
             e00: this.uniforms.extrinsics.value.elements[0],
-            e01: this.uniforms.extrinsics.value.elements[1],
-            e02: this.uniforms.extrinsics.value.elements[2],
-            e03: this.uniforms.extrinsics.value.elements[3],
-            e10: this.uniforms.extrinsics.value.elements[4],
+            e10: this.uniforms.extrinsics.value.elements[1],
+            e20: this.uniforms.extrinsics.value.elements[2],
+            e30: this.uniforms.extrinsics.value.elements[3],
+            e01: this.uniforms.extrinsics.value.elements[4],
             e11: this.uniforms.extrinsics.value.elements[5],
-            e12: this.uniforms.extrinsics.value.elements[6],
-            e13: this.uniforms.extrinsics.value.elements[7],
-            e20: this.uniforms.extrinsics.value.elements[8],
-            e21: this.uniforms.extrinsics.value.elements[9],
+            e21: this.uniforms.extrinsics.value.elements[6],
+            e31: this.uniforms.extrinsics.value.elements[7],
+            e02: this.uniforms.extrinsics.value.elements[8],
+            e12: this.uniforms.extrinsics.value.elements[9],
             e22: this.uniforms.extrinsics.value.elements[10],
-            e23: this.uniforms.extrinsics.value.elements[11],
-            e30: this.uniforms.extrinsics.value.elements[12],
-            e31: this.uniforms.extrinsics.value.elements[13],
-            e32: this.uniforms.extrinsics.value.elements[14],
+            e32: this.uniforms.extrinsics.value.elements[11],
+            e03: this.uniforms.extrinsics.value.elements[12],
+            e13: this.uniforms.extrinsics.value.elements[13],
+            e23: this.uniforms.extrinsics.value.elements[14],
             e33: this.uniforms.extrinsics.value.elements[15]
         }
     }
     set extrinsics(extrinsics) {
         this.uniforms.extrinsics.value.set(
-            extrinsics.e00, extrinsics.e01, extrinsics.e02, extrinsics.e03,
-            extrinsics.e10, extrinsics.e11, extrinsics.e12, extrinsics.e13,
-            extrinsics.e20, extrinsics.e21, extrinsics.e22, extrinsics.e23,
-            extrinsics.e30, extrinsics.e31, extrinsics.e32, extrinsics.e33
+            extrinsics.e00, extrinsics.e10, extrinsics.e20, extrinsics.e30,
+            extrinsics.e01, extrinsics.e11, extrinsics.e21, extrinsics.e31,
+            extrinsics.e02, extrinsics.e12, extrinsics.e22, extrinsics.e32,
+            extrinsics.e03, extrinsics.e13, extrinsics.e23, extrinsics.e33
         )
     }
 }

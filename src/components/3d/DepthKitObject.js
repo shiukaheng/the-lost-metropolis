@@ -1,5 +1,5 @@
 import { extend, useLoader } from "@react-three/fiber";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import DepthKitMaterial from "./materials/DepthKitMaterial";
 
@@ -7,23 +7,24 @@ import DepthKitMaterial from "./materials/DepthKitMaterial";
 const VERTS_WIDE = 256;
 const VERTS_TALL = 256;
 
-var geometry = undefined
-buildGeometry()
-
-extend({ DepthKitMaterial });
+extend({ DepthKitMaterial });   
 
 function DepthKitObject({videoUrl="", metaUrl="", posterUrl="", autoplay=true, loop=false, muted=true, ...props}) {
     const mesh = useRef(null);
-    // Create video element
+    const material = useRef(null)
+    // Create geometry
+    const [geometry, setGeometry] = useState(()=>{console.log("built geometry"); return buildGeometry(VERTS_WIDE, VERTS_TALL)});
+    // Create video element 
     function createVideoElement(videoUrl) {
         const video = document.createElement("video");
         video.crossOrigin = "anonymous"
         video.setAttribute('crossorigin', 'anonymous');
         video.setAttribute('webkit-playsinline', 'webkit-playsinline');
         video.setAttribute('playsinline', 'playsinline');
+        console.log(video)
         return video
     }
-    const [video] = useState(createVideoElement(videoUrl))
+    const [video] = useState(()=>createVideoElement(videoUrl))
     // Change video source dynamically
     useEffect(() => {
         if (videoUrl) {
@@ -46,91 +47,61 @@ function DepthKitObject({videoUrl="", metaUrl="", posterUrl="", autoplay=true, l
             video.muted = muted
         }
     }, [video, autoplay, loop, muted])
+
     // Load meta info
     const metaInf = useLoader(THREE.FileLoader, metaUrl, (loader)=>{
         loader.setResponseType('json')
     })
-    // TODO: make geometry dynamically generated again
-    // const [geometry] = useState(()=>{
-    //     if (!geometry) {
-    //         buildGeometry()
-    //     }
-    //     return geometry
-    // })
+
     return (
-        <mesh ref={mesh} geometry={geometry} {...props}>
-            <depthKitMaterial {...{
+        <mesh ref={mesh} geometry={geometry} frustumCulled={false} {...props}>
+            <depthKitMaterial ref={material} attach="material" 
+                {...{
                 width: metaInf.textureWidth,
                 height: metaInf.textureHeight,
                 mindepth: metaInf.nearClip,
                 maxdepth: metaInf.farClip,
-                focalLength: metaInf.depthFocalLength,
-                principalPoint: metaInf.depthPrincipalPoint,
-                imageDimensions: metaInf.depthImageSize,
-                crop: metaInf.crop,
+                focalLength: [metaInf.depthFocalLength.x, metaInf.depthFocalLength.y],
+                principalPoint: [metaInf.depthPrincipalPoint.x, metaInf.depthPrincipalPoint.y],
+                imageDimensions: [metaInf.depthImageSize.x, metaInf.depthImageSize.y],
+                crop: [metaInf.crop.x, metaInf.crop.y, metaInf.crop.z, metaInf.crop.w],
                 extrinsics: metaInf.extrinsics
-            }}>
+                }}
+            >
                 <videoTexture attach="videoTexture" args={[video]} minFilter={THREE.NearestFilter} magFilter={THREE.LinearFilter} format={THREE.RGBFormat} generateMipmaps={false}/>
             </depthKitMaterial>
         </mesh>
     );
 }
 
-// function buildGeometry() {
-//     geometry = new THREE.Geometry();
-
-//     for (let y = 0; y < VERTS_TALL; y++) {
-//         for (let x = 0; x < VERTS_WIDE; x++) {
-//             geometry.vertices.push(new THREE.Vector3(x, y, 0));
-//         }
-//     }
-//     for (let y = 0; y < VERTS_TALL - 1; y++) {
-//         for (let x = 0; x < VERTS_WIDE - 1; x++) {
-//             geometry.faces.push(
-//                 new THREE.Face3(
-//                     x + y * VERTS_WIDE,
-//                     x + (y + 1) * VERTS_WIDE,
-//                     (x + 1) + y * (VERTS_WIDE)
-//                 ));
-//             geometry.faces.push(
-//                 new THREE.Face3(
-//                     x + 1 + y * VERTS_WIDE,
-//                     x + (y + 1) * VERTS_WIDE,
-//                     (x + 1) + (y + 1) * (VERTS_WIDE)
-//                 ));
-//         }
-//     }
-// }
-
-// TODO: Update to use BufferGeometry instead of Geometry
-function buildGeometry() {
-    geometry = new THREE.BufferGeometry();
-    const positions = new Float32Array(VERTS_WIDE * VERTS_TALL * 3);
-    const uvs = new Float32Array(VERTS_WIDE * VERTS_TALL * 2);
-    const index = new Uint32Array(VERTS_WIDE * VERTS_TALL * 6);
+function buildGeometry(verts_wide, verts_tall) {
+    var geometry = new THREE.BufferGeometry();
+    const positions = new Float32Array(verts_wide * verts_tall * 3);
+    const uvs = new Float32Array(verts_wide * verts_tall * 2);
+    const index = new Uint32Array(verts_wide * verts_tall * 6);
     let i = 0;
     let j = 0;
-    for (let y = 0; y < VERTS_TALL; y++) {
-        for (let x = 0; x < VERTS_WIDE; x++) {
+    for (let y = 0; y < verts_tall; y++) {
+        for (let x = 0; x < verts_wide; x++) {
             positions[i + 0] = x;
             positions[i + 1] = y;
             positions[i + 2] = 0;
-            uvs[j + 0] = x / (VERTS_WIDE - 1);
-            uvs[j + 1] = y / (VERTS_TALL - 1);
+            uvs[j + 0] = x / (verts_wide - 1);
+            uvs[j + 1] = y / (verts_tall - 1);
             i += 3;
             j += 2;
         }
     }
     i = 0;
     j = 0;
-    for (let y = 0; y < VERTS_TALL - 1; y++) {
-        for (let x = 0; x < VERTS_WIDE - 1; x++) {
-            index[i + 0] = x + y * VERTS_WIDE;
-            index[i + 1] = x + (y + 1) * VERTS_WIDE;
-            index[i + 2] = (x + 1) + y * VERTS_WIDE;
-            index[i + 3] = (x + 1) + y * VERTS_WIDE;
-            index[i + 4] = x + (y + 1) * VERTS_WIDE;
-            index[i + 5] = (x + 1) + (y + 1) * VERTS_WIDE;
+    for (let y = 0; y < verts_tall - 1; y++) {
+        for (let x = 0; x < verts_wide - 1; x++) {
+            index[i + 0] = x + y * verts_wide;
+            index[i + 1] = x + (y + 1) * verts_wide;
+            index[i + 2] = (x + 1) + y * verts_wide;
+            index[i + 3] = (x + 1) + y * verts_wide;
+            index[i + 4] = x + (y + 1) * verts_wide;
+            index[i + 5] = (x + 1) + (y + 1) * verts_wide;
             i += 6;
             j += 4;
         }
@@ -138,6 +109,7 @@ function buildGeometry() {
     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     geometry.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
     geometry.setIndex(new THREE.BufferAttribute(index, 1));
+    return geometry
 }
 
 export {DepthKitObject, VERTS_TALL, VERTS_WIDE};
