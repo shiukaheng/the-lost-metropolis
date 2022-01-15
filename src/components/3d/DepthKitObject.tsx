@@ -1,7 +1,7 @@
 import { extend, useLoader } from "@react-three/fiber";
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
-import DepthKitMaterial from "../3d/materials/DepthKitMaterial";
+import DepthKitMaterial from "./materials/DepthKitMaterial";
 
 const VERTS_WIDE = 256;
 const VERTS_TALL = 256;

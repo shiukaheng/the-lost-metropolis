@@ -1,5 +1,5 @@
-import { ReactComponent as ChiLogo } from './assets/chilogo.svg';
-import { ReactComponent as EngLogo } from './assets/englogo.svg';
+import ChiLogo from "./svgs/chilogo.svg";
+import EngLogo from "./svgs/englogo.svg";
 import { ThemeContext } from "./App"
 import { useContext } from 'react';
 import { formatRGBCSS } from '../utilities';
