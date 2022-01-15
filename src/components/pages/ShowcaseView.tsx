@@ -1,11 +1,11 @@
-import ShowcaseContentCard from '../components/ShowcaseCard';
+import ShowcaseContentCard from '../ShowcaseCard';
 import { useState, useContext } from 'react';
 import {ArrowLeftIcon, ArrowRightIcon} from '@heroicons/react/outline';
 import SwipeableViews from 'react-swipeable-views';
 import { useParams } from 'react-router';
 import { useNavigate } from 'react-router-dom';
 import { ThemeContext } from '../App';
-import { formatRGBCSS } from '../utilities';
+import { formatRGBCSS } from '../../utilities';
 
 function ShowcaseView({content_array}) {
     const theme = useContext(ThemeContext);

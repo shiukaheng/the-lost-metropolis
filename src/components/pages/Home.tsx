@@ -1,10 +1,10 @@
 import React, { Suspense } from 'react'
-import MagicDiv from '../components/MagicDiv'
-import HighlightViewport from '../components/HighlightViewport'
-import GenericPage from '../components/GenericPage'
-import PotreeObject from '../components/3d/PotreeObject'
-import { DepthKitObject } from "../components/3d/DepthKitObject"
-import TestObject from '../components/3d/TestObject'
+import MagicDiv from '../MagicDiv'
+import HighlightViewport from '../HighlightViewport'
+import GenericPage from '../GenericPage'
+import PotreeObject from '../3d/PotreeObject'
+import { DepthKitObject } from "../3d/DepthKitObject"
+import TestObject from '../3d/TestObject'
 
 function Home() {
     return (
