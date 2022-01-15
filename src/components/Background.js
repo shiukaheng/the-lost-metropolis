@@ -1,4 +1,4 @@
-import { ThemeContext } from "../App";
+import { ThemeContext } from "./App";
 import { useContext } from "react";
 import { formatRGBCSS } from "../utilities";
 

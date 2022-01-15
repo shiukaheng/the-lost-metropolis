@@ -1,4 +1,4 @@
-import { SettingsContext, ThemeContext } from "../App"
+import { SettingsContext, ThemeContext } from "./App"
 import { useContext, useLayoutEffect, useRef, useState } from "react"
 import { formatRGBCSS } from "../utilities"
 

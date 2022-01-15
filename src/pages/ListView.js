@@ -3,7 +3,7 @@
 import tw from 'tailwind-styled-components';
 import { useNavigate } from 'react-router-dom';
 import { useContext } from 'react';
-import { SettingsContext } from "../App";
+import { SettingsContext } from "./App";
 import MagicDiv from '../components/MagicDiv';
 import GenericPage from '../components/GenericPage';
 

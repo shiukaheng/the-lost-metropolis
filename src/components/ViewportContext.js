@@ -1,5 +1,5 @@
 import { useContextBridge } from "@react-three/drei"
-import { CursorDataContext } from "../App"
+import { CursorDataContext } from "./App"
 import { PotreeManager } from "./3d/PotreeManager"
 
 // Convenience component to provide common contexts to viewport children, in the future may include 3DTilesManager, NexusManager, etc which serves to manage 3DTilesObject and NexusObject on each render.
