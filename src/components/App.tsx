@@ -6,6 +6,7 @@ import { useState, createContext, useEffect } from "react";
 import MagicDiv from "./MagicDiv";
 import Background from "./Background";
 import AnimatedSwitch from "./AnimatedSwitch";
+import { FC } from "react";
 
 // All pages
 import Home from "./pages/Home"
@@ -97,7 +98,7 @@ function MultiLangNavLink({text, to, ...props}) {
     }}/>
 }
 
-function App() {
+function App():FC {
     // Theme defines the background color and foreground color, as well as the background video. It is not persistent between sessions and is defined by what content the user is viewing.
     const [theme, setTheme] = useState(defaultTheme)
     // Settings defines user preferences persistent between sessions.
