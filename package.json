@@ -13,6 +13,7 @@
     "@parcel/transformer-svg-react": "^2.2.0",
     "autoprefixer": "^10.4.2",
     "parcel": "^2.2.0",
+    "parcel-reporter-static-files-copy": "^1.3.4",
     "postcss": "^8.4.5",
     "tailwindcss": "^3.0.15"
   },
@@ -24,6 +25,7 @@
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-router-dom": "^6.2.1",
+    "react-spring": "^9.4.2",
     "react-swipeable-views": "^0.14.0",
     "react-transition-group": "^4.4.2",
     "styled-components": "^5.3.3",
@@ -31,5 +33,8 @@
     "three": "^0.136.0",
     "troika-three-text": "^0.45.0",
     "typescript": "^4.5.4"
+  },
+  "staticFiles": {
+    "staticOutPath": "static"
   }
 }
