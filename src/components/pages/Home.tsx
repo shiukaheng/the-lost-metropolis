@@ -5,7 +5,6 @@ import GenericPage from '../GenericPage'
 import PotreeObject from '../3d/PotreeObject'
 import { DepthKitObject } from "../3d/DepthKitObject"
 import TestObject from '../3d/TestObject'
-import LabelObject from '../3d/LabelObject'
 
 function Home() {
     return (
