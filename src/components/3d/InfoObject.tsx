@@ -11,8 +11,8 @@ function InfoObject({text="", iconScale=0.1, ...props}) {
         from: {opacity: 0, scale: [0.3, 0.3 , 0.3]},
         enter: {opacity: 1, scale: [0.5, 0.5, 0.5]},
         leave: {opacity: 0, scale: [0.3, 0.3, 0.3]},
-
-        config: config.gentle
+        exitBeforeEnter: true,
+        config: config.default
     })
     const AnimatedText = a(Text)
     const AnimatedLabelIcon = a(LabelIconObject)
@@ -23,9 +23,7 @@ function InfoObject({text="", iconScale=0.1, ...props}) {
             <AnimatedLabelIcon iconUrl="/static/viewport/info-icon.png" scale={0.25} onClick={()=>{setExpanded(!expanded)}} iconScale={scale} iconOpacity={opacity} skirtHidden={!expanded}/>
         </Billboard>
         :
-        <Billboard follow>
-            <AnimatedText scale={scale} gpuAccelerateSDF={true} fillOpacity={opacity} onClick={()=>{setExpanded(!expanded)}} text={text}/>
-        </Billboard>
+        <AnimatedText scale={scale} gpuAccelerateSDF={true} fillOpacity={opacity} onClick={()=>{setExpanded(!expanded)}} text={text}/>
     )
 );
 }
