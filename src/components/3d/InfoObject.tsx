@@ -14,6 +14,7 @@ function InfoObject({text="", iconScale=0.1, ...props}) {
         exitBeforeEnter: true,
         config: config.default
     })
+    
     const AnimatedText = a(Text)
     const AnimatedLabelIcon = a(LabelIconObject)
     return transitions(({opacity, scale}, item) => (

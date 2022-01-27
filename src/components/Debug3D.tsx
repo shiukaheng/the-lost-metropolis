@@ -11,9 +11,9 @@ function Debug3D() {
     return ( 
     <DebugViewport className="bg-black absolute h-full w-full">
         <DebugPlane rotation={[Math.PI/2, 0, 0]}/>
-        <InfoObject text={"Hello there! This is an exhibit."}/>
+        {/* <InfoObject text={"Hello there! This is an exhibit."}/> */}
         {/* <LinkObject url={"https://google.com"}/> */}
-        {/* <ButtonObject/> */}
+        <ButtonObject width={0.5}/>
     </DebugViewport>
     );
 }

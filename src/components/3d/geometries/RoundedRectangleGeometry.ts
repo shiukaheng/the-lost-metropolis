@@ -2,22 +2,27 @@ import { BufferGeometry, BufferAttribute } from "three"
 
 export default class RoundedRectangleGeometry extends BufferGeometry {
     
-    constructor( width=1, height=1, radius=0.25, smoothness=10 ) {
+    constructor( defaultWidth=1, defaultHeight=1, defaultRadius=0.05, defaultSmoothness=10 ) {
         
         super( );
         
         this.type = 'RoundedRectangleGeometry';
         
-        this.parameters = {
-            
-            width: width,
-            height: height,
-            radius: radius,
-            smoothness: smoothness
-            
-        };
-        
+        this._width = defaultWidth;
+        this._height = defaultHeight;
+        this._radius = defaultRadius;
+        this._smoothness = defaultSmoothness;
 
+        this.update( defaultWidth, defaultHeight, defaultRadius, defaultSmoothness );
+    }
+
+    static fromJSON( data ) {
+
+		return new RoundedRectangleGeometry( data.width, data.height, data.radius, data.smoothness );
+
+	}
+
+    update( width, height, radius, smoothness ) {
         // helper const's
         const wi = width / 2 - radius;		// inner width
         const hi = height / 2 - radius;		// inner height
@@ -92,10 +97,40 @@ export default class RoundedRectangleGeometry extends BufferGeometry {
         this.setAttribute( 'uv', new BufferAttribute( new Float32Array( uvs ), 2 ) );
     }
 
-    static fromJSON( data ) {
+    get width() {
+        return this._width;
+    }
 
-		return new RoundedRectangleGeometry( data.width, data.height, data.radius, data.smoothness );
+    set width( value ) {
+        this._width = value;
+        this.update( this._width, this._height, this._radius, this._smoothness );
+    }
 
-	}
+    get height() {
+        return this._height;
+    }
+
+    set height( value ) {
+        this._height = value;
+        this.update( this._width, this._height, this._radius, this._smoothness );
+    }
+
+    get radius() {
+        return this._radius;
+    }
+
+    set radius( value ) {
+        this._radius = value;
+        this.update( this._width, this._height, this._radius, this._smoothness );
+    }
+
+    get smoothness() {
+        return this._smoothness;
+    }
+
+    set smoothness( value ) {
+        this._smoothness = value;
+        this.update( this._width, this._height, this._radius, this._smoothness );
+    }
     
 }

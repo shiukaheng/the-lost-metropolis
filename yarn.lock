@@ -1263,6 +1263,14 @@
     utility-types "^3.10.0"
     zustand "^3.5.1"
 
+"@react-three/xr@^3.2.0":
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/@react-three/xr/-/xr-3.2.0.tgz#a53a34605883785b0f04d77a716ae38d75dec1b9"
+  integrity sha512-AjemVDCoZGH7+dV4cU+ZmWQ+6Ullord2D2sQU+1sGEs0OWnvaoPB6UVfaOjY/fAxpriE7QVaFJCPrb7AdKViOw==
+  dependencies:
+    "@webxr-input-profiles/motion-controllers" "^1.0.0"
+    react-merge-refs "^1.1.0"
+
 "@svgr/babel-plugin-add-jsx-attribute@^5.4.0":
   version "5.4.0"
   resolved "https://registry.yarnpkg.com/@svgr/babel-plugin-add-jsx-attribute/-/babel-plugin-add-jsx-attribute-5.4.0.tgz#81ef61947bb268eb9d50523446f9c638fb355906"
