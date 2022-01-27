@@ -2,11 +2,13 @@ import { BrowserRouter as Router, Route } from "react-router-dom";
 import NavigationBar from "./NavigationBar"
 import AppContainer from "./AppContainer"
 import { useNavigate } from 'react-router-dom';
-import { useState, createContext, useEffect } from "react";
+import { useState, createContext, useLayoutEffect } from "react";
 import MagicDiv from "./MagicDiv";
 import Background from "./Background";
 import AnimatedSwitch from "./AnimatedSwitch";
 import { FC } from "react";
+import Experience from "./Experience";
+import { formatRGBCSS } from "../utilities";
 
 // All pages
 import Home from "./pages/Home"
@@ -59,36 +61,7 @@ const content_array = [
         "time_posted": "2020-05-01",
         "id": "state_theatre",
         "link": "http://tlmhk.synology.me/state/",
-    },
-    // {
-    //     "title": {
-    //         "en": "Hong Kong City Hall",
-    //         "zh": "香港大會堂",
-    //     },
-    //     "description": {
-    //         "en": `Hong Kong City Hall (Chinese: 香港大會堂) is a building located at Edinburgh Place, Central, Hong Kong Island, Hong Kong.
-
-    //         Since Hong Kong is a "Special Administrative Region" and not a normal Chinese city, there is no mayor or city council; therefore, the City Hall does not hold the offices of a city government, unlike most city halls around the world. Instead, it is a complex providing municipal services, including performing venues and libraries.
-            
-    //         The City Hall is managed by the Government's Leisure and Cultural Services Department. The Urban Council (UrbCo) managed the City Hall (through the Urban Services Department) and held its meetings there prior to its dissolution in December 1999. Prior to its dissolution the UrbCo served as the municipal council for Hong Kong Island and Kowloon (including New Kowloon). The UrbCo had its meeting chamber in the Low Block of the City Hall.`,
-    //         "zh": "香港大會堂跟同樣位於愛丁堡廣場的第四代郵政總局、昔日第三代的中環天星碼頭及其停車場、和已拆卸的皇后碼頭屬同一時期的建築，並形成一個大眾市民的公共空間。昔日的市政局總部大樓即在香港大會堂旁的展城館。",
-    //     },
-    //     "time_posted": "2020-05-02",
-    //     "id": "city_hall"
-    // },
-    // {
-    //     "title": {
-    //         "en": "Hong Kong Disneyland",
-    //         "zh": "香港迪士尼",
-    //     },
-    //     "description": {
-    //         "en": `Hong Kong Disneyland is a theme park located in the district of Kowloon. It is the largest theme park in the world, with a total of over 10,000 rides and over 30,000 guest capacity. It is one of the most popular theme parks in Asia, with a total of over 3,000,000 visitors annually.
-    //         The Hong Kong Disneyland is a member of the Hong Kong Disneyland Group, which is the largest theme park group in Asia. It is the largest theme park in Hong Kong, with a total of 10,000 rides and over 30,000 guest capacity. It is one of the most popular theme parks in Asia, with a total of over 3,000,000 visitors annually.`,
-    //         "zh": `香港迪士尼是一個位於香港山莊的主題公園，它是世界上最大的主題公園，共有10,000個主題角色，共有超過30,000人的嘉賓容量。它是大陸最受歡迎的主題公園之一，共有3,000,000位訪客每年。香港迪士尼是香港迪士尼集團的一個成員，是大陸最大的主題公園集團之一。它是香港最大的主題公園，共有10,000個主題角色，共有超過30,000人的嘉賓容量。它是大陸最受歡迎的主題公園之一，共有3,000,000位訪客每年。`
-    //     },
-    //     "time_posted": "2020-05-03",
-    //     "id": "disneyland"
-    // }
+    }
 ]
 
 function MultiLangNavLink({text, to, ...props}) {
@@ -105,7 +78,7 @@ function App():FC {
     const [settings, setSettings] = useState(defaultSettings)
     const [cursorData, setCursorData] = useState(defaultCursorData)
     // set cursorData with listener on body element
-    useEffect(() => {
+    useLayoutEffect(() => {
         const body = document.querySelector("body")
         const mouseMoveHandler = (e) => {
             const newData = {
@@ -119,41 +92,68 @@ function App():FC {
             body.removeEventListener("mousemove", mouseMoveHandler)
         }
     }, [])
+    // set background color on body element
+    useLayoutEffect(() => {
+        const body = document.querySelector("body")
+        body.style.backgroundColor = formatRGBCSS(theme.backgroundColor)
+    }, [theme.backgroundColor])
     return (
         <CursorDataContext.Provider value={cursorData}>
             <SettingsContext.Provider value={settings}>
                 <ThemeContext.Provider value={theme}>
                     <Router>
                         <div className="absolute w-full h-full">
-                            <Background/>
-                            <AppContainer>
-                                <NavigationBar>
-                                    <MultiLangNavLink text={{"en": "home", "zh": "首頁"}} to="/"/>
-                                    <MultiLangNavLink text={{"en": "browse", "zh": "瀏覽"}} to="/browse"/>
-                                    <MultiLangNavLink text={{"en": "list", "zh": "列表"}} to="/list"/>
-                                    <MultiLangNavLink text={{"en": "about", "zh": "關於"}} to="/about"/>
-                                    <MagicDiv mergeTransitions={true} className="nav-button" onClick={()=>{setSettings(
-                                        oldSettings => ({
-                                            ...oldSettings,
-                                            lang: oldSettings.lang === "en" ? "zh" : "en"
-                                        })
-                                    )}}>中／eng</MagicDiv>
-                                    <MagicDiv mergeTransitions={true} className="nav-button" onClick={()=>{setTheme(
-                                        oldTheme => ({
-                                            ...oldTheme,
-                                            foregroundColor: oldTheme.backgroundColor,
-                                            backgroundColor: oldTheme.foregroundColor
-                                        })
-                                    )}}>?!</MagicDiv>
-                                </NavigationBar>
-                                <AnimatedSwitch>
-                                    <Route path="/" element={<Home/>}/>
-                                    <Route path="/browse" element={<ShowcaseView content_array={content_array}/>}/>
-                                    <Route path="/browse/:id" element={<ShowcaseView content_array={content_array}/>}/>
-                                    <Route path="/list" element={<ListView content_array={content_array}/>}/>
-                                    <Route path="/about" element={<About/>}/>
-                                </AnimatedSwitch>
-                            </AppContainer>
+                            <AnimatedSwitch pathPreprocessor={
+                                (path) => {
+                                    if (path.split("/")[1] !== "experience") {
+                                        path = ""
+                                    }
+                                    return path
+                                }
+                            }>
+                                <Route path="/experience/:id" element={<Experience content_array={content_array}/>}/>
+                                <Route path="*" element={
+                                    <div className="w-full h-full">
+                                        <Background/>
+                                        <AppContainer>
+                                            <NavigationBar>
+                                                <MultiLangNavLink text={{"en": "home", "zh": "首頁"}} to="/"/>
+                                                <MultiLangNavLink text={{"en": "browse", "zh": "瀏覽"}} to="/browse"/>
+                                                <MultiLangNavLink text={{"en": "list", "zh": "列表"}} to="/list"/>
+                                                <MultiLangNavLink text={{"en": "about", "zh": "關於"}} to="/about"/>
+                                                <MagicDiv mergeTransitions={true} className="nav-button" onClick={()=>{setSettings(
+                                                    oldSettings => ({
+                                                        ...oldSettings,
+                                                        lang: oldSettings.lang === "en" ? "zh" : "en"
+                                                    })
+                                                )}}>中／eng</MagicDiv>
+                                                <MagicDiv mergeTransitions={true} className="nav-button" onClick={()=>{setTheme(
+                                                    oldTheme => ({
+                                                        ...oldTheme,
+                                                        foregroundColor: oldTheme.backgroundColor,
+                                                        backgroundColor: oldTheme.foregroundColor
+                                                    })
+                                                )}}>?!</MagicDiv>
+                                            </NavigationBar>
+                                            <AnimatedSwitch pathPreprocessor={
+                                                // Prevent the animation from triggering when under navigating in the browse directory, since it already has a sliding animation
+                                                (path) => {
+                                                    if (path.split("/")[1]==="browse") {
+                                                        path = "browse"
+                                                    }
+                                                    return path
+                                                }
+                                            }>
+                                                <Route path="/" element={<Home/>}/>
+                                                <Route path="/browse" element={<ShowcaseView content_array={content_array}/>}/>
+                                                <Route path="/browse/:id" element={<ShowcaseView content_array={content_array}/>}/>
+                                                <Route path="/list" element={<ListView content_array={content_array}/>}/>
+                                                <Route path="/about" element={<About/>}/>
+                                            </AnimatedSwitch>
+                                        </AppContainer>
+                                    </div>
+                                }/>
+                            </AnimatedSwitch>
                         </div>
                     </Router>
                 </ThemeContext.Provider>
