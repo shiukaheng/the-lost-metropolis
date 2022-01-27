@@ -9,7 +9,7 @@ import TestObject from '../3d/TestObject'
 function Home() {
     return (
         <GenericPage className="relative w-full h-full overflow-x-hidden flex flex-col gap-4">
-            <HighlightViewport className="absolute w-full h-full overflow-hidden flex-grow">
+            <HighlightViewport className="absolute w-full h-full overflow-hidden flex-grow rounded-3xl">
                 <PotreeObject pointSizeType={0} pointSize={1} scale={[0.9, 0.9, 0.9]} rotation={[0, 0, 0]} position={[-10, -3 , 12]} baseUrl={"http://tlmhk.synology.me/data/BigShot/"}/>   
             </HighlightViewport>
             <MagicDiv autoColor={false} className="absolute w-full h-full font-extrabold text-5xl md:text-6xl text-center pointer-events-none" languageSpecificChildren={{
