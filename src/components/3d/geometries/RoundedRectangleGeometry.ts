@@ -1,5 +1,5 @@
 import { BufferGeometry, BufferAttribute } from "three"
-
+import { extend, Object3DNode } from "@react-three/fiber"
 export default class RoundedRectangleGeometry extends BufferGeometry {
     
     constructor( defaultWidth=1, defaultHeight=1, defaultRadius=0.05, defaultSmoothness=10 ) {
@@ -133,4 +133,14 @@ export default class RoundedRectangleGeometry extends BufferGeometry {
         this.update( this._width, this._height, this._radius, this._smoothness );
     }
     
+}
+
+extend({RoundedRectangleGeometry})
+
+declare global {
+    namespace JSX {
+        interface IntrinsicElements {
+            roundedRectangleGeometry: Object3DNode<RoundedRectangleGeometry, typeof RoundedRectangleGeometry>
+        }
+    }
 }

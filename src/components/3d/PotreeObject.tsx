@@ -1,5 +1,4 @@
-import { useFrame } from "@react-three/fiber";
-import { useContext, useEffect, useRef, useLayoutEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { PotreeContext } from "./PotreeManager";
 
 type PotreeObjectProps = JSX.IntrinsicElements["group"] & {

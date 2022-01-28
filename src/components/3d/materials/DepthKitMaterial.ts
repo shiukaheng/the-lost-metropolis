@@ -1,4 +1,4 @@
-import { extend } from "@react-three/fiber";
+import { extend, Object3DNode } from "@react-three/fiber";
 import * as THREE from "three";
 import rgbdVert from "../shaders/rgbd.vert";
 import rgbdFrag from "../shaders/rgbd.frag";
@@ -161,6 +161,16 @@ class DepthKitMaterial extends THREE.ShaderMaterial {
             extrinsics.e02, extrinsics.e12, extrinsics.e22, extrinsics.e32,
             extrinsics.e03, extrinsics.e13, extrinsics.e23, extrinsics.e33
         )
+    }
+}
+
+extend({DepthKitMaterial})
+
+declare global {
+    namespace JSX {
+        interface IntrinsicElements {
+            depthKitMaterial: Object3DNode<DepthKitMaterial, typeof DepthKitMaterial>
+        }
     }
 }
 
