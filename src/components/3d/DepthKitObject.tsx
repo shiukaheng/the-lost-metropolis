@@ -8,7 +8,16 @@ const VERTS_TALL = 256;
 
 extend({ DepthKitMaterial });
 
-function DepthKitObject({ metaUrl = "", ...props }) {
+type DepthKitObjectProps = JSX.IntrinsicElements["mesh"] & {
+  metaUrl: string;
+  videoUrl: string;
+  posterUrl?: string;
+  autoplay?: boolean;
+  loop?: boolean;
+  muted?: boolean;
+}
+
+function DepthKitObject({ metaUrl="", videoUrl="", posterUrl="", autoplay=true, loop=true, muted=false, ...props }:DepthKitObjectProps) {
   const mesh = useRef(null);
 
   // Load meta info
@@ -50,7 +59,6 @@ function DepthKitObject({ metaUrl = "", ...props }) {
 // Wrapper for the cool videoTexture
 function AdvancedVideoTexture({
   videoUrl = "",
-  metaUrl = "",
   posterUrl = "",
   autoplay = true,
   loop = false,

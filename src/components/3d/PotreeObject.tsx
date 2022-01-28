@@ -2,7 +2,15 @@ import { useFrame } from "@react-three/fiber";
 import { useContext, useEffect, useRef, useLayoutEffect, useState } from "react";
 import { PotreeContext } from "./PotreeManager";
 
-function PotreeObject({cloudName="cloud.js", baseUrl, pointSize=1, pointSizeType=1, pointShape=0, ...props}) {
+type PotreeObjectProps = JSX.IntrinsicElements["group"] & {
+    cloudName?: string
+    baseUrl: string
+    pointSize?: number
+    pointSizeType?: number
+    pointShape?: number
+}
+
+function PotreeObject({cloudName="cloud.js", baseUrl, pointSize=1, pointSizeType=1, pointShape=0, ...props}:PotreeObjectProps) {
     const {potree, pointClouds} = useContext(PotreeContext)
     const [pointCloud, setPointCloud] = useState(null)
     const objectGroup = useRef(null)

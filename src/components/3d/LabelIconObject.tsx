@@ -6,7 +6,15 @@ import { useFrame, useLoader } from "@react-three/fiber"
 import { TextureLoader } from "three"
 import OptionalInteractive from "./OptionalInteractive"
 
-export default function LabelIconObject({onClick=()=>{}, iconUrl="", iconScale=1, iconOpacity=1, skirtHidden=false, ...props}) {
+type LabelIconObjectProps = JSX.IntrinsicElements["group"] & {
+    onClick?: () => void
+    iconUrl: string
+    iconScale?: number
+    iconOpacity?: number
+    skirtHidden?: boolean
+}
+
+export default function LabelIconObject({onClick=()=>{}, iconUrl="", iconScale=1, iconOpacity=1, skirtHidden=false, ...props}:LabelIconObjectProps) {
     const texture = useLoader(TextureLoader, iconUrl)
     const [hovered, setHovered] = useState(false)
     const { iconExtHoverScale, iconExtHoverOpacity } = useSpring({

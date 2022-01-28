@@ -1,10 +1,15 @@
 import { Potree } from '@pnext/three-loader';
 import { useFrame } from '@react-three/fiber';
-import { createContext, useEffect, useRef } from 'react';
+import { createContext, useEffect, useRef, ReactNode } from 'react';
 const PotreeContext = createContext(null)
 const defaultPointBudget = 100000
 
-function PotreeManager({pointBudget=defaultPointBudget, children, ...props}) {
+type PotreeManagerProps = {
+    pointBudget?: number
+    children: ReactNode
+}
+
+function PotreeManager({pointBudget=defaultPointBudget, children}:PotreeManagerProps) {
     // Using useRef to maintain non-state variable across renders
     const {current: potree} = useRef(new Potree())
     const {current: pointClouds} = useRef([])

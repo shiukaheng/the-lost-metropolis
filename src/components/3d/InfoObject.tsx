@@ -4,7 +4,12 @@ import { useTransition, config } from "react-spring"
 import { a } from "@react-spring/three"
 import LabelIconObject from "./LabelIconObject"
 
-function InfoObject({text="", iconScale=0.1, ...props}) {
+type InfoObjectProps = JSX.IntrinsicElements["group"] & {
+    text?: string
+    iconScale?: number
+}
+
+function InfoObject({text="", iconScale=0.1, ...props}:InfoObjectProps) {
     const [expanded, setExpanded] = useState(true)
     
     const transitions = useTransition(expanded, {
@@ -21,10 +26,10 @@ function InfoObject({text="", iconScale=0.1, ...props}) {
         item 
         ?
         <Billboard follow>
-            <AnimatedLabelIcon iconUrl="/static/viewport/info-icon.png" scale={0.25} onClick={()=>{setExpanded(!expanded)}} iconScale={scale} iconOpacity={opacity} skirtHidden={!expanded}/>
+            <AnimatedLabelIcon iconUrl="/static/viewport/info-icon.png" scale={0.25} onClick={()=>{setExpanded(!expanded)}} iconScale={scale} iconOpacity={opacity} skirtHidden={!expanded} {...props}/>
         </Billboard>
         :
-        <AnimatedText scale={scale} gpuAccelerateSDF={true} fillOpacity={opacity} onClick={()=>{setExpanded(!expanded)}} text={text}/>
+        <AnimatedText scale={scale} gpuAccelerateSDF={true} fillOpacity={opacity} onClick={()=>{setExpanded(!expanded)}} text={text} {...props}/>
     )
 );
 }
