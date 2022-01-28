@@ -1,7 +1,7 @@
 import { extend } from '@react-three/fiber';
 import RoundedRectangleGeometry from './geometries/RoundedRectangleGeometry';
 import { Text } from "@react-three/drei"
-import { DoubleSide } from 'three';
+import { DoubleSide, Color } from 'three';
 import { useRef, useLayoutEffect, useState, Suspense } from "react"
 import { useTransition, config, animated, useSpring } from "react-spring"
 import { a } from "@react-spring/three"
@@ -9,7 +9,20 @@ import OptionalInteractive from "./OptionalInteractive"
 
 extend({ RoundedRectangleGeometry })
 
-function ButtonObject({width=0.5, height=0.25, text="Button", foregroundColor="white", backgroundColor="#282828", backgroundOpacity=0.8, fontSize=0.1, font=undefined, onClick=()=>{}, radius=0.05, ...props}) {
+type ButtonObjectProps = JSX.IntrinsicElements['mesh'] & {
+    width?: number
+    height?: number
+    text?: string
+    foregroundColor?: Color
+    backgroundColor?: Color
+    backgroundOpacity?: number
+    fontSize?: number
+    font?: string
+    onClick?: () => void
+    radius?: number
+}
+
+function ButtonObject({width=0.5, height=0.25, text="Button", foregroundColor="white", backgroundColor="#282828", backgroundOpacity=0.8, fontSize=0.1, font=undefined, onClick=()=>{}, radius=0.05, ...props}:ButtonObjectProps) {
     const [clicked, setClicked] = useState(false)
     const [hovered, setHovered] = useState(false)
     const { buttonHoverScale } = useSpring({

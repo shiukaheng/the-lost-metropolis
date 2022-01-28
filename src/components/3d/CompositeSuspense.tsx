@@ -1,6 +1,10 @@
-import { Suspense } from "react"
+import { Suspense, ReactNode } from "react"
 
-function CompositeSuspense({children}) {
+type CompositeSuspenseProps = {
+    children: ReactNode
+}
+
+function CompositeSuspense({children}:CompositeSuspenseProps) {
     return (
         <Suspense fallback={null}>
             {children}
