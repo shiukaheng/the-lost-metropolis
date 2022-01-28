@@ -1,13 +1,19 @@
 import { Canvas } from "@react-three/fiber"
 import { PotreeManager } from "./3d/PotreeManager"
+import ViewportContext from "./ViewportContext"
+import { ReactNode } from "react";
 
-function Viewport({children, ...props}) {
+type ViewportProps = {
+    children?: ReactNode
+}
+
+function Viewport({children, ...props}:ViewportProps) {
     return (
         <div {...props}>
             <Canvas>
-                <PotreeManager pointBudget={1000000}>
+                <ViewportContext>
                     {children}
-                </PotreeManager>
+                </ViewportContext>
             </Canvas>
         </div>
     );

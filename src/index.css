@@ -8,6 +8,10 @@
     }
 }
 
+.editor-embedded-widget {
+    @apply border-b border-white py-2
+}
+
 .page-margins {
     @apply p-8 pt-0 md:p-20 md:pl-0 flex-grow;
 }
