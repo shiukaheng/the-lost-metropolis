@@ -5,7 +5,7 @@ import { useState } from 'react';
 import EditorEmbeddedWidget from './EditorEmbeddedWidget';
 import EditorComponentGraph from './EditorComponentGraph';
 import TestObject from '../3d/TestObject';
-import { StringType, Vector3Type } from './EditorInputTypes';
+import { EulerType, StringType, Vector3Type } from './EditorInputTypes';
 import EditorComponentProperties from './EditorComponentProperties';
 import MagicDiv from '../MagicDiv';
 import { TransformControls } from '@react-three/drei';
@@ -34,7 +34,7 @@ editorRegister(TestObject, {
         "default": [0, 0, 0]
     },
     "rotation": {
-        "type": Vector3Type,
+        "type": EulerType,
         "default": [0, 0, 0]
     },
     "scale": {
@@ -55,7 +55,7 @@ function Editor() {
     const wrappedSceneChildren = sceneChildren.map(child => {
         if (selectedIDs.includes(child.props.id)) {
             return (
-                <EditorTransformControls updateSceneChildren={setSceneChildren} mode="translate" key={child.props.id}>
+                <EditorTransformControls setSceneChildren={setSceneChildren} mode="translate" key={child.props.id}>
                     {child}
                 </EditorTransformControls>
             )
@@ -68,8 +68,8 @@ function Editor() {
         <MagicDiv backgroundColorCSSProps={["backgroundColor"]} className="absolute w-full h-full flex flex-row">
             <div className="w-1/2 h-full flex flex-col p-4 overflow-clip">
                 <div className="editor-embedded-widget text-2xl font-bold">Editor</div>
-                <EditorComponentGraph sceneChildren={sceneChildren} updateSceneChildren={setSceneChildren} selectedIDs={selectedIDs} updateSelectedIDs={setSelectedIDs} supportedComponents={supportedComponents}/>
-                <EditorComponentProperties sceneChildren={sceneChildren} updateSceneChildren={setSceneChildren} selectedIDs={selectedIDs} supportedComponents={supportedComponents}/>
+                <EditorComponentGraph sceneChildren={sceneChildren} setSceneChildren={setSceneChildren} selectedIDs={selectedIDs} setSelectedIDs={setSelectedIDs} supportedComponents={supportedComponents}/>
+                <EditorComponentProperties sceneChildren={sceneChildren} setSceneChildren={setSceneChildren} selectedIDs={selectedIDs} supportedComponents={supportedComponents}/>
             </div>
             <div className="w-1/2 h-full bg-black">
                 <DebugViewport className="w-full h-full">

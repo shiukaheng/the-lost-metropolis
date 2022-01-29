@@ -38,22 +38,6 @@
     @apply mr-3 md:mr-0 font-serif font-bold md:hover:opacity-50 transition-opacity duration-500 text-left cursor-pointer select-none;
 }
 
-.editor-input-field {
-    @apply flex flex-row gap-2 overflow-clip
-}
-
-.vector-input {
-    @apply flex flex-row overflow-clip gap-2
-}
-
-.vector-input input {
-    @apply rounded-full w-16 text-black px-2
-}
-
-.string-input {
-    @apply rounded-full text-black px-2
-}
-
 .page-transition-enter {
     opacity: 0;
 }
@@ -96,4 +80,30 @@
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
     background-color: rgba(255, 255, 255, 0.6);
+}
+
+/* Editor CSS */
+
+.number-input-field {
+    @apply bg-white rounded-full w-20 text-black px-2
+}
+
+.string-input-cell {
+    @apply bg-white rounded-full w-full text-black px-2
+}
+
+.matrix-input {
+    @apply flex flex-col gap-2
+}
+
+.matrix-input-row {
+    @apply flex flex-row gap-2
+}
+
+.matrix-input-cell {
+    @apply bg-white rounded-full w-14 text-black px-2
+}
+
+.matrix-input-cell.invalid {
+    @apply bg-red-400 border-2 border-red-600
 }

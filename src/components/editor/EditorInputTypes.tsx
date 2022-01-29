@@ -65,9 +65,10 @@ const VectorType: EditorInputType = {
     typeCheck: (value) => Array.isArray(value) && value.length > 0 && value.every(v => typeof v === "number")
 }
 
+// Matrix type is a special case, since it should be composed of arrays of arrays of numbers. Not directly usable in R3F, more of a helper for the Matrix3 and Matrix4 types
 const MatrixType: EditorInputType = {
     typeName: "matrix",
-    typeCheck: (value) => Array.isArray(value) && value.length > 0 && value.every(v => typeof v === "number")
+    typeCheck: (value) => Array.isArray(value) && value.length > 0 && value.every(v => Array.isArray(v) && v.length > 0 && v.every(v => typeof v === "number"))
 }
 
 export {

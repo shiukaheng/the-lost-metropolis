@@ -18,19 +18,19 @@ import { Object3D } from "three"
 //     })
 // }
 
-function updatePartialSceneChildren(sceneChildren, updateChildren) {
+function updatePartialSceneChildren(sceneChildren, childrenToUpdate) {
     // return new sceneChildren but with the children whose props.id is in updateChildren
-    const idsToBeUpdated = updateChildren.map(child => child.props.id)
+    const idsToBeUpdated = childrenToUpdate.map(child => child.props.id)
     return sceneChildren.map(child => {
         if (idsToBeUpdated.includes(child.props.id)) {
-            return updateChildren.find(item => item.props.id === child.props.id)
+            return childrenToUpdate.find(item => item.props.id === child.props.id)
         } else {
             return child
         }
     })
 }
 
-function EditorTransformControls({updateSceneChildren, children, ...props}) {
+function EditorTransformControls({setSceneChildren, children, ...props}) {
     // If children is a single element, wrap it in an array
     const childrenArray = Children.toArray(children);
     const transformControlsRef = useRef() 
@@ -64,7 +64,7 @@ function EditorTransformControls({updateSceneChildren, children, ...props}) {
     }, [childrenArray])
     
     return (
-        <TransformControls ref={transformControlsRef} onMouseUp={
+        <TransformControls {...props} ref={transformControlsRef} onMouseUp={
             () => {
                 
                 // Make TransformControls apply its own transformation to child objects when moved, only using position rotation and scale properties and not the transformation matrix
@@ -87,7 +87,7 @@ function EditorTransformControls({updateSceneChildren, children, ...props}) {
                     transformControlsRef.current.object.position.set(0,0,0)
                     transformControlsRef.current.object.rotation.set(0,0,0)
                     transformControlsRef.current.object.scale.set(1,1,1)
-                    updateSceneChildren(updatePartialSceneChildren(childrenArray, newChildren))
+                    setSceneChildren(updatePartialSceneChildren(childrenArray, newChildren))
                 }
             }
         }>
