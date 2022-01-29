@@ -1,6 +1,6 @@
-import { useState } from "react"
+import React, { useState, ReactNode } from "react"
 
-export default function EditorEmbeddedWidget({title="Title", children=[]}) {
+export default function EditorEmbeddedWidget({title="Title", children}) {
     const [expanded, setExpanded] = useState(true)
     return (
         <div className="editor-embedded-widget">
@@ -8,7 +8,7 @@ export default function EditorEmbeddedWidget({title="Title", children=[]}) {
                 <div className="text-white text-md font-bold">{title}</div>
                 <div className="text-white text-xl font-bold ml-auto" onClick={()=>{setExpanded(!expanded)}}>{expanded ? "-" : "+"}</div>
             </div>
-            {expanded ? children : []}
+            {expanded ? children : null}
         </div>
     )
 }

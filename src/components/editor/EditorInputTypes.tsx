@@ -1,65 +1,75 @@
 import {ReactNode} from 'react';
 
-type EditorArgumentType = {
+type EditorInputType = {
     typeName: string
     typeCheck: (value: any) => boolean
 }
 
-const NumberType: EditorArgumentType = {
+const NumberType: EditorInputType = {
     typeName: "number",
     typeCheck: (value) => typeof value === "number"
 }
 
-const StringType: EditorArgumentType = {
+const StringType: EditorInputType = {
     typeName: "string",
     typeCheck: (value) => typeof value === "string"
 }
 
-const URLType: EditorArgumentType = {
+const URLType: EditorInputType = {
     typeName: "url",
     typeCheck: (value) => typeof value === "string" && value.startsWith("http")
 }
 
-const Vector3Type: EditorArgumentType = {
+const Vector3Type: EditorInputType = {
     typeName: "vector3",
     typeCheck: (value) => Array.isArray(value) && value.length === 3 && value.every(v => typeof v === "number")
 }
 
-const Vector4Type: EditorArgumentType = {
+const Vector4Type: EditorInputType = {
     typeName: "vector4",
     typeCheck: (value) => Array.isArray(value) && value.length === 4 && value.every(v => typeof v === "number")
 }
 
-const Vector2Type: EditorArgumentType = {
+const Vector2Type: EditorInputType = {
     typeName: "vector2",
     typeCheck: (value) => Array.isArray(value) && value.length === 2 && value.every(v => typeof v === "number")
 }
 
-const ColorType: EditorArgumentType = {
+const ColorType: EditorInputType = {
     typeName: "color",
     typeCheck: (value) => Array.isArray(value) && value.length === 3 && value.every(v => typeof v === "number")
 }
 
-const QuaternionType: EditorArgumentType = {
+const QuaternionType: EditorInputType = {
     typeName: "quaternion",
     typeCheck: (value) => Array.isArray(value) && value.length === 4 && value.every(v => typeof v === "number")
 }
 
-const EulerType: EditorArgumentType = {
+const EulerType: EditorInputType = {
     typeName: "euler",
     typeCheck: (value) => Array.isArray(value) && value.length === 3 && value.every(v => typeof v === "number")
 }
 
-const Matrix3Type: EditorArgumentType = {
+const Matrix3Type: EditorInputType = {
     typeName: "matrix3",
     typeCheck: (value) => Array.isArray(value) && value.length === 9 && value.every(v => typeof v === "number")
 }
 
-const Matrix4Type: EditorArgumentType = {
+const Matrix4Type: EditorInputType = {
     typeName: "matrix4",
     typeCheck: (value) => Array.isArray(value) && value.length === 16 && value.every(v => typeof v === "number")
 }
 
+const VectorType: EditorInputType = {
+    typeName: "vector",
+    typeCheck: (value) => Array.isArray(value) && value.length > 0 && value.every(v => typeof v === "number")
+}
+
+const MatrixType: EditorInputType = {
+    typeName: "matrix",
+    typeCheck: (value) => Array.isArray(value) && value.length > 0 && value.every(v => typeof v === "number")
+}
+
 export {
-    NumberType, Vector3Type, Vector4Type, Vector2Type, ColorType, QuaternionType, EulerType, Matrix3Type, Matrix4Type, StringType, URLType
+    EditorInputType, NumberType, Vector3Type, Vector4Type, Vector2Type, ColorType, QuaternionType, EulerType, Matrix3Type, Matrix4Type, StringType, URLType, VectorType, MatrixType
 }

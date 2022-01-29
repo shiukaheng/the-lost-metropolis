@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import {
-    NumberType, Vector3Type, Vector4Type, Vector2Type, ColorType, QuaternionType, EulerType, Matrix3Type, Matrix4Type, StringType, URLType
+    NumberType, Vector3Type, Vector4Type, Vector2Type, ColorType, QuaternionType, EulerType, Matrix3Type, Matrix4Type, StringType, URLType, MatrixType, VectorType
 } from "./EditorInputTypes"
 import { range } from "lodash"
 import { createElement } from "react";
@@ -10,7 +10,7 @@ function NumberInput({defaultValue, onValueChange}) {
     const [value, setValue] = useState(defaultValue);
     const [isValid, setIsValid] = useState(true);
     return (
-        <input className={`number-input ${isValid ? "" : "invalid"}`} type="number" value={value} onChange={(e) => {
+        <input className={`input-field number-input ${isValid ? "" : "invalid"}`} type="number" value={value} onChange={(e) => {
             const newValue = parseFloat(e.target.value);
             if (newValue !== value) {
                 setValue(newValue);
@@ -28,7 +28,7 @@ function NumberInput({defaultValue, onValueChange}) {
 function StringInput({defaultValue, onValueChange}) {
     const [value, setValue] = useState(defaultValue);
     return (
-        <input className="string-input" type="text" value={value} onChange={(e) => {
+        <input className="input-field string-input" type="text" value={value} onChange={(e) => {
             const newValue = e.target.value;
             if (newValue !== value) {
                 setValue(newValue);
@@ -43,7 +43,7 @@ function URLInput({defaultValue, onValueChange}) {
     const [value, setValue] = useState(defaultValue);
     const [isValid, setIsValid] = useState(true);
     return (
-        <input className={`url-input ${isValid ? "" : "invalid"}`} type="url" value={value} onChange={(e) => {
+        <input className={`input-field url-input ${isValid ? "" : "invalid"}`} type="url" value={value} onChange={(e) => {
             const newValue = e.target.value;
             if (newValue !== value) {
                 setValue(newValue);
@@ -63,7 +63,7 @@ function MatrixInput({rows, columns, defaultValue, onValueChange}) {
     const [value, setValue] = useState(defaultValue);
     const [isValid, setIsValid] = useState(true);
     return (
-        <div className="matrix-input">
+        <div className="input-field matrix-input">
             {
                 range(rows).map(row => (
                     <div key={row} className="matrix-row">
@@ -94,13 +94,14 @@ function VectorInput({length, defaultValue, onValueChange}) {
     const [value, setValue] = useState(defaultValue);
     const [isValid, setIsValid] = useState(true);
     return (
-        <div className="vector-input">
+        <div className="input-field vector-input">
             {
                 range(length).map(index => (
                     <input key={index} className={`vector-cell ${isValid ? "" : "invalid"}`} type="number" value={value[index]} onChange={(e) => {
                         const newValue = value.slice();
                         newValue[index] = parseFloat(e.target.value);
                         setValue(newValue);
+                        // If every element of newValue is a number and is not NaN, then newValue is a valid vector
                         if (VectorType.typeCheck(newValue)) {
                             setIsValid(true);
                             onValueChange(newValue);
@@ -140,8 +141,8 @@ function ColorInput({defaultValue, onValueChange}) {
 const Vector2Input = ({defaultValue, onValueChange}) => VectorInput({length: 2, defaultValue, onValueChange});
 const Vector3Input = ({defaultValue, onValueChange}) => VectorInput({length: 3, defaultValue, onValueChange});
 const Vector4Input = ({defaultValue, onValueChange}) => VectorInput({length: 4, defaultValue, onValueChange});
-const QuaternionType = ({defaultValue, onValueChange}) => VectorInput({length: 4, defaultValue, onValueChange});
-const EulerType = ({defaultValue, onValueChange}) => VectorInput({length: 3, defaultValue, onValueChange});
+const QuaternionInput = ({defaultValue, onValueChange}) => VectorInput({length: 4, defaultValue, onValueChange});
+const EulerInput = ({defaultValue, onValueChange}) => VectorInput({length: 3, defaultValue, onValueChange});
 const Matrix3Input = ({defaultValue, onValueChange}) => MatrixInput({rows: 3, columns: 3, defaultValue, onValueChange});
 const Matrix4Input = ({defaultValue, onValueChange}) => MatrixInput({rows: 4, columns: 4, defaultValue, onValueChange});
 
@@ -153,11 +154,11 @@ const InputComponentMap = {
     "vector2": Vector2Input,
     "vector3": Vector3Input,
     "vector4": Vector4Input,
-    "quaternion": QuaternionType,
-    "euler": EulerType,
+    "quaternion": QuaternionInput,
+    "euler": EulerInput,
     "matrix3": Matrix3Input,
-    "matrix4": Matrix4Input
-}
+    "matrix4": Matrix4Input,
+};
 
 type EditorInputProps = {
     propName: string

@@ -5,20 +5,28 @@ import { useState } from 'react';
 import EditorEmbeddedWidget from './EditorEmbeddedWidget';
 import EditorComponentGraph from './EditorComponentGraph';
 import TestObject from '../3d/TestObject';
-import { Vector3Type } from './EditorInputTypes';
+import { StringType, Vector3Type } from './EditorInputTypes';
+import EditorComponentProperties from './EditorComponentProperties';
+import MagicDiv from '../MagicDiv';
 
 var supportedComponents = []
 
 function editorRegister(component, inputs) {
     supportedComponents.push({
-        componentName: component.name,
-        component: component,
-        inputs: inputs
+        label: component.name,
+        value: {
+            component: component,
+            inputs: inputs
+        }
     })
 }
 
 // Register editable components
 editorRegister(TestObject, {
+    "name": {
+        "type": StringType,
+        "default": "TestObject"
+    },
     "position": {
         "type": Vector3Type,
         "default": [0, 0, 0]
@@ -34,12 +42,18 @@ editorRegister(TestObject, {
 })
 
 function Editor() {
-    const [sceneChildren, setSceneChildren] = useState([])
+    const [sceneChildren, _setSceneChildren] = useState([])
+    const [selectedSceneChildren, setSelectedSceneChildren] = useState([])
+    const setSceneChildren = (newChildren) => {
+        _setSceneChildren(newChildren)
+        setSelectedSceneChildren(selectedSceneChildren.filter(child => sceneChildren.includes(child)))
+    }
     return (
-        <div className="absolute w-full h-full flex flex-row">
-            <div className="w-1/2 h-full bg-zinc-800 flex flex-col p-4 text-white">
+        <MagicDiv backgroundColorCSSProps={["backgroundColor"]} className="absolute w-full h-full flex flex-row">
+            <div className="w-1/2 h-full flex flex-col p-4 overflow-clip">
                 <div className="editor-embedded-widget text-2xl font-bold">Editor</div>
-                <EditorComponentGraph sceneChildren={sceneChildren} onUpdateSceneChildren={setSceneChildren} supportedComponents={supportedComponents}/>
+                <EditorComponentGraph sceneChildren={sceneChildren} updateSceneChildren={setSceneChildren} selectedSceneChildren={selectedSceneChildren} updateSelectedSceneChildren={setSelectedSceneChildren} supportedComponents={supportedComponents}/>
+                <EditorComponentProperties sceneChildren={sceneChildren} updateSceneChildren={setSceneChildren} selectedSceneChildren={selectedSceneChildren} updateSelectedSceneChildren={setSelectedSceneChildren} supportedComponents={supportedComponents}/>
             </div>
             <div className="w-1/2 h-full bg-black">
                 <DebugViewport className="w-full h-full">
@@ -47,7 +61,7 @@ function Editor() {
                     {sceneChildren}
                 </DebugViewport>
             </div>
-        </div>
+        </MagicDiv>
     );
 }
 

@@ -17,17 +17,41 @@
 }
 
 .secondary-button {
-    @apply border-black border px-4 rounded-full md:hover:opacity-50 font-serif font-bold md:text-xl h-8 md:h-9 cursor-pointer transition-opacity duration-500;
+    @apply border-black select-none border px-4 rounded-full md:hover:opacity-50 font-serif font-bold md:text-xl h-8 md:h-9 cursor-pointer transition-opacity duration-500;
     line-height: 1.6;
 }
 
 .primary-button {
-    @apply  bg-black text-white px-4 rounded-full md:hover:opacity-50 font-serif font-bold md:text-xl h-8 md:h-9 cursor-pointer transition-opacity duration-500;
+    @apply  bg-black select-none text-white px-4 rounded-full md:hover:opacity-50 font-serif font-bold md:text-xl h-8 md:h-9 cursor-pointer transition-opacity duration-500;
     line-height: 1.6;
+}
+
+.primary-button.disabled {
+    @apply cursor-default pointer-events-none
+}
+
+.secondary-button.disabled {
+    @apply cursor-default pointer-events-none
 }
 
 .nav-button {
     @apply mr-3 md:mr-0 font-serif font-bold md:hover:opacity-50 transition-opacity duration-500 text-left cursor-pointer select-none;
+}
+
+.editor-input-field {
+    @apply flex flex-row gap-2 overflow-clip
+}
+
+.vector-input {
+    @apply flex flex-row overflow-clip gap-2
+}
+
+.vector-input input {
+    @apply rounded-full w-16 text-black px-2
+}
+
+.string-input {
+    @apply rounded-full text-black px-2
 }
 
 .page-transition-enter {
