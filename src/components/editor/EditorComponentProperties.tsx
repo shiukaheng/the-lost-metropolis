@@ -3,11 +3,6 @@ import EditorInput from "./EditorInput";
 import { v4 as uuidv4 } from 'uuid';
 import { cloneElement, useState } from "react";
 
-function inspect(value) {
-    console.log(value)
-    return value
-}
-
 export default function EditorComponentProperties({sceneChildren, setSceneChildren, selectedIDs, supportedComponents}) {
     return (
         <EditorEmbeddedWidget title="Component properties">
@@ -18,7 +13,6 @@ export default function EditorComponentProperties({sceneChildren, setSceneChildr
                     (()=>{
                         const child = sceneChildren.find(component => component.props.id === selectedIDs[0])
                         const propsDescription = supportedComponents.find(item => item.value.component === child.type).value.inputs
-                        console.log(child.props, propsDescription)
                         const inputs = Object.entries(propsDescription).map(([propName, propDescription], i) => (
                             <EditorInput key={selectedIDs[0]+i.toString()} propName={propName} typeName={propDescription.type.typeName} value={child.props[propName]} setValue={(value)=>{
                                 setSceneChildren(sceneChildren.map(child => {
