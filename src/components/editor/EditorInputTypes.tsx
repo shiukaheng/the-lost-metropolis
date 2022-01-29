@@ -71,6 +71,11 @@ const MatrixType: EditorInputType = {
     typeCheck: (value) => Array.isArray(value) && value.length > 0 && value.every(v => Array.isArray(v) && v.length > 0 && v.every(v => typeof v === "number"))
 }
 
+const BooleanType: EditorInputType = {
+    typeName: "boolean",
+    typeCheck: (value) => typeof value === "boolean"
+}
+
 export {
-    EditorInputType, NumberType, Vector3Type, Vector4Type, Vector2Type, ColorType, QuaternionType, EulerType, Matrix3Type, Matrix4Type, StringType, URLType, VectorType, MatrixType
+    EditorInputType, NumberType, Vector3Type, Vector4Type, Vector2Type, ColorType, QuaternionType, EulerType, Matrix3Type, Matrix4Type, StringType, URLType, VectorType, MatrixType, BooleanType
 }

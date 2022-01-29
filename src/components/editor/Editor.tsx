@@ -5,11 +5,12 @@ import { useState } from 'react';
 import EditorEmbeddedWidget from './EditorEmbeddedWidget';
 import EditorComponentGraph from './EditorComponentGraph';
 import TestObject from '../3d/TestObject';
-import { EulerType, StringType, Vector3Type } from './EditorInputTypes';
+import { BooleanType, EulerType, StringType, URLType, Vector3Type } from './EditorInputTypes';
 import EditorComponentProperties from './EditorComponentProperties';
 import MagicDiv from '../MagicDiv';
 import { TransformControls } from '@react-three/drei';
 import EditorTransformControls from './EditorTransformControls';
+import { DepthKitObject } from '../3d/DepthKitObject';
 
 var supportedComponents = []
 
@@ -23,11 +24,10 @@ function editorRegister(component, inputs) {
     })
 }
 
-// Register editable components
-editorRegister(TestObject, {
+const genericProps = {
     "name": {
         "type": StringType,
-        "default": "TestObject"
+        "default": "Object"
     },
     "position": {
         "type": Vector3Type,
@@ -41,6 +41,37 @@ editorRegister(TestObject, {
         "type": Vector3Type,
         "default": [1, 1, 1]
     }
+}
+
+// Register editable components
+editorRegister(TestObject, genericProps)
+editorRegister(DebugPlane, genericProps)
+editorRegister(DepthKitObject, {
+    ...genericProps,
+    metaUrl: {
+        type: URLType,
+        default: "http://localhost/"
+    },
+    videoUrl: {
+        type: URLType,
+        default: "http://localhost/"
+    },
+    posterUrl: {
+        type: URLType,
+        default: "http://localhost/"
+    },
+    autoplay: {
+        type: BooleanType,
+        default: false
+    },
+    muted: {
+        type: BooleanType,
+        default: false
+    },
+    loop: {
+        type: BooleanType,
+        default: false
+    },
 })
 
 function Editor() {

@@ -50,7 +50,7 @@ function DepthKitObject({ metaUrl="", videoUrl="", posterUrl="", autoplay=true, 
           extrinsics: metaInf.extrinsics
         }}
       >
-        <AdvancedVideoTexture {...props} />
+        <AdvancedVideoTexture {...{videoUrl, posterUrl, autoplay, loop, muted}} />
       </depthKitMaterial>
     </mesh>
   );

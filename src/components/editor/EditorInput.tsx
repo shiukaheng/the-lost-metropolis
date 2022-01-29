@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import {
-    NumberType, Vector3Type, Vector4Type, Vector2Type, ColorType, QuaternionType, EulerType, Matrix3Type, Matrix4Type, StringType, URLType, MatrixType, VectorType, EditorInputType
+    NumberType, Vector3Type, Vector4Type, Vector2Type, ColorType, QuaternionType, EulerType, Matrix3Type, Matrix4Type, StringType, URLType, MatrixType, VectorType, EditorInputType, BooleanType
 } from "./EditorInputTypes"
 import { range } from "lodash"
 import { createElement } from "react";
@@ -22,6 +22,13 @@ function NumberInput({value, setValue}) {
                 setValid(false);
             }
         }}/>
+    );
+}
+
+// Component for inputting boolean
+function BooleanInput({value, setValue}) {
+    return (
+        <input className="boolean-input-field" type="checkbox" checked={value} onChange={(e) => setValue(e.target.checked)}/>
     );
 }
 
@@ -179,6 +186,7 @@ const InputComponentMap = {
     "euler": EulerInput,
     "matrix3": Matrix3Input,
     "matrix4": Matrix4Input,
+    "boolean": BooleanInput,
 }
 
 type EditorInputProps = {
