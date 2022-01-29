@@ -1,9 +1,34 @@
 import { TransformControls } from "@react-three/drei";
-import { useLayoutEffect, useRef } from "react";
+import { useLayoutEffect, useRef, cloneElement } from "react";
 import { transform } from "typescript";
 import { Children } from "react";
+// import { useThree } from "@react-three/fiber";
+import { Object3D } from "three"
 
+// function updatePartialSceneChildren(sceneChildren, updateChildren) {
+//     // return new sceneChildren but with the children whose props.id is in updateChildren
+//     return sceneChildren.map(child => {
+//         if (updateChildren.includes(child.props.id)) {
+//             return cloneElement(child, {
+//                 children: updatePartialSceneChildren(child.props.children, updateChildren)
+//             })
+//         } else {
+//             return child
+//         }
+//     })
+// }
 
+function updatePartialSceneChildren(sceneChildren, updateChildren) {
+    // return new sceneChildren but with the children whose props.id is in updateChildren
+    const idsToBeUpdated = updateChildren.map(child => child.props.id)
+    return sceneChildren.map(child => {
+        if (idsToBeUpdated.includes(child.props.id)) {
+            return updateChildren.find(item => item.props.id === child.props.id)
+        } else {
+            return child
+        }
+    })
+}
 
 function EditorTransformControls({updateSceneChildren, children, ...props}) {
     // If children is a single element, wrap it in an array
@@ -13,7 +38,6 @@ function EditorTransformControls({updateSceneChildren, children, ...props}) {
     useLayoutEffect(() => {
         if (transformControlsRef.current) {
             // Set gizmo position from average of children positions via child.props.position
-            console.log(childrenArray)
             const meanChildPosition = childrenArray.reduce((acc, child) => {
                 return [
                     acc[0] + child.props.position[0],
@@ -38,12 +62,38 @@ function EditorTransformControls({updateSceneChildren, children, ...props}) {
             }
         }
     }, [childrenArray])
-    // Todo: Make TransformControls apply its own transformation to child objects when moved
     
-    return (<TransformControls ref={transformControlsRef} onMouseUp={
-        () => {
-            console.log(transformControlsRef.current)
-        }
-    }{...props}>{childrenArray}</TransformControls>);
+    return (
+        <TransformControls ref={transformControlsRef} onMouseUp={
+            () => {
+                
+                // Make TransformControls apply its own transformation to child objects when moved, only using position rotation and scale properties and not the transformation matrix
+                if (transformControlsRef.current) {
+                    const newChildren = childrenArray.map(
+                        child => {
+                            const dummyObject = new Object3D()
+                            dummyObject.position.set(...child.props.position)
+                            dummyObject.rotation.set(...child.props.rotation)
+                            dummyObject.scale.set(...child.props.scale)
+                            dummyObject.updateMatrix()
+                            dummyObject.applyMatrix4(transformControlsRef.current.object.matrixWorld)
+                            return cloneElement(child, {
+                                position: dummyObject.position.toArray(),
+                                rotation: dummyObject.rotation.toArray(),
+                                scale: dummyObject.scale.toArray()
+                            })
+                        }
+                    )
+                    transformControlsRef.current.object.position.set(0,0,0)
+                    transformControlsRef.current.object.rotation.set(0,0,0)
+                    transformControlsRef.current.object.scale.set(1,1,1)
+                    updateSceneChildren(updatePartialSceneChildren(childrenArray, newChildren))
+                }
+            }
+        }>
+            {childrenArray}
+        </TransformControls>
+    );
 }
+
 export default EditorTransformControls;

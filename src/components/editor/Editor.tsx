@@ -47,15 +47,15 @@ function Editor() {
     const [sceneChildren, _setSceneChildren] = useState([])
     const [selectedIDs, setSelectedIDs] = useState([])
     const setSceneChildren = (newChildren) => {
-        _setSceneChildren(newChildren)
         const sceneIDs = newChildren.map(child => child.props.id)
         setSelectedIDs(selectedIDs.filter(id => sceneIDs.includes(id)))
+        _setSceneChildren(newChildren)
     }
     // Wrap children whose child.props.id is in selectedIDs with TransformControls
     const wrappedSceneChildren = sceneChildren.map(child => {
         if (selectedIDs.includes(child.props.id)) {
             return (
-                <EditorTransformControls mode="translate" key={child.props.id}>
+                <EditorTransformControls updateSceneChildren={setSceneChildren} mode="translate" key={child.props.id}>
                     {child}
                 </EditorTransformControls>
             )
