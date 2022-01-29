@@ -10,6 +10,7 @@
   "author": "Heng <31088159+shiukaheng@users.noreply.github.com>",
   "license": "MIT",
   "devDependencies": {
+    "@parcel/transformer-glsl": "^2.2.0",
     "@parcel/transformer-svg-react": "^2.2.0",
     "autoprefixer": "^10.4.2",
     "parcel": "^2.2.0",
