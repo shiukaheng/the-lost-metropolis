@@ -8,7 +8,7 @@ function DebugViewport({children, ...props}) {
         <div {...props}>
             <Canvas>
                 <ViewportContext>
-                    <OrbitControls enablePan={true} enableZoom={true} enableRotate={true} />
+                    <OrbitControls enablePan enableRotate enableZoom makeDefault/>
                     {children}
                 </ViewportContext>
             </Canvas>

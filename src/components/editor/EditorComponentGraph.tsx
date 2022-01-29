@@ -34,7 +34,7 @@ function SceneChildItem({child, onClick, selected}) {
 }
 
 // Component for selecting scene or deleting scene components, stays in sync with the editor viewport
-export default function EditorComponentGraph({sceneChildren, updateSceneChildren, selectedSceneChildren, updateSelectedSceneChildren, supportedComponents}) {
+export default function EditorComponentGraph({sceneChildren, updateSceneChildren, selectedIDs, updateSelectedIDs, supportedComponents}) {
     const [addChildrenType, setAddChildrenType] = useState(null)
     const shiftPress = useKeyPress("Shift")
     const theme = useContext(ThemeContext)
@@ -71,7 +71,7 @@ export default function EditorComponentGraph({sceneChildren, updateSceneChildren
     return (
         <EditorEmbeddedWidget title="Components">
             <KeyPressCallback keyName="Delete" onDown={()=>{
-                updateSceneChildren(sceneChildren.filter(child => !(selectedSceneChildren.includes(child))))
+                updateSceneChildren(sceneChildren.filter(child => !(selectedIDs.includes(child.props.id))))
             }}/>
             <div className="flex flex-row gap-2">
                 <Select className="flex-grow" options={supportedComponents} styles={customStyles} onChange={(value, _)=>{setAddChildrenType(value.value)}}/>
@@ -83,16 +83,16 @@ export default function EditorComponentGraph({sceneChildren, updateSceneChildren
             <div className="mt-2 gap-2">
                 {
                     sceneChildren.map((child) => (
-                        <SceneChildItem selected={selectedSceneChildren.includes(child)} key={uuidv4()} child={child} onClick={
+                        <SceneChildItem selected={selectedIDs.includes(child.props.id)} key={uuidv4()} child={child} onClick={
                             ()=>{
                                 if (shiftPress) {
-                                    if (selectedSceneChildren.includes(child)) {
-                                        updateSelectedSceneChildren(selectedSceneChildren.filter(elem => elem !== child))
+                                    if (selectedIDs.includes(child.props.id)) {
+                                        updateSelectedIDs(selectedIDs.filter(elem => elem !== child.props.id))
                                     } else {
-                                        updateSelectedSceneChildren(selectedSceneChildren.concat([child]))
+                                        updateSelectedIDs(selectedIDs.concat([child.props.id]))
                                     }
                                 } else {
-                                    updateSelectedSceneChildren([child])
+                                    updateSelectedIDs([child.props.id])
                                 }
                             }
                         }/>

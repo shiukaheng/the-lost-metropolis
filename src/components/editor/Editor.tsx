@@ -8,6 +8,8 @@ import TestObject from '../3d/TestObject';
 import { StringType, Vector3Type } from './EditorInputTypes';
 import EditorComponentProperties from './EditorComponentProperties';
 import MagicDiv from '../MagicDiv';
+import { TransformControls } from '@react-three/drei';
+import EditorTransformControls from './EditorTransformControls';
 
 var supportedComponents = []
 
@@ -43,22 +45,36 @@ editorRegister(TestObject, {
 
 function Editor() {
     const [sceneChildren, _setSceneChildren] = useState([])
-    const [selectedSceneChildren, setSelectedSceneChildren] = useState([])
+    const [selectedIDs, setSelectedIDs] = useState([])
     const setSceneChildren = (newChildren) => {
         _setSceneChildren(newChildren)
-        setSelectedSceneChildren(selectedSceneChildren.filter(child => sceneChildren.includes(child)))
+        const sceneIDs = newChildren.map(child => child.props.id)
+        setSelectedIDs(selectedIDs.filter(id => sceneIDs.includes(id)))
     }
+    // Wrap children whose child.props.id is in selectedIDs with TransformControls
+    const wrappedSceneChildren = sceneChildren.map(child => {
+        if (selectedIDs.includes(child.props.id)) {
+            return (
+                <EditorTransformControls mode="translate" key={child.props.id}>
+                    {child}
+                </EditorTransformControls>
+            )
+        } else {
+            return child
+        }
+    })
+
     return (
         <MagicDiv backgroundColorCSSProps={["backgroundColor"]} className="absolute w-full h-full flex flex-row">
             <div className="w-1/2 h-full flex flex-col p-4 overflow-clip">
                 <div className="editor-embedded-widget text-2xl font-bold">Editor</div>
-                <EditorComponentGraph sceneChildren={sceneChildren} updateSceneChildren={setSceneChildren} selectedSceneChildren={selectedSceneChildren} updateSelectedSceneChildren={setSelectedSceneChildren} supportedComponents={supportedComponents}/>
-                <EditorComponentProperties sceneChildren={sceneChildren} updateSceneChildren={setSceneChildren} selectedSceneChildren={selectedSceneChildren} updateSelectedSceneChildren={setSelectedSceneChildren} supportedComponents={supportedComponents}/>
+                <EditorComponentGraph sceneChildren={sceneChildren} updateSceneChildren={setSceneChildren} selectedIDs={selectedIDs} updateSelectedIDs={setSelectedIDs} supportedComponents={supportedComponents}/>
+                <EditorComponentProperties sceneChildren={sceneChildren} updateSceneChildren={setSceneChildren} selectedIDs={selectedIDs} supportedComponents={supportedComponents}/>
             </div>
             <div className="w-1/2 h-full bg-black">
                 <DebugViewport className="w-full h-full">
                     <DebugPlane rotation={[Math.PI/2, 0, 0]}/>
-                    {sceneChildren}
+                    {wrappedSceneChildren}
                 </DebugViewport>
             </div>
         </MagicDiv>
