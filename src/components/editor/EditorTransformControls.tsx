@@ -5,19 +5,6 @@ import { Children } from "react";
 // import { useThree } from "@react-three/fiber";
 import { Object3D } from "three"
 
-// function updatePartialSceneChildren(sceneChildren, updateChildren) {
-//     // return new sceneChildren but with the children whose props.id is in updateChildren
-//     return sceneChildren.map(child => {
-//         if (updateChildren.includes(child.props.id)) {
-//             return cloneElement(child, {
-//                 children: updatePartialSceneChildren(child.props.children, updateChildren)
-//             })
-//         } else {
-//             return child
-//         }
-//     })
-// }
-
 function updatePartialSceneChildren(sceneChildren, childrenToUpdate) {
     // return new sceneChildren but with the children whose props.id is in updateChildren
     const idsToBeUpdated = childrenToUpdate.map(child => child.props.id)
@@ -29,6 +16,8 @@ function updatePartialSceneChildren(sceneChildren, childrenToUpdate) {
         }
     })
 }
+
+// Bug to fix: when object is rotated, the gizmo's transformations are applied to the object as if the gizmo was not rotated
 
 function EditorTransformControls({setSceneChildren, children, ...props}) {
     // If children is a single element, wrap it in an array
