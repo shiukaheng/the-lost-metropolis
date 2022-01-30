@@ -77,7 +77,7 @@ export default function EditorComponentGraph({sceneChildren, setSceneChildren, s
                 <Select className="flex-grow" options={supportedComponents} styles={customStyles} onChange={(value, _)=>{setAddChildrenType(value.value)}}/>
                 <MagicDiv mergeTransitions className={`editor-secondary-button ${(addChildrenType===null) ? "disabled" : ""}`} onClick={()=>{
                     setSceneChildren(sceneChildren.concat([createElement(addChildrenType.component, generateKey(getDefaultInputs(addChildrenType.inputs)), null)]))
-                }}>Add</MagicDiv>
+                }}>add</MagicDiv>
             </div>
             <div className="mt-2 gap-2">
                 {
