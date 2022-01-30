@@ -29,7 +29,7 @@ function generateKey({...props}) {
 
 function SceneChildItem({child, onClick, selected}) {
     return (
-        <div className={`cursor-pointer select-none rounded-full ${selected ? "bg-blue-600" : "bg-transparent"}`} onClick={onClick}>{child.type.name}</div>
+        <div className={`px-2 cursor-pointer select-none rounded-full ${selected ? "bg-blue-600" : "bg-transparent"}`} onClick={onClick}>{`${child.props.name} - [${child.type.name}]`}</div>
     )
 }
 
@@ -75,7 +75,7 @@ export default function EditorComponentGraph({sceneChildren, setSceneChildren, s
             }}/>
             <div className="flex flex-row gap-2">
                 <Select className="flex-grow" options={supportedComponents} styles={customStyles} onChange={(value, _)=>{setAddChildrenType(value.value)}}/>
-                <MagicDiv mergeTransitions className={`secondary-button ${(addChildrenType===null) ? "disabled" : ""}`} onClick={()=>{
+                <MagicDiv mergeTransitions className={`editor-secondary-button ${(addChildrenType===null) ? "disabled" : ""}`} onClick={()=>{
                     setSceneChildren(sceneChildren.concat([createElement(addChildrenType.component, generateKey(getDefaultInputs(addChildrenType.inputs)), null)]))
                 }}>Add</MagicDiv>
             </div>

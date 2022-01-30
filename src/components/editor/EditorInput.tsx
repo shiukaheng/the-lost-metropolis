@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
     NumberType, Vector3Type, Vector4Type, Vector2Type, ColorType, QuaternionType, EulerType, Matrix3Type, Matrix4Type, StringType, URLType, MatrixType, VectorType, EditorInputType, BooleanType
 } from "./EditorInputTypes"
@@ -12,13 +12,23 @@ import { createElement } from "react";
 // Component for inputting numbers
 function NumberInput({value, setValue}) {
     const [valid, setValid] = useState(true);
+    const [inputBuffer, setInputBuffer] = useState(value);
+    useEffect(()=>{
+        if (NumberType.typeCheck(value)) {
+            setValid(true);
+        } else {
+            setValid(false);
+        }
+        setInputBuffer(value);
+    }, [value]);
     return (
-        <input className={`number-input-field ${valid ? "" : "invalid"}`} type="number" value={value} onChange={(e) => {
+        <input className={`number-input-field ${valid ? "" : "invalid"}`} type="number" value={valid ? value : inputBuffer} onChange={(e) => {
             const newValue = parseFloat(e.target.value);
             if (NumberType.typeCheck(newValue)) {
                 setValue(newValue);
                 setValid(true);
             } else {
+                setInputBuffer(newValue);
                 setValid(false);
             }
         }}/>
@@ -51,13 +61,16 @@ function StringInput({value, setValue}) {
 // Component for inputting a URL, has red boundary on input when invalid, checked with URLType.typeCheck and only call onValueChange when input is valid
 function URLInput({value, setValue}) {
     const [valid, setValid] = useState(true);
+    const [inputBuffer, setInputBuffer] = useState(value);
     return (
-        <input className={`string-input-cell ${valid ? "" : "invalid"}`} type="text" value={value} onChange={(e) => {
+        <input className={`string-input-cell ${valid ? "" : "invalid"}`} type="text" value={valid ? value : inputBuffer} onChange={(e) => {
             const newValue = e.target.value;
             if (URLType.typeCheck(newValue)) {
                 setValue(newValue);
                 setValid(true);
-            } else {
+            }
+            else {
+                setInputBuffer(newValue);
                 setValid(false);
             }
         }}/>
@@ -66,6 +79,16 @@ function URLInput({value, setValue}) {
 
 function MatrixInput({rows, columns, value, setValue}) {
     const [valid, setValid] = useState(true);
+    const [inputBuffer, setInputBuffer] = useState(value);
+    useEffect(()=>{
+        if (MatrixType.typeCheck(value)) {
+            setValid(true);
+        } else {
+            setValid(false);
+        }
+        // Keep input buffer in sync with value
+        setInputBuffer(value);
+    }, [value]);
     return (
         <div className={`matrix-input ${valid ? "" : "invalid"}`}>
             {
@@ -73,7 +96,7 @@ function MatrixInput({rows, columns, value, setValue}) {
                     <div key={row} className="matrix-input-row">
                         {
                             range(columns).map(column => (
-                                <input key={column} className={`matrix-input-cell ${valid ? "" : "invalid"}`} type="number" value={value[row][column]} onChange={(e) => {
+                                <input key={column} className={`matrix-input-cell ${valid ? "" : "invalid"}`} type="number" value={valid ? value[row][column] : inputBuffer[row][column]} onChange={(e) => {
                                     const newValue = value.map(row => row.slice()); // clone
                                     newValue[row][column] = parseFloat(e.target.value);
                                     console.log(newValue)
@@ -81,9 +104,19 @@ function MatrixInput({rows, columns, value, setValue}) {
                                         setValue(newValue);
                                         setValid(true);
                                     } else {
+                                        setInputBuffer(newValue);
                                         setValid(false);
                                     }
-                                }}/>
+                                }}
+                                onBlur={
+                                    // When input is blurred and invalid, set input buffer to value and set valid to true
+                                    () => {
+                                        if (!valid) {
+                                            setInputBuffer(value);
+                                            setValid(true);
+                                        }
+                                    }
+                                }/>
                             ))
                         }
                     </div>
@@ -92,29 +125,6 @@ function MatrixInput({rows, columns, value, setValue}) {
         </div>
     );
 }
-
-// Generic component for inputting a vector of any dimension, composed by N cells of html number input elements, borders should all turn red when output vector is only call onValueChange when input is valid
-// function VectorInput({length, value, setValue}) {
-//     const [valid, setValid] = useState(true);
-//     return (
-//         <div className={`editor-input-field ${valid ? "" : "invalid"}`}>
-//             {
-//                 range(length).map(index => (
-//                     <input key={index} className={`vector-cell ${valid ? "" : "invalid"}`} type="number" value={value[index]} onChange={(e) => {
-//                         const newValue = value.map(value => value); // clone
-//                         newValue[index] = parseFloat(e.target.value);
-//                         if (VectorType.typeCheck(newValue)) {
-//                             setValue(newValue);
-//                             setValid(true);
-//                         } else {
-//                             setValid(false);
-//                         }
-//                     }}/>
-//                 ))
-//             }
-//         </div>
-//     );
-// }
 
 function VectorInput({length, value, setValue}) {
     const wrappedSetValue = (newValue) => {

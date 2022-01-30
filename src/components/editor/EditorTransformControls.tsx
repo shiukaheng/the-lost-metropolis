@@ -4,6 +4,8 @@ import { useLayoutEffect, useRef, cloneElement, Fragment } from "react";
 import { Children } from "react";
 import { Object3D } from "three"
 
+// Todo: support multi-selection transform grouping
+
 function EditorTransformControls({updatePartialSceneChildren, children, ...props}) {
     const transformControlsRef = useRef(null) 
     // If children is a single element, wrap it in an array

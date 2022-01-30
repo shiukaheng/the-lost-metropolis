@@ -21,6 +21,11 @@
     line-height: 1.6;
 }
 
+.editor-secondary-button {
+    @apply border-black select-none border px-4 rounded-full md:hover:opacity-50 font-serif font-bold text-xl h-9 cursor-pointer transition-opacity duration-500;
+    line-height: 1.6;
+}
+
 .primary-button {
     @apply  bg-black select-none text-white px-4 rounded-full md:hover:opacity-50 font-serif font-bold md:text-xl h-8 md:h-9 cursor-pointer transition-opacity duration-500;
     line-height: 1.6;
@@ -83,6 +88,18 @@
 }
 
 /* Editor CSS */
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
 
 .number-input-field {
     @apply bg-white rounded-full w-20 text-black px-2

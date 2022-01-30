@@ -10,6 +10,8 @@ import EditorComponentProperties from './EditorComponentProperties';
 import MagicDiv from '../MagicDiv';
 import { DepthKitObject } from '../3d/DepthKitObject';
 import EditorTransformControls from './EditorTransformControls';
+import EditorTransformOptions from './EditorTransformOptions';
+import EditorIO from './EditorIO';
 
 var supportedComponents = []
 
@@ -88,6 +90,8 @@ function _updatePartialSceneChildren(sceneChildren, childrenToUpdate) {
 function Editor() {
     const [sceneChildren, _setSceneChildren] = useState([])
     const [selectedIDs, setSelectedIDs] = useState([])
+    const [transformMode, setTransformMode] = useState("translate")
+    const [transformSpace, setTransformSpace] = useState("world")
     const setSceneChildren = (newChildren) => {
         const sceneIDs = newChildren.map(child => child.props.id)
         setSelectedIDs(selectedIDs.filter(id => sceneIDs.includes(id)))
@@ -100,7 +104,7 @@ function Editor() {
     const wrappedSceneChildren = sceneChildren.map(child => {
         if (selectedIDs.includes(child.props.id)) {
             return (
-                <EditorTransformControls updatePartialSceneChildren={updatePartialSceneChildren} mode="translate" key={child.props.id}>
+                <EditorTransformControls updatePartialSceneChildren={updatePartialSceneChildren} mode={transformMode} space={transformSpace} key={child.props.id}>
                     {child}
                 </EditorTransformControls>
             )
@@ -115,6 +119,8 @@ function Editor() {
                 <div className="editor-embedded-widget text-2xl font-bold">Editor</div>
                 <EditorComponentGraph sceneChildren={sceneChildren} setSceneChildren={setSceneChildren} selectedIDs={selectedIDs} setSelectedIDs={setSelectedIDs} supportedComponents={supportedComponents}/>
                 <EditorComponentProperties sceneChildren={sceneChildren} setSceneChildren={setSceneChildren} selectedIDs={selectedIDs} supportedComponents={supportedComponents}/>
+                <EditorTransformOptions {...{transformMode, setTransformMode, transformSpace, setTransformSpace}}/>
+                <EditorIO sceneChildren={sceneChildren} setSceneChildren={setSceneChildren}/>
             </div>
             <div className="w-1/2 h-full bg-black">
                 <DebugViewport className="w-full h-full">
