@@ -8,9 +8,8 @@ import TestObject from '../3d/TestObject';
 import { BooleanType, EulerType, StringType, URLType, Vector3Type } from './EditorInputTypes';
 import EditorComponentProperties from './EditorComponentProperties';
 import MagicDiv from '../MagicDiv';
-import { TransformControls } from '@react-three/drei';
-import EditorTransformControls from './EditorTransformControls';
 import { DepthKitObject } from '../3d/DepthKitObject';
+import EditorTransformControls from './EditorTransformControls';
 
 var supportedComponents = []
 
@@ -74,6 +73,18 @@ editorRegister(DepthKitObject, {
     },
 })
 
+function _updatePartialSceneChildren(sceneChildren, childrenToUpdate) {
+    // return new sceneChildren but with the children whose props.id is in updateChildren
+    const idsToBeUpdated = childrenToUpdate.map(child => child.props.id)
+    return sceneChildren.map(child => {
+        if (idsToBeUpdated.includes(child.props.id)) {
+            return childrenToUpdate.find(item => item.props.id === child.props.id)
+        } else {
+            return child
+        }
+    })
+}
+
 function Editor() {
     const [sceneChildren, _setSceneChildren] = useState([])
     const [selectedIDs, setSelectedIDs] = useState([])
@@ -82,11 +93,14 @@ function Editor() {
         setSelectedIDs(selectedIDs.filter(id => sceneIDs.includes(id)))
         _setSceneChildren(newChildren)
     }
+    const updatePartialSceneChildren = (newChildren) => {
+        _setSceneChildren(_updatePartialSceneChildren(sceneChildren, newChildren))
+    }
     // Wrap children whose child.props.id is in selectedIDs with TransformControls
     const wrappedSceneChildren = sceneChildren.map(child => {
         if (selectedIDs.includes(child.props.id)) {
             return (
-                <EditorTransformControls setSceneChildren={setSceneChildren} mode="translate" key={child.props.id}>
+                <EditorTransformControls updatePartialSceneChildren={updatePartialSceneChildren} mode="translate" key={child.props.id}>
                     {child}
                 </EditorTransformControls>
             )
