@@ -84,7 +84,6 @@ export default function EditorComponentGraph({sceneChildren, setSceneChildren, s
                     sceneChildren.map((child) => (
                         <SceneChildItem selected={selectedIDs.includes(child.props.id)} key={uuidv4()} child={child} onClick={
                             ()=>{
-                                console.log("clicked")
                                 if (shiftPress) {
                                     if (selectedIDs.includes(child.props.id)) {
                                         setSelectedIDs(selectedIDs.filter(elem => elem !== child.props.id))

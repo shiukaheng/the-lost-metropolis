@@ -5,7 +5,7 @@ import { useState } from 'react';
 import EditorEmbeddedWidget from './EditorEmbeddedWidget';
 import EditorComponentGraph from './EditorComponentGraph';
 import TestObject from '../3d/TestObject';
-import { BooleanType, EulerType, StringType, URLType, Vector3Type } from './EditorInputTypes';
+import { BooleanType, ColorType, EulerType, StringType, URLType, Vector3Type } from './EditorInputTypes';
 import EditorComponentProperties from './EditorComponentProperties';
 import MagicDiv from '../MagicDiv';
 import { DepthKitObject } from '../3d/DepthKitObject';
@@ -23,6 +23,18 @@ function editorRegister(component, inputs) {
             inputs: inputs
         }
     })
+}
+
+function getComponentPropInfo(component) {
+    return supportedComponents.find(item => item.value.component === component).value.inputs
+}
+
+function getComponentPropInfoFromName(componentName) {
+    return supportedComponents.find(item => item.value.component.name === componentName).value.inputs
+}
+
+function getComponentFromName(componentName) {
+    return supportedComponents.find(item => item.value.component.name === componentName).value.component
 }
 
 const genericProps = {
@@ -45,7 +57,12 @@ const genericProps = {
 }
 
 // Register editable components
-editorRegister(TestObject, genericProps)
+editorRegister(TestObject, {
+    ...genericProps,
+    "color": {
+        "type": ColorType,
+        "default": [1, 1, 1]
+    }})
 editorRegister(DebugPlane, genericProps)
 editorRegister(DepthKitObject, {
     ...genericProps,
@@ -132,4 +149,4 @@ function Editor() {
     );
 }
 
-export {Editor, editorRegister}
+export {Editor, editorRegister, supportedComponents, getComponentPropInfo, getComponentPropInfoFromName, getComponentFromName}

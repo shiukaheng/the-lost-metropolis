@@ -50,9 +50,11 @@ const QuaternionType: EditorInputType = {
     typeCheck: (value) => VectorType.typeCheck(value) && value.length === 4
 }
 
+const EulerOrders = ["XYZ", "YZX", "ZXY", "XZY", "YXZ", "ZYX"]
+
 const EulerType: EditorInputType = {
     typeName: "euler",
-    typeCheck: (value) => VectorType.typeCheck(value) && value.length === 3
+    typeCheck: ([x, y, z, ...remaining]) => VectorType.typeCheck([x, y, z]) && ((remaining.length === 0) || ((remaining.length === 1) && (EulerOrders.includes(remaining[0]))))
 }
 
 const Matrix3Type: EditorInputType = {

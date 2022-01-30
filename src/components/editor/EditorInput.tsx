@@ -23,13 +23,18 @@ function NumberInput({value, setValue}) {
     }, [value]);
     return (
         <input className={`number-input-field ${valid ? "" : "invalid"}`} type="number" value={valid ? value : inputBuffer} onChange={(e) => {
-            const newValue = parseFloat(e.target.value);
-            if (NumberType.typeCheck(newValue)) {
-                setValue(newValue);
-                setValid(true);
+            if (e.target.value === "") {
+                setInputBuffer("")
+                setValid(false)
             } else {
-                setInputBuffer(newValue);
-                setValid(false);
+                const newValue = parseFloat(e.target.value);
+                if (NumberType.typeCheck(newValue)) {
+                    setValue(newValue);
+                    setValid(true);
+                } else {
+                    setInputBuffer(newValue);
+                    setValid(false);
+                }
             }
         }}/>
     );
@@ -98,14 +103,19 @@ function MatrixInput({rows, columns, value, setValue}) {
                             range(columns).map(column => (
                                 <input key={column} className={`matrix-input-cell ${valid ? "" : "invalid"}`} type="number" value={valid ? value[row][column] : inputBuffer[row][column]} onChange={(e) => {
                                     const newValue = value.map(row => row.slice()); // clone
-                                    newValue[row][column] = parseFloat(e.target.value);
-                                    console.log(newValue)
-                                    if (MatrixType.typeCheck(newValue)) {
-                                        setValue(newValue);
-                                        setValid(true);
-                                    } else {
+                                    if (e.target.value === "") {
+                                        newValue[row][column] = "";
                                         setInputBuffer(newValue);
                                         setValid(false);
+                                    } else {
+                                        newValue[row][column] = parseFloat(e.target.value);
+                                        if (MatrixType.typeCheck(newValue)) {
+                                            setValue(newValue);
+                                            setValid(true);
+                                        } else {
+                                            setInputBuffer(newValue);
+                                            setValid(false);
+                                        }
                                     }
                                 }}
                                 onBlur={
@@ -145,19 +155,27 @@ function EulerInput({value, setValue}) {
 
 // Component for inputting a color using html color input element, but transform the hex string into a three number array representing RGB, no type checking needed as the input element always returns a valid RGB color
 
+function rgbToHexString(rgb) {
+    var rgb = rgb.map(x => Math.round(x * 255));
+    return "#" + rgb.map(c => (c.toString(16).padStart(2, "0"))).join("");
+}
+
 function hexStringToRGB(hexString) {
-    const hex = hexString.replace("#", "");
-    const r = parseInt(hex.substring(0, 2), 16);
-    const g = parseInt(hex.substring(2, 4), 16);
-    const b = parseInt(hex.substring(6, 8), 16);
-    return [r, g, b];
+    // Input is a string of the form "#RRGGBB"
+    // Output [r, g, b] where each is between 0 and 1
+    const hex = hexString.slice(1);
+    const r = parseInt(hex.slice(0, 2), 16) / 255;
+    const g = parseInt(hex.slice(2, 4), 16) / 255;
+    const b = parseInt(hex.slice(4, 6), 16) / 255;
+    return [r, g, b]
 }
 
 // ColorInput uses html color input element, no type checking needed as the input element always returns a valid RGB color
 function ColorInput({value, setValue}) {
     return (
-        <input className="color-input-cell" type="color" value={value} onChange={(e) => {
+        <input className="color-input-cell" type="color" value={rgbToHexString(value)} onChange={(e) => {
             const newValue = hexStringToRGB(e.target.value);
+            console.log
             setValue(newValue)
         }}/>
     );
