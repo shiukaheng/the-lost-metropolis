@@ -1,4 +1,4 @@
-import { createElement } from 'react';
+import { createContext, createElement } from 'react';
 import DebugViewport from '../DebugViewport';
 import DebugPlane from '../3d/DebugPlane';
 import { useState } from 'react';
@@ -104,11 +104,18 @@ function _updatePartialSceneChildren(sceneChildren, childrenToUpdate) {
     })
 }
 
+const defaultEditorContext = {
+    childrenInteractions: true,
+}
+
+const EditorContext = createContext(defaultEditorContext)
+
 function Editor() {
     const [sceneChildren, _setSceneChildren] = useState([])
     const [selectedIDs, setSelectedIDs] = useState([])
     const [transformMode, setTransformMode] = useState("translate")
     const [transformSpace, setTransformSpace] = useState("world")
+    const [childrenInteractions, setChildrenInteractions] = useState(true)
     const setSceneChildren = (newChildren) => {
         const sceneIDs = newChildren.map(child => child.props.id)
         setSelectedIDs(selectedIDs.filter(id => sceneIDs.includes(id)))
@@ -142,11 +149,13 @@ function Editor() {
             <div className="w-1/2 h-full bg-black">
                 <DebugViewport className="w-full h-full">
                     <DebugPlane rotation={[Math.PI/2, 0, 0]}/>
-                    {wrappedSceneChildren}
+                    <EditorContext.Provider value={{childrenInteractions: childrenInteractions}}>
+                        {wrappedSceneChildren}
+                    </EditorContext.Provider>
                 </DebugViewport>
             </div>
         </MagicDiv>
     );
 }
 
-export {Editor, editorRegister, supportedComponents, getComponentPropInfo, getComponentPropInfoFromName, getComponentFromName}
+export {Editor, editorRegister, supportedComponents, getComponentPropInfo, getComponentPropInfoFromName, getComponentFromName, EditorContext}
