@@ -126,7 +126,7 @@ input[type=number] {
 }
 
 .color-input-cell {
-    @apply rounded-full overflow-clip
+    @apply rounded-full overflow-clip cursor-pointer
 }
 
 input[type="color"] {
