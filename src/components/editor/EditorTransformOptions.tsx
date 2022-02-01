@@ -6,6 +6,7 @@ import { formatRGBCSS } from "../../utilities";
 import MagicDiv from "../MagicDiv";
 import { useContext, useState } from "react";
 import EditorEmbeddedWidget from "./EditorEmbeddedWidget";
+import { EditorContext } from "./Editor";
 
 function TransformModeSetter({transformMode, setTransformMode, transformSpace, setTransformSpace}) {
     const theme = useContext(ThemeContext)
@@ -50,10 +51,11 @@ function TransformModeSetter({transformMode, setTransformMode, transformSpace, s
     )
 }
 
-export default function EditorTransformOptions({...props}) {
+export default function EditorTransformOptions() {
+    const { transformMode, setTransformMode, transformSpace, setTransformSpace } = useContext(EditorContext)
     return (
         <EditorEmbeddedWidget title="Transformation options">
-            <TransformModeSetter {...props}/>
+            <TransformModeSetter {...{ transformMode, setTransformMode, transformSpace, setTransformSpace }}/>
         </EditorEmbeddedWidget>
     )
 }

@@ -129,6 +129,10 @@ input[type=number] {
     @apply rounded-full overflow-clip cursor-pointer
 }
 
+.boolean-input-field {
+    transform: translate(0px,8px);
+}
+
 input[type="color"] {
 	-webkit-appearance: none;
 	border: none;

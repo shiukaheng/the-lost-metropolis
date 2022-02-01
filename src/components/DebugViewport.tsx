@@ -1,6 +1,6 @@
 import { Canvas } from "@react-three/fiber"
 import DebugPlane from "./3d/DebugPlane";
-import ViewportContext from "./ViewportContext"
+import ViewportCanvas from "./ViewportCanvas"
 import { OrbitControls } from '@react-three/drei'
 import { ErrorBoundary } from "react-error-boundary";
 import MagicDiv from "./MagicDiv";
@@ -19,12 +19,10 @@ function DebugViewport({children, ...props}) {
     return (
         <div {...props}>
             <ErrorBoundary FallbackComponent={Fallback}>
-                <Canvas>
-                    <ViewportContext>
-                        <OrbitControls enablePan enableRotate enableZoom makeDefault/>
-                        {children}
-                    </ViewportContext>
-                </Canvas>
+                <ViewportCanvas>
+                    <OrbitControls enablePan enableRotate enableZoom makeDefault/>
+                    {children}
+                </ViewportCanvas>
             </ErrorBoundary>
         </div>
     );

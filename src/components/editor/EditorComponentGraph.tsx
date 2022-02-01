@@ -5,6 +5,7 @@ import { createElement, useEffect, useRef, useState, useContext } from "react";
 import { v4 as uuidv4 } from 'uuid';
 import { useKeyPress, KeyPressCallback, formatRGBCSS } from "../../utilities";
 import { ThemeContext } from "../App"
+import { EditorContext, editorRegister } from "./Editor";
 
 function getDefaultInputs(inputObject) {
     var defaultInputs = {}
@@ -34,9 +35,10 @@ function SceneChildItem({child, onClick, selected}) {
 }
 
 // Component for selecting scene or deleting scene components, stays in sync with the editor viewport
-export default function EditorComponentGraph({sceneChildren, setSceneChildren, selectedIDs, setSelectedIDs, supportedComponents}) {
+export default function EditorComponentGraph() {
+    const {sceneChildren, setSceneChildren, selectedIDs, setSelectedIDs, addSelectedIDs, removeSelectedIDs, supportedComponents, shiftPressed} = useContext(EditorContext)
     const [addChildrenType, setAddChildrenType] = useState(null)
-    const shiftPress = useKeyPress("Shift")
+
     const theme = useContext(ThemeContext)
     const customStyles = {
         option: (provided, state) => ({
@@ -84,11 +86,11 @@ export default function EditorComponentGraph({sceneChildren, setSceneChildren, s
                     sceneChildren.map((child) => (
                         <SceneChildItem selected={selectedIDs.includes(child.props.id)} key={uuidv4()} child={child} onClick={
                             ()=>{
-                                if (shiftPress) {
+                                if (shiftPressed) {
                                     if (selectedIDs.includes(child.props.id)) {
-                                        setSelectedIDs(selectedIDs.filter(elem => elem !== child.props.id))
+                                        removeSelectedIDs(child.props.id)
                                     } else {
-                                        setSelectedIDs(selectedIDs.concat([child.props.id]))
+                                        addSelectedIDs(child.props.id)
                                     }
                                 } else {
                                     setSelectedIDs([child.props.id])

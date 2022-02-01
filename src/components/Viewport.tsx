@@ -1,6 +1,6 @@
 import { Canvas } from "@react-three/fiber"
 import { PotreeManager } from "./3d/PotreeManager"
-import ViewportContext from "./ViewportContext"
+import ViewportCanvas from "./ViewportCanvas"
 import { ReactNode } from "react";
 
 type ViewportProps = {
@@ -10,11 +10,9 @@ type ViewportProps = {
 function Viewport({children, ...props}:ViewportProps) {
     return (
         <div {...props}>
-            <Canvas>
-                <ViewportContext>
-                    {children}
-                </ViewportContext>
-            </Canvas>
+            <ViewportCanvas>
+                {children}
+            </ViewportCanvas>
         </div>
     );
 }

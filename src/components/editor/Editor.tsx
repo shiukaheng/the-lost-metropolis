@@ -12,6 +12,8 @@ import { DepthKitObject } from '../3d/DepthKitObject';
 import EditorTransformControls from './EditorTransformControls';
 import EditorTransformOptions from './EditorTransformOptions';
 import EditorIO from './EditorIO';
+import { KeyPressCallback, useKeyPress } from '../../utilities';
+import { useContextBridge } from '@react-three/drei';
 
 var supportedComponents = []
 
@@ -62,7 +64,12 @@ editorRegister(TestObject, {
     "color": {
         "type": ColorType,
         "default": [1, 1, 1]
-    }})
+    },
+    "wireframe": {
+        "type": BooleanType,
+        "default": false
+    }
+})
 editorRegister(DebugPlane, genericProps)
 editorRegister(DepthKitObject, {
     ...genericProps,
@@ -109,26 +116,90 @@ function joinChildren(sceneChildren, childrenToUpdate) {
 // selectedIDs, setSelectedIDs, addSelectedIDs, removeSelectedIDs,
 // transformMode, setTransformMode,
 // transformSpace, setTransformSpace,
-// overrideInteractions, setOverrideInteractions
+// overrideInteractions, setOverrideInteractions,
+// supportedComponents
 
-defaultEditorContext = {
+const defaultEditorContext = {
     sceneChildren: [],
-    setSceneChildren: () => { },
-    addSceneChildren: () => { },
-    removeSceneChildren: () => { },
+    setSceneChildren: (children:[]) => { },
+    addSceneChildren: (children:[]) => { },
+    removeSceneChildren: (children:[]) => { },
     selectedIDs: [],
-    setSelectedIDs: () => { },
-    addSelectedIDs: () => { },
-    removeSelectedIDs: () => { },
+    setSelectedIDs: (ids:[]) => { },
+    addSelectedIDs: (ids:[]) => { },
+    removeSelectedIDs: (ids:[]) => { },
     transformMode: "translate",
-    setTransformMode: () => { },
+    setTransformMode: (mode:string) => { },
     transformSpace: "world",
-    setTransformSpace: () => { },
+    setTransformSpace: (space:string) => { },
     overrideInteractions: false,
-    setOverrideInteractions: () => { },
+    setOverrideInteractions: (override:boolean) => { },
+    supportedComponents: supportedComponents,
+    shiftPressed: false,
 }
 
+
+// Components should be set to selection when clicked on, added to selection when shift-clicked, and all other behaviour should result in no changes
+
+// Assume a unified interaction interface with mouse and VR controllers:
+// Mouse:
+// - onClick -> onClick
+// - onMouseEnter -> onHover
+// - onMouseLeave -> onBlur
+// VR controller:
+// - onClick -> onClick
+// - onHover -> onHover
+// - onBlur -> onBlur
+
+// Create convenience functions for creating 3d components respecting overrideInteractions:
+// Provide onClick, onHover, onBlur wrapper functions to be used in components
+// e.g., Before: onClick -> Do something After: onClick -> Do that something IF overrideInteractions is false, otherwise do other thing with ID as argument
+// Take care that context may be undefined in cases where the component is not being used in an editor
+
+function wrapOnClick(onClick:(e)=>void, context, id) {
+    return (event) => {
+        if (context?.overrideInteractions) {
+            if (context.shiftPressed) {
+                if (context.selectedIDs.includes(id)) {
+                    context.removeSelectedIDs([id])
+                } else {
+                    context.addSelectedIDs([id])
+                }
+            } else {
+                context.setSelectedIDs([id])
+            }
+        } else {
+            onClick(event)
+        }
+    }
+}
+
+// Behaviour for hover and blur is to ignore if overrideInteractions is true; id is passed just in case for future use
+function wrapOnHover(onHover:(e)=>{}, context, id) {
+    return (event) => {
+        if (!context?.overrideInteractions) {
+            onHover(event)
+        }
+    }
+}
+
+function wrapOnBlur(onBlur:(e)=>{}, context, id) {
+    return (event) => {
+        if (!context?.overrideInteractions) {
+            onBlur(event)
+        }
+    }
+}
+            
+
 const EditorContext = createContext(defaultEditorContext)
+
+function inspect(v:any) {
+    console.log(v)
+    return v
+}
+
+const TestContext = createContext(false)
 
 function Editor() {
     // Setup state for editor
@@ -137,6 +208,7 @@ function Editor() {
     const [transformMode, setTransformMode] = useState("translate")
     const [transformSpace, setTransformSpace] = useState("world")
     const [overrideInteractions, setOverrideInteractions] = useState(true)
+    const shiftPressed = useKeyPress("Shift")
 
     // Make selectedIDs react to setSceneChildren
     const setSceneChildren = (newChildren) => {
@@ -178,27 +250,28 @@ function Editor() {
 
     return (
         <EditorContext.Provider value={
-            {sceneChildren, setSceneChildren, addSceneChildren, removeSceneChildren, selectedIDs, setSelectedIDs, addSelectedIDs, removeSelectedIDs, transformMode, setTransformMode, transformSpace, setTransformSpace, overrideInteractions, setOverrideInteractions}
+            {sceneChildren, setSceneChildren, addSceneChildren, removeSceneChildren, selectedIDs, setSelectedIDs, addSelectedIDs, removeSelectedIDs, transformMode, setTransformMode, transformSpace, setTransformSpace, overrideInteractions, setOverrideInteractions, supportedComponents, shiftPressed}
         }>
+            <KeyPressCallback keyName={"Escape"} onDown={()=>{setSelectedIDs([])}}/>
             <MagicDiv backgroundColorCSSProps={["backgroundColor"]} className="absolute w-full h-full flex flex-row">
                 <div className="w-1/2 h-full flex flex-col p-4 overflow-clip">
                     <div className="editor-embedded-widget text-2xl font-bold">Editor</div>
-                    <EditorComponentGraph sceneChildren={sceneChildren} setSceneChildren={setSceneChildren} selectedIDs={selectedIDs} setSelectedIDs={setSelectedIDs} supportedComponents={supportedComponents}/>
-                    <EditorComponentProperties sceneChildren={sceneChildren} setSceneChildren={setSceneChildren} selectedIDs={selectedIDs} supportedComponents={supportedComponents}/>
-                    <EditorTransformOptions {...{transformMode, setTransformMode, transformSpace, setTransformSpace}}/>
+                    <EditorComponentGraph/>
+                    <EditorComponentProperties/>
+                    <EditorTransformOptions/>
                     <EditorIO sceneChildren={sceneChildren} setSceneChildren={setSceneChildren}/>
                 </div>
                 <div className="w-1/2 h-full bg-black">
+                    <TestContext.Provider value={true}>
                     <DebugViewport className="w-full h-full">
                         <DebugPlane rotation={[Math.PI/2, 0, 0]}/>
-                        <EditorContext.Provider value={{childrenInteractions: overrideInteractions}}>
                             {wrappedSceneChildren}
-                        </EditorContext.Provider>
                     </DebugViewport>
+                    </TestContext.Provider>
                 </div>
             </MagicDiv>
         </EditorContext.Provider>
     );
 }
 
-export {Editor, editorRegister, supportedComponents, getComponentPropInfo, getComponentPropInfoFromName, getComponentFromName, EditorContext}
+export {Editor, editorRegister, supportedComponents, getComponentPropInfo, getComponentPropInfoFromName, getComponentFromName, EditorContext, wrapOnClick, wrapOnHover, wrapOnBlur, TestContext}

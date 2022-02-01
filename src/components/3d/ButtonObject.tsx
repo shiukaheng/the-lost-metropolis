@@ -24,6 +24,7 @@ type ButtonObjectProps = JSX.IntrinsicElements['mesh'] & {
 }
 
 function ButtonObject({width=0.5, height=0.25, text="Button", foregroundColor="white", backgroundColor="#282828", backgroundOpacity=0.8, fontSize=0.1, font=undefined, onClick=()=>{}, radius=0.05, ...props}:ButtonObjectProps) {
+    const { overrideInteractions } = useContext(EditorContext)
     const [clicked, setClicked] = useState(false)
     const [hovered, setHovered] = useState(false)
     const editorContext = useContext(EditorContext)

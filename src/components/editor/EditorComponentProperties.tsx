@@ -1,9 +1,11 @@
 import EditorEmbeddedWidget from "./EditorEmbeddedWidget";
 import EditorInput from "./EditorInput";
 import { v4 as uuidv4 } from 'uuid';
-import { cloneElement } from "react";
+import { cloneElement, useContext } from "react";
+import { EditorContext } from "./Editor";
 
-export default function EditorComponentProperties({ sceneChildren, setSceneChildren, selectedIDs, supportedComponents}) {
+export default function EditorComponentProperties() {
+    const {sceneChildren, setSceneChildren, selectedIDs, supportedComponents} = useContext(EditorContext);
     return (
         <EditorEmbeddedWidget title="Component properties">
             <div className="flex flex-col">

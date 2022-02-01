@@ -1,6 +1,7 @@
 import { Color, extend } from '@react-three/fiber';
 import { Text } from "@react-three/drei"
 import { DoubleSide } from 'three';
+import RoundedRectangleGeometry from './geometries/RoundedRectangleGeometry';
 
 type TextPanelObjectProps = JSX.IntrinsicElements["group"] & {
     width?: number
@@ -13,6 +14,8 @@ type TextPanelObjectProps = JSX.IntrinsicElements["group"] & {
     font?: string
     radius?: number
 }
+
+extend(RoundedRectangleGeometry)
 
 function TextPanelObject({width=1.5, height=1, text="Button", foregroundColor="white", backgroundColor="#282828", backgroundOpacity=0.8, fontSize=0.1, font=undefined, radius=0.05, ...props}:TextPanelObjectProps) {
     return (
