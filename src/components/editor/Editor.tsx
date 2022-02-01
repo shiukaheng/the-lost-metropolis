@@ -273,15 +273,11 @@ function Editor() {
 
     // Wrap children whose child.props.id is in selectedIDs with TransformControls
     const wrappedSceneChildren = sceneChildren.map(child => {
-        if (selectedIDs.includes(child.props.id)) {
-            return (
-                <EditorTransformControls updatePartialSceneChildren={updateSceneChildren} mode={transformMode} space={transformSpace} key={child.props.id}>
-                    {child}
-                </EditorTransformControls>
-            )
-        } else {
-            return child
-        }
+        return (
+            <EditorTransformControls enabled={selectedIDs.includes(child.props.id)} updatePartialSceneChildren={updateSceneChildren} mode={transformMode} space={transformSpace} key={child.props.id}>
+                {child}
+            </EditorTransformControls>
+        )
     })
 
     return (
