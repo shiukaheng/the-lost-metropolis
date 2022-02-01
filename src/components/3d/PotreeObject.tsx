@@ -9,36 +9,40 @@ type PotreeObjectProps = JSX.IntrinsicElements["group"] & {
     pointShape?: number
 }
 
-function PotreeObject({cloudName="cloud.js", baseUrl, pointSize=1, pointSizeType=1, pointShape=0, ...props}:PotreeObjectProps) {
-    const {potree, pointClouds} = useContext(PotreeContext)
+function PotreeObject({cloudName="cloud.js", baseUrl, pointSize=1, pointSizeType=1, pointShape=0, id, ...props}:PotreeObjectProps) {
+    const {potree, setPointCloud: setManagerPointCloud} = useContext(PotreeContext)
     const [pointCloud, setPointCloud] = useState(null)
     const objectGroup = useRef(null)
-    useEffect(() => {
-        // remove current cloud from pointClouds (if existing)
-        const removeCurrentPointCloud = () => {
-            if (pointCloud !== null) { // If a cloud exists already, remove it.
-                const oldCloud = pointCloud
-                oldCloud.removeFromParent()
-                const index = pointClouds.indexOf(oldCloud)
-                if (index !== -1) {
-                    pointClouds.splice(index)
+    const isValid = useRef(true)
+
+    // Use useEffect to update pointCloud variable on cloudName, baseUrl changes
+    useEffect(()=>{
+        // Request new point with new cloudName and baseUrl asynchronously, then update pointCloud. In the asynchrnous callback, check if isValid is true. If it is, set pointCloud to the new pointCloud.
+        const loadNewPointCloud = async () => {
+            try {
+                const newPointCloud = await potree.loadPointCloud(cloudName, relativeUrl => `${baseUrl}${relativeUrl}`)
+                if (isValid.current) {
+                    // Update manager references
+                    setManagerPointCloud(newPointCloud, id)
+                    // Update self references
+                    setPointCloud(newPointCloud)
+                    // Clear old point cloud
+                    objectGroup.current.remove(objectGroup.current.children[0])
+                    // Add new point cloud
+                    objectGroup.current.add(newPointCloud)
                 }
+            } catch (e) {
+                console.warn("Failed to acquire cloud", e)
             }
         }
-        const loadNewPointCloud = async () => {
-            const newCloud = await potree.loadPointCloud(cloudName, relativeUrl => `${baseUrl}${relativeUrl}`)
-            setPointCloud(newCloud)
-            pointClouds.push(newCloud)
-            objectGroup.current.add(newCloud)
-        }
         loadNewPointCloud()
-        // return function that removes current pointClouds on unmount
-        return () => {
-            removeCurrentPointCloud() // POTENTIAL BUG: If loadNewPointCloud was invoked and not completed and the component was unmounted, object may not be removed from pointClouds array
+        return ()=>{
+            setManagerPointCloud(null, id)
         }
-    }, [cloudName, baseUrl, potree, pointClouds])
+    }, [cloudName, baseUrl])
     useEffect(() => {
-        if (pointCloud !== null) {
+        // Get last element in pointCloudBuffer
+        if (pointCloud) {
             pointCloud.material.size = pointSize
             pointCloud.material.pointSizeType = pointSizeType
             pointCloud.material.shape = pointShape
