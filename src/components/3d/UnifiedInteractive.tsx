@@ -10,7 +10,7 @@ export default function UnifiedInteractive({children=[], onClick=()=>{}, onHover
     const wrappedOnHover = wrapOnHover(onHover, editorContext, parentID)
     const wrappedOnBlur = wrapOnBlur(onBlur, editorContext, parentID)
     const wrappedChildren = (
-        <group onClick={wrappedOnClick} onPointerEnter={wrappedOnHover} onPointerLeave={wrappedOnBlur} {...props}>
+        <group {...props} onClick={wrappedOnClick} onPointerEnter={wrappedOnHover} onPointerLeave={wrappedOnBlur}>
             {children}
         </group>
     )
