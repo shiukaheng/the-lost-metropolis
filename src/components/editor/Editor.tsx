@@ -1,11 +1,11 @@
-import { createContext, createElement } from 'react';
+import { cloneElement, createContext, createElement } from 'react';
 import DebugViewport from '../DebugViewport';
 import DebugPlane from '../3d/DebugPlane';
 import { useState } from 'react';
 import EditorEmbeddedWidget from './EditorEmbeddedWidget';
 import EditorComponentGraph from './EditorComponentGraph';
 import TestObject from '../3d/TestObject';
-import { BooleanType, ColorType, EulerType, StringType, URLType, Vector3Type } from './EditorInputTypes';
+import { BooleanType, ColorType, EulerType, NumberType, StringType, URLType, Vector3Type } from './EditorInputTypes';
 import EditorComponentProperties from './EditorComponentProperties';
 import MagicDiv from '../MagicDiv';
 import { DepthKitObject } from '../3d/DepthKitObject';
@@ -14,6 +14,9 @@ import EditorTransformOptions from './EditorTransformOptions';
 import EditorIO from './EditorIO';
 import { KeyPressCallback, useKeyPress } from '../../utilities';
 import { useContextBridge } from '@react-three/drei';
+import LabelIconObject from '../3d/LabelIconObject';
+import InfoObject from '../3d/InfoObject';
+import PotreeObject from '../3d/PotreeObject';
 
 var supportedComponents = []
 
@@ -98,6 +101,22 @@ editorRegister(DepthKitObject, {
         default: false
     },
 })
+editorRegister(PotreeObject, {
+    ...genericProps,
+    cloudName: {
+        type: StringType,
+        default: "cloud.js"
+    },
+    baseUrl: {
+        type: URLType,
+        default: "http://localhost/"
+    },
+    pointSize: {
+        type: NumberType,
+        default: 1
+    }
+    // Todo: Support selection types for pointSizeType, pointShape
+})
 
 function joinChildren(sceneChildren, childrenToUpdate) {
     // return new sceneChildren but with the children whose props.id is in updateChildren
@@ -136,6 +155,7 @@ const defaultEditorContext = {
     setOverrideInteractions: (override:boolean) => { },
     supportedComponents: supportedComponents,
     shiftPressed: false,
+    updateSceneChildren: (children:[]) => { },
 }
 
 
@@ -147,7 +167,7 @@ const defaultEditorContext = {
 // - onMouseEnter -> onHover
 // - onMouseLeave -> onBlur
 // VR controller:
-// - onClick -> onClick
+// - onClick -> onSelect
 // - onHover -> onHover
 // - onBlur -> onBlur
 
@@ -175,7 +195,7 @@ function wrapOnClick(onClick:(e)=>void, context, id) {
 }
 
 // Behaviour for hover and blur is to ignore if overrideInteractions is true; id is passed just in case for future use
-function wrapOnHover(onHover:(e)=>{}, context, id) {
+function wrapOnHover(onHover:(e)=>void, context, id) {
     return (event) => {
         if (!context?.overrideInteractions) {
             onHover(event)
@@ -183,7 +203,7 @@ function wrapOnHover(onHover:(e)=>{}, context, id) {
     }
 }
 
-function wrapOnBlur(onBlur:(e)=>{}, context, id) {
+function wrapOnBlur(onBlur:(e)=>void, context, id) {
     return (event) => {
         if (!context?.overrideInteractions) {
             onBlur(event)
@@ -217,6 +237,22 @@ function Editor() {
         _setSceneChildren(newChildren)
     }
 
+    const updateSceneChildren = (newChildren) => {
+        setSceneChildren(sceneChildren.map(child => {
+            const newChild = newChildren.find(newChild => newChild.props.id === child.props.id)
+            if (newChild) {
+                return cloneElement(
+                    child,
+                    {
+                        ...newChild.props
+                    }
+                )
+            } else {
+                return child
+            }
+        }))
+    }
+    
     // Create convenience functions for adding and removing children
     const addSceneChildren = (newChildren) => {
         _setSceneChildren(joinChildren(sceneChildren, newChildren))
@@ -239,7 +275,7 @@ function Editor() {
     const wrappedSceneChildren = sceneChildren.map(child => {
         if (selectedIDs.includes(child.props.id)) {
             return (
-                <EditorTransformControls updatePartialSceneChildren={addSceneChildren} mode={transformMode} space={transformSpace} key={child.props.id}>
+                <EditorTransformControls updatePartialSceneChildren={updateSceneChildren} mode={transformMode} space={transformSpace} key={child.props.id}>
                     {child}
                 </EditorTransformControls>
             )
@@ -250,7 +286,7 @@ function Editor() {
 
     return (
         <EditorContext.Provider value={
-            {sceneChildren, setSceneChildren, addSceneChildren, removeSceneChildren, selectedIDs, setSelectedIDs, addSelectedIDs, removeSelectedIDs, transformMode, setTransformMode, transformSpace, setTransformSpace, overrideInteractions, setOverrideInteractions, supportedComponents, shiftPressed}
+            {sceneChildren, setSceneChildren, addSceneChildren, removeSceneChildren, selectedIDs, setSelectedIDs, addSelectedIDs, removeSelectedIDs, transformMode, setTransformMode, transformSpace, setTransformSpace, overrideInteractions, setOverrideInteractions, supportedComponents, shiftPressed, updateSceneChildren}
         }>
             <KeyPressCallback keyName={"Escape"} onDown={()=>{setSelectedIDs([])}}/>
             <MagicDiv backgroundColorCSSProps={["backgroundColor"]} className="absolute w-full h-full flex flex-row">

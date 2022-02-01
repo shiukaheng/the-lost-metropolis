@@ -26,7 +26,7 @@ function InfoObject({text="", iconScale=0.1, ...props}:InfoObjectProps) {
         item 
         ?
         <Billboard follow>
-            <AnimatedLabelIcon iconUrl="/static/viewport/info-icon.png" scale={0.25} onClick={()=>{setExpanded(!expanded)}} iconScale={scale} iconOpacity={opacity} skirtHidden={!expanded} {...props}/>
+            <AnimatedLabelIcon iconUrl="/static/viewport/info-icon.png" scale={iconScale} onClick={()=>{setExpanded(!expanded)}} iconScale={scale} iconOpacity={opacity} skirtHidden={!expanded} {...props}/>
         </Billboard>
         :
         <AnimatedText scale={scale} gpuAccelerateSDF={true} fillOpacity={opacity} onClick={()=>{setExpanded(!expanded)}} text={text} {...props}/>
