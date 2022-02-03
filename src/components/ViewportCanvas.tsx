@@ -1,6 +1,6 @@
 import { useContextBridge } from "@react-three/drei"
 import { CursorDataContext } from "./App"
-import { PotreeManager } from "./3d/PotreeManager"
+import { PotreeManager } from "./3d/managers/PotreeManager"
 import { Children, useContext, useEffect, useLayoutEffect, useRef } from "react"
 import CompositeSuspense from "./3d/CompositeSuspense"
 import { EditorContext } from "./editor/EditorContext"

@@ -1,5 +1,5 @@
 import { useContext, useEffect, useRef, useState } from "react";
-import { PotreeContext } from "./PotreeManager";
+import { PotreeContext } from "./managers/PotreeManager";
 
 type PotreeObjectProps = JSX.IntrinsicElements["group"] & {
     cloudName?: string
