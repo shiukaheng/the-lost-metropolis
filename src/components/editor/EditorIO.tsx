@@ -89,12 +89,22 @@ function deserializeChildren(childrenArray) {
 }
 
 function EditorIO() {
-    const {sceneChildren, setSceneChildren} = useContext(ViewerContext)
+    const {sceneChildren, setSceneChildren, defaultCameraProps, setDefaultCameraProps} = useContext(ViewerContext)
     const inputFile = useRef(null) 
     const onButtonClick = () => {
         // `current` points to the mounted file input element
        inputFile.current.click();
-      };
+    };
+    const serialize = () => {
+        return {
+            sceneChildren: exportChildren(sceneChildren),
+            defaultCameraProps: defaultCameraProps
+        }
+    }
+    const deserialize = (obj) => {
+        setSceneChildren(deserializeChildren(obj.sceneChildren));
+        setDefaultCameraProps(obj.defaultCameraProps);
+    }
     return (
         <EditorEmbeddedWidget title="Import / Export">
             <div className="flex flex-row gap-2">
@@ -102,8 +112,7 @@ function EditorIO() {
                     var reader = new FileReader();
                     reader.onload = (e2) => {
                         const json = JSON.parse(e2.target.result);
-                        const newSceneChildren = deserializeChildren(json);
-                        setSceneChildren(newSceneChildren);
+                        deserialize(json)
                     }
                     reader.readAsText(e.target.files[0]);
                 }}/>
@@ -113,7 +122,7 @@ function EditorIO() {
                     Import
                 </MagicDiv>
                 <MagicDiv mergeTransitions className="editor-secondary-button" onClick={()=>{
-                    const blob = new Blob([JSON.stringify(exportChildren(sceneChildren))], {type: "text/plain;charset=utf-8"});
+                    const blob = new Blob([JSON.stringify(serialize())], {type: "text/plain;charset=utf-8"});
                     FileSaver.saveAs(blob, "scene.json");
                 }}>
                     Export

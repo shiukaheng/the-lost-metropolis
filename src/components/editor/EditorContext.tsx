@@ -11,7 +11,9 @@ const defaultEditorContext = {
     setTransformSpace: (space:string) => { },
     overrideInteractions: false,
     setOverrideInteractions: (override:boolean) => { },
-    shiftPressed: false
+    shiftPressed: false,
+    setSceneChildren: (children:[]) => { },
+    removeSceneChildren: (children:[]) => { }
 }
 
 const EditorContext = createContext(defaultEditorContext)

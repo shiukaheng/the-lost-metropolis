@@ -2,7 +2,28 @@ import DebugPlane from "../3d/DebugPlane"
 import TestObject from "../3d/TestObject"
 import PotreeObject from "../3d/PotreeObject"
 import { DepthKitObject } from "../3d/DepthKitObject"
+import ButtonObject from "../3d/ButtonObject"
 import { StringType, Vector3Type, EulerType, NumberType, ColorType, BooleanType, URLType } from "../editor/EditorInputTypes"
+import LabelIconObject from "../3d/LabelIconObject"
+
+const genericInputs = {
+    "name": {
+        "type": StringType,
+        "default": "Object"
+    },
+    "position": {
+        "type": Vector3Type,
+        "default": [0, 0, 0]
+    },
+    "rotation": {
+        "type": EulerType,
+        "default": [0, 0, 0]
+    },
+    "scale": {
+        "type": Vector3Type,
+        "default": [1, 1, 1]
+    }
+}
 
 const supportedComponents = [
     {
@@ -10,93 +31,10 @@ const supportedComponents = [
         value: {
             component: TestObject,
             inputs: {
-                "name": {
-                    "type": StringType,
-                    "default": "Object"
-                },
-                "position": {
-                    "type": Vector3Type,
-                    "default": [0, 0, 0]
-                },
-                "rotation": {
-                    "type": EulerType,
-                    "default": [0, 0, 0]
-                },
-                "scale": {
-                    "type": Vector3Type,
+                ...genericInputs,
+                "color": {
+                    "type": ColorType,
                     "default": [1, 1, 1]
-                }
-            }
-        }
-    },
-    {
-        label: "DebugPlane",
-        value: {
-            component: DebugPlane,
-            inputs: {
-                "name": {
-                    "type": StringType,
-                    "default": "Object"
-                },
-                "position": {
-                    "type": Vector3Type,
-                    "default": [0, 0, 0]
-                },
-                "rotation": {
-                    "type": EulerType,
-                    "default": [0, 0, 0]
-                },
-                "scale": {
-                    "type": Vector3Type,
-                    "default": [1, 1, 1]
-                }
-            }
-        }
-    },
-    {
-        label: "DepthKitObject",
-        value: {
-            component: DepthKitObject,
-            inputs: {
-                "name": {
-                    "type": StringType,
-                    "default": "Object"
-                },
-                "position": {
-                    "type": Vector3Type,
-                    "default": [0, 0, 0]
-                },
-                "rotation": {
-                    "type": EulerType,
-                    "default": [0, 0, 0]
-                },
-                "scale": {
-                    "type": Vector3Type,
-                    "default": [1, 1, 1]
-                },
-                metaUrl: {
-                    type: URLType,
-                    default: "http://localhost/"
-                },
-                videoUrl: {
-                    type: URLType,
-                    default: "http://localhost/"
-                },
-                posterUrl: {
-                    type: URLType,
-                    default: "http://localhost/"
-                },
-                autoplay: {
-                    type: BooleanType,
-                    default: false
-                },
-                muted: {
-                    type: BooleanType,
-                    default: false
-                },
-                loop: {
-                    type: BooleanType,
-                    default: false
                 }
             }
         }
@@ -106,22 +44,7 @@ const supportedComponents = [
         value: {
             component: PotreeObject,
             inputs: {
-                "name": {
-                    "type": StringType,
-                    "default": "Object"
-                },
-                "position": {
-                    "type": Vector3Type,
-                    "default": [0, 0, 0]
-                },
-                "rotation": {
-                    "type": EulerType,
-                    "default": [0, 0, 0]
-                },
-                "scale": {
-                    "type": Vector3Type,
-                    "default": [1, 1, 1]
-                },
+                ...genericInputs,
                 cloudName: {
                     type: StringType,
                     default: "cloud.js"
@@ -137,6 +60,25 @@ const supportedComponents = [
             }
         }
     },
+    {
+        label: "LabelIconObject",
+        value: {
+            component: LabelIconObject,
+            inputs: {
+                ...genericInputs
+            }
+        }
+    }
+    // {
+    //     label: "ButtonObject",
+    //     value: {
+    //         component: ButtonObject,
+    //         inputs: {
+    //             ...genericInputs,
+
+    //         }
+    //     }
+    // }
 ]
 
 function getComponentPropInfo(component) {

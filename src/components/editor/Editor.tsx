@@ -13,6 +13,7 @@ import EditorSceneSettings from './EditorSceneSettings';
 import { EditorContext } from './EditorContext';
 import ViewerManager from '../viewer/Viewer';
 import { ViewerContext } from '../viewer/ViewerContext';
+import LabelIconObject from '../3d/LabelIconObject';
 
 function Editor() {
     return (
@@ -23,7 +24,7 @@ function Editor() {
 }
 
 function EditorManager() {
-    const {sceneChildren} = useContext(ViewerContext)
+    const {sceneChildren, setSceneChildren: _setSceneChildren} = useContext(ViewerContext)
     // Setup state for editor
     const [selectedIDs, setSelectedIDs] = useState([])
     const [transformMode, setTransformMode] = useState("translate")
@@ -38,10 +39,19 @@ function EditorManager() {
         setSelectedIDs(selectedIDs.filter(id => !idsToRemove.includes(id)))
     }
 
-    useEffect(()=>{
-        const sceneIDs = sceneChildren.map(child => child.props.id)
-        setSelectedIDs(selectedIDs.filter(id => sceneIDs.includes(id)))
-    }, [sceneChildren])
+    // Overrides for setSceneChildren and removeSceneChildren to update selectedIDs
+
+    const setSceneChildren = (newChildren) => {
+        // Filter out selected IDs that don't exist in the new scene
+        const newSelectedIDs = selectedIDs.filter(id => newChildren.find(child => child.props.id === id))
+        setSelectedIDs(newSelectedIDs)
+        // Update the scene
+        _setSceneChildren(newChildren)
+    }
+
+    const removeSceneChildren = (childrenToRemove) => {
+        setSceneChildren(sceneChildren.filter(child => !childrenToRemove.includes(child)))
+    }
 
     // Wrap children whose child.props.id is in selectedIDs with TransformControls
     const wrappedSceneChildren = sceneChildren.map(child => {
@@ -54,7 +64,7 @@ function EditorManager() {
 
     return (
         <EditorContext.Provider value={
-            {selectedIDs, setSelectedIDs, addSelectedIDs, removeSelectedIDs, transformMode, setTransformMode, transformSpace, setTransformSpace, overrideInteractions, setOverrideInteractions, shiftPressed}
+            {selectedIDs, setSelectedIDs, addSelectedIDs, removeSelectedIDs, transformMode, setTransformMode, transformSpace, setTransformSpace, overrideInteractions, setOverrideInteractions, shiftPressed, setSceneChildren, removeSceneChildren}
         }>
             <KeyPressCallback keyName={"Escape"} onDown={()=>{setSelectedIDs([])}}/>
             <MagicDiv backgroundColorCSSProps={["backgroundColor"]} className="absolute w-full h-full flex flex-row">
@@ -69,7 +79,7 @@ function EditorManager() {
                 <div className="w-1/2 h-full bg-black">
                     <DebugViewport className="w-full h-full">
                         <DebugPlane rotation={[Math.PI/2, 0, 0]}/>
-                            {wrappedSceneChildren}
+                        {wrappedSceneChildren}
                     </DebugViewport>
                 </div>
             </MagicDiv>

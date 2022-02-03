@@ -1,6 +1,7 @@
 import { Interactive, InteractionsContext } from "@react-three/xr";
-import { useContext } from "react";
-import { EditorContext, wrapOnBlur, wrapOnClick, wrapOnHover } from "../editor/Editor";
+import { useContext, ReactNode } from "react";
+import { EditorContext } from "../editor/EditorContext";
+import { wrapOnClick, wrapOnBlur, wrapOnHover } from "../editor/utilities";
 
 export default function UnifiedInteractive({children=[], onClick=()=>{}, onHover=()=>{}, onBlur=()=>{}, parentID, ...props}) {
     const { addInteraction, removeInteraction } = useContext(InteractionsContext)

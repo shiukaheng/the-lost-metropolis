@@ -38,8 +38,8 @@ function SceneChildItem({child, onClick, selected}) {
 
 // Component for selecting scene or deleting scene components, stays in sync with the editor viewport
 export default function EditorComponentGraph() {
-    const {sceneChildren, setSceneChildren} = useContext(ViewerContext)
-    const {selectedIDs, setSelectedIDs, addSelectedIDs, removeSelectedIDs, shiftPressed} = useContext(EditorContext)
+    const {sceneChildren} = useContext(ViewerContext)
+    const {selectedIDs, setSelectedIDs, addSelectedIDs, removeSelectedIDs, shiftPressed, setSceneChildren} = useContext(EditorContext)
     const [addChildrenType, setAddChildrenType] = useState(null)
 
     const theme = useContext(ThemeContext)
