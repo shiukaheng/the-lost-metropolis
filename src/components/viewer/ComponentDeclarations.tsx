@@ -66,7 +66,15 @@ const supportedComponents = [
         value: {
             component: InfoObject,
             inputs: {
-                ...genericInputs
+                ...genericInputs,
+                text: {
+                    type: StringType,
+                    default: "Info"
+                },
+                iconScale: {
+                    type: NumberType,
+                    default: 0.1
+                }
             }
         }
     }

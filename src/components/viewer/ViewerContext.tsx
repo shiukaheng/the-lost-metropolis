@@ -4,7 +4,7 @@ import { createContext } from "react"
 const defaultViewerContext = {
     // Default camera props
     defaultCameraProps: {
-        position: [1,0,0],
+        position: [0,0,1],
         rotation: [0,0,0],
         fov: 50
     },

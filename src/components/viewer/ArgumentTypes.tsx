@@ -12,7 +12,7 @@ const NumberType: EditorInputType = {
 
 const StringType: EditorInputType = {
     typeName: "string",
-    typeCheck: (value) => typeof value === "string"
+    typeCheck: (value) => typeof value === "string" && (value !== undefined)
 }
 
 const URLType: EditorInputType = {

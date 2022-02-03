@@ -5,7 +5,7 @@ import { ViewerContext } from "./ViewerContext"
 function ViewerManager({children}) {
     // Helps to manage Viewer state (camera initial position, post processing, etc), seperated to be reused in Editor and Viewer
     const [defaultCameraProps, setDefaultCameraProps] = useState({
-        position: [1,0,0],
+        position: [0,0,1],
         rotation: [0,0,0],
         fov: 50
     })

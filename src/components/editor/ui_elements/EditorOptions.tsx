@@ -7,6 +7,7 @@ import MagicDiv from "../../MagicDiv";
 import { useContext, useState } from "react";
 import EditorEmbeddedWidget from "./EditorEmbeddedWidget";
 import { EditorContext } from "../EditorContext";
+import EditorInput from "./EditorInput"
 
 function TransformModeSetter({transformMode, setTransformMode, transformSpace, setTransformSpace}) {
     const theme = useContext(ThemeContext)
@@ -51,11 +52,15 @@ function TransformModeSetter({transformMode, setTransformMode, transformSpace, s
     )
 }
 
-export default function EditorTransformOptions() {
-    const { transformMode, setTransformMode, transformSpace, setTransformSpace } = useContext(EditorContext)
+export default function EditorOptions() {
+    const { transformMode, setTransformMode, transformSpace, setTransformSpace, setOverrideInteractions, overrideInteractions } = useContext(EditorContext)
     return (
-        <EditorEmbeddedWidget title="Transformation options">
-            <TransformModeSetter {...{ transformMode, setTransformMode, transformSpace, setTransformSpace }}/>
+        <EditorEmbeddedWidget title="Editor options">
+            <div className="flex flex-row gap-2">
+                <div>Transformation</div>
+                <TransformModeSetter {...{ transformMode, setTransformMode, transformSpace, setTransformSpace }}/>
+            </div>
+            <EditorInput propName="Bypass editor interactions" typeName="boolean" value={!overrideInteractions} setValue={()=>{setOverrideInteractions((v)=>(!v))}}/>
         </EditorEmbeddedWidget>
     )
 }

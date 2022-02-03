@@ -8,7 +8,9 @@ export default function EditorEmbeddedWidget({title="Title", children}) {
                 <div className="text-white text-md font-bold">{title}</div>
                 <div className="text-white text-xl font-bold ml-auto" onClick={()=>{setExpanded(!expanded)}}>{expanded ? "-" : "+"}</div>
             </div>
-            {expanded ? children : null}
+            <div className="flex flex-col gap-2">
+                {expanded ? children : null}
+            </div>
         </div>
     )
 }

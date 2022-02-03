@@ -23,7 +23,7 @@ export default function LabelIconObject({onClick=()=>{}, iconUrl="", iconScale=1
         config: config.gentle
     })
     return (
-        <UnifiedInteractive onClick={onClick} onHover={()=>{setHovered(true)}} onBlur={()=>{setHovered(false)}} parentID={props.id} {...props}>
+        <UnifiedInteractive onClick={onClick} onHover={()=>{setHovered(true)}} onBlur={()=>{setHovered(false)}} parentID={props.id} position={props.position}>
             <Billboard>
                 <mesh scale={iconScale}>
                     <planeGeometry attach="geometry" args={[1, 1]}/>

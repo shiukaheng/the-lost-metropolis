@@ -1,5 +1,5 @@
 import MagicDiv from "../../MagicDiv";
-import { getComponentPropInfo, supportedComponents, getComponentPropInfoFromName, getComponentFromName} from "../viewer/ComponentDeclarations";
+import { getComponentPropInfo, supportedComponents, getComponentPropInfoFromName, getComponentFromName} from "../../viewer/ComponentDeclarations";
 import EditorEmbeddedWidget from "./EditorEmbeddedWidget";
 import { createElement, useContext, useRef } from "react";
 import FileSaver from "file-saver"

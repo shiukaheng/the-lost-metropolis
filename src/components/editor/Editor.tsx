@@ -6,8 +6,8 @@ import EditorComponentGraph from './ui_elements/EditorComponentGraph';
 import EditorComponentProperties from './ui_elements/EditorComponentProperties';
 import MagicDiv from '../MagicDiv';
 import EditorTransformControls from './ui_elements/EditorTransformControls';
-import EditorTransformOptions from './ui_elements/EditorTransformOptions';
-import EditorIO from './EditorIO';
+import EditorOptions from './ui_elements/EditorOptions';
+import EditorIO from './ui_elements/EditorIO';
 import { KeyPressCallback, useKeyPress } from '../../utilities';
 import EditorSceneSettings from './ui_elements/EditorSceneSettings';
 import { EditorContext } from './EditorContext';
@@ -72,7 +72,7 @@ function EditorManager() {
                     <div className="editor-embedded-widget text-2xl font-bold">Editor</div>
                     <EditorComponentGraph/>
                     <EditorComponentProperties/>
-                    <EditorTransformOptions/>
+                    <EditorOptions/>
                     <EditorIO/>
                     <EditorSceneSettings/>
                 </div>
