@@ -1,12 +1,16 @@
 import { TransformControls } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
-import { useLayoutEffect, useRef, cloneElement, Fragment } from "react";
+import { useLayoutEffect, useRef, cloneElement, Fragment, useContext } from "react";
 import { Children } from "react";
 import { Object3D } from "three"
+import { ViewerContext } from "../viewer/ViewerContext";
+import { EditorContext } from "./EditorContext";
 
 // Todo: support multi-selection transform grouping
 
-function EditorTransformControls({enabled, updatePartialSceneChildren, children, ...props}) {
+function EditorTransformControls({enabled, children, ...props}) {
+    const { updateSceneChildren } = useContext(ViewerContext)
+    const { transformMode, transformSpace } = useContext(EditorContext)
     const transformControlsRef = useRef(null) 
     // If children is a single element, wrap it in an array
     const childrenArray = Children.toArray(children);
@@ -19,7 +23,7 @@ function EditorTransformControls({enabled, updatePartialSceneChildren, children,
                 transformControlsRef.current.object.rotation.set(...childrenArray[0].props.rotation)
             } else {
                 // Copy transform object transformation to object
-                updatePartialSceneChildren(
+                updateSceneChildren(
                     childrenArray.map(child => cloneElement(
                         child,
                         {
@@ -35,7 +39,7 @@ function EditorTransformControls({enabled, updatePartialSceneChildren, children,
     
     return (
         <Fragment>
-            {enabled ? <TransformControls ref={transformControlsRef} {...props} /> : null}
+            {enabled ? <TransformControls ref={transformControlsRef} mode={transformMode} space={transformSpace} /> : null}
             {children}
         </Fragment>
     );

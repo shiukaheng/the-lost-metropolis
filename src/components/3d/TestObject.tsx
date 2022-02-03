@@ -1,10 +1,8 @@
 // JSX of magenta wireframe cube using react-three-fiber
 
-import { context } from "@react-three/fiber";
 import { useContext } from "react";
-import { editorRegister } from "../Editor";
-import { EditorContext, wrapOnClick } from "../editor/Editor";
-import { Vector3Type } from "../editor/EditorInputTypes";
+import { EditorContext } from "../editor/EditorContext";
+import { wrapOnClick } from "../editor/utilities";
 
 type TestObjectProps = JSX.IntrinsicElements['group']
 

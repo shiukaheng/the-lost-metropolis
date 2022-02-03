@@ -1,6 +1,6 @@
 import { applyProps } from "@react-three/fiber";
 import { useContext } from "react";
-import { ViewerContext } from "../viewer/Viewer";
+import { ViewerContext } from "../viewer/ViewerContext";
 import EditorButton from "./EditorButton";
 import EditorEmbeddedWidget from "./EditorEmbeddedWidget";
 import EditorInput from "./EditorInput";

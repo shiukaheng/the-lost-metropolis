@@ -1,18 +1,6 @@
-import { createContext, useRef, useState } from "react"
-
-const defaultViewerContext = {
-    defaultCameraProps: {
-        position: [1,0,0],
-        rotation: [0,0,0],
-        fov: 50
-    },
-    setDefaultCameraProps: (props) => {},
-    cameraRef: {
-        current: null
-    },
-}
-
-const ViewerContext = createContext(defaultViewerContext)
+import { cloneElement, useRef, useState } from "react"
+import { joinChildren } from "../editor/utilities"
+import { ViewerContext } from "./ViewerContext"
 
 function ViewerManager({children}) {
     // Helps to manage Viewer state (camera initial position, post processing, etc), seperated to be reused in Editor and Viewer
@@ -22,8 +10,35 @@ function ViewerManager({children}) {
         fov: 50
     })
     const cameraRef = useRef(null) // Will be updated by Viewport
+    const [sceneChildren, setSceneChildren] = useState([])
+    // Make selectedIDs react to setSceneChildren
+
+    const updateSceneChildren = (newChildren) => {
+        setSceneChildren(sceneChildren.map(child => {
+            const newChild = newChildren.find(newChild => newChild.props.id === child.props.id)
+            if (newChild) {
+                return cloneElement(
+                    child,
+                    {
+                        ...newChild.props
+                    }
+                )
+            } else {
+                return child
+            }
+        }))
+    }
+    
+    // Create convenience functions for adding and removing children
+    const addSceneChildren = (newChildren) => {
+        setSceneChildren(joinChildren(sceneChildren, newChildren))
+    }
+    const removeSceneChildren = (childrenToRemove) => {
+        setSceneChildren(sceneChildren.filter(child => !childrenToRemove.includes(child)))
+    }
+
     return (
-        <ViewerContext.Provider value={{defaultCameraProps, setDefaultCameraProps, cameraRef}}>
+        <ViewerContext.Provider value={{defaultCameraProps, setDefaultCameraProps, cameraRef, sceneChildren, setSceneChildren, addSceneChildren, removeSceneChildren, updateSceneChildren}}>
             {children}
         </ViewerContext.Provider>
     );
@@ -31,4 +46,4 @@ function ViewerManager({children}) {
 
 export default ViewerManager;
 
-export { ViewerContext, defaultViewerContext, ViewerManager }
+export { ViewerManager }

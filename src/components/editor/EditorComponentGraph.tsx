@@ -5,7 +5,9 @@ import { createElement, useEffect, useRef, useState, useContext } from "react";
 import { v4 as uuidv4 } from 'uuid';
 import { useKeyPress, KeyPressCallback, formatRGBCSS } from "../../utilities";
 import { ThemeContext } from "../App"
-import { EditorContext, editorRegister } from "./Editor";
+import { EditorContext } from "./EditorContext";
+import { ViewerContext } from "../viewer/ViewerContext";
+import { supportedComponents } from "../viewer/ComponentDeclarations"
 
 function getDefaultInputs(inputObject) {
     var defaultInputs = {}
@@ -36,7 +38,8 @@ function SceneChildItem({child, onClick, selected}) {
 
 // Component for selecting scene or deleting scene components, stays in sync with the editor viewport
 export default function EditorComponentGraph() {
-    const {sceneChildren, setSceneChildren, selectedIDs, setSelectedIDs, addSelectedIDs, removeSelectedIDs, supportedComponents, shiftPressed} = useContext(EditorContext)
+    const {sceneChildren, setSceneChildren} = useContext(ViewerContext)
+    const {selectedIDs, setSelectedIDs, addSelectedIDs, removeSelectedIDs, shiftPressed} = useContext(EditorContext)
     const [addChildrenType, setAddChildrenType] = useState(null)
 
     const theme = useContext(ThemeContext)

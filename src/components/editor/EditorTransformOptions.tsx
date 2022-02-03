@@ -6,7 +6,7 @@ import { formatRGBCSS } from "../../utilities";
 import MagicDiv from "../MagicDiv";
 import { useContext, useState } from "react";
 import EditorEmbeddedWidget from "./EditorEmbeddedWidget";
-import { EditorContext } from "./Editor";
+import { EditorContext } from "./EditorContext";
 
 function TransformModeSetter({transformMode, setTransformMode, transformSpace, setTransformSpace}) {
     const theme = useContext(ThemeContext)

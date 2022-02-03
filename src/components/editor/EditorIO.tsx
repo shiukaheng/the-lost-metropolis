@@ -1,8 +1,9 @@
 import MagicDiv from "../MagicDiv";
-import { getComponentPropInfo, supportedComponents, getComponentPropInfoFromName, getComponentFromName, EditorContext } from "./Editor";
+import { getComponentPropInfo, supportedComponents, getComponentPropInfoFromName, getComponentFromName} from "../viewer/ComponentDeclarations";
 import EditorEmbeddedWidget from "./EditorEmbeddedWidget";
 import { createElement, useContext, useRef } from "react";
 import FileSaver from "file-saver"
+import { ViewerContext } from "../viewer/ViewerContext";
 
 // Utilties and components for import / export
 
@@ -88,7 +89,7 @@ function deserializeChildren(childrenArray) {
 }
 
 function EditorIO() {
-    const {sceneChildren, setSceneChildren} = useContext(EditorContext)
+    const {sceneChildren, setSceneChildren} = useContext(ViewerContext)
     const inputFile = useRef(null) 
     const onButtonClick = () => {
         // `current` points to the mounted file input element

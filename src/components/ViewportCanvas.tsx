@@ -3,9 +3,9 @@ import { CursorDataContext } from "./App"
 import { PotreeManager } from "./3d/PotreeManager"
 import { Children, useContext, useEffect, useLayoutEffect, useRef } from "react"
 import CompositeSuspense from "./3d/CompositeSuspense"
-import { EditorContext } from "./editor/Editor"
+import { EditorContext } from "./editor/EditorContext"
 import { Canvas, useThree } from "@react-three/fiber"
-import { ViewerContext } from "./viewer/Viewer"
+import { ViewerContext } from "./viewer/ViewerContext"
 
 function CameraHelper() {
     const {defaultCameraProps, cameraRef} = useContext(ViewerContext)
