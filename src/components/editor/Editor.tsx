@@ -17,6 +17,8 @@ import { useContextBridge } from '@react-three/drei';
 import LabelIconObject from '../3d/LabelIconObject';
 import InfoObject from '../3d/InfoObject';
 import PotreeObject from '../3d/PotreeObject';
+import EditorSceneSettings from './EditorSceneSettings';
+import ViewerManager, { defaultViewerContext, ViewerContext } from '../viewer/Viewer';
 
 var supportedComponents = []
 
@@ -219,8 +221,6 @@ function inspect(v:any) {
     return v
 }
 
-const TestContext = createContext(false)
-
 function Editor() {
     // Setup state for editor
     const [sceneChildren, _setSceneChildren] = useState([])
@@ -281,29 +281,30 @@ function Editor() {
     })
 
     return (
-        <EditorContext.Provider value={
-            {sceneChildren, setSceneChildren, addSceneChildren, removeSceneChildren, selectedIDs, setSelectedIDs, addSelectedIDs, removeSelectedIDs, transformMode, setTransformMode, transformSpace, setTransformSpace, overrideInteractions, setOverrideInteractions, supportedComponents, shiftPressed, updateSceneChildren}
-        }>
-            <KeyPressCallback keyName={"Escape"} onDown={()=>{setSelectedIDs([])}}/>
-            <MagicDiv backgroundColorCSSProps={["backgroundColor"]} className="absolute w-full h-full flex flex-row">
-                <div className="w-1/2 h-full flex flex-col p-4 overflow-clip">
-                    <div className="editor-embedded-widget text-2xl font-bold">Editor</div>
-                    <EditorComponentGraph/>
-                    <EditorComponentProperties/>
-                    <EditorTransformOptions/>
-                    <EditorIO sceneChildren={sceneChildren} setSceneChildren={setSceneChildren}/>
-                </div>
-                <div className="w-1/2 h-full bg-black">
-                    <TestContext.Provider value={true}>
-                    <DebugViewport className="w-full h-full">
-                        <DebugPlane rotation={[Math.PI/2, 0, 0]}/>
-                            {wrappedSceneChildren}
-                    </DebugViewport>
-                    </TestContext.Provider>
-                </div>
-            </MagicDiv>
-        </EditorContext.Provider>
+        <ViewerManager>
+            <EditorContext.Provider value={
+                {sceneChildren, setSceneChildren, addSceneChildren, removeSceneChildren, selectedIDs, setSelectedIDs, addSelectedIDs, removeSelectedIDs, transformMode, setTransformMode, transformSpace, setTransformSpace, overrideInteractions, setOverrideInteractions, supportedComponents, shiftPressed, updateSceneChildren}
+            }>
+                <KeyPressCallback keyName={"Escape"} onDown={()=>{setSelectedIDs([])}}/>
+                <MagicDiv backgroundColorCSSProps={["backgroundColor"]} className="absolute w-full h-full flex flex-row">
+                    <div className="w-1/2 h-full flex flex-col p-4 overflow-clip">
+                        <div className="editor-embedded-widget text-2xl font-bold">Editor</div>
+                        <EditorComponentGraph/>
+                        <EditorComponentProperties/>
+                        <EditorTransformOptions/>
+                        <EditorIO/>
+                        <EditorSceneSettings/>
+                    </div>
+                    <div className="w-1/2 h-full bg-black">
+                        <DebugViewport className="w-full h-full">
+                            <DebugPlane rotation={[Math.PI/2, 0, 0]}/>
+                                {wrappedSceneChildren}
+                        </DebugViewport>
+                    </div>
+                </MagicDiv>
+            </EditorContext.Provider>
+        </ViewerManager>
     );
 }
 
-export {Editor, editorRegister, supportedComponents, getComponentPropInfo, getComponentPropInfoFromName, getComponentFromName, EditorContext, wrapOnClick, wrapOnHover, wrapOnBlur, TestContext}
+export {Editor, editorRegister, supportedComponents, getComponentPropInfo, getComponentPropInfoFromName, getComponentFromName, EditorContext, wrapOnClick, wrapOnHover, wrapOnBlur}

@@ -10,40 +10,13 @@ import TextPanelObject from './3d/TextPanelObject';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, useContextBridge, Text } from '@react-three/drei';
 
-const TestContext = createContext(false)
-const TestContext2 = createContext(0)
-
-function SceneWrapper({children}) {
-    const TestBridge = useContextBridge(TestContext)
-    return (
-        <Canvas>
-            <TestBridge>
-                {children}
-            </TestBridge>
-        </Canvas>
-    )
-}
-
-function SceneWrapper2({children}) {
-    const TestBridge2 = useContextBridge(TestContext2)
-}
-
-function Scene() {
-    const testContext = useContext(TestContext)
-    return (
-        <Text text={testContext.toString()}/>
-    )
-}
-
 function Debug3D() {
     return (
-        <TestContext.Provider value={true}>
-            <div className="absolute w-full h-full bg-black">
-                <SceneWrapper>
-                    <Scene/>
-                </SceneWrapper>
-            </div>
-        </TestContext.Provider>
+        <div className="absolute w-full h-full bg-black">
+            <SceneWrapper>
+                <Scene/>
+            </SceneWrapper>
+        </div>
     );
 }
 

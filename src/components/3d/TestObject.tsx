@@ -3,7 +3,7 @@
 import { context } from "@react-three/fiber";
 import { useContext } from "react";
 import { editorRegister } from "../Editor";
-import { EditorContext, TestContext, wrapOnClick } from "../editor/Editor";
+import { EditorContext, wrapOnClick } from "../editor/Editor";
 import { Vector3Type } from "../editor/EditorInputTypes";
 
 type TestObjectProps = JSX.IntrinsicElements['group']

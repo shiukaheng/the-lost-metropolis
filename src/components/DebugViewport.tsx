@@ -1,4 +1,4 @@
-import { Canvas } from "@react-three/fiber"
+import { Canvas, useThree } from "@react-three/fiber"
 import DebugPlane from "./3d/DebugPlane";
 import ViewportCanvas from "./ViewportCanvas"
 import { OrbitControls } from '@react-three/drei'
@@ -19,7 +19,7 @@ function DebugViewport({children, ...props}) {
     return (
         <div {...props}>
             <ErrorBoundary FallbackComponent={Fallback}>
-                <ViewportCanvas>
+                <ViewportCanvas> 
                     <OrbitControls enablePan enableRotate enableZoom makeDefault/>
                     {children}
                 </ViewportCanvas>
