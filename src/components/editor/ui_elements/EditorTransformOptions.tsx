@@ -1,12 +1,12 @@
-import Translate from "./svgs/translate.svg"
-import Rotate from "./svgs/rotate.svg"
-import Scale from "./svgs/scale.svg"
-import { ThemeContext } from "../App"
-import { formatRGBCSS } from "../../utilities";
-import MagicDiv from "../MagicDiv";
+import Translate from "../svgs/translate.svg"
+import Rotate from "../svgs/rotate.svg"
+import Scale from "../svgs/scale.svg"
+import { ThemeContext } from "../../App"
+import { formatRGBCSS } from "../../../utilities";
+import MagicDiv from "../../MagicDiv";
 import { useContext, useState } from "react";
 import EditorEmbeddedWidget from "./EditorEmbeddedWidget";
-import { EditorContext } from "./EditorContext";
+import { EditorContext } from "../EditorContext";
 
 function TransformModeSetter({transformMode, setTransformMode, transformSpace, setTransformSpace}) {
     const theme = useContext(ThemeContext)

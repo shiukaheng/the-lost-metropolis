@@ -2,9 +2,9 @@ import EditorEmbeddedWidget from "./EditorEmbeddedWidget";
 import EditorInput from "./EditorInput";
 import { v4 as uuidv4 } from 'uuid';
 import { cloneElement, useContext } from "react";
-import { EditorContext } from "./EditorContext";
-import { supportedComponents } from "../viewer/ComponentDeclarations"
-import { ViewerContext } from "../viewer/ViewerContext";
+import { EditorContext } from "./../EditorContext";
+import { supportedComponents } from "../../viewer/ComponentDeclarations"
+import { ViewerContext } from "../../viewer/ViewerContext";
 
 export default function EditorComponentProperties() {
     const { sceneChildren, setSceneChildren } = useContext(ViewerContext)

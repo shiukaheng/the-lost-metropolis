@@ -1,10 +1,10 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
     NumberType, Vector3Type, Vector4Type, Vector2Type, ColorType, QuaternionType, EulerType, Matrix3Type, Matrix4Type, StringType, URLType, MatrixType, VectorType, EditorInputType, BooleanType
-} from "./EditorInputTypes"
+} from "../../viewer/ArgumentTypes"
 import { range } from "lodash"
 import { createElement } from "react";
-import { linearTosRGB, sRGBToLinear } from '../../utilities';
+import { linearTosRGB, sRGBToLinear } from '../../../utilities';
 
 // Props for input elements:
 // value is the current value of the property, used to display the current value of the property in the editor

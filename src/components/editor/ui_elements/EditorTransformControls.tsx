@@ -3,8 +3,8 @@ import { useFrame } from "@react-three/fiber";
 import { useLayoutEffect, useRef, cloneElement, Fragment, useContext } from "react";
 import { Children } from "react";
 import { Object3D } from "three"
-import { ViewerContext } from "../viewer/ViewerContext";
-import { EditorContext } from "./EditorContext";
+import { ViewerContext } from "../../viewer/ViewerContext";
+import { EditorContext } from "../EditorContext";
 
 // Todo: support multi-selection transform grouping
 
