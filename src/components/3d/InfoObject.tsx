@@ -22,16 +22,17 @@ function InfoObject({text="", iconScale=0.1, ...props}:InfoObjectProps) {
     
     const AnimatedText = a(Text)
     const AnimatedLabelIcon = a(LabelIconObject)
-    return transitions(({opacity, scale}, item) => (
-        item 
-        ?
-        <Billboard follow>
-            <AnimatedLabelIcon iconUrl="/static/viewport/info-icon.png" scale={iconScale} onClick={()=>{setExpanded(!expanded)}} iconScale={scale} iconOpacity={opacity} skirtHidden={!expanded} {...props}/>
-        </Billboard>
-        :
-        <AnimatedText scale={scale} gpuAccelerateSDF={true} fillOpacity={opacity} onClick={()=>{setExpanded(!expanded)}} text={text} {...props}/>
-    )
-);
+    return (
+        transitions(
+            ({opacity, scale}, item) => (
+                item 
+                ?
+                <AnimatedLabelIcon iconUrl="/static/viewport/info-icon.png" scale={iconScale} onClick={()=>{setExpanded(!expanded)}} iconScale={scale} iconOpacity={opacity} skirtHidden={!expanded} {...props}/>
+                :
+                <AnimatedText scale={scale} gpuAccelerateSDF={true} fillOpacity={opacity} onClick={()=>{setExpanded(!expanded)}} text={text} {...props}/>
+            )
+        )
+    );
 }
 
 export default InfoObject;

@@ -5,6 +5,7 @@ import { DepthKitObject } from "../3d/DepthKitObject"
 import ButtonObject from "../3d/ButtonObject"
 import { StringType, Vector3Type, EulerType, NumberType, ColorType, BooleanType, URLType } from "../editor/EditorInputTypes"
 import LabelIconObject from "../3d/LabelIconObject"
+import InfoObject from "../3d/InfoObject"
 
 const genericInputs = {
     "name": {
@@ -61,9 +62,9 @@ const supportedComponents = [
         }
     },
     {
-        label: "LabelIconObject",
+        label: "InfoObject",
         value: {
-            component: LabelIconObject,
+            component: InfoObject,
             inputs: {
                 ...genericInputs
             }

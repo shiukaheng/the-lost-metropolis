@@ -24,14 +24,16 @@ export default function LabelIconObject({onClick=()=>{}, iconUrl="", iconScale=1
     })
     return (
         <UnifiedInteractive onClick={onClick} onHover={()=>{setHovered(true)}} onBlur={()=>{setHovered(false)}} parentID={props.id} {...props}>
-            <mesh scale={iconScale}>
-                <planeGeometry attach="geometry" args={[1, 1]}/>
-                <meshBasicMaterial attach="material" transparent opacity={iconOpacity} color="white" map={texture}/>
-            </mesh>
-            <a.mesh scale={iconExtHoverScale}>
-                <circleGeometry args={[0.2, 30]}/>
-                <a.meshBasicMaterial transparent opacity={iconExtHoverOpacity}/>
-            </a.mesh>
+            <Billboard>
+                <mesh scale={iconScale}>
+                    <planeGeometry attach="geometry" args={[1, 1]}/>
+                    <meshBasicMaterial attach="material" transparent opacity={iconOpacity} color="white" map={texture}/>
+                </mesh>
+                <a.mesh scale={iconExtHoverScale}>
+                    <circleGeometry args={[0.2, 30]}/>
+                    <a.meshBasicMaterial transparent opacity={iconExtHoverOpacity}/>
+                </a.mesh>
+            </Billboard>
         </UnifiedInteractive>
     )
 }
