@@ -3,7 +3,7 @@ import { useContext, ReactNode } from "react";
 import { EditorContext } from "../editor/EditorContext";
 import { wrapOnClick, wrapOnBlur, wrapOnHover } from "../editor/utilities";
 
-export default function UnifiedInteractive({children=[], onClick=()=>{}, onHover=()=>{}, onBlur=()=>{}, parentID, ...props}) {
+export default function UnifiedInteractive({children, onClick=()=>{}, onHover=()=>{}, onBlur=()=>{}, parentID, ...props}) {
     const { addInteraction, removeInteraction } = useContext(InteractionsContext)
     const interactionsSuported = (addInteraction===null) && (removeInteraction===null)
     const editorContext = useContext(EditorContext)

@@ -3,19 +3,20 @@ import { useState } from "react"
 import { useTransition, config } from "react-spring"
 import { a } from "@react-spring/three"
 import LabelIconObject from "./LabelIconObject"
+import UnifiedInteractive from "./UnifiedInteractive"
 
 type InfoObjectProps = JSX.IntrinsicElements["group"] & {
     text?: string
     iconScale?: number
 }
 
-function InfoObject({text="", iconScale=0.1, ...props}:InfoObjectProps) {
+function InfoObject({text="", iconSize=0.1, fontSize=0.1, textMaxWidth=10, wrapText=false, ...props}:InfoObjectProps) {
     const [expanded, setExpanded] = useState(true)
     
     const transitions = useTransition(expanded, {
-        from: {opacity: 0, scale: [0.3, 0.3 , 0.3]},
-        enter: {opacity: 1, scale: [0.5, 0.5, 0.5]},
-        leave: {opacity: 0, scale: [0.3, 0.3, 0.3]},
+        from: {opacity: 0, scale: [0.6, 0.6, 0.6]},
+        enter: {opacity: 1, scale: [1, 1, 1]},
+        leave: {opacity: 0, scale: [0.6, 0.6, 0.6]},
         exitBeforeEnter: true,
         config: config.default
     })
@@ -27,9 +28,11 @@ function InfoObject({text="", iconScale=0.1, ...props}:InfoObjectProps) {
             ({opacity, scale}, item) => (
                 item 
                 ?
-                <AnimatedLabelIcon iconUrl="/static/viewport/info-icon.png" scale={iconScale} onClick={()=>{setExpanded(!expanded)}} iconScale={scale} iconOpacity={opacity} skirtHidden={!expanded} {...props}/>
+                <AnimatedLabelIcon iconUrl="/static/viewport/info-icon.png" onClick={()=>{setExpanded(!expanded)}} iconScale={scale} iconOpacity={opacity} skirtHidden={!expanded} scale={iconSize} id={props.id} position={props.position}/>
                 :
-                <AnimatedText scale={scale} gpuAccelerateSDF={true} fillOpacity={opacity} onClick={()=>{setExpanded(!expanded)}} text={text} {...props}/>
+                <UnifiedInteractive {...props} onClick={()=>{setExpanded(!expanded)}} parentID={props.id}>
+                    <AnimatedText scale={scale} gpuAccelerateSDF={true} fillOpacity={opacity} text={text} maxWidth={wrapText ? textMaxWidth : Infinity} fontSize={fontSize}/>
+                </UnifiedInteractive>
             )
         )
     );
