@@ -86,24 +86,14 @@ function KeyPressCallback({keyName, onDown=()=>{}, onUp=()=>{}}) {
 }
 
 // Linear color to sRGB color conversion (From Github Copilot ??!)
-function linearTosRGB(color: number[]): number[] {
-    return color.map(c => {
-        if (c <= 0.0031308) {
-            return 12.92 * c;
-        } else {
-            return 1.055 * Math.pow(c, 1 / 2.4) - 0.055;
-        }
-    });
+function SRGBToLinear( c_arr ) {
+	return c_arr.map((c)=>(( c < 0.04045 ) ? c * 0.0773993808 : Math.pow( c * 0.9478672986 + 0.0521327014, 2.4 )));
+
 }
 
-function sRGBToLinear(color: number[]): number[] {
-    return color.map(c => {
-        if (c <= 0.04045) {
-            return c / 12.92;
-        } else {
-            return Math.pow((c + 0.055) / 1.055, 2.4);
-        }
-    });
+function LinearToSRGB( c_arr ) {
+	return c_arr.map((c)=>(( c < 0.0031308 ) ? c * 12.92 : 1.055 * ( Math.pow( c, 0.41666 ) ) - 0.055));
+
 }
 
-export { formatRGBCSS, useKeyPress, useAsyncKeyPress, useAsyncReference, KeyPressCallback, linearTosRGB, sRGBToLinear };
+export { formatRGBCSS, useKeyPress, useAsyncKeyPress, useAsyncReference, KeyPressCallback, LinearToSRGB, SRGBToLinear };
