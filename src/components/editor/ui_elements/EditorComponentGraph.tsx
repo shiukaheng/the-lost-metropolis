@@ -7,7 +7,7 @@ import { useKeyPress, KeyPressCallback, formatRGBCSS } from "../../../utilities"
 import { ThemeContext } from "../../App"
 import { EditorContext } from "../EditorContext";
 import { ViewerContext } from "../../viewer/ViewerContext";
-import { supportedComponents } from "../../viewer/ComponentDeclarations"
+import { getLabelFromComponent, supportedComponents } from "../../viewer/ComponentDeclarations"
 
 function getDefaultInputs(inputObject) {
     var defaultInputs = {}
@@ -32,7 +32,7 @@ function generateKey({...props}) {
 
 function SceneChildItem({child, onClick, selected}) {
     return (
-        <div className={`px-2 cursor-pointer select-none rounded-full ${selected ? "bg-blue-600" : "bg-transparent"}`} onClick={onClick}>{`${child.props.name} - [${child.type.name}]`}</div>
+        <div className={`px-2 cursor-pointer select-none rounded-full ${selected ? "bg-blue-600" : "bg-transparent"}`} onClick={onClick}>{`${child.props.name} - [${getLabelFromComponent(child.type)}]`}</div>
     )
 }
 
@@ -84,7 +84,7 @@ export default function EditorComponentGraph() {
                     setSceneChildren(sceneChildren.concat([createElement(addChildrenType.component, generateKey(getDefaultInputs(addChildrenType.inputs)), null)]))
                 }}>add</MagicDiv>
             </div>
-            <div className="mt-2 gap-2">
+            <div className="gap-2">
                 {
                     sceneChildren.map((child) => (
                         <SceneChildItem selected={selectedIDs.includes(child.props.id)} key={uuidv4()} child={child} onClick={

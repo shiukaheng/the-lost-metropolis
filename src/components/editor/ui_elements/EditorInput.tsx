@@ -174,9 +174,12 @@ function hexStringToRGB(hexString) {
 // ColorInput uses html color input element, no type checking needed as the input element always returns a valid RGB color
 function ColorInput({value, setValue}) {
     return (
-        <input className="color-input-cell" type="color" value={rgbToHexString(LinearToSRGB(value))} onChange={(e) => {
-            const newValue = SRGBToLinear(hexStringToRGB(e.target.value));
-            setValue(newValue)
+        // <input className="color-input-cell" type="color" value={rgbToHexString(LinearToSRGB(value))} onChange={(e) => {
+        //     const newValue = SRGBToLinear(hexStringToRGB(e.target.value));
+        //     setValue(newValue)
+        // }}/>
+        <input className="color-input-cell" type="color" value={value} onChange={(e) => {
+            setValue(e.target.value)
         }}/>
     );
 }

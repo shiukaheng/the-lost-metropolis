@@ -6,6 +6,7 @@ import ButtonObject from "../3d/ButtonObject"
 import { StringType, Vector3Type, EulerType, NumberType, ColorType, BooleanType, URLType } from "./ArgumentTypes"
 import LabelIconObject from "../3d/LabelIconObject"
 import InfoObject from "../3d/InfoObject"
+import ErrorObject from "../3d/ErrorObject"
 
 const genericInputs = {
     "name": {
@@ -28,7 +29,7 @@ const genericInputs = {
 
 const supportedComponents = [
     {
-        label: "TestObject",
+        label: "Test object",
         value: {
             component: TestObject,
             inputs: {
@@ -41,7 +42,7 @@ const supportedComponents = [
         }
     },
     {
-        label: "PotreeObject",
+        label: "Point cloud",
         value: {
             component: PotreeObject,
             inputs: {
@@ -62,7 +63,7 @@ const supportedComponents = [
         }
     },
     {
-        label: "InfoObject",
+        label: "Label",
         value: {
             component: InfoObject,
             inputs: {
@@ -71,23 +72,38 @@ const supportedComponents = [
                     type: StringType,
                     default: "Info"
                 },
-                iconScale: {
+                iconSize: {
                     type: NumberType,
                     default: 0.1
+                },
+                fontSize: {
+                    type: NumberType,
+                    default: 0.1
+                },
+                textMaxWidth: {
+                    type: NumberType,
+                    default: 10
+                },
+                wrapText: {
+                    type: BooleanType,
+                    default: false
                 }
             }
         }
-    }
+    },
     // {
-    //     label: "ButtonObject",
+    //     label: "ErrorObject",
     //     value: {
-    //         component: ButtonObject,
+    //         component: ErrorObject,
     //         inputs: {
     //             ...genericInputs,
-
+    //             error: {
+    //                 type: StringType,
+    //                 default: "Error"
+    //             }
     //         }
     //     }
-    // }
+    // },
 ]
 
 function getComponentPropInfo(component) {
@@ -102,4 +118,8 @@ function getComponentFromName(componentName) {
     return supportedComponents.find(item => item.value.component.name === componentName).value.component
 }
 
-export { supportedComponents, getComponentPropInfo, getComponentPropInfoFromName, getComponentFromName }
+function getLabelFromComponent(component) {
+    return supportedComponents.find(item => item.value.component === component).label
+}
+
+export { supportedComponents, getComponentPropInfo, getComponentPropInfoFromName, getComponentFromName, getLabelFromComponent }

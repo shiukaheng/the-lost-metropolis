@@ -4,6 +4,7 @@ import EditorEmbeddedWidget from "./EditorEmbeddedWidget";
 import { createElement, useContext, useRef } from "react";
 import FileSaver from "file-saver"
 import { ViewerContext } from "../../viewer/ViewerContext";
+import { v4 as uuidv4 } from 'uuid';
 
 // Utilties and components for import / export
 
@@ -52,10 +53,15 @@ function fixProps(newProps, propInfo) {
     // Check whether any props specified in propInfo are missing, if so, add it from the default value and warn
     Object.entries(propInfo).forEach(([key, value]) => {
         if (!(key in newProps)) {
-            console.warn(`Prop ${key} missing from export, adding default value`);
+            console.warn(`Prop ${key} missing, adding default value`);
             newProps[key] = value.default;
         }
     });
+    // Check whether id prop is missing, if so generate from uuidv4
+    if (!("id" in newProps)) {
+        console.warn(`ID prop missing, generating one to fill in`);
+        newProps["id"] = uuidv4();
+    }
 }
 
 function exportChildren(childrenArray) {
