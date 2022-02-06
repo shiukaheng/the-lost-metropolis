@@ -24,7 +24,7 @@ function Editor() {
 }
 
 function EditorManager() {
-    const {sceneChildren, setSceneChildren: _setSceneChildren} = useContext(ViewerContext)
+    const {sceneChildren, setSceneChildren: _setSceneChildren, audioListener} = useContext(ViewerContext)
     // Setup state for editor
     const [selectedIDs, setSelectedIDs] = useState([])
     const [transformMode, setTransformMode] = useState("translate")
@@ -76,7 +76,7 @@ function EditorManager() {
                     <EditorIO/>
                     <EditorSceneSettings/>
                 </div>
-                <div className="w-1/2 h-full bg-black">
+                <div className="w-1/2 h-full bg-black" onClick={()=>{audioListener.context.resume()}}>
                     <DebugViewport className="w-full h-full">
                         <DebugPlane rotation={[Math.PI/2, 0, 0]}/>
                         {wrappedSceneChildren}

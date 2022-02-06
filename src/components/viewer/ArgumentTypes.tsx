@@ -17,7 +17,7 @@ const StringType: EditorInputType = {
 
 const URLType: EditorInputType = {
     typeName: "url",
-    typeCheck: (value) => typeof value === "string" && value.startsWith("http")
+    typeCheck: (value) => typeof value === "string" && (value !== undefined)
 }
 
 const VectorType: EditorInputType = {

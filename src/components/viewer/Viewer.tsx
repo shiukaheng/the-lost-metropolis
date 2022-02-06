@@ -1,6 +1,7 @@
 import { cloneElement, useRef, useState } from "react"
 import { joinChildren } from "../editor/utilities"
 import { ViewerContext } from "./ViewerContext"
+import { AudioListener } from "three"
 
 function ViewerManager({children}) {
     // Helps to manage Viewer state (camera initial position, post processing, etc), seperated to be reused in Editor and Viewer
@@ -37,8 +38,13 @@ function ViewerManager({children}) {
         setSceneChildren(sceneChildren.filter(child => !childrenToRemove.includes(child)))
     }
 
+    // Create AudioListener
+    const [audioListener] = useState(()=>{
+        return new AudioListener()
+    })
+
     return (
-        <ViewerContext.Provider value={{defaultCameraProps, setDefaultCameraProps, cameraRef, sceneChildren, setSceneChildren, addSceneChildren, removeSceneChildren, updateSceneChildren}}>
+        <ViewerContext.Provider value={{defaultCameraProps, setDefaultCameraProps, cameraRef, sceneChildren, setSceneChildren, addSceneChildren, removeSceneChildren, updateSceneChildren, audioListener}}>
             {children}
         </ViewerContext.Provider>
     );

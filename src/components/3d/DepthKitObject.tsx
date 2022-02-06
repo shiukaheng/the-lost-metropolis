@@ -1,6 +1,9 @@
-import { extend, useLoader } from "@react-three/fiber";
-import { useEffect, useRef, useState } from "react";
+import { extend, useLoader, useThree, Vector3 } from "@react-three/fiber";
+import { useContext, useEffect, useRef, useState } from "react";
+import { ErrorBoundary } from "react-error-boundary";
 import * as THREE from "three";
+import { ViewerContext } from "../viewer/ViewerContext";
+import ErrorObject from "./ErrorObject";
 import DepthKitMaterial from "./materials/DepthKitMaterial";
 
 const VERTS_WIDE = 256;
@@ -15,10 +18,34 @@ type DepthKitObjectProps = JSX.IntrinsicElements["mesh"] & {
   autoplay?: boolean;
   loop?: boolean;
   muted?: boolean;
+  audioPositionOffset?: Vector3;
 }
 
-function DepthKitObject({ metaUrl="", videoUrl="", posterUrl="", autoplay=true, loop=true, muted=false, ...props }:DepthKitObjectProps) {
+function DepthKitObject(props:DepthKitObjectProps) {
+  return (
+  <ErrorBoundary fallbackRender={({error, resetErrorBoundary}) => (
+    <ErrorObject error={error} position={props.position} scale={props.scale} onClick={resetErrorBoundary} id={props.id}/>
+  )}>
+    <_DepthKitObject {...props} />
+  </ErrorBoundary>);
+}
+
+function _DepthKitObject({ metaUrl="", videoUrl="", posterUrl="", autoplay=true, loop=true, muted=false, audioPositionOffset=[0,0,0], ...props }:DepthKitObjectProps) {
   const mesh = useRef(null);
+  const audioGroupRef = useRef(null)
+  const [positionalAudio, setPositionalAudio] = useState(null);
+
+  useEffect(()=>{
+    if (audioGroupRef.current && positionalAudio) {
+      positionalAudio.removeFromParent()
+      audioGroupRef.current.add(positionalAudio);
+    }
+    return (()=>{
+      if (positionalAudio) {
+        positionalAudio.removeFromParent()
+      }
+    })
+  }, [positionalAudio])
 
   // Load meta info
   const metaInf = useLoader(THREE.FileLoader, metaUrl, (loader) => {
@@ -50,8 +77,9 @@ function DepthKitObject({ metaUrl="", videoUrl="", posterUrl="", autoplay=true, 
           extrinsics: metaInf.extrinsics
         }}
       >
-        <AdvancedVideoTexture {...{videoUrl, posterUrl, autoplay, loop, muted}} />
+        <AdvancedVideoTexture getPositionalAudio={setPositionalAudio} {...{videoUrl, posterUrl, autoplay, loop, muted}} />
       </depthKitMaterial>
+      <group ref={audioGroupRef} position={audioPositionOffset}/>
     </mesh>
   );
 }
@@ -62,8 +90,11 @@ function AdvancedVideoTexture({
   posterUrl = "",
   autoplay = true,
   loop = false,
-  muted = true
+  muted = true,
+  getPositionalAudio = (audioSource: any) => {}
 }) {
+  const { audioListener } = useContext(ViewerContext)
+  const [positionalAudio, setPositionalAudio] = useState(null);
   const [video] = useState(() => {
     const video = document.createElement("video");
     video.autoplay = true;
@@ -72,15 +103,32 @@ function AdvancedVideoTexture({
     video.setAttribute("webkit-playsinline", "webkit-playsinline");
     video.setAttribute("playsinline", "playsinline");
     console.log(Date.now(), "Creating Video Element", video);
-    window.videodom = video
+    const newPositionalAudio = new THREE.PositionalAudio(audioListener);
+    // Override default source node with video element
+    newPositionalAudio.setMediaElementSource(video);
+    setPositionalAudio(newPositionalAudio);
+    console.log(newPositionalAudio)
     return video;
   });
+  useEffect(() => {
+    if (positionalAudio) {
+      getPositionalAudio(positionalAudio);
+    }
+  }, [positionalAudio]);
+  // Clean up when we're done
+  useEffect(() => {
+    return () => {
+      if (positionalAudio) {
+        positionalAudio.disconnect();
+        video.remove()
+      }
+    };
+  }, []);
   // Change video source dynamically
   useEffect(() => {
     if (videoUrl) {
       video.src = videoUrl;
       video.load();
-      window.video = video;
     }
   }, [video, videoUrl]);
   // Make poster url reactive
@@ -158,4 +206,4 @@ function buildGeometry(verts_wide = VERTS_WIDE, verts_tall = VERTS_TALL) {
 
 // Thanks so much to https://github.com/DennisSmolek for fixing the loading issues!!!
 
-export { DepthKitObject, VERTS_TALL, VERTS_WIDE };
+export { DepthKitObject, VERTS_TALL, VERTS_WIDE, DepthKitObjectProps };

@@ -104,6 +104,60 @@ const supportedComponents = [
     //         }
     //     }
     // },
+    {
+        label: "RGBD video",
+        value: {
+            component: DepthKitObject,
+            inputs: {
+                ...genericInputs,
+                metaUrl: {
+                    type: URLType,
+                    default: "http://localhost/depthkit.json"
+                },
+                videoUrl: {
+                    type: URLType,
+                    default: "http://localhost/depthkit.mp4"
+                },
+                posterUrl: {
+                    type: URLType,
+                    default: "http://localhost/depthkit.jpg"
+                },
+                autoplay: {
+                    type: BooleanType,
+                    default: true
+                },
+                loop: {
+                    type: BooleanType,
+                    default: true
+                },
+                muted: {
+                    type: BooleanType,
+                    default: false
+                },
+                audioPositionOffset: {
+                    type: Vector3Type,
+                    default: [0, 0, 0]
+                }
+            }
+        }
+    },
+    {
+        label: "Debug plane",
+        value: {
+            component: DebugPlane,
+            inputs: {
+                ...genericInputs,
+                size: {
+                    type: NumberType,
+                    default: 1
+                },
+                color: {
+                    type: ColorType,
+                    default: [1, 1, 1]
+                }
+            }
+        }
+    }
 ]
 
 function getComponentPropInfo(component) {

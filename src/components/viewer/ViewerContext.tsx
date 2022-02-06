@@ -13,6 +13,7 @@ const defaultViewerContext = {
     cameraRef: {
         current: null
     },
+    audioListener: AudioListener,
     // Managing scene contents
     sceneChildren: [],
     setSceneChildren: (children:[]) => { },

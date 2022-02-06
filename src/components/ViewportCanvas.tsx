@@ -1,19 +1,17 @@
 import { useContextBridge } from "@react-three/drei"
 import { CursorDataContext } from "./App"
 import { PotreeManager } from "./3d/managers/PotreeManager"
-import { Children, useContext, useEffect, useLayoutEffect, useRef } from "react"
+import { Children, useContext, useEffect, useLayoutEffect, useRef, useState } from "react"
 import CompositeSuspense from "./3d/CompositeSuspense"
 import { EditorContext } from "./editor/EditorContext"
 import { Canvas, useThree } from "@react-three/fiber"
 import { ViewerContext } from "./viewer/ViewerContext"
 
 function CameraHelper() {
-    const {defaultCameraProps, cameraRef} = useContext(ViewerContext)
-    useThree(({camera})=>{
-        cameraRef.current = camera
-    })
+    const {defaultCameraProps, cameraRef, audioListener} = useContext(ViewerContext)
+    const { camera } = useThree()
     useLayoutEffect(()=>{
-        const camera = cameraRef.current
+        cameraRef.current = camera
         if (camera) {
             if (defaultCameraProps.position) {
                 camera.position.fromArray(defaultCameraProps.position)
@@ -28,7 +26,16 @@ function CameraHelper() {
                 camera.updateProjectionMatrix()
             }
         }
-    }, [defaultCameraProps])
+    }, [defaultCameraProps, camera])
+    useLayoutEffect(()=>{
+        if (camera) {
+            audioListener.removeFromParent()
+            camera.add(audioListener)
+        }
+        return ()=>{
+            audioListener.removeFromParent()
+        }
+    }, [camera])
     return null
 }
 

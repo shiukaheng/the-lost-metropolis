@@ -65,9 +65,11 @@ class DepthKitMaterial extends THREE.ShaderMaterial {
                     value: 3.0
                 }
             },
-            vertexShader: rgbdVert, // TODO
-            fragmentShader: rgbdFrag, // TODO
-            transparent: true
+            vertexShader: rgbdVert,
+            fragmentShader: rgbdFrag, 
+            transparent: true,
+            depthTest: true,
+            depthWrite: true,
         })
         this.side = THREE.DoubleSide
         window.materials.push(this)
