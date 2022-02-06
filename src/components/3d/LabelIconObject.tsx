@@ -14,7 +14,7 @@ type LabelIconObjectProps = JSX.IntrinsicElements["group"] & {
     skirtHidden?: boolean
 }
 
-export default function LabelIconObject({onClick=()=>{}, iconUrl="", iconScale=0.1, iconOpacity=1, skirtHidden=false, ...props}:LabelIconObjectProps) {
+export default function LabelIconObject({onClick=()=>{}, iconUrl="/static/viewport/info-icon.png", iconScale=0.1, iconOpacity=1, skirtHidden=false, ...props}:LabelIconObjectProps) {
     const texture = useLoader(TextureLoader, iconUrl)
     const [hovered, setHovered] = useState(false)
     const { iconExtHoverScale, iconExtHoverOpacity } = useSpring({
@@ -25,11 +25,11 @@ export default function LabelIconObject({onClick=()=>{}, iconUrl="", iconScale=0
     return (
         <UnifiedInteractive onClick={onClick} onHover={()=>{setHovered(true)}} onBlur={()=>{setHovered(false)}} parentID={props.id} position={props.position} scale={props.scale}>
             <Billboard>
-                <mesh scale={iconScale}>
+                <mesh scale={iconScale} renderOrder={1}>
                     <planeGeometry attach="geometry" args={[1, 1]}/>
                     <meshBasicMaterial attach="material" transparent opacity={iconOpacity} color="white" map={texture}/>
                 </mesh>
-                <group scale={iconScale}>
+                <group scale={iconScale} renderOrder={1}>
                     <a.mesh scale={iconExtHoverScale}>
                         <circleGeometry args={[0.5, 30]}/>
                         <a.meshBasicMaterial transparent opacity={iconExtHoverOpacity}/>

@@ -31,7 +31,7 @@ function InfoObject({text="", iconSize=0.1, fontSize=0.1, textMaxWidth=10, wrapT
                 <AnimatedLabelIcon iconUrl="/static/viewport/info-icon.png" onClick={()=>{setExpanded(!expanded)}} iconScale={scale} iconOpacity={opacity} skirtHidden={!expanded} scale={iconSize} id={props.id} position={props.position}/>
                 :
                 <UnifiedInteractive {...props} onClick={()=>{setExpanded(!expanded)}} parentID={props.id}>
-                    <AnimatedText scale={scale} gpuAccelerateSDF={true} fillOpacity={opacity} text={text} maxWidth={wrapText ? textMaxWidth : Infinity} fontSize={fontSize}/>
+                    <AnimatedText scale={scale} gpuAccelerateSDF={true} fillOpacity={opacity} text={text} maxWidth={wrapText ? textMaxWidth : Infinity} fontSize={fontSize} renderOrder={1}/>
                 </UnifiedInteractive>
             )
         )
