@@ -8,7 +8,7 @@ import Background from "./Background";
 import AnimatedSwitch from "./AnimatedSwitch";
 import { FC } from "react";
 import Experience from "./Experience";
-import { formatRGBCSS } from "../utilities";
+import { formatRGBCSS, useStickyState } from "../utilities";
 
 // All pages
 import Home from "./pages/Home"
@@ -75,7 +75,7 @@ function App():FC {
     // Theme defines the background color and foreground color, as well as the background video. It is not persistent between sessions and is defined by what content the user is viewing.
     const [theme, setTheme] = useState(defaultTheme)
     // Settings defines user preferences persistent between sessions.
-    const [settings, setSettings] = useState(defaultSettings)
+    const [settings, setSettings] = useStickyState(defaultSettings, "settings")
     const [cursorData, setCursorData] = useState(defaultCursorData)
     // set cursorData with listener on body element
     useLayoutEffect(() => {
