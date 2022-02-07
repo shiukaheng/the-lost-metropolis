@@ -15,6 +15,7 @@ import Home from "./pages/Home"
 import ShowcaseView from "./pages/ShowcaseView";
 import ListView from "./pages/ListView";
 import About from "./pages/About"
+import { AuthProvider } from "./admin/AuthProvider";
 
 const defaultTheme = {
     backgroundColor: [0, 0, 0],
@@ -98,67 +99,69 @@ function App():FC {
         body.style.backgroundColor = formatRGBCSS(theme.backgroundColor)
     }, [theme.backgroundColor])
     return (
-        <CursorDataContext.Provider value={cursorData}>
-            <SettingsContext.Provider value={settings}>
-                <ThemeContext.Provider value={theme}>
-                    <Router>
-                        <div className="absolute w-full h-full">
-                            <AnimatedSwitch pathPreprocessor={
-                                (path) => {
-                                    if (path.split("/")[1] !== "experience") {
-                                        path = ""
+        <AuthProvider>
+            <CursorDataContext.Provider value={cursorData}>
+                <SettingsContext.Provider value={settings}>
+                    <ThemeContext.Provider value={theme}>
+                        <Router>
+                            <div className="absolute w-full h-full">
+                                <AnimatedSwitch pathPreprocessor={
+                                    (path) => {
+                                        if (path.split("/")[1] !== "experience") {
+                                            path = ""
+                                        }
+                                        return path
                                     }
-                                    return path
-                                }
-                            }>
-                                <Route path="/experience/:id" element={<Experience content_array={content_array}/>}/>
-                                <Route path="*" element={
-                                    <div className="w-full h-full">
-                                        <Background/>
-                                        <AppContainer>
-                                            <NavigationBar>
-                                                <MultiLangNavLink text={{"en": "home", "zh": "首頁"}} to="/"/>
-                                                <MultiLangNavLink text={{"en": "browse", "zh": "瀏覽"}} to="/browse"/>
-                                                <MultiLangNavLink text={{"en": "list", "zh": "列表"}} to="/list"/>
-                                                <MultiLangNavLink text={{"en": "about", "zh": "關於"}} to="/about"/>
-                                                <MagicDiv mergeTransitions={true} className="nav-button" onClick={()=>{setSettings(
-                                                    oldSettings => ({
-                                                        ...oldSettings,
-                                                        lang: oldSettings.lang === "en" ? "zh" : "en"
-                                                    })
-                                                )}}>中／eng</MagicDiv>
-                                                <MagicDiv mergeTransitions={true} className="nav-button" onClick={()=>{setTheme(
-                                                    oldTheme => ({
-                                                        ...oldTheme,
-                                                        foregroundColor: oldTheme.backgroundColor,
-                                                        backgroundColor: oldTheme.foregroundColor
-                                                    })
-                                                )}}>?!</MagicDiv>
-                                            </NavigationBar>
-                                            <AnimatedSwitch pathPreprocessor={
-                                                // Prevent the animation from triggering when under navigating in the browse directory, since it already has a sliding animation
-                                                (path) => {
-                                                    if (path.split("/")[1]==="browse") {
-                                                        path = "browse"
+                                }>
+                                    <Route path="/experience/:id" element={<Experience content_array={content_array}/>}/>
+                                    <Route path="*" element={
+                                        <div className="w-full h-full">
+                                            <Background/>
+                                            <AppContainer>
+                                                <NavigationBar>
+                                                    <MultiLangNavLink text={{"en": "home", "zh": "首頁"}} to="/"/>
+                                                    <MultiLangNavLink text={{"en": "browse", "zh": "瀏覽"}} to="/browse"/>
+                                                    <MultiLangNavLink text={{"en": "list", "zh": "列表"}} to="/list"/>
+                                                    <MultiLangNavLink text={{"en": "about", "zh": "關於"}} to="/about"/>
+                                                    <MagicDiv mergeTransitions={true} className="nav-button" onClick={()=>{setSettings(
+                                                        oldSettings => ({
+                                                            ...oldSettings,
+                                                            lang: oldSettings.lang === "en" ? "zh" : "en"
+                                                        })
+                                                    )}}>中／eng</MagicDiv>
+                                                    <MagicDiv mergeTransitions={true} className="nav-button" onClick={()=>{setTheme(
+                                                        oldTheme => ({
+                                                            ...oldTheme,
+                                                            foregroundColor: oldTheme.backgroundColor,
+                                                            backgroundColor: oldTheme.foregroundColor
+                                                        })
+                                                    )}}>?!</MagicDiv>
+                                                </NavigationBar>
+                                                <AnimatedSwitch pathPreprocessor={
+                                                    // Prevent the animation from triggering when under navigating in the browse directory, since it already has a sliding animation
+                                                    (path) => {
+                                                        if (path.split("/")[1]==="browse") {
+                                                            path = "browse"
+                                                        }
+                                                        return path
                                                     }
-                                                    return path
-                                                }
-                                            }>
-                                                <Route path="/" element={<Home/>}/>
-                                                <Route path="/browse" element={<ShowcaseView content_array={content_array}/>}/>
-                                                <Route path="/browse/:id" element={<ShowcaseView content_array={content_array}/>}/>
-                                                <Route path="/list" element={<ListView content_array={content_array}/>}/>
-                                                <Route path="/about" element={<About/>}/>
-                                            </AnimatedSwitch>
-                                        </AppContainer>
-                                    </div>
-                                }/>
-                            </AnimatedSwitch>
-                        </div>
-                    </Router>
-                </ThemeContext.Provider>
-            </SettingsContext.Provider>
-        </CursorDataContext.Provider>
+                                                }>
+                                                    <Route path="/" element={<Home/>}/>
+                                                    <Route path="/browse" element={<ShowcaseView content_array={content_array}/>}/>
+                                                    <Route path="/browse/:id" element={<ShowcaseView content_array={content_array}/>}/>
+                                                    <Route path="/list" element={<ListView content_array={content_array}/>}/>
+                                                    <Route path="/about" element={<About/>}/>
+                                                </AnimatedSwitch>
+                                            </AppContainer>
+                                        </div>
+                                    }/>
+                                </AnimatedSwitch>
+                            </div>
+                        </Router>
+                    </ThemeContext.Provider>
+                </SettingsContext.Provider>
+            </CursorDataContext.Provider>
+        </AuthProvider>
   )
 }
 
