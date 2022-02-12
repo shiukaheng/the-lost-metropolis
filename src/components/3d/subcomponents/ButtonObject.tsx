@@ -1,12 +1,12 @@
 import { extend } from '@react-three/fiber';
-import RoundedRectangleGeometry from './geometries/RoundedRectangleGeometry';
+import RoundedRectangleGeometry from '../geometries/RoundedRectangleGeometry';
 import { Text } from "@react-three/drei"
 import { DoubleSide, Color } from 'three';
 import { useRef, useLayoutEffect, useState, Suspense, useContext } from "react"
 import { useTransition, config, animated, useSpring } from "react-spring"
 import { a } from "@react-spring/three"
-import UnifiedInteractive from "./UnifiedInteractive"
-import { EditorContext, wrapOnClick } from '../editor/Editor';
+import UnifiedInteractive from "../UnifiedInteractive"
+import { EditorContext, wrapOnClick } from '../../editor/Editor';
 
 extend({ RoundedRectangleGeometry })
 
