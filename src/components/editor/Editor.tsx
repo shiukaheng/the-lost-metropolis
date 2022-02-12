@@ -62,26 +62,37 @@ function EditorManager() {
         )
     })
 
+    const [editorExpanded, setEditorExpanded] = useState(true)
+
     return (
         <EditorContext.Provider value={
             {selectedIDs, setSelectedIDs, addSelectedIDs, removeSelectedIDs, transformMode, setTransformMode, transformSpace, setTransformSpace, overrideInteractions, setOverrideInteractions, shiftPressed, setSceneChildren, removeSceneChildren}
         }>
             <KeyPressCallback keyName={"Escape"} onDown={()=>{setSelectedIDs([])}}/>
-            <MagicDiv backgroundColorCSSProps={["backgroundColor"]} className="absolute w-full h-full flex flex-row">
-                <div className="w-1/2 h-full flex flex-col p-4 overflow-clip">
-                    <div className="editor-embedded-widget text-2xl font-bold">Editor</div>
-                    <EditorComponentGraph/>
-                    <EditorComponentProperties/>
-                    <EditorOptions/>
-                    <EditorIO/>
-                    <EditorSceneSettings/>
-                </div>
-                <div className="w-1/2 h-full bg-black" onClick={()=>{audioListener.context.resume()}}>
+            <MagicDiv backgroundColorCSSProps={["backgroundColor"]} className="absolute w-full h-full">
+                <div className="absolute w-full h-full bg-black" onClick={()=>{audioListener.context.resume()}}>
                     <DebugViewport className="w-full h-full">
                         <DebugPlane rotation={[Math.PI/2, 0, 0]}/>
                         {wrappedSceneChildren}
                     </DebugViewport>
                 </div>
+            </MagicDiv>
+            <MagicDiv className="absolute w-[500px] flex flex-col p-4 overflow-clip">
+                <div className="editor-embedded-widget text-2xl font-bold flex flex-row">
+                    <div>Editor</div>
+                    <div className="ml-auto cursor-pointer text-xl select-none" onClick={()=>{setEditorExpanded(!editorExpanded)}}>{editorExpanded ? "-" : "+"}</div>    
+                </div>
+                {
+                    editorExpanded ?
+                    <div>
+                        <EditorComponentGraph/>
+                        <EditorComponentProperties/>
+                        <EditorOptions/>
+                        <EditorIO/>
+                        <EditorSceneSettings/>
+                    </div>
+                    : null
+                }
             </MagicDiv>
         </EditorContext.Provider>
     );

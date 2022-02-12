@@ -6,7 +6,7 @@ import EditorEmbeddedWidget from "./EditorEmbeddedWidget";
 import EditorInput from "./EditorInput";
 
 function EditorSceneSettings() {    
-    const {defaultCameraProps, setDefaultCameraProps, cameraRef} = useContext(ViewerContext);
+    const {defaultCameraProps, setDefaultCameraProps, cameraRef, potreePointBudget, setPotreePointBudget} = useContext(ViewerContext);
     return (
         <EditorEmbeddedWidget title="Scene settings">
             <div className="flex flex-col gap-2">
@@ -22,6 +22,7 @@ function EditorSceneSettings() {
                         })
                     }
                 }}/>
+                <EditorInput propName="Point budget" typeName="number" value={potreePointBudget} setValue={setPotreePointBudget}/>
             </div>
         </EditorEmbeddedWidget>
     )

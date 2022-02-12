@@ -43,8 +43,11 @@ function ViewerManager({children}) {
         return new AudioListener()
     })
 
+    // Args for Potree
+    const [potreePointBudget, setPotreePointBudget] = useState(1e6)
+
     return (
-        <ViewerContext.Provider value={{defaultCameraProps, setDefaultCameraProps, cameraRef, sceneChildren, setSceneChildren, addSceneChildren, removeSceneChildren, updateSceneChildren, audioListener}}>
+        <ViewerContext.Provider value={{defaultCameraProps, setDefaultCameraProps, cameraRef, sceneChildren, setSceneChildren, addSceneChildren, removeSceneChildren, updateSceneChildren, audioListener, potreePointBudget, setPotreePointBudget}}>
             {children}
         </ViewerContext.Provider>
     );

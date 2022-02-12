@@ -1,17 +1,17 @@
 import { Potree } from '@pnext/three-loader';
 import { useFrame } from '@react-three/fiber';
-import { createContext, useEffect, useRef, ReactNode, useState } from 'react';
+import { createContext, useEffect, useRef, ReactNode, useState, useContext } from 'react';
+import { ViewerContext } from '../../viewer/ViewerContext';
 const PotreeContext = createContext(null)
-const defaultPointBudget = 100000
 
 type PotreeManagerProps = {
-    pointBudget?: number
     children: ReactNode
 }
 
-function PotreeManager({pointBudget=defaultPointBudget, children}:PotreeManagerProps) {
+function PotreeManager({children}:PotreeManagerProps) {
     // Using useRef to maintain non-state variable across renders
     const {current: potree} = useRef(new Potree())
+    const {potreePointBudget} = useContext(ViewerContext)
     const [pointClouds, setPointClouds] = useState({})
     const setPointCloud = (cloud, childID) => {setPointClouds((oldPointClouds)=>{oldPointClouds[childID] = cloud; return oldPointClouds})}
     useFrame((state, delta) => {
@@ -19,8 +19,8 @@ function PotreeManager({pointBudget=defaultPointBudget, children}:PotreeManagerP
     })
     // Manually update potree properties when pointBudget prop changes
     useEffect(()=>{
-        potree.pointBudget = pointBudget
-    }, [potree, pointBudget])
+        potree.pointBudget = potreePointBudget
+    }, [potree, potreePointBudget])
     return (
         <PotreeContext.Provider value={{potree, pointClouds, setPointClouds, setPointCloud}}>
             {children}

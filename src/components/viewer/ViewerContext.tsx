@@ -20,6 +20,8 @@ const defaultViewerContext = {
     addSceneChildren: (children:[]) => { },
     removeSceneChildren: (children:[]) => { },
     updateSceneChildren: (children:[]) => { },
+    potreePointBudget: 100000,
+    setPotreePointBudget: (budget:number) => {},
 }
 
 const ViewerContext = createContext(defaultViewerContext)

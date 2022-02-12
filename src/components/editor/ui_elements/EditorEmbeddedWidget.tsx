@@ -6,7 +6,7 @@ export default function EditorEmbeddedWidget({title="Title", children}) {
         <div className="editor-embedded-widget">
             <div className="flex flex-row">
                 <div className="text-white text-md font-bold">{title}</div>
-                <div className="text-white text-xl font-bold ml-auto" onClick={()=>{setExpanded(!expanded)}}>{expanded ? "-" : "+"}</div>
+                <div className="text-white text-xl font-bold ml-auto select-none cursor-pointer" onClick={()=>{setExpanded(!expanded)}}>{expanded ? "-" : "+"}</div>
             </div>
             <div className="flex flex-col gap-2">
                 {expanded ? children : null}

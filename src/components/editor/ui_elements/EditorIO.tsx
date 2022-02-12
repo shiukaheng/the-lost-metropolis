@@ -95,7 +95,7 @@ function deserializeChildren(childrenArray) {
 }
 
 function EditorIO() {
-    const {sceneChildren, setSceneChildren, defaultCameraProps, setDefaultCameraProps} = useContext(ViewerContext)
+    const {sceneChildren, setSceneChildren, defaultCameraProps, setDefaultCameraProps, potreePointBudget, setPotreePointBudget} = useContext(ViewerContext)
     const inputFile = useRef(null) 
     const onButtonClick = () => {
         // `current` points to the mounted file input element
@@ -104,12 +104,14 @@ function EditorIO() {
     const serialize = () => {
         return {
             sceneChildren: exportChildren(sceneChildren),
-            defaultCameraProps: defaultCameraProps
+            defaultCameraProps: defaultCameraProps,
+            potreePointBudget,
         }
     }
     const deserialize = (obj) => {
         setSceneChildren(deserializeChildren(obj.sceneChildren));
         setDefaultCameraProps(obj.defaultCameraProps);
+        setPotreePointBudget(obj.potreePointBudget);
     }
     return (
         <EditorEmbeddedWidget title="Import / Export">
