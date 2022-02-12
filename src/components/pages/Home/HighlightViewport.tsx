@@ -1,9 +1,9 @@
 import { Canvas, useFrame } from "@react-three/fiber"
 import { useRef, useContext, useEffect, useLayoutEffect } from "react"
 import * as THREE from 'three'
-import { PotreeManager } from "./3d/managers/PotreeManager"
+import { PotreeManager } from "../../3d/managers/PotreeManager"
 import { useContextBridge } from "@react-three/drei"
-import { CursorDataContext } from "./App"
+import { CursorDataContext } from "../../App"
 
 function FollowMouse({object, posOffsetIntensity=[1, 1], rotOffsetIntensity=[0, 0], lambda=2, captureMode="window"}) {
     const cursorData = useContext(CursorDataContext)

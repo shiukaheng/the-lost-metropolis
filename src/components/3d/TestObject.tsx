@@ -2,8 +2,7 @@
 
 import { useContext } from "react";
 import { EditorContext } from "../editor/EditorContext";
-import { wrapOnClick } from "../editor/utilities";
-import UnifiedInteractive from "./UnifiedInteractive";
+import UnifiedInteractive from "./subcomponents/UnifiedInteractive";
 
 type TestObjectProps = JSX.IntrinsicElements['group']
 

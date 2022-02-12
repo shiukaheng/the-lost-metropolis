@@ -1,10 +1,10 @@
 import { cloneElement, useContext, useEffect } from 'react';
-import DebugViewport from '../DebugViewport';
+import EditorViewport from "./EditorViewport";
 import DebugPlane from '../3d/DebugPlane';
 import { useState } from 'react';
 import EditorComponentGraph from './ui_elements/EditorComponentGraph';
 import EditorComponentProperties from './ui_elements/EditorComponentProperties';
-import MagicDiv from '../MagicDiv';
+import MagicDiv from '../utilities/MagicDiv';
 import EditorTransformControls from './ui_elements/EditorTransformControls';
 import EditorOptions from './ui_elements/EditorOptions';
 import EditorIO from './ui_elements/EditorIO';
@@ -13,7 +13,6 @@ import EditorSceneSettings from './ui_elements/EditorSceneSettings';
 import { EditorContext } from './EditorContext';
 import ViewerManager from '../viewer/Viewer';
 import { ViewerContext } from '../viewer/ViewerContext';
-import LabelIconObject from '../3d/LabelIconObject';
 
 function Editor() {
     return (
@@ -71,10 +70,10 @@ function EditorManager() {
             <KeyPressCallback keyName={"Escape"} onDown={()=>{setSelectedIDs([])}}/>
             <MagicDiv backgroundColorCSSProps={["backgroundColor"]} className="absolute w-full h-full">
                 <div className="absolute w-full h-full bg-black" onClick={()=>{audioListener.context.resume()}}>
-                    <DebugViewport className="w-full h-full">
+                    <EditorViewport className="w-full h-full">
                         <DebugPlane rotation={[Math.PI/2, 0, 0]}/>
                         {wrappedSceneChildren}
-                    </DebugViewport>
+                    </EditorViewport>
                 </div>
             </MagicDiv>
             <MagicDiv className="absolute w-[500px] flex flex-col p-4 overflow-clip">

@@ -1,5 +1,5 @@
 import { Canvas } from "@react-three/fiber"
-import { PotreeManager } from "./3d/managers/PotreeManager"
+import { PotreeManager } from "../3d/managers/PotreeManager"
 import ViewportCanvas from "./ViewportCanvas"
 import { ReactNode } from "react";
 

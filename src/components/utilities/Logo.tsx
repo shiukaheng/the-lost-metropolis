@@ -1,8 +1,8 @@
-import ChiLogo from "./svgs/chilogo.svg";
-import EngLogo from "./svgs/englogo.svg";
-import { ThemeContext } from "./App"
+import ChiLogo from "../svgs/chilogo.svg";
+import EngLogo from "../svgs/englogo.svg";
+import { ThemeContext } from "../App"
 import { useContext } from 'react';
-import { formatRGBCSS } from '../utilities';
+import { formatRGBCSS } from '../../utilities';
 
 function Logo() {
     const theme = useContext(ThemeContext);

@@ -1,9 +1,8 @@
 import { Canvas, useThree } from "@react-three/fiber"
-import DebugPlane from "./3d/DebugPlane";
-import ViewportCanvas from "./ViewportCanvas"
+import ViewportCanvas from "../Viewer/ViewportCanvas"
 import { OrbitControls } from '@react-three/drei'
 import { ErrorBoundary } from "react-error-boundary";
-import MagicDiv from "./MagicDiv";
+import MagicDiv from "../utilities/MagicDiv";
 
 function Fallback({error, resetErrorBoundary}) {
     return (
@@ -15,7 +14,7 @@ function Fallback({error, resetErrorBoundary}) {
       )
 }
 
-function DebugViewport({children, ...props}) {
+function EditorViewport({children, ...props}) {
     return (
         <div {...props}>
             <ErrorBoundary FallbackComponent={Fallback}>
@@ -28,4 +27,4 @@ function DebugViewport({children, ...props}) {
     );
 }
 
-export default DebugViewport;
+export default EditorViewport;

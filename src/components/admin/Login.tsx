@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth"
 import { auth } from "../../firebase-config";
-import MagicDiv from "../MagicDiv";
+import MagicDiv from "../utilities/MagicDiv";
 import { Fade } from "react-reveal";
 import { useNavigate } from "react-router-dom";
 

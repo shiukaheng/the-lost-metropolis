@@ -3,7 +3,7 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import * as THREE from "three";
 import { ViewerContext } from "../viewer/ViewerContext";
-import ErrorObject from "./ErrorObject";
+import ErrorObject from "./subcomponents/ErrorObject";
 import DepthKitMaterial from "./materials/DepthKitMaterial";
 
 const VERTS_WIDE = 256;

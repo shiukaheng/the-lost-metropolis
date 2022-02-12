@@ -1,5 +1,5 @@
 import React from 'react'
-import GenericPage from '../GenericPage'
+import GenericPage from '../utilities/GenericPage'
 
 function About() {
     return (

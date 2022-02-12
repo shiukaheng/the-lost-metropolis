@@ -1,6 +1,6 @@
-import MagicDiv from '../MagicDiv'
-import HighlightViewport from '../HighlightViewport'
-import GenericPage from '../GenericPage'
+import MagicDiv from '../utilities/MagicDiv'
+import HighlightViewport from './Home/HighlightViewport'
+import GenericPage from '../utilities/GenericPage'
 import PotreeObject from '../3d/PotreeObject'
 
 function Home() {

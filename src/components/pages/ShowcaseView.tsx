@@ -1,4 +1,4 @@
-import ShowcaseContentCard from '../ShowcaseCard';
+import ShowcaseContentCard from './ShowcaseView/ShowcaseCard';
 import { useState, useContext } from 'react';
 import {ArrowLeftIcon, ArrowRightIcon} from '@heroicons/react/outline';
 import SwipeableViews from 'react-swipeable-views';

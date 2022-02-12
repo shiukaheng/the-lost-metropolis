@@ -2,11 +2,10 @@ import { extend } from '@react-three/fiber';
 import RoundedRectangleGeometry from '../geometries/RoundedRectangleGeometry';
 import { Text } from "@react-three/drei"
 import { DoubleSide, Color } from 'three';
-import { useRef, useLayoutEffect, useState, Suspense, useContext } from "react"
-import { useTransition, config, animated, useSpring } from "react-spring"
+import { useState } from "react"
+import { config, useSpring } from "react-spring"
 import { a } from "@react-spring/three"
-import UnifiedInteractive from "../UnifiedInteractive"
-import { EditorContext, wrapOnClick } from '../../editor/Editor';
+import UnifiedInteractive from "./UnifiedInteractive"
 
 extend({ RoundedRectangleGeometry })
 
@@ -24,7 +23,6 @@ type ButtonObjectProps = JSX.IntrinsicElements['mesh'] & {
 }
 
 function ButtonObject({width=0.5, height=0.25, text="Button", foregroundColor="white", backgroundColor="#282828", backgroundOpacity=0.8, fontSize=0.1, font=undefined, onClick=()=>{}, radius=0.05, ...props}:ButtonObjectProps) {
-    const editorContext = useContext(EditorContext)
     const [clicked, setClicked] = useState(false)
     const [hovered, setHovered] = useState(false)
     const { buttonHoverScale } = useSpring({

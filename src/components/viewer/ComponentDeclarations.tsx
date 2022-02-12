@@ -2,11 +2,8 @@ import DebugPlane from "../3d/DebugPlane"
 import TestObject from "../3d/TestObject"
 import PotreeObject from "../3d/PotreeObject"
 import { DepthKitObject } from "../3d/DepthKitObject"
-import ButtonObject from "../3d/ButtonObject"
 import { StringType, Vector3Type, EulerType, NumberType, ColorType, BooleanType, URLType } from "./ArgumentTypes"
-import LabelIconObject from "../3d/LabelIconObject"
 import InfoObject from "../3d/InfoObject"
-import ErrorObject from "../3d/ErrorObject"
 
 const genericInputs = {
     "name": {

@@ -1,4 +1,3 @@
-import { Billboard } from "@react-three/drei";
 import LabelIconObject from "./LabelIconObject";
 import { Text } from "@react-three/drei"
 

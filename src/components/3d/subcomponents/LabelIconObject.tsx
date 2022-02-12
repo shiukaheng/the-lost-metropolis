@@ -1,8 +1,8 @@
-import { Text, Image, Billboard } from "@react-three/drei"
-import { useRef, useLayoutEffect, useState, Suspense } from "react"
-import { useTransition, config, animated, useSpring } from "react-spring"
+import { Billboard } from "@react-three/drei"
+import { useState } from "react"
+import { config, useSpring } from "react-spring"
 import { a } from "@react-spring/three"
-import { useFrame, useLoader } from "@react-three/fiber"
+import { useLoader } from "@react-three/fiber"
 import { TextureLoader } from "three"
 import UnifiedInteractive from "./UnifiedInteractive"
 

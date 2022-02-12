@@ -1,4 +1,4 @@
-import MagicDiv from "./MagicDiv";
+import MagicDiv from "../../utilities/MagicDiv";
 import { Fragment } from "react";
 import { useNavigate } from 'react-router-dom';
 

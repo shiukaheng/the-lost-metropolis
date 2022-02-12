@@ -2,8 +2,8 @@ import { Text, Billboard } from "@react-three/drei"
 import { useState } from "react"
 import { useTransition, config } from "react-spring"
 import { a } from "@react-spring/three"
-import LabelIconObject from "./LabelIconObject"
-import UnifiedInteractive from "./UnifiedInteractive"
+import LabelIconObject from "./subcomponents/LabelIconObject"
+import UnifiedInteractive from "./subcomponents/UnifiedInteractive"
 
 type InfoObjectProps = JSX.IntrinsicElements["group"] & {
     text?: string

@@ -1,6 +1,6 @@
 import { useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import MagicDiv from "../MagicDiv";
+import MagicDiv from "../utilities/MagicDiv";
 import { AuthContext } from "./AuthProvider";
 
 function AdminPanel() {

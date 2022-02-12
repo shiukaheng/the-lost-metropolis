@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
-import MagicDiv from './MagicDiv';
+import MagicDiv from '../utilities/MagicDiv';
 
 function Experience({content_array=[], ...props}) {
     const { id } = useParams();

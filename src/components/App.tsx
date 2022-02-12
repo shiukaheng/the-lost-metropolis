@@ -1,13 +1,13 @@
 import { BrowserRouter as Router, Route } from "react-router-dom";
-import NavigationBar from "./NavigationBar"
-import AppContainer from "./AppContainer"
+import NavigationBar from "./utilities/NavigationBar"
+import AppContainer from "./utilities/AppContainer"
 import { useNavigate } from 'react-router-dom';
 import { useState, createContext, useLayoutEffect, useContext } from "react";
-import MagicDiv from "./MagicDiv";
-import Background from "./Background";
-import AnimatedSwitch from "./AnimatedSwitch";
+import MagicDiv from "./utilities/MagicDiv";
+import Background from "./utilities/Background";
+import AnimatedSwitch from "./utilities/AnimatedSwitch";
 import { FC } from "react";
-import Experience from "./Experience";
+import Experience from "./pages/Experience";
 import { formatRGBCSS, useStickyState } from "../utilities";
 import Login from "./admin/Login";
 
