@@ -3,15 +3,17 @@ import { signInWithEmailAndPassword } from "firebase/auth"
 import { auth } from "../../firebase-config";
 import MagicDiv from "../MagicDiv";
 import { Fade } from "react-reveal";
+import { useNavigate } from "react-router-dom";
 
 function Login() {
     const [buttonText, setButtonText] = useState("log in")
+    const navigate = useNavigate()
     const handleLogin = useCallback(async event => {
         event.preventDefault();
         const { email, password } = event.target.elements;
         try {
             await signInWithEmailAndPassword(auth, email.value, password.value);
-            console.log("Signed in!", auth)
+            navigate("/admin")
         } catch (error) {
             console.warn(error);
             setButtonText("try again")

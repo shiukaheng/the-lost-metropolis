@@ -2,20 +2,22 @@ import { BrowserRouter as Router, Route } from "react-router-dom";
 import NavigationBar from "./NavigationBar"
 import AppContainer from "./AppContainer"
 import { useNavigate } from 'react-router-dom';
-import { useState, createContext, useLayoutEffect } from "react";
+import { useState, createContext, useLayoutEffect, useContext } from "react";
 import MagicDiv from "./MagicDiv";
 import Background from "./Background";
 import AnimatedSwitch from "./AnimatedSwitch";
 import { FC } from "react";
 import Experience from "./Experience";
 import { formatRGBCSS, useStickyState } from "../utilities";
+import Login from "./admin/Login";
 
 // All pages
 import Home from "./pages/Home"
 import ShowcaseView from "./pages/ShowcaseView";
 import ListView from "./pages/ListView";
 import About from "./pages/About"
-import { AuthProvider } from "./admin/AuthProvider";
+import { AuthContext, AuthProvider } from "./admin/AuthProvider";
+import AdminPanel from "./admin/AdminPanel";
 
 const defaultTheme = {
     backgroundColor: [0, 0, 0],
@@ -114,6 +116,8 @@ function App():FC {
                                     }
                                 }>
                                     <Route path="/experience/:id" element={<Experience content_array={content_array}/>}/>
+                                    <Route path="/login" element={<Login/>}/>
+                                    <Route path="/admin" element={<AdminPanel/>}/>
                                     <Route path="*" element={
                                         <div className="w-full h-full">
                                             <Background/>

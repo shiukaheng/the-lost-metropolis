@@ -2,12 +2,7 @@ import { useLocation,Routes } from "react-router";
 import { CSSTransition, SwitchTransition } from "react-transition-group";
 import { FC } from "react";
 
-type AnimatedSwitchProps = {
-  pathPreprocessor:(path:string)=>string,
-  children: FC<{}>[]
-}
-
-const AnimatedSwitch:FC = ({pathPreprocessor=(path)=>{return path}, ...props}:AnimatedSwitchProps) => {
+const AnimatedSwitch = ({pathPreprocessor=(path)=>{return path}, ...props}) => {
     const location = useLocation();
     var path = pathPreprocessor(location.pathname)
     return (
