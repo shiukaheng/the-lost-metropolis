@@ -90,8 +90,6 @@ function App():FC {
                                 }
                             }>
                                 <Route path="/experience/:id" element={<Experience content_array={content_array}/>}/>
-                                <Route path="/login" element={<Login/>}/>
-                                <Route path="/admin" element={<AdminPanel/>}/>
                                 <Route path="*" element={
                                     <div className="w-full h-full">
                                         <Background/>
@@ -111,6 +109,8 @@ function App():FC {
                                                 <Route path="/browse/:id" element={<ShowcaseView content_array={content_array}/>}/>
                                                 <Route path="/list" element={<ListView content_array={content_array}/>}/>
                                                 <Route path="/about" element={<About/>}/>
+                                                <Route path="/login" element={<Login/>}/>
+                                                <Route path="/admin" element={<AdminPanel/>}/>
                                             </AnimatedSwitch>
                                         </AppContainer>
                                     </div>
