@@ -4,6 +4,8 @@
 
 // - Getting all posts that are published
 
+// - Check if is logged in
+
 // Admin / creating content
 
 // - Creating a post
