@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useLayoutEffect } from "react"
 
 function formatRGBCSS(color: number[]): string {
     return "rgb(" + color[0] + "," + color[1] + "," + color[2] + ")";
@@ -109,4 +109,23 @@ function useStickyState(defaultValue, key) {
     return [value, setValue];
 }
 
-export { formatRGBCSS, useKeyPress, useAsyncKeyPress, useAsyncReference, KeyPressCallback, LinearToSRGB, SRGBToLinear, useStickyState };
+function useFollowMouse(onMouseMove=null) {
+    const mousePosRef = useRef([0,0])
+    useLayoutEffect(() => {
+        const body = document.querySelector("body")
+        const mouseMoveHandler = (e) => {
+            mousePosRef.current[0] = (e.clientX/(window.innerWidth)-0.5)*2
+            mousePosRef.current[1] = -(e.clientY/(window.innerHeight)-0.5)*2
+            if (onMouseMove) {
+                onMouseMove(mousePosRef.current)
+            }
+        }
+        body.addEventListener("mousemove", mouseMoveHandler)
+        return () => {
+            body.removeEventListener("mousemove", mouseMoveHandler)
+        }
+    }, [])
+    return mousePosRef
+}
+
+export { formatRGBCSS, useKeyPress, useAsyncKeyPress, useAsyncReference, KeyPressCallback, LinearToSRGB, SRGBToLinear, useStickyState, useFollowMouse };

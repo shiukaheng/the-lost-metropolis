@@ -40,11 +40,6 @@ const defaultThemeContext = {
     setTheme: (newTheme) => {},
 }
 
-const defaultCursorData = {
-    x: 0,
-    y: 0
-}
-
 const ThemeContext = createContext(defaultThemeContext)
 
 const SettingsContext = createContext(defaultSettingsContext)
@@ -53,8 +48,6 @@ const SettingsContext = createContext(defaultSettingsContext)
 
 // const options = { frequency: 60, referenceFrame: 'device' };
 // const sensor = new RelativeOrientationSensor(options);
-
-const CursorDataContext = createContext(defaultCursorData)
 
 const content_array = [
     {
@@ -77,22 +70,6 @@ function App():FC {
     const [theme, setTheme] = useState(defaultTheme)
     // Settings defines user preferences persistent between sessions.
     const [settings, setSettings] = useStickyState(defaultSettings, "settings")
-    const [cursorData, setCursorData] = useState(defaultCursorData)
-    // set cursorData with listener on body element
-    useLayoutEffect(() => {
-        const body = document.querySelector("body")
-        const mouseMoveHandler = (e) => {
-            const newData = {
-                x: (e.clientX/(window.innerWidth)-0.5)*2,
-                y: -(e.clientY/(window.innerHeight)-0.5)*2
-            }
-            setCursorData(newData)
-        }
-        body.addEventListener("mousemove", mouseMoveHandler)
-        return () => {
-            body.removeEventListener("mousemove", mouseMoveHandler)
-        }
-    }, [])
     // set background color on body element
     useLayoutEffect(() => {
         const body = document.querySelector("body")
@@ -100,53 +77,51 @@ function App():FC {
     }, [theme.backgroundColor])
     return (
         <AuthProvider>
-            <CursorDataContext.Provider value={cursorData}>
-                <SettingsContext.Provider value={{settings, setSettings}}>
-                    <ThemeContext.Provider value={{theme, setTheme}}>
-                        <Router>
-                            <div className="absolute w-full h-full">
-                                <AnimatedSwitch pathPreprocessor={
-                                    (path) => {
-                                        if (path.split("/")[1] !== "experience") {
-                                            path = ""
-                                        }
-                                        return path
+            <SettingsContext.Provider value={{settings, setSettings}}>
+                <ThemeContext.Provider value={{theme, setTheme}}>
+                    <Router>
+                        <div className="absolute w-full h-full">
+                            <AnimatedSwitch pathPreprocessor={
+                                (path) => {
+                                    if (path.split("/")[1] !== "experience") {
+                                        path = ""
                                     }
-                                }>
-                                    <Route path="/experience/:id" element={<Experience content_array={content_array}/>}/>
-                                    <Route path="/login" element={<Login/>}/>
-                                    <Route path="/admin" element={<AdminPanel/>}/>
-                                    <Route path="*" element={
-                                        <div className="w-full h-full">
-                                            <Background/>
-                                            <AppContainer>
-                                                <NavigationBar/>
-                                                <AnimatedSwitch pathPreprocessor={
-                                                    // Prevent the animation from triggering when under navigating in the browse directory, since it already has a sliding animation
-                                                    (path) => {
-                                                        if (path.split("/")[1]==="browse") {
-                                                            path = "browse"
-                                                        }
-                                                        return path
+                                    return path
+                                }
+                            }>
+                                <Route path="/experience/:id" element={<Experience content_array={content_array}/>}/>
+                                <Route path="/login" element={<Login/>}/>
+                                <Route path="/admin" element={<AdminPanel/>}/>
+                                <Route path="*" element={
+                                    <div className="w-full h-full">
+                                        <Background/>
+                                        <AppContainer>
+                                            <NavigationBar/>
+                                            <AnimatedSwitch pathPreprocessor={
+                                                // Prevent the animation from triggering when under navigating in the browse directory, since it already has a sliding animation
+                                                (path) => {
+                                                    if (path.split("/")[1]==="browse") {
+                                                        path = "browse"
                                                     }
-                                                }>
-                                                    <Route path="/" element={<Home/>}/>
-                                                    <Route path="/browse" element={<ShowcaseView content_array={content_array}/>}/>
-                                                    <Route path="/browse/:id" element={<ShowcaseView content_array={content_array}/>}/>
-                                                    <Route path="/list" element={<ListView content_array={content_array}/>}/>
-                                                    <Route path="/about" element={<About/>}/>
-                                                </AnimatedSwitch>
-                                            </AppContainer>
-                                        </div>
-                                    }/>
-                                </AnimatedSwitch>
-                            </div>
-                        </Router>
-                    </ThemeContext.Provider>
-                </SettingsContext.Provider>
-            </CursorDataContext.Provider>
+                                                    return path
+                                                }
+                                            }>
+                                                <Route path="/" element={<Home/>}/>
+                                                <Route path="/browse" element={<ShowcaseView content_array={content_array}/>}/>
+                                                <Route path="/browse/:id" element={<ShowcaseView content_array={content_array}/>}/>
+                                                <Route path="/list" element={<ListView content_array={content_array}/>}/>
+                                                <Route path="/about" element={<About/>}/>
+                                            </AnimatedSwitch>
+                                        </AppContainer>
+                                    </div>
+                                }/>
+                            </AnimatedSwitch>
+                        </div>
+                    </Router>
+                </ThemeContext.Provider>
+            </SettingsContext.Provider>
         </AuthProvider>
   )
 }
 
-export { App, ThemeContext, SettingsContext, CursorDataContext }
+export { App, ThemeContext, SettingsContext }
