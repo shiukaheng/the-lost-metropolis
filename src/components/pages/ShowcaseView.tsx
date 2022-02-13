@@ -8,7 +8,7 @@ import { ThemeContext } from '../App';
 import { formatRGBCSS } from '../../utilities';
 
 function ShowcaseView({content_array}) {
-    const theme = useContext(ThemeContext);
+    const {theme} = useContext(ThemeContext);
     const { id } = useParams();
     const navigate = useNavigate();
     // If id is not null, match the id to the content array and setActiveIndex to the index of the content array

@@ -19,6 +19,15 @@ import About from "./pages/About"
 import { AuthContext, AuthProvider } from "./admin/AuthProvider";
 import AdminPanel from "./admin/AdminPanel";
 
+const defaultSettings = {
+    lang: "en"
+}
+
+const defaultSettingsContext = {
+    settings: defaultSettings,
+    setSettings: (newSettings) => {},
+}
+
 const defaultTheme = {
     backgroundColor: [0, 0, 0],
     foregroundColor: [255, 255, 255],
@@ -26,23 +35,19 @@ const defaultTheme = {
     transitionDuration: 0.5
 }
 
-const defaultSettings = {
-    lang: "en"
+const defaultThemeContext = {
+    theme: defaultTheme,
+    setTheme: (newTheme) => {},
 }
-
-// const defaultSensorData = {
-//     relativeOrientationAvailable: false,
-//     relativeOrientationMatrix: null
-// }
 
 const defaultCursorData = {
     x: 0,
     y: 0
 }
 
-const ThemeContext = createContext(defaultTheme)
+const ThemeContext = createContext(defaultThemeContext)
 
-const SettingsContext = createContext(defaultSettings)
+const SettingsContext = createContext(defaultSettingsContext)
 
 // const SensorDataContext = createContext(defaultSensorData)
 
@@ -66,13 +71,6 @@ const content_array = [
         "link": "http://tlmhk.synology.me/state/",
     }
 ]
-
-function MultiLangNavLink({text, to, ...props}) {
-    const navigate = useNavigate();
-    return <MagicDiv mergeTransitions={true} className={"nav-button"} languageSpecificChildren={text} onClick={()=>{
-        navigate(to)
-    }}/>
-}
 
 function App():FC {
     // Theme defines the background color and foreground color, as well as the background video. It is not persistent between sessions and is defined by what content the user is viewing.
@@ -103,8 +101,8 @@ function App():FC {
     return (
         <AuthProvider>
             <CursorDataContext.Provider value={cursorData}>
-                <SettingsContext.Provider value={settings}>
-                    <ThemeContext.Provider value={theme}>
+                <SettingsContext.Provider value={{settings, setSettings}}>
+                    <ThemeContext.Provider value={{theme, setTheme}}>
                         <Router>
                             <div className="absolute w-full h-full">
                                 <AnimatedSwitch pathPreprocessor={
@@ -122,25 +120,7 @@ function App():FC {
                                         <div className="w-full h-full">
                                             <Background/>
                                             <AppContainer>
-                                                <NavigationBar>
-                                                    <MultiLangNavLink text={{"en": "home", "zh": "首頁"}} to="/"/>
-                                                    <MultiLangNavLink text={{"en": "browse", "zh": "瀏覽"}} to="/browse"/>
-                                                    <MultiLangNavLink text={{"en": "list", "zh": "列表"}} to="/list"/>
-                                                    <MultiLangNavLink text={{"en": "about", "zh": "關於"}} to="/about"/>
-                                                    <MagicDiv mergeTransitions={true} className="nav-button" onClick={()=>{setSettings(
-                                                        oldSettings => ({
-                                                            ...oldSettings,
-                                                            lang: oldSettings.lang === "en" ? "zh" : "en"
-                                                        })
-                                                    )}}>中／eng</MagicDiv>
-                                                    <MagicDiv mergeTransitions={true} className="nav-button" onClick={()=>{setTheme(
-                                                        oldTheme => ({
-                                                            ...oldTheme,
-                                                            foregroundColor: oldTheme.backgroundColor,
-                                                            backgroundColor: oldTheme.foregroundColor
-                                                        })
-                                                    )}}>?!</MagicDiv>
-                                                </NavigationBar>
+                                                <NavigationBar/>
                                                 <AnimatedSwitch pathPreprocessor={
                                                     // Prevent the animation from triggering when under navigating in the browse directory, since it already has a sliding animation
                                                     (path) => {

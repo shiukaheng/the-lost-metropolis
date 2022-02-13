@@ -12,7 +12,7 @@ const StyledCell = tw.td`text-left font-serif md:text-lg font-semibold pt-2 pb-6
 
 function ListView({content_array}) {
     const navigate = useNavigate();
-    const Settings = useContext(SettingsContext);
+    const {settings} = useContext(SettingsContext);
     return ( 
 
         <GenericPage>
@@ -22,7 +22,7 @@ function ListView({content_array}) {
                         {content_array.map((content, index) => (
                             <StyledRow key={index} onClick={()=>(navigate("/browse/"+content.id))}>
                                 <StyledCell>{index}</StyledCell>
-                                <StyledCell>{content.title[Settings.lang].toLowerCase()}</StyledCell>
+                                <StyledCell>{content.title[settings.lang].toLowerCase()}</StyledCell>
                                 <StyledCell>{content.time_posted.toLowerCase()}</StyledCell>
                             </StyledRow>
                         ))}

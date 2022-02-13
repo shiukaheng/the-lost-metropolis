@@ -10,7 +10,7 @@ import { EditorContext } from "../EditorContext";
 import EditorInput from "./EditorInput"
 
 function TransformModeSetter({transformMode, setTransformMode, transformSpace, setTransformSpace}) {
-    const theme = useContext(ThemeContext)
+    const {theme} = useContext(ThemeContext)
     const iconActiveStyle = {
         color: formatRGBCSS(theme.backgroundColor)
     }

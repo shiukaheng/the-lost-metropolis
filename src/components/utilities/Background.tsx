@@ -4,7 +4,7 @@ import { formatRGBCSS } from "../../utilities";
 
 
 function Background() {
-    const theme = useContext(ThemeContext);
+    const {theme} = useContext(ThemeContext);
     return ( 
         <div className="absolute w-full h-full" style={{
             backgroundColor: formatRGBCSS(theme.backgroundColor),

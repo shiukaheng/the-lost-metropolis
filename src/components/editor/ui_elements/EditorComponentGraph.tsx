@@ -42,7 +42,7 @@ export default function EditorComponentGraph() {
     const {selectedIDs, setSelectedIDs, addSelectedIDs, removeSelectedIDs, shiftPressed, setSceneChildren} = useContext(EditorContext)
     const [addChildrenType, setAddChildrenType] = useState(null)
 
-    const theme = useContext(ThemeContext)
+    const {theme} = useContext(ThemeContext)
     const customStyles = {
         option: (provided, state) => ({
             ...provided,

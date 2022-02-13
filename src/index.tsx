@@ -7,6 +7,5 @@ import { Editor } from "./components/editor/Editor"
 import Login from './components/admin/Login';
 
 // ReactDOM.render(<Editor/>, document.getElementById('root')); 
-// ReactDOM.render(<App/>, document.getElementById('root')); 
+ReactDOM.render(<App/>, document.getElementById('root')); 
 // ReactDOM.render(<Debug3D/>, document.getElementById('root'));
-ReactDOM.render(<Login/>, document.getElementById('root'));
