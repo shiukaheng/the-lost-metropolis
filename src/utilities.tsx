@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useLayoutEffect, useContext } from "react"
 import { AuthContext } from "./components/admin/AuthProvider";
+import { SettingsContext } from "./components/App";
 
 function formatRGBCSS(color: number[]): string {
     return "rgb(" + color[0] + "," + color[1] + "," + color[2] + ")";
@@ -149,4 +150,9 @@ const useSubscription = (provider) => {
     return posts;
 }
 
-export { formatRGBCSS, useKeyPress, useAsyncKeyPress, useAsyncReference, KeyPressCallback, LinearToSRGB, SRGBToLinear, useStickyState, useFollowMouse, useSubscription };
+const useMultilang = (content) => {
+    const {settings} = useContext(SettingsContext)
+    return content[settings.lang]
+}
+
+export { formatRGBCSS, useKeyPress, useAsyncKeyPress, useAsyncReference, KeyPressCallback, LinearToSRGB, SRGBToLinear, useStickyState, useFollowMouse, useSubscription, useMultilang };

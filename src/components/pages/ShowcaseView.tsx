@@ -5,11 +5,13 @@ import SwipeableViews from 'react-swipeable-views';
 import { useParams } from 'react-router';
 import { useNavigate } from 'react-router-dom';
 import { ThemeContext } from '../App';
-import { formatRGBCSS } from '../../utilities';
+import { formatRGBCSS, useMultilang } from '../../utilities';
 import { ContentContext } from '../providers/ContentProvider';
 import MagicDiv from '../utilities/MagicDiv';
 import GenericPage from '../utilities/GenericPage';
 import { animated, config, useTransition } from 'react-spring';
+import { SwitchTransition, CSSTransition } from 'react-transition-group';
+import { Fade } from 'react-reveal';
 
 function ShowcaseView() {
     const {posts} = useContext(ContentContext);
@@ -25,37 +27,44 @@ function ShowcaseView() {
         navigate(`/browse/${posts[index].id}`);
     }
 
-    const transitions = useTransition((posts === null || posts.length === 0), {
-        from: { opacity: 0 },
-        enter: { opacity: 1 },
-        leave: { opacity: 0 },
-        delay: 200,
-        config: config.gentle,
-        exitBeforeEnter: true
-    })
-
-    const AnimatedGenericPage = animated(GenericPage)
-    const AnimatedShowcasePanel = animated(ShowcasePanel)
-
     return (
-        transitions(
-            ({opacity}, item) => (
-                item
-                ?
-                <AnimatedGenericPage style={{opacity}}>
-                    <div>Oops.</div>
-                </AnimatedGenericPage>
-                :
-                <AnimatedShowcasePanel style={{opacity}} activeIndex={activeIndex} setActiveIndex={setActiveIndex} posts={posts} theme={theme}/>
-            )
+        <SwitchTransition>
+            <CSSTransition key={(posts === null || posts.length === 0) ? "not ready" : "ready"} classNames="page-transition" timeout={250}>
+                {
+                    (posts === null || posts.length === 0)
+                    ?
+                    <div className='relative h-full w-full justify-between page-margins'>
+                        {/* Make the below div store a single child div that would be dead center */}
+                        {LoadingScreen()}
+                    </div>
+                    :
+                    <ShowcasePanel activeIndex={activeIndex} setActiveIndex={setActiveIndex} posts={posts} theme={theme}/>
+                }
+            </CSSTransition>
+        </SwitchTransition>
         )
-    )
 }
 
 export default ShowcaseView;
 
-function ShowcasePanel({activeIndex, setActiveIndex, posts, theme, style}) {
-    return <div className="flex flex-col h-full w-full justify-between" style={style}>
+function LoadingScreen() {
+    const text = useMultilang({
+        en: "Loading...",
+        zh: "載入中..."
+    })
+    return <div className='h-full flex justify-center items-center'>
+        <MagicDiv>
+            <Fade top cascade>
+                <div className="text-5xl font-black">
+                    {text}
+                </div>
+            </Fade>
+        </MagicDiv>
+    </div>;
+}
+
+function ShowcasePanel({activeIndex, setActiveIndex, posts, theme}) {
+    return <div className="flex flex-col h-full w-full justify-between">
         <div className="h-full w-full relative overflow-hidden">
             <SwipeableViews index={activeIndex} onChangeIndex={(index => { setActiveIndex(index); })} containerStyle={{
                 position: 'absolute',

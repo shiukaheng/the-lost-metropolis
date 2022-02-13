@@ -45,7 +45,9 @@ function DashboardHeader() {
 //     )
 // }
 
-const StyledRow = tw.tr`border-b border-t border-current md:hover:opacity-50 transition-opacity duration-500 cursor-pointer table-row`
+// Todo: Handle loading state when API hasn't fetched content yet
+
+const StyledRow = tw.tr`border-b border-t border-current md:hover:opacity-50 transition-opacity duration-500 cursor-pointer table-row text-ellipsis`
 const StyledCell = tw.td`text-left font-serif md:text-lg font-semibold pt-2 pb-6 table-cell`
 
 function PostList() {
