@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef, useLayoutEffect } from "react"
+import { useState, useEffect, useRef, useLayoutEffect, useContext } from "react"
+import { AuthContext } from "./components/admin/AuthProvider";
 
 function formatRGBCSS(color: number[]): string {
     return "rgb(" + color[0] + "," + color[1] + "," + color[2] + ")";
@@ -128,4 +129,24 @@ function useFollowMouse(onMouseMove=null) {
     return mousePosRef
 }
 
-export { formatRGBCSS, useKeyPress, useAsyncKeyPress, useAsyncReference, KeyPressCallback, LinearToSRGB, SRGBToLinear, useStickyState, useFollowMouse };
+const useSubscription = (provider) => {
+    const {currentUser} = useContext(AuthContext);
+    const [posts, setPosts] = useState(null);
+    const unsubRef = useRef(null);
+    useEffect(() => {
+        if (!!unsubRef.current) {
+            unsubRef.current
+        }
+        if (!!currentUser) {
+            unsubRef.current = provider(setPosts);
+        }
+        return () => {
+            if (unsubRef.current) {
+                unsubRef.current();
+            }
+        };
+    }, [currentUser]);
+    return posts;
+}
+
+export { formatRGBCSS, useKeyPress, useAsyncKeyPress, useAsyncReference, KeyPressCallback, LinearToSRGB, SRGBToLinear, useStickyState, useFollowMouse, useSubscription };

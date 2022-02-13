@@ -17,8 +17,8 @@ import ShowcaseView from "./pages/ShowcaseView";
 import ListView from "./pages/ListView";
 import About from "./pages/About"
 import { AuthContext, AuthProvider } from "./admin/AuthProvider";
-import AdminPanel from "./admin/AdminPanel";
 import Dashboard from "./admin/Dashboard";
+import { ContentProvider } from "./providers/ContentProvider";
 
 const defaultSettings = {
     lang: "en"
@@ -78,50 +78,51 @@ function App():FC {
     }, [theme.backgroundColor])
     return (
         <AuthProvider>
-            <SettingsContext.Provider value={{settings, setSettings}}>
-                <ThemeContext.Provider value={{theme, setTheme}}>
-                    <Router>
-                        <div className="absolute w-full h-full">
-                            <AnimatedSwitch pathPreprocessor={
-                                (path) => {
-                                    if (path.split("/")[1] !== "experience") {
-                                        path = ""
+            <ContentProvider>
+                <SettingsContext.Provider value={{settings, setSettings}}>
+                    <ThemeContext.Provider value={{theme, setTheme}}>
+                        <Router>
+                            <div className="absolute w-full h-full">
+                                <AnimatedSwitch pathPreprocessor={
+                                    (path) => {
+                                        if (path.split("/")[1] !== "experience") {
+                                            path = ""
+                                        }
+                                        return path
                                     }
-                                    return path
-                                }
-                            }>
-                                <Route path="/experience/:id" element={<Experience content_array={content_array}/>}/>
-                                <Route path="*" element={
-                                    <div className="w-full h-full">
-                                        <Background/>
-                                        <AppContainer>
-                                            <NavigationBar/>
-                                            <AnimatedSwitch pathPreprocessor={
-                                                // Prevent the animation from triggering when under navigating in the browse directory, since it already has a sliding animation
-                                                (path) => {
-                                                    if (path.split("/")[1]==="browse") {
-                                                        path = "browse"
+                                }>
+                                    <Route path="/experience/:id" element={<Experience content_array={content_array}/>}/>
+                                    <Route path="*" element={
+                                        <div className="w-full h-full">
+                                            <Background/>
+                                            <AppContainer>
+                                                <NavigationBar/>
+                                                <AnimatedSwitch pathPreprocessor={
+                                                    // Prevent the animation from triggering when under navigating in the browse directory, since it already has a sliding animation
+                                                    (path) => {
+                                                        if (path.split("/")[1]==="browse") {
+                                                            path = "browse"
+                                                        }
+                                                        return path
                                                     }
-                                                    return path
-                                                }
-                                            }>
-                                                <Route path="/" element={<Home/>}/>
-                                                <Route path="/browse" element={<ShowcaseView content_array={content_array}/>}/>
-                                                <Route path="/browse/:id" element={<ShowcaseView content_array={content_array}/>}/>
-                                                <Route path="/list" element={<ListView content_array={content_array}/>}/>
-                                                <Route path="/about" element={<About/>}/>
-                                                <Route path="/login" element={<Login/>}/>
-                                                {/* <Route path="/admin" element={<AdminPanel/>}/> */}
-                                                <Route path="/dashboard" element={<Dashboard/>}/>
-                                            </AnimatedSwitch>
-                                        </AppContainer>
-                                    </div>
-                                }/>
-                            </AnimatedSwitch>
-                        </div>
-                    </Router>
-                </ThemeContext.Provider>
-            </SettingsContext.Provider>
+                                                }>
+                                                    <Route path="/" element={<Home/>}/>
+                                                    <Route path="/browse" element={<ShowcaseView content_array={content_array}/>}/>
+                                                    <Route path="/browse/:id" element={<ShowcaseView content_array={content_array}/>}/>
+                                                    <Route path="/list" element={<ListView content_array={content_array}/>}/>
+                                                    <Route path="/about" element={<About/>}/>
+                                                    <Route path="/login" element={<Login/>}/>
+                                                    <Route path="/dashboard" element={<Dashboard/>}/>
+                                                </AnimatedSwitch>
+                                            </AppContainer>
+                                        </div>
+                                    }/>
+                                </AnimatedSwitch>
+                            </div>
+                        </Router>
+                    </ThemeContext.Provider>
+                </SettingsContext.Provider>
+            </ContentProvider>
         </AuthProvider>
   )
 }

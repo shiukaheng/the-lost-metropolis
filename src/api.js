@@ -1,7 +1,8 @@
 import { addDoc, collection, deleteDoc, onSnapshot, Timestamp, updateDoc } from "firebase/firestore";
 import { transform } from "lodash";
-import {auth, db, storage} from "./firebase-config";
+import { auth, db, storage } from "./firebase-config";
 import { signOut } from "firebase/auth";
+import { collection, query, where } from "firebase/firestore";
 
 // Functions to further abstract API calls to firebase for easier understanding / maintenance / migration
 
@@ -35,7 +36,8 @@ import { signOut } from "firebase/auth";
 //   }
 // ]
 function transformPost(doc) {
-    const { data, id } = doc;
+    const id = doc.id;
+    const data = doc.data();
     return {
         id: id,
         title: data.title,
@@ -51,9 +53,9 @@ function transformPost(doc) {
 
 export const subscribeToPosts = (callback) => {
     const postsRef = collection(db, "posts")
-    const query = query(postsRef, where("published", "==", true))
-    const unsub = onSnapshot(query, (docs) => {
-        callback(docs.map(transformPost))
+    const queryRef = query(postsRef, where("published", "==", true))
+    const unsub = onSnapshot(queryRef, (docsRef) => {
+        callback(docsRef.docs.map(transformPost))
     })
     return unsub
 }
@@ -69,8 +71,32 @@ export const logOut = async () => {
 
 // Admin / creating content
 
+// Subscribe to all editable posts -> Subscribe to query posts collection and return all posts where owner = currentUser or readCollaborators contains currentUser
+// This will call a callback with a list of posts in the format from the database whenever there are changes:
+// [
+//   {
+//     id: <str>, - from document.id
+//     title: <str>,
+//     description: <str>,
+//     content: <str>, - serialized 3D content
+//     createdAt: <str>,
+//     updatedAt: <str>,
+//     owner: <str>,
+//     readCollaborators: <array>,
+//     writeCollaborators: <array>,
+//   }
+// ]
+export const subscribeToEditablePosts = (callback) => {
+    const postsRef = collection(db, "posts")
+    const queryRef = query(postsRef, where("owner", "==", auth.currentUser.uid, "OR", "readCollaborators", "array-contains", auth.currentUser.uid))
+    const unsub = onSnapshot(queryRef, (docsRef) => {
+        callback(docsRef.docs.map(transformPost))
+    })
+    return unsub
+}
+
 // - Create post -> create document in posts collection, returns document id
-export const createPost = async (title, description, content, readCollaborators, writeCollaborators) => {
+export const createPost = async (title, description, content, readCollaborators, writeCollaborators, published) => {
     const postsRef = collection(db, "posts")
     const post = {
         title: title,
@@ -81,12 +107,13 @@ export const createPost = async (title, description, content, readCollaborators,
         owner: auth.currentUser.uid,
         readCollaborators: readCollaborators,
         writeCollaborators: writeCollaborators,
+        published: published,
     }
     const docRef = await addDoc(postsRef, post) // https://firebase.google.com/docs/firestore/manage-data/add-data#add_a_document
     return docRef.id
 }
 // - Update post -> update document in posts collection
-export const updatePost = async (id, title, description, content, readCollaborators, writeCollaborators) => {
+export const updatePost = async (id, title, description, content, readCollaborators, writeCollaborators, published) => {
     const postRef = doc(db, "posts", id)
     const post = {
         title: title,
@@ -95,6 +122,7 @@ export const updatePost = async (id, title, description, content, readCollaborat
         updatedAt: Timestamp(),
         readCollaborators: readCollaborators,
         writeCollaborators: writeCollaborators,
+        published: published,
     }
     await updateDoc(postRef, post) // https://firebase.google.com/docs/firestore/manage-data/update-data#update_a_document
 }
