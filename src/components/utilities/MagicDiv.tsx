@@ -4,7 +4,7 @@ import { formatRGBCSS } from "../../utilities"
 
 // Dynamically color div css attributes based on theme, but note that its not compatible with external transitions due to use of element css which overrides classes
 function MagicDiv({ languageSpecificChildren, style, foregroundColorCSSProps=["color", "borderColor"], backgroundColorCSSProps=[], children, className, mergeTransitions=false, autoColor=true, ...props }) {
-    const settings = useContext(SettingsContext)
+    const {settings} = useContext(SettingsContext)
     const {theme} = useContext(ThemeContext)
     const div = useRef(null)
     const [existingTransition, setExistingTransition] = useState("")
