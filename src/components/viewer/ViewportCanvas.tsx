@@ -1,5 +1,4 @@
 import { useContextBridge } from "@react-three/drei"
-import { CursorDataContext } from "../App"
 import { PotreeManager } from "../3d/managers/PotreeManager"
 import { Children, useContext, useEffect, useLayoutEffect, useRef, useState } from "react"
 import CompositeSuspense from "../3d/subcomponents/CompositeSuspense"
@@ -42,7 +41,7 @@ function CameraHelper() {
 // Convenience component to provide common contexts to viewport children, in the future may include 3DTilesManager, NexusManager, etc which serves to manage 3DTilesObject and NexusObject on each render.
 // TODO: Provide a way to change the child manager's parameters, e.g. pointBudget, etc.
 function ViewportCanvas({children, ...props}) {
-    const ContextBridge = useContextBridge(CursorDataContext, EditorContext, ViewerContext)
+    const ContextBridge = useContextBridge(EditorContext, ViewerContext)
     const wrappedChildren = Children.map(children, (child) => (
         <CompositeSuspense>
             {child}

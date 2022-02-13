@@ -18,6 +18,7 @@ import ListView from "./pages/ListView";
 import About from "./pages/About"
 import { AuthContext, AuthProvider } from "./admin/AuthProvider";
 import AdminPanel from "./admin/AdminPanel";
+import Dashboard from "./admin/Dashboard";
 
 const defaultSettings = {
     lang: "en"
@@ -110,7 +111,8 @@ function App():FC {
                                                 <Route path="/list" element={<ListView content_array={content_array}/>}/>
                                                 <Route path="/about" element={<About/>}/>
                                                 <Route path="/login" element={<Login/>}/>
-                                                <Route path="/admin" element={<AdminPanel/>}/>
+                                                {/* <Route path="/admin" element={<AdminPanel/>}/> */}
+                                                <Route path="/dashboard" element={<Dashboard/>}/>
                                             </AnimatedSwitch>
                                         </AppContainer>
                                     </div>

@@ -102,7 +102,7 @@ input[type=number] {
 }
 
 .number-input-field {
-    @apply bg-white rounded-full w-20 text-black px-2
+    @apply rounded-full w-20 px-2 bg-transparent border
 }
 
 .string-input-cell {
@@ -118,11 +118,7 @@ input[type=number] {
 }
 
 .matrix-input-cell {
-    @apply bg-white rounded-full w-14 text-black px-2
-}
-
-.matrix-input-cell.invalid {
-    @apply bg-red-400 border-2 border-red-600
+    @apply number-input-field
 }
 
 .color-input-cell {
@@ -131,6 +127,22 @@ input[type=number] {
 
 .boolean-input-field {
     transform: translate(0px,8px);
+}
+
+.invalid {
+    @apply border-red-600 text-red-600;
+}
+
+.invalid::placeholder {
+    @apply text-red-600 opacity-50;
+}
+
+:-ms-input-placeholder { /* Internet Explorer 10-11 */
+    @apply text-red-600 opacity-50;
+}
+  
+::-ms-input-placeholder { /* Microsoft Edge */
+    @apply text-red-600 opacity-50;
 }
 
 input[type="color"] {

@@ -38,6 +38,7 @@
     "react-swipeable-views": "^0.14.0",
     "react-transition-group": "^4.4.2",
     "styled-components": "^5.3.3",
+    "tailwind-merge": "^1.2.0",
     "tailwind-styled-components": "^2.0.4",
     "three": "^0.136.0",
     "troika-three-text": "^0.45.0",

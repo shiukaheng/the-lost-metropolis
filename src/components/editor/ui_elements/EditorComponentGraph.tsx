@@ -1,6 +1,6 @@
 import EditorEmbeddedWidget from "./EditorEmbeddedWidget";
 import Select from 'react-select';
-import MagicDiv from "../../MagicDiv";
+import MagicDiv from "../../utilities/MagicDiv";
 import { createElement, useEffect, useRef, useState, useContext } from "react";
 import { v4 as uuidv4 } from 'uuid';
 import { useKeyPress, KeyPressCallback, formatRGBCSS } from "../../../utilities";

@@ -3,7 +3,7 @@ import { useContext, useLayoutEffect, useRef, useState } from "react"
 import { formatRGBCSS } from "../../utilities"
 
 // Dynamically color div css attributes based on theme, but note that its not compatible with external transitions due to use of element css which overrides classes
-function MagicDiv({ languageSpecificChildren, style, foregroundColorCSSProps=["color", "borderColor"], backgroundColorCSSProps=[], children, className, mergeTransitions=false, autoColor=true, ...props }) {
+function MagicDiv({ languageSpecificChildren=null, style=undefined, foregroundColorCSSProps=["color", "borderColor"], backgroundColorCSSProps=[], children=undefined, className="", mergeTransitions=false, autoColor=true, ...props }) {
     const {settings} = useContext(SettingsContext)
     const {theme} = useContext(ThemeContext)
     const div = useRef(null)
@@ -27,7 +27,7 @@ function MagicDiv({ languageSpecificChildren, style, foregroundColorCSSProps=["c
                 ...style
             } : {...style}
         }>
-            {[languageSpecificChildren!==undefined ? languageSpecificChildren[settings.lang] : children].concat(mergeTransitions ? [<div ref={div} className={className} style={{display: "none"}} />].map((elem, index) => (Object.assign({}, elem, {key: index}))) : [])}
+            {[languageSpecificChildren!==null ? languageSpecificChildren[settings.lang] : children].concat(mergeTransitions ? [<div ref={div} className={className} style={{display: "none"}} />].map((elem, index) => (Object.assign({}, elem, {key: index}))) : [])}
         </div>
     );
 }

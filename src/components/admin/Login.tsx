@@ -4,6 +4,7 @@ import { auth } from "../../firebase-config";
 import MagicDiv from "../utilities/MagicDiv";
 import { Fade } from "react-reveal";
 import { useNavigate } from "react-router-dom";
+import GenericPage from "../utilities/GenericPage";
 
 function Login() {
     const [buttonText, setButtonText] = useState("log in")
@@ -20,22 +21,21 @@ function Login() {
         }
     }, [])
     return (
-        <MagicDiv backgroundColorCSSProps={["backgroundColor"]} className=" absolute w-full h-full flex justify-center items-center">
-            <Fade top>
-                <div className="flex flex-col gap-4">
-                    {/* Login form */}
-                    <form onSubmit={handleLogin} className="flex flex-col gap-2">
-                        <label>
-                            <input type="email" name="email" placeholder="email" className="string-input-cell"/>
-                        </label>
-                        <label>
-                            <input type="password" name="password" placeholder="password" className="string-input-cell"/>
-                        </label>
-                        <button type="submit" className="secondary-button">{buttonText}</button>   
-                    </form>
-                </div>
+        <GenericPage className="flex flex-col gap-8">
+            <Fade top cascade>
+                <MagicDiv className={"text-5xl font-black"} languageSpecificChildren={{"en": "member login", "zh": "會員登錄"}}/>
             </Fade>
-        </MagicDiv>
+            {/* Login form */}
+            <form onSubmit={handleLogin} className="flex flex-col gap-2 w-[20rem]">
+                <label>
+                    <input type="email" name="email" placeholder="email" className="string-input-cell"/>
+                </label>
+                <label>
+                    <input type="password" name="password" placeholder="password" className="string-input-cell"/>
+                </label>
+                <button type="submit" className="secondary-button">{buttonText}</button>   
+            </form>
+        </GenericPage>
     );
 }
 

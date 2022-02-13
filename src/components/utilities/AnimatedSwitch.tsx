@@ -4,6 +4,7 @@ import { FC } from "react";
 
 const AnimatedSwitch = ({pathPreprocessor=(path)=>{return path}, ...props}) => {
     const location = useLocation();
+    // Todo: prevent changing key when pathPreprocessor returns null
     var path = pathPreprocessor(location.pathname)
     return (
     <SwitchTransition component={null}>

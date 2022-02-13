@@ -1,4 +1,4 @@
-import MagicDiv from "../../MagicDiv";
+import MagicDiv from "../../utilities/MagicDiv";
 
 function EditorButton({text="Button", onClick=()=>{}, className=""}) {
     return (

@@ -1,4 +1,4 @@
-import MagicDiv from "../../MagicDiv";
+import MagicDiv from "../../utilities/MagicDiv";
 import { getComponentPropInfo, supportedComponents, getComponentPropInfoFromName, getComponentFromName} from "../../viewer/ComponentDeclarations";
 import EditorEmbeddedWidget from "./EditorEmbeddedWidget";
 import { createElement, useContext, useRef } from "react";

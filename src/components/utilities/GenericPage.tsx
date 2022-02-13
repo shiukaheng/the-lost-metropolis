@@ -1,6 +1,6 @@
 import MagicDiv from "./MagicDiv";
 
-function GenericPage({className, style, ...props}) {
+function GenericPage({className="", style=undefined, ...props}) {
     return (
         <div className="w-full h-full relative overflow-auto page-margins">
             <MagicDiv {...{className, style}}>
