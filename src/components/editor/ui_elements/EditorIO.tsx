@@ -5,6 +5,7 @@ import { createElement, useContext, useRef } from "react";
 import FileSaver from "file-saver"
 import { ViewerContext } from "../../viewer/ViewerContext";
 import { v4 as uuidv4 } from 'uuid';
+import MagicButton from "../../utilities/MagicButton";
 
 // Utilties and components for import / export
 
@@ -94,25 +95,35 @@ function deserializeChildren(childrenArray) {
     return childrenArray.map(child => deserializeChild(child, componentClasses));
 }
 
+const useSerialize = () => {
+    const {sceneChildren, defaultCameraProps, potreePointBudget} = useContext(ViewerContext)
+    return () => {
+    return {
+        sceneChildren: exportChildren(sceneChildren),
+        defaultCameraProps: defaultCameraProps,
+        potreePointBudget: potreePointBudget,
+    }
+}}
+
+const useDeserialize = () => { 
+    const {setSceneChildren, setDefaultCameraProps, setPotreePointBudget} = useContext(ViewerContext)
+    return (obj) => {
+        console.log(obj)
+        setSceneChildren(deserializeChildren(obj.sceneChildren));
+        setDefaultCameraProps(obj.defaultCameraProps);
+        setPotreePointBudget(obj.potreePointBudget);
+    }
+}
+
 function EditorIO() {
-    const {sceneChildren, setSceneChildren, defaultCameraProps, setDefaultCameraProps, potreePointBudget, setPotreePointBudget} = useContext(ViewerContext)
     const inputFile = useRef(null) 
     const onButtonClick = () => {
         // `current` points to the mounted file input element
        inputFile.current.click();
     };
-    const serialize = () => {
-        return {
-            sceneChildren: exportChildren(sceneChildren),
-            defaultCameraProps: defaultCameraProps,
-            potreePointBudget,
-        }
-    }
-    const deserialize = (obj) => {
-        setSceneChildren(deserializeChildren(obj.sceneChildren));
-        setDefaultCameraProps(obj.defaultCameraProps);
-        setPotreePointBudget(obj.potreePointBudget);
-    }
+    const serialize = useSerialize();
+    const deserialize = useDeserialize();
+
     return (
         <EditorEmbeddedWidget title="Import / Export">
             <div className="flex flex-row gap-2">
@@ -140,4 +151,4 @@ function EditorIO() {
     );
 }
 
-export { exportChildren, deserializeChildren  };;    
+export { EditorIO, exportChildren, deserializeChildren, useSerialize, useDeserialize  };;    
