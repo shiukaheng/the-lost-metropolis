@@ -32,7 +32,7 @@ function generateKey({...props}) {
 
 function SceneChildItem({child, onClick, selected}) {
     return (
-        <div className={`px-2 cursor-pointer select-none rounded-full ${selected ? "bg-blue-600" : "bg-transparent"}`} onClick={onClick}>{`${child.props.name} - [${getLabelFromComponent(child.type)}]`}</div>
+        <div className={`px-2 cursor-pointer select-none rounded-3xl ${selected ? "bg-blue-600" : "bg-transparent"}`} onClick={onClick}>{`${child.props.name} - [${getLabelFromComponent(child.type)}]`}</div>
     )
 }
 

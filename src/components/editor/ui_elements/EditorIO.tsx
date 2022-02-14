@@ -140,4 +140,4 @@ function EditorIO() {
     );
 }
 
-export default EditorIO;    
+export { exportChildren, deserializeChildren  };;    

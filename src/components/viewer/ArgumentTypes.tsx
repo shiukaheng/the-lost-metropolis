@@ -78,6 +78,11 @@ const BooleanType: EditorInputType = {
     typeCheck: (value) => typeof value === "boolean"
 }
 
+const MultilineString: EditorInputType = {
+    typeName: "multiline-string",
+    typeCheck: (value) => typeof value === "string" && (value !== undefined)
+}
+
 export {
-    EditorInputType, NumberType, Vector3Type, Vector4Type, Vector2Type, ColorType, QuaternionType, EulerType, Matrix3Type, Matrix4Type, StringType, URLType, VectorType, MatrixType, BooleanType
+    EditorInputType, NumberType, Vector3Type, Vector4Type, Vector2Type, ColorType, QuaternionType, EulerType, Matrix3Type, Matrix4Type, StringType, URLType, VectorType, MatrixType, BooleanType, MultilineString
 }

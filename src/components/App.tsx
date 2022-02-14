@@ -18,11 +18,15 @@ import ListView from "./pages/ListView";
 import About from "./pages/About"
 import { AuthContext, AuthProvider } from "./admin/AuthProvider";
 import Dashboard from "./admin/Dashboard";
-import { ContentProvider } from "./providers/ContentProvider";
+import { ContentContext, ContentProvider } from "./providers/ContentProvider";
+import { EditPost } from "./admin/EditPost";
+import LoadingScreen from "./utilities/LoadingScreen";
 
 const defaultSettings = {
     lang: "en"
 }
+
+export const languages = ["en", "zh"]
 
 const defaultSettingsContext = {
     settings: defaultSettings,
@@ -81,45 +85,7 @@ function App():FC {
             <ContentProvider>
                 <SettingsContext.Provider value={{settings, setSettings}}>
                     <ThemeContext.Provider value={{theme, setTheme}}>
-                        <Router>
-                            <div className="absolute w-full h-full">
-                                <AnimatedSwitch pathPreprocessor={
-                                    (path) => {
-                                        if (path.split("/")[1] !== "experience") {
-                                            path = ""
-                                        }
-                                        return path
-                                    }
-                                }>
-                                    <Route path="/experience/:id" element={<Experience content_array={content_array}/>}/>
-                                    <Route path="*" element={
-                                        <div className="w-full h-full">
-                                            <Background/>
-                                            <AppContainer>
-                                                <NavigationBar/>
-                                                <AnimatedSwitch pathPreprocessor={
-                                                    // Prevent the animation from triggering when under navigating in the browse directory, since it already has a sliding animation
-                                                    (path) => {
-                                                        if (path.split("/")[1]==="browse") {
-                                                            path = "browse"
-                                                        }
-                                                        return path
-                                                    }
-                                                }>
-                                                    <Route path="/" element={<Home/>}/>
-                                                    <Route path="/browse" element={<ShowcaseView content_array={content_array}/>}/>
-                                                    <Route path="/browse/:id" element={<ShowcaseView content_array={content_array}/>}/>
-                                                    <Route path="/list" element={<ListView content_array={content_array}/>}/>
-                                                    <Route path="/about" element={<About/>}/>
-                                                    <Route path="/login" element={<Login/>}/>
-                                                    <Route path="/dashboard" element={<Dashboard/>}/>
-                                                </AnimatedSwitch>
-                                            </AppContainer>
-                                        </div>
-                                    }/>
-                                </AnimatedSwitch>
-                            </div>
-                        </Router>
+                        <SiteRouter/>
                     </ThemeContext.Provider>
                 </SettingsContext.Provider>
             </ContentProvider>
@@ -128,3 +94,44 @@ function App():FC {
 }
 
 export { App, ThemeContext, SettingsContext }
+
+function SiteRouter() {
+    const {posts, editablePosts} = useContext(ContentContext)
+    return <Router>
+        <LoadingScreen ready={(posts!==null || editablePosts!==null)}>
+            <div className="absolute w-full h-full">
+                <AnimatedSwitch pathPreprocessor={(path) => {
+                    if (path.split("/")[1] !== "experience") {
+                        path = "";
+                    }
+                    return path;
+                } }>
+                    <Route path="/experience/:id" element={<Experience content_array={content_array} />} /> 
+                    <Route path="*" element={<div className="w-full h-full">
+                        <Background />
+                        <AppContainer>
+                            <NavigationBar />
+                            <AnimatedSwitch pathPreprocessor={
+                                // Prevent the animation from triggering when under navigating in the browse directory, since it already has a sliding animation
+                                (path) => {
+                                    if (path.split("/")[1] === "browse") {
+                                        path = "browse";
+                                    }
+                                    return path;
+                                } }>
+                                <Route path="/" element={<Home />} />
+                                <Route path="/browse" element={<ShowcaseView/>} />
+                                <Route path="/browse/:id" element={<ShowcaseView/>} />
+                                <Route path="/list" element={<ListView />} />
+                                <Route path="/about" element={<About />} />
+                                <Route path="/login" element={<Login />} />
+                                <Route path="/dashboard" element={<Dashboard />} />
+                                <Route path="/edit/:id" element={<EditPost/>} />
+                            </AnimatedSwitch>
+                        </AppContainer>
+                    </div>} />
+                </AnimatedSwitch>
+            </div>
+        </LoadingScreen>
+    </Router>;
+}

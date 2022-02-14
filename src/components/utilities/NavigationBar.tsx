@@ -34,7 +34,7 @@ export default function NavigationBar(props) {
             {/* <div className="flex justify-center flex-col"> DESKTOP*/} 
             <div className="flex justify-left flex-row md:flex-col">
                 <LoggedInFilter>
-                    <MultiLangNavLink text={{"en": `[ ${_.sample(["create✨", "chur d la💨", "post la!!"])} ]`, "zh": `[ ${_.sample(["開post📝","做大佢🔥","練習中文✏️","好多人等住睇💓"])} ]`}} to="/dashboard"/>
+                    <MultiLangNavLink text={{"en": "[ manage ]", "zh": "[ 管理 ]"}} to="/dashboard"/>
                 </LoggedInFilter>
                 <MultiLangNavLink text={{"en": "home", "zh": "首頁"}} to="/"/>
                 <MultiLangNavLink text={{"en": "browse", "zh": "瀏覽"}} to="/browse"/>

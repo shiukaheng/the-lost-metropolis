@@ -1,4 +1,4 @@
-import { addDoc, collection, deleteDoc, onSnapshot, Timestamp, updateDoc } from "firebase/firestore";
+import { addDoc, collection, deleteDoc, onSnapshot, Timestamp, updateDoc, doc } from "firebase/firestore";
 import { transform } from "lodash";
 import { auth, db, storage } from "./firebase-config";
 import { signOut } from "firebase/auth";
@@ -17,8 +17,8 @@ import { collection, query, where } from "firebase/firestore";
 //     createdAt: <str>,
 //     updatedAt: <str>,
 //     owner: <str>,
-//     readCollaborators: <array>,
-//     writeCollaborators: <array>,
+//     viewers: <array>,
+//     editors: <array>,
 //   }
 // ]
 // Which needs to transformed into the format:
@@ -27,14 +27,16 @@ import { collection, query, where } from "firebase/firestore";
 //     id: <str>, - from document.id
 //     title: <str>,
 //     description: <str>,
-//     content: <str>, - serialized 3D content
+//     data: <str>, - serialized 3D content
 //     createdAt: <str>,
 //     updatedAt: <str>,
 //     owner: <str>,
-//     readCollaborators: <array>,
-//     writeCollaborators: <array>,
+//     viewers: <array>,
+//     editors: <array>,
 //   }
 // ]
+
+// Transform post from firebase format to platform agnostic format
 function transformPost(doc) {
     const id = doc.id;
     const data = doc.data();
@@ -42,12 +44,28 @@ function transformPost(doc) {
         id: id,
         title: data.title,
         description: data.description,
-        content: data.content,
-        createdAt: data.createdAt,
-        updatedAt: data.updatedAt,
+        data: data.data,
+        createdAt: data.createdAt.toDate(),
+        updatedAt: data.updatedAt.toDate(),
         owner: data.owner,
-        readCollaborators: data.readCollaborators,
-        writeCollaborators: data.writeCollaborators,
+        viewers: data.viewers,
+        editors: data.editors,
+        published: data.published,
+    };
+}
+
+// Transform post from platform agnostic format to firebase format
+function inverseTransformPost(obj) {
+    return {
+        title: obj.title,
+        description: obj.description,
+        data: obj.data,
+        createdAt: Timestamp.fromDate(obj.createdAt),
+        updatedAt: Timestamp.fromDate(obj.updatedAt),
+        owner: obj.owner,   
+        viewers: obj.viewers,
+        editors: obj.editors,
+        published: obj.published,
     };
 }
 
@@ -69,7 +87,7 @@ export const logOut = async () => {
     await signOut(auth)
 }
 
-// Admin / creating content
+// Admin / creating data
 
 // Subscribe to all editable posts -> Subscribe to query posts collection and return all posts where owner = currentUser or readCollaborators contains currentUser
 // This will call a callback with a list of posts in the format from the database whenever there are changes:
@@ -78,58 +96,66 @@ export const logOut = async () => {
 //     id: <str>, - from document.id
 //     title: <str>,
 //     description: <str>,
-//     content: <str>, - serialized 3D content
+//     data: <str>, - serialized 3D content
 //     createdAt: <str>,
 //     updatedAt: <str>,
 //     owner: <str>,
-//     readCollaborators: <array>,
-//     writeCollaborators: <array>,
+//     viewers: <array>,
+//     editors: <array>,
 //   }
 // ]
 export const subscribeToEditablePosts = (callback) => {
     const postsRef = collection(db, "posts")
-    const queryRef = query(postsRef, where("owner", "==", auth.currentUser.uid, "OR", "readCollaborators", "array-contains", auth.currentUser.uid))
+    const queryRef = query(postsRef, where("owner", "==", auth.currentUser.uid, "OR", "editors", "array-contains", auth.currentUser.uid))
     const unsub = onSnapshot(queryRef, (docsRef) => {
         callback(docsRef.docs.map(transformPost))
     })
     return unsub
 }
 
-// - Create post -> create document in posts collection, returns document id
-export const createPost = async (title, description, content, readCollaborators, writeCollaborators, published) => {
-    const postsRef = collection(db, "posts")
-    const post = {
-        title: title,
-        description: description,
-        content: content,
-        createdAt: Timestamp(),
-        updatedAt: Timestamp(),
-        owner: auth.currentUser.uid,
-        readCollaborators: readCollaborators,
-        writeCollaborators: writeCollaborators,
-        published: published,
-    }
-    const docRef = await addDoc(postsRef, post) // https://firebase.google.com/docs/firestore/manage-data/add-data#add_a_document
-    return docRef.id
-}
+// // - Create post -> create document in posts collection, returns document id
+// export const createPost = async (postObj) => {
+//     const postsRef = collection(db, "posts")
+//     const docRef = await addDoc(postsRef, {...inverseTransformPost(postObj), owner: auth.currentUser.uid}) // https://firebase.google.com/docs/firestore/manage-data/add-data#add_a_document
+//     return docRef.id
+// }
+
 // - Update post -> update document in posts collection
-export const updatePost = async (id, title, description, content, readCollaborators, writeCollaborators, published) => {
+export const updatePost = async (id, title, description, data, viewers, editors, published) => {
     const postRef = doc(db, "posts", id)
     const post = {
         title: title,
         description: description,
-        content: content,
-        updatedAt: Timestamp(),
-        readCollaborators: readCollaborators,
-        writeCollaborators: writeCollaborators,
+        data: data,
+        updatedAt: Timestamp.now(),
+        viewers: viewers,
+        editors: editors,
         published: published,
     }
+    console.log(post)
     await updateDoc(postRef, post) // https://firebase.google.com/docs/firestore/manage-data/update-data#update_a_document
+}
+
+export const createPost = async (title, description, data, viewers, editors, published) => {
+    const postsRef = collection(db, "posts")
+    const created = Timestamp.now()
+    const docRef = await addDoc(postsRef, {
+        title: title,
+        description: description,
+        data: data,
+        createdAt: created,
+        updatedAt: created,
+        owner: auth.currentUser.uid,
+        viewers: viewers,
+        editors: editors,
+        published: published,
+    })
+    return docRef.id
 }
 
 // - Delete post -> delete document in posts collection
 export const deletePost = async (id) => {
-    const postRef = collection(db, "posts", id)
+    const postRef = doc(db, "posts", id)
     await deleteDoc(postRef) // https://firebase.google.com/docs/firestore/manage-data/delete-data#delete_a_document
 }
 

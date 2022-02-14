@@ -17,17 +17,17 @@
 }
 
 .secondary-button {
-    @apply border-black select-none border px-4 rounded-full md:hover:opacity-50 font-serif font-bold md:text-xl h-8 md:h-9 cursor-pointer transition-opacity duration-500;
+    @apply border-black select-none border px-4 rounded-3xl md:hover:opacity-50 font-serif font-bold md:text-xl h-8 md:h-9 cursor-pointer transition-opacity duration-500;
     line-height: 1.6;
 }
 
 .editor-secondary-button {
-    @apply border-black select-none border px-4 rounded-full md:hover:opacity-50 font-serif font-bold text-xl h-9 cursor-pointer transition-opacity duration-500;
+    @apply border-black select-none border px-4 rounded-3xl md:hover:opacity-50 font-serif font-bold text-xl h-9 cursor-pointer transition-opacity duration-500;
     line-height: 1.6;
 }
 
 .primary-button {
-    @apply  bg-black select-none text-white px-4 rounded-full md:hover:opacity-50 font-serif font-bold md:text-xl h-8 md:h-9 cursor-pointer transition-opacity duration-500;
+    @apply  bg-black select-none text-white px-4 rounded-3xl md:hover:opacity-50 font-serif font-bold md:text-xl h-8 md:h-9 cursor-pointer transition-opacity duration-500;
     line-height: 1.6;
 }
 
@@ -62,6 +62,13 @@
     transition: opacity 250ms ease-out;
 }
 
+.post-editor * td {
+    @apply pb-4 text-left align-top whitespace-nowrap pr-8
+}
+
+.post-editor * td:last-child {
+    @apply w-full mr-0 pr-8
+}
 
 /* width */
 ::-webkit-scrollbar {
@@ -102,11 +109,11 @@ input[type=number] {
 }
 
 .number-input-field {
-    @apply rounded-full w-20 px-2 bg-transparent border
+    @apply rounded-3xl w-20 px-2 bg-transparent border
 }
 
 .string-input-cell {
-    @apply rounded-full w-full bg-transparent px-2 border
+    @apply rounded-3xl w-full bg-transparent px-2 border
 }
 
 .matrix-input {
@@ -122,11 +129,15 @@ input[type=number] {
 }
 
 .color-input-cell {
-    @apply rounded-full overflow-clip cursor-pointer
+    @apply rounded-3xl overflow-clip cursor-pointer
 }
 
 .boolean-input-field {
     transform: translate(0px,8px);
+}
+
+.multiline-string-input-cell {
+    @apply rounded-3xl w-full bg-transparent p-2 border resize-none
 }
 
 .invalid {

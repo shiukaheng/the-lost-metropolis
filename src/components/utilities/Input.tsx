@@ -184,6 +184,15 @@ function ColorInput({value, setValue}) {
     );
 }
 
+// Multiline string input using textarea
+function MultilineStringInput({value, setValue}) {
+    return (
+        <textarea className="multiline-string-input-cell h-72" value={value} onChange={(e) => {
+            setValue(e.target.value)
+        }}/>
+    );
+}
+
 // Helper functions for flattening and unflattening between vector and matrix
 
 function flattenMatrix(matrix) {
@@ -218,6 +227,7 @@ const InputComponentMap = {
     "matrix3": Matrix3Input,
     "matrix4": Matrix4Input,
     "boolean": BooleanInput,
+    "multiline-string": MultilineStringInput
 }
 
 type InputProps = {

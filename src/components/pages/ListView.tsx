@@ -6,29 +6,28 @@ import { useContext } from 'react';
 import { SettingsContext } from "../App";
 import MagicDiv from '../utilities/MagicDiv';
 import GenericPage from '../utilities/GenericPage';
+import LoadingScreen from '../utilities/LoadingScreen';
+import PostList from '../utilities/PostList';
+import { ContentContext } from '../providers/ContentProvider';
 
 const StyledRow = tw.tr`border-b border-t border-current md:hover:opacity-50 transition-opacity duration-500 cursor-pointer table-row`
 const StyledCell = tw.td`text-left font-serif md:text-lg font-semibold pt-2 pb-6 table-cell`
 
-function ListView({content_array}) {
+function ListView() {
     const navigate = useNavigate();
-    const {settings} = useContext(SettingsContext);
+    const {posts} = useContext(ContentContext)
+    const {settings} = useContext(SettingsContext)
     return ( 
-
-        <GenericPage>
-            <MagicDiv className="relative w-full h-full overflow-y-auto">
-                <table className="w-full">
-                    <tbody>
-                        {content_array.map((content, index) => (
-                            <StyledRow key={index} onClick={()=>(navigate("/browse/"+content.id))}>
-                                <StyledCell>{index}</StyledCell>
-                                <StyledCell>{content.title[settings.lang].toLowerCase()}</StyledCell>
-                                <StyledCell>{content.time_posted.toLowerCase()}</StyledCell>
-                            </StyledRow>
-                        ))}
-                    </tbody>
-                </table>
-            </MagicDiv>
+        <GenericPage className="flex flex-col gap-4 md:gap-8">
+            {/* <DashboardHeader/> */}
+            <LoadingScreen ready={posts!==null}>
+                <PostList posts={posts} onPostClick={(post)=>{navigate(`/browse/${post.id}`)}}
+                columnMakers={[
+                    (post, index) => index,
+                    (post, index) => (post.title[settings.lang]),
+                    (post, index) => post.createdAt.toLocaleDateString("en-UK"),
+                ]}/>
+            </LoadingScreen>
         </GenericPage>
     );
 }

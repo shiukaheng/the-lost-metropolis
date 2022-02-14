@@ -7,23 +7,25 @@ import EditorComponentProperties from './ui_elements/EditorComponentProperties';
 import MagicDiv from '../utilities/MagicDiv';
 import EditorTransformControls from './ui_elements/EditorTransformControls';
 import EditorOptions from './ui_elements/EditorOptions';
-import EditorIO from './ui_elements/EditorIO';
+import { deserializeChildren, exportChildren } from './ui_elements/EditorIO';
 import { KeyPressCallback, useKeyPress } from '../../utilities';
 import EditorSceneSettings from './ui_elements/EditorSceneSettings';
 import { EditorContext } from './EditorContext';
 import ViewerManager from '../viewer/Viewer';
 import { ViewerContext } from '../viewer/ViewerContext';
 
-function Editor() {
+function Editor({value, setValue}) {
     return (
         <ViewerManager>
-            <EditorManager/>
+            <EditorManager value={value} setValue={setValue}/>
         </ViewerManager>
     )
 }
 
-function EditorManager() {
-    const {sceneChildren, setSceneChildren: _setSceneChildren, audioListener} = useContext(ViewerContext)
+// Todo seperate Editor UI from EditorManager
+
+function EditorManager({value, setValue}) {
+    const {sceneChildren, setSceneChildren: _setSceneChildren, audioListener, defaultCameraProps, setDefaultCameraProps, potreePointBudget, setPotreePointBudget} = useContext(ViewerContext)
     // Setup state for editor
     const [selectedIDs, setSelectedIDs] = useState([])
     const [transformMode, setTransformMode] = useState("translate")
@@ -63,6 +65,31 @@ function EditorManager() {
 
     const [editorExpanded, setEditorExpanded] = useState(true)
 
+    // IO
+    const serialize = () => {
+        return {
+            sceneChildren: exportChildren(sceneChildren),
+            defaultCameraProps: defaultCameraProps,
+            potreePointBudget,
+        }
+    }
+    const deserialize = (obj) => {
+        setSceneChildren(deserializeChildren(obj.sceneChildren));
+        setDefaultCameraProps(obj.defaultCameraProps);
+        setPotreePointBudget(obj.potreePointBudget);
+    }
+    // useEffect(()=>{
+    //     if (value) {
+    //         deserialize(value)
+    //     }
+    // }, [value, sceneChildren])
+
+    useEffect(()=>{
+        if (sceneChildren) {
+            setValue(serialize())
+        }
+    }, [sceneChildren])
+
     return (
         <EditorContext.Provider value={
             {selectedIDs, setSelectedIDs, addSelectedIDs, removeSelectedIDs, transformMode, setTransformMode, transformSpace, setTransformSpace, overrideInteractions, setOverrideInteractions, shiftPressed, setSceneChildren, removeSceneChildren}
@@ -87,7 +114,7 @@ function EditorManager() {
                         <EditorComponentGraph/>
                         <EditorComponentProperties/>
                         <EditorOptions/>
-                        <EditorIO/>
+                        {/* <EditorIO/> */}
                         <EditorSceneSettings/>
                     </div>
                     : null

@@ -27,7 +27,7 @@ function TransformModeSetter({transformMode, setTransformMode, transformSpace, s
     }
     return(
         <div className="flex flex-row gap-2">
-            <div className="rounded-full border flex flex-row h-6 overflow-clip w-[4.5rem]" style={{
+            <div className="rounded-3xl border flex flex-row h-6 overflow-clip w-[4.5rem]" style={{
                 borderColor: formatRGBCSS(theme.foregroundColor)
             }}>
                 <div className="cursor-pointer w-1/3 p-1" onClick={()=>{setTransformMode("translate")}} style={(transformMode==="translate") ? iconContainerActiveStyle : iconContainerInactiveStyle}>
@@ -40,7 +40,7 @@ function TransformModeSetter({transformMode, setTransformMode, transformSpace, s
                     <Scale className="w-full h-full fill-current" style={(transformMode==="scale") ? iconActiveStyle : iconInactiveStyle}/>
                 </div>
             </div>
-            <MagicDiv className="rounded-full border flex flex-row h-6 overflow-clip w-[7rem]">
+            <MagicDiv className="rounded-3xl border flex flex-row h-6 overflow-clip w-[7rem]">
                 <div className="cursor-pointer w-1/2 text-center text-sm px-1" onClick={()=>{setTransformSpace("world")}} style={(transformSpace==="world" ? iconContainerActiveStyle : iconContainerInactiveStyle)}>
                     World
                 </div>
