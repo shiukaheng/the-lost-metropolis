@@ -11,7 +11,7 @@ import { deserializeChildren, EditorIO, exportChildren, useDeserialize, useSeria
 import { KeyPressCallback, useBufferedPost, useKeyPress, useMultilang } from '../../utilities';
 import EditorSceneSettings from './ui_elements/EditorSceneSettings';
 import { EditorContext } from './EditorContext';
-import ViewerManager from '../viewer/Viewer';
+import { ViewerManager } from '../viewer/Viewer';
 import { ViewerContext } from '../viewer/ViewerContext';
 import MagicButton from '../utilities/MagicButton';
 import { useParams } from 'react-router-dom';
@@ -110,7 +110,7 @@ function EditorManager() {
                     </EditorViewport>
                 </div>
             </MagicDiv>
-            <MagicDiv className="absolute w-[500px] h-full flex flex-col p-8 overflow-clip">
+            <MagicDiv className="absolute w-[500px] h-full flex flex-col p-8 overflow-clip select-none">
                 <div className="editor-embedded-widget text-2xl font-bold">
                     <div className="flex flex-row gap-4">
                         <div className='text-3xl'>Editor</div>

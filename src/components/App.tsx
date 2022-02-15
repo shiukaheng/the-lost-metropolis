@@ -7,8 +7,8 @@ import MagicDiv from "./utilities/MagicDiv";
 import Background from "./utilities/Background";
 import AnimatedSwitch from "./utilities/AnimatedSwitch";
 import { FC } from "react";
-import Experience from "./pages/Experience";
-import { formatRGBCSS, useStickyState } from "../utilities";
+import View from "./pages/View";
+import { formatRGBCSS, KeyPressCallback, useStickyState } from "../utilities";
 import Login from "./admin/Login";
 
 // All pages
@@ -99,14 +99,15 @@ function SiteRouter() {
     const {posts, editablePosts} = useContext(ContentContext)
     return <Router>
         <LoadingScreen ready={(posts!==null || editablePosts!==null)}>
+            <KeyPressCallback keyName={"F9"} onDown={(()=>{console.log("hi")})}/>
             <div className="absolute w-full h-full">
                 <AnimatedSwitch pathPreprocessor={(path) => {
-                    if (path.split("/")[1] !== "experience") {
+                    if (path.split("/")[1] !== "view") {
                         path = "";
                     }
                     return path;
                 } }>
-                    <Route path="/experience/:id" element={<Experience content_array={content_array} />} /> 
+                    <Route path="/view/:id" element={<View />} /> 
                     <Route path="*" element={<div className="w-full h-full">
                         <Background />
                         <AppContainer>

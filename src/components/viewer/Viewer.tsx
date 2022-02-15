@@ -1,7 +1,10 @@
-import { cloneElement, useRef, useState } from "react"
+import { cloneElement, useRef, useState, useContext, useEffect } from "react"
 import { joinChildren } from "../editor/utilities"
 import { ViewerContext } from "./ViewerContext"
 import { AudioListener } from "three"
+import { useDeserialize } from "../editor/ui_elements/EditorIO"
+import Viewport from "./Viewport"
+import { FirstPersonControls, OrbitControls } from "@react-three/drei"
 
 function ViewerManager({children}) {
     // Helps to manage Viewer state (camera initial position, post processing, etc), seperated to be reused in Editor and Viewer
@@ -53,6 +56,31 @@ function ViewerManager({children}) {
     );
 }
 
-export default ViewerManager;
+function ViewerUI({post, ...props}) {
+    const {sceneChildren} = useContext(ViewerContext)
+    const deserialize = useDeserialize()
+    useEffect(()=>{
+        deserialize(post)
+    }, [post])
+    return (
+        <Viewport {...props}>
+            <OrbitControls
+            enableZoom={false}
+            enablePan={false}
+            minPolarAngle={Math.PI / 2}
+            maxPolarAngle={Math.PI / 2}
+            />
+            {sceneChildren}
+        </Viewport>
+    )
+}
 
-export { ViewerManager }
+function Viewer({post, ...props}) {
+    return (
+        <ViewerManager {...props}>
+            <ViewerUI post={post} {...props}/>
+        </ViewerManager>
+    )
+}
+
+export { ViewerManager, Viewer }
