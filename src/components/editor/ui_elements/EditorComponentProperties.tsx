@@ -5,12 +5,15 @@ import { cloneElement, useContext } from "react";
 import { EditorContext } from "./../EditorContext";
 import { supportedComponents } from "../../viewer/ComponentDeclarations"
 import { ViewerContext } from "../../viewer/ViewerContext";
+import MagicDiv from "../../utilities/MagicDiv";
+import { useMultilang } from "../../../utilities";
 
 export default function EditorComponentProperties() {
     const { sceneChildren, setSceneChildren } = useContext(ViewerContext)
     const { selectedIDs } = useContext(EditorContext);
+    const heading = useMultilang({"en": "component properties", "zh": "組件屬性"})
     return (
-        <EditorEmbeddedWidget title="Component properties">
+        <EditorEmbeddedWidget title={heading}>
             <div className="flex flex-col">
                 <div className="flex flex-col gap-2">
                     {
@@ -37,9 +40,21 @@ export default function EditorComponentProperties() {
                         (
                             selectedIDs.length > 1
                             ?
-                            <div>Multiple components selected</div>
+                            // <div>Multiple components selected</div>
+                            <MagicDiv languageSpecificChildren={
+                                {
+                                    "en": "Multiple components selected",
+                                    "zh": "選擇多個組件"
+                                }
+                            }/>
                             :
-                            <div>No component selected</div>
+                            // <div>No component selected</div>
+                            <MagicDiv languageSpecificChildren={
+                                {
+                                    "en": "No component selected",
+                                    "zh": "沒有選擇組件"
+                                }
+                            }/>
                         )
                     }
                 </div>

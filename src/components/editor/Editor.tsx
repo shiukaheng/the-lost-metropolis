@@ -97,6 +97,7 @@ function EditorManager() {
         "zh": "注意: 您正在編輯的文章已經被修改，若按更新將覆蓋修改。"
     })
     const pullLabel = useMultilang({"en": "update to latest version", "zh": "獲取最新版本"});
+    const heading = useMultilang({"en": "editor", "zh": "編輯器"})
     return (
         <EditorContext.Provider value={
             {selectedIDs, setSelectedIDs, addSelectedIDs, removeSelectedIDs, transformMode, setTransformMode, transformSpace, setTransformSpace, overrideInteractions, setOverrideInteractions, shiftPressed, setSceneChildren, removeSceneChildren}
@@ -113,7 +114,7 @@ function EditorManager() {
             <MagicDiv className="absolute w-[500px] h-full flex flex-col p-8 overflow-clip select-none">
                 <div className="editor-embedded-widget text-2xl font-bold">
                     <div className="flex flex-row gap-4">
-                        <div className='text-3xl'>Editor</div>
+                        <div className='text-3xl'>{heading}</div>
                         {overwriteWarning ? <MagicButton solid onClick={pull}>{pullLabel}</MagicButton> : null}
                         <MagicButton disabled={!changed} onClick={push}>{updateLabel}</MagicButton>
                         <div className="ml-auto cursor-pointer text-xl select-none" onClick={()=>{setEditorExpanded(!editorExpanded)}}>{editorExpanded ? "-" : "+"}</div>    

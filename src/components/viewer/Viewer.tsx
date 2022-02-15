@@ -4,7 +4,7 @@ import { ViewerContext } from "./ViewerContext"
 import { AudioListener } from "three"
 import { useDeserialize } from "../editor/ui_elements/EditorIO"
 import Viewport from "./Viewport"
-import { FirstPersonControls, OrbitControls } from "@react-three/drei"
+import { FirstPersonControls, OrbitControls, PointerLockControls } from "@react-three/drei"
 
 function ViewerManager({children}) {
     // Helps to manage Viewer state (camera initial position, post processing, etc), seperated to be reused in Editor and Viewer
@@ -64,12 +64,9 @@ function ViewerUI({post, ...props}) {
     }, [post])
     return (
         <Viewport {...props}>
-            <OrbitControls
-            enableZoom={false}
-            enablePan={false}
-            minPolarAngle={Math.PI / 2}
-            maxPolarAngle={Math.PI / 2}
-            />
+            {/* <FirstPersonControls activeLook={false}/> */}
+            <PointerLockControls/>
+            
             {sceneChildren}
         </Viewport>
     )

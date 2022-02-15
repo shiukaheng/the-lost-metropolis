@@ -62,6 +62,32 @@
     transition: opacity 250ms ease-out;
 }
 
+/* bg animation */
+
+.background-transition-enter {
+    opacity: 0;
+    transform: scale(1.1);
+}
+
+.background-transition-enter.background-transition-enter-active {
+    opacity: 1;
+    transform: scale(1);
+    transition: 500ms ease-out;
+}
+
+.background-transition-exit {
+    opacity: 1;
+    transform: scale(1);
+    transform: translate(0, 0);
+}
+
+.background-transition-exit.background-transition-exit-active {
+    opacity: 0;
+    transform: scale(1.1);
+    transition: 500ms ease-in;
+}
+
+
 .post-editor * td {
     @apply pb-4 text-left align-top whitespace-nowrap pr-8
 }

@@ -2,7 +2,7 @@ import Translate from "../svgs/translate.svg"
 import Rotate from "../svgs/rotate.svg"
 import Scale from "../svgs/scale.svg"
 import { ThemeContext } from "../../App"
-import { formatRGBCSS } from "../../../utilities";
+import { formatRGBCSS, useMultilang } from "../../../utilities";
 import MagicDiv from "../../utilities/MagicDiv"
 import { useContext, useState } from "react";
 import EditorEmbeddedWidget from "./EditorEmbeddedWidget";
@@ -54,13 +54,16 @@ function TransformModeSetter({transformMode, setTransformMode, transformSpace, s
 
 export default function EditorOptions() {
     const { transformMode, setTransformMode, transformSpace, setTransformSpace, setOverrideInteractions, overrideInteractions } = useContext(EditorContext)
+    const heading = useMultilang({"en": "editor options", "zh": "編輯器選項"})
+    const transformationLabel = useMultilang({"en": "transformation", "zh": "變換"})
+    const bypassLabel = useMultilang({"en": "bypass editor interactions", "zh": "跳過編輯器互動"})
     return (
-        <EditorEmbeddedWidget title="Editor options">
+        <EditorEmbeddedWidget title={heading}>
             <div className="flex flex-row gap-2">
-                <div>Transformation</div>
+                <div>{transformationLabel}</div>
                 <TransformModeSetter {...{ transformMode, setTransformMode, transformSpace, setTransformSpace }}/>
             </div>
-            <EditorInput propName="Bypass editor interactions" typeName="boolean" value={!overrideInteractions} setValue={()=>{setOverrideInteractions((v)=>(!v))}}/>
+            <EditorInput propName={bypassLabel} typeName="boolean" value={!overrideInteractions} setValue={()=>{setOverrideInteractions((v)=>(!v))}}/>
         </EditorEmbeddedWidget>
     )
 }

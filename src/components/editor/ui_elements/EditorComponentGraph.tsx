@@ -3,7 +3,7 @@ import Select from 'react-select';
 import MagicDiv from "../../utilities/MagicDiv";
 import { createElement, useEffect, useRef, useState, useContext } from "react";
 import { v4 as uuidv4 } from 'uuid';
-import { useKeyPress, KeyPressCallback, formatRGBCSS } from "../../../utilities";
+import { useKeyPress, KeyPressCallback, formatRGBCSS, useMultilang } from "../../../utilities";
 import { ThemeContext } from "../../App"
 import { EditorContext } from "../EditorContext";
 import { ViewerContext } from "../../viewer/ViewerContext";
@@ -41,6 +41,7 @@ export default function EditorComponentGraph() {
     const {sceneChildren} = useContext(ViewerContext)
     const {selectedIDs, setSelectedIDs, addSelectedIDs, removeSelectedIDs, shiftPressed, setSceneChildren} = useContext(EditorContext)
     const [addChildrenType, setAddChildrenType] = useState(null)
+    const heading = useMultilang({"en": "components", "zh": "組件"})
 
     const {theme} = useContext(ThemeContext)
     const customStyles = {
@@ -74,7 +75,7 @@ export default function EditorComponentGraph() {
         })
     }
     return (
-        <EditorEmbeddedWidget title="Components">
+        <EditorEmbeddedWidget title={heading}>
             <KeyPressCallback keyName="Delete" onDown={()=>{
                 setSceneChildren(sceneChildren.filter(child => !(selectedIDs.includes(child.props.id))))
             }}/>
@@ -82,7 +83,10 @@ export default function EditorComponentGraph() {
                 <Select className="flex-grow" options={supportedComponents} styles={customStyles} onChange={(value, _)=>{setAddChildrenType(value.value)}}/>
                 <MagicDiv mergeTransitions className={`editor-secondary-button ${(addChildrenType===null) ? "disabled" : ""}`} onClick={()=>{
                     setSceneChildren(sceneChildren.concat([createElement(addChildrenType.component, generateKey(getDefaultInputs(addChildrenType.inputs)), null)]))
-                }}>add</MagicDiv>
+                }} languageSpecificChildren={{
+                    "en": "add",
+                    "zh": "新增"
+                }}/>
             </div>
             <div className="gap-2">
                 {

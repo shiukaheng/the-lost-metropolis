@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useLayoutEffect, useContext, useCallback } from "react"
 import { createPost, updatePost } from "./api";
 import { AuthContext } from "./components/admin/AuthProvider";
-import { languages, SettingsContext } from "./components/App";
+import { languages, SettingsContext, ThemeContext } from "./components/App";
 import { ContentContext } from "./components/providers/ContentProvider";
 import { cloneDeep, isEqual } from "lodash"
 
@@ -302,4 +302,18 @@ const createEmptyMultilangString = () => {
     }, {})
 }
 
-export { formatRGBCSS, useKeyPress, useAsyncKeyPress, useAsyncReference, KeyPressCallback, LinearToSRGB, SRGBToLinear, useStickyState, useFollowMouse, useSubscription, useMultilang, usePost, useBufferedPost, useConfirm, createEmptyMultilangString };
+const useTheme = (targetTheme) => {
+    const {theme, setTheme} = useContext(ThemeContext)
+    const originalThemeRef = useRef(theme)
+    useEffect(()=>{
+        originalThemeRef.current = theme
+        setTheme(targetTheme)
+        return (
+            () => {
+                setTheme(originalThemeRef.current)
+            }
+        )
+    }, [])
+}
+
+export { formatRGBCSS, useKeyPress, useAsyncKeyPress, useAsyncReference, KeyPressCallback, LinearToSRGB, SRGBToLinear, useStickyState, useFollowMouse, useSubscription, useMultilang, usePost, useBufferedPost, useConfirm, createEmptyMultilangString, useTheme };

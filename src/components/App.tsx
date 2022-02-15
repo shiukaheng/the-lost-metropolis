@@ -37,6 +37,8 @@ const defaultTheme = {
     backgroundColor: [0, 0, 0],
     foregroundColor: [255, 255, 255],
     backgroundVideo: null,
+    backgroundImage: null,
+    backgroundOpacity: 1,
     transitionDuration: 0.5
 }
 

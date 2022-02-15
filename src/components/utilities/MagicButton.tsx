@@ -4,7 +4,7 @@ import { formatRGBCSS } from "../../utilities"
 import { twMerge } from 'tailwind-merge'
 
 // Dynamically color div css attributes based on theme, but note that its not compatible with external transitions due to use of element css which overrides classes
-function MagicButton({ languageSpecificChildren=null, style={}, solid=false, children=undefined, className="", mergeTransitions=true, autoColor=true, disabled=false, onClick=()=>{}, ...props }) {
+function MagicButton({ languageSpecificChildren=null, style={}, solid=false, children=undefined, className="", mergeTransitions=true, autoColor=true, disabled=false, onClick=(e)=>{}, ...props }) {
     const {settings} = useContext(SettingsContext)
     const {theme} = useContext(ThemeContext)
     const testDiv = useRef(null)
@@ -31,13 +31,13 @@ function MagicButton({ languageSpecificChildren=null, style={}, solid=false, chi
 
     return (
         <Fragment>
-            <input onClick={disabled ? undefined : async ()=>{
+            <input onClick={disabled ? undefined : async (e)=>{
                 // If the onClick function is synchronous, just call it; if asynchronous, set pending to true and call it; when it resolves, set pending to false
                 if (onClick.constructor.name === "Function") {
-                    onClick()
+                    onClick(e)
                 } else if (onClick.constructor.name === "AsyncFunction") {
                     setPending(true)
-                    await onClick()
+                    await onClick(e)
                     setPending(false)
                 }
             }} {...props} type="button" className={mergedClassNames} value={languageSpecificChildren ? languageSpecificChildren[settings.lang] : children} style={

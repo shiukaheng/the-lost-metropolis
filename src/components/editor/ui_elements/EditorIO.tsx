@@ -6,6 +6,7 @@ import FileSaver from "file-saver"
 import { ViewerContext } from "../../viewer/ViewerContext";
 import { v4 as uuidv4 } from 'uuid';
 import MagicButton from "../../utilities/MagicButton";
+import { useMultilang } from "../../../utilities";
 
 // Utilties and components for import / export
 
@@ -122,9 +123,11 @@ function EditorIO() {
     };
     const serialize = useSerialize();
     const deserialize = useDeserialize();
-
+    const heading = useMultilang({"en": "import / export", "zh": "導入 / 導出"});
+    const importLabel = useMultilang({"en": "import", "zh": "導入"});
+    const exportLabel = useMultilang({"en": "export", "zh": "導出"});
     return (
-        <EditorEmbeddedWidget title="Import / Export">
+        <EditorEmbeddedWidget title={heading}>
             <div className="flex flex-row gap-2">
                 <input type='file' id='file' ref={inputFile} style={{display: 'none'}} onChange={(e)=>{
                     var reader = new FileReader();
@@ -137,13 +140,13 @@ function EditorIO() {
                 <MagicDiv mergeTransitions className="editor-secondary-button" onClick={()=>{
                     onButtonClick();
                 }}>
-                    Import
+                    {importLabel}
                 </MagicDiv>
                 <MagicDiv mergeTransitions className="editor-secondary-button" onClick={()=>{
                     const blob = new Blob([JSON.stringify(serialize())], {type: "text/plain;charset=utf-8"});
                     FileSaver.saveAs(blob, "scene.json");
                 }}>
-                    Export
+                    {exportLabel}
                 </MagicDiv>
             </div>
         </EditorEmbeddedWidget>

@@ -35,53 +35,58 @@ function ShowcasePanel() {
         setActiveID(posts[index].id);
         navigate(`/browse/${posts[index].id}`);
     }
-    return <div className="flex flex-col h-full w-full justify-between">
-        <div className="h-full w-full relative overflow-hidden">
-            { activeIndex === null ?
-                <div className="h-full w-full flex justify-center items-center md:pb-20 md:pr-20">
-                    <MagicDiv className="text-5xl font-black">
-                        No content available
-                    </MagicDiv>
-                </div>
-                :
-                <SwipeableViews index={activeIndex} onChangeIndex={(index => { setActiveIndex(index); })} containerStyle={{
-                    position: 'absolute',
-                    height: '100%',
-                    width: '100%'
-                }}>
-                    {posts.map((post, key) => (
-                        <div key={key} className="absolute w-full h-full overflow-y-auto">
-                            <ShowcaseContentCard post={post} />
+    return (
+        <div className="w-full h-full relative">
+            <div className="flex flex-col h-full w-full absolute justify-between">
+                <div className="h-full w-full relative overflow-hidden">
+                    { activeIndex === null ?
+                        <div className="h-full w-full flex justify-center items-center md:pb-20 md:pr-20">
+                            <MagicDiv className="text-5xl font-black">
+                                No content available
+                            </MagicDiv>
                         </div>
-                    ))}
-                </SwipeableViews>
-            }
-        </div>
-        {/* Navigating between different scans.. Todo swipe left and right for mobile. Hidden left and right arrows. Can use same animation for desktop. */}
-        <div className="flex-row gap-2 justify-between hidden md:flex items-center md:pb-20 md:pr-20">
-            <ArrowLeftIcon className="h-5 cursor-pointer hover:opacity-50 transition-opacity duration-500" onClick={ (posts && posts.length > 0) ? () => {
-                var proposedIndex = (activeIndex - 1) % posts.length;
-                if (proposedIndex < 0) {
-                    proposedIndex = posts.length - 1;
-                }
-                // updateUrl(proposedIndex)
-                setActiveIndex(proposedIndex);
-            } : ()=>{} } style={{
-                color: formatRGBCSS(theme.foregroundColor),
-                transition: `color ${theme.transitionDuration}s opacity 500ms` // Hacky..
-            }}></ArrowLeftIcon>
-            <div className="flex flex-row gap-2" style={{ color: formatRGBCSS(theme.foregroundColor), transition: `color ${theme.transitionDuration}s` }}>
-                <div className="font-serif font-bold select-none">{activeIndex !== null ? activeIndex + 1 : "- "}/{posts && posts.length > 0 ? posts.length : " -"}</div>
+                        :
+                        <SwipeableViews index={activeIndex} onChangeIndex={(index => { setActiveIndex(index); })} containerStyle={{
+                            position: 'absolute',
+                            height: '100%',
+                            width: '100%'
+                        }}>
+                            {posts.map((post, key) => (
+                                <div key={key} className="absolute w-full h-full overflow-y-auto">
+                                    <ShowcaseContentCard post={post} />
+                                </div>
+                            ))}
+                        </SwipeableViews>
+                    }
+                </div>
+                {/* Navigating between different scans.. Todo swipe left and right for mobile. Hidden left and right arrows. Can use same animation for desktop. */}
+                <div className="flex-row gap-2 justify-between hidden md:flex items-center md:pb-20 md:pr-20">
+                    <ArrowLeftIcon className="h-5 cursor-pointer hover:opacity-50 transition-opacity duration-500" onClick={ (posts && posts.length > 0) ? () => {
+                        var proposedIndex = (activeIndex - 1) % posts.length;
+                        if (proposedIndex < 0) {
+                            proposedIndex = posts.length - 1;
+                        }
+                        // updateUrl(proposedIndex)
+                        setActiveIndex(proposedIndex);
+                    } : ()=>{} } style={{
+                        color: formatRGBCSS(theme.foregroundColor),
+                        transition: `color ${theme.transitionDuration}s opacity 500ms` // Hacky..
+                    }}></ArrowLeftIcon>
+                    <div className="flex flex-row gap-2" style={{ color: formatRGBCSS(theme.foregroundColor), transition: `color ${theme.transitionDuration}s` }}>
+                        <div className="font-serif font-bold select-none">{activeIndex !== null ? activeIndex + 1 : "- "}/{posts && posts.length > 0 ? posts.length : " -"}</div>
+                    </div>
+                    {/* <button className="border-black border px-4 rounded-3xl md:hover:opacity-50 transition-opacity duration-500 font-serif font-bold text-s md:text-xl h-8 md:h-9">show all</button> */}
+                    <ArrowRightIcon className="h-5 cursor-pointer hover:opacity-50 transition-opacity duration-500" onClick={ (posts && posts.length > 0) ? () => {
+                        const proposedIndex = (activeIndex + 1) % posts.length;
+                        // updateUrl(proposedIndex)
+                        setActiveIndex(proposedIndex);
+                    } : ()=>{} } style={{
+                        color: formatRGBCSS(theme.foregroundColor),
+                        transition: `color ${theme.transitionDuration}s opacity 500ms`
+                    }}></ArrowRightIcon>
+                </div>
             </div>
-            {/* <button className="border-black border px-4 rounded-3xl md:hover:opacity-50 transition-opacity duration-500 font-serif font-bold text-s md:text-xl h-8 md:h-9">show all</button> */}
-            <ArrowRightIcon className="h-5 cursor-pointer hover:opacity-50 transition-opacity duration-500" onClick={ (posts && posts.length > 0) ? () => {
-                const proposedIndex = (activeIndex + 1) % posts.length;
-                // updateUrl(proposedIndex)
-                setActiveIndex(proposedIndex);
-            } : ()=>{} } style={{
-                color: formatRGBCSS(theme.foregroundColor),
-                transition: `color ${theme.transitionDuration}s opacity 500ms`
-            }}></ArrowRightIcon>
+            <div className="w-full h-full"></div>
         </div>
-    </div>;
+    );
 }
