@@ -137,7 +137,7 @@ export const updatePost = async (id, content) => {
     await updateDoc(postRef, inverseTransformPost(content)) // https://firebase.google.com/docs/firestore/manage-data/update-data#update_a_document
 }
 
-export const createPost = async ({title=createEmptyMultilangString(), description=createEmptyMultilangString(), data="", viewers=[], editors=[], published=false}={}) => { // Todo: dynamically create template data
+export const createPost = async ({title=createEmptyMultilangString(), description=createEmptyMultilangString(), data=null, viewers=[], editors=[], published=false}={}) => { // Todo: dynamically create template data
     const postsRef = collection(db, "posts")
     const created =  new Date().toISOString()
     const object = {
@@ -151,7 +151,7 @@ export const createPost = async ({title=createEmptyMultilangString(), descriptio
         editors: editors,
         published: published,
     }
-    console.log(inverseTransformPost(object))
+    // console.log(inverseTransformPost(object))
     const docRef = await addDoc(postsRef, inverseTransformPost(object))
     return docRef.id
 }

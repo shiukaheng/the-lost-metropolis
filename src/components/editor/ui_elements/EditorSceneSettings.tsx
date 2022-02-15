@@ -10,6 +10,7 @@ function EditorSceneSettings() {
     return (
         <EditorEmbeddedWidget title="Scene settings">
             <div className="flex flex-col gap-2">
+                <EditorInput propName="Point budget" typeName="number" value={potreePointBudget} setValue={setPotreePointBudget}/>
                 <EditorInput propName="Default camera position" typeName="vector3" value={defaultCameraProps.position} setValue={(position)=>{setDefaultCameraProps({...defaultCameraProps, position})}}/>
                 <EditorInput propName="Default camera rotation" typeName="euler" value={defaultCameraProps.rotation} setValue={(rotation)=>{setDefaultCameraProps({...defaultCameraProps, rotation})}}/>
                 <EditorInput propName="Default camera fov" typeName="number" value={defaultCameraProps.fov} setValue={(fov)=>{setDefaultCameraProps({...defaultCameraProps, fov})}}/>
@@ -22,7 +23,6 @@ function EditorSceneSettings() {
                         })
                     }
                 }}/>
-                <EditorInput propName="Point budget" typeName="number" value={potreePointBudget} setValue={setPotreePointBudget}/>
             </div>
         </EditorEmbeddedWidget>
     )

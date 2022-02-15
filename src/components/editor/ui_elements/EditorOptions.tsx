@@ -22,7 +22,7 @@ function TransformModeSetter({transformMode, setTransformMode, transformSpace, s
         color: formatRGBCSS(theme.backgroundColor)
     }
     const iconContainerInactiveStyle = {
-        backgroundColor: formatRGBCSS(theme.backgroundColor),
+        // backgroundColor: formatRGBCSS(theme.backgroundColor),
         color: formatRGBCSS(theme.foregroundColor)
     }
     return(

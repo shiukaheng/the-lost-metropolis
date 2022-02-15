@@ -7,13 +7,14 @@ import EditorComponentProperties from './ui_elements/EditorComponentProperties';
 import MagicDiv from '../utilities/MagicDiv';
 import EditorTransformControls from './ui_elements/EditorTransformControls';
 import EditorOptions from './ui_elements/EditorOptions';
-import { deserializeChildren, EditorIO, exportChildren } from './ui_elements/EditorIO';
-import { KeyPressCallback, useKeyPress } from '../../utilities';
+import { deserializeChildren, EditorIO, exportChildren, useDeserialize, useSerialize } from './ui_elements/EditorIO';
+import { KeyPressCallback, useBufferedPost, useKeyPress, useMultilang } from '../../utilities';
 import EditorSceneSettings from './ui_elements/EditorSceneSettings';
 import { EditorContext } from './EditorContext';
 import ViewerManager from '../viewer/Viewer';
 import { ViewerContext } from '../viewer/ViewerContext';
 import MagicButton from '../utilities/MagicButton';
+import { useParams } from 'react-router-dom';
 
 function Editor() {
     return (
@@ -66,6 +67,36 @@ function EditorManager() {
 
     const [editorExpanded, setEditorExpanded] = useState(true)
 
+    const serialize = useSerialize()
+    const deserialize = useDeserialize()
+
+    const { id } = useParams();
+    const [buffer, setBuffer, post, push, pull, changed, overwriteWarning] = useBufferedPost(id, ["data"], undefined, (buffer) => {
+        if (buffer.data) {
+            deserialize(buffer.data)
+        }
+    });
+    // Syncing internal state with buffer
+    // Fetch data from buffer during mount
+    useEffect(() => {
+        if (buffer.data) {
+            // console.log("Deserializing buffer", buffer.data)
+            deserialize(buffer.data)
+        } else {
+            // console.log("No buffer data, not deserializing", buffer)
+        }
+    }, [])
+    // Update the buffer when internal state changes, will have one redundant update on mount because of initial fetch, but what the heck
+    useEffect(() => {
+        setBuffer({data: serialize()})
+    }, [sceneChildren, defaultCameraProps, potreePointBudget])
+    // Update internal state when buffer changes, which only happens if we change sceneChildren (handled), and pull
+    const updateLabel = useMultilang({"en": "update", "zh": "更新"})
+    const overwriteLabel = useMultilang({
+        "en": "warning: the post has changed while you were editing. saving will overwrite the changes.",
+        "zh": "注意: 您正在編輯的文章已經被修改，若按更新將覆蓋修改。"
+    })
+    const pullLabel = useMultilang({"en": "update to latest version", "zh": "獲取最新版本"});
     return (
         <EditorContext.Provider value={
             {selectedIDs, setSelectedIDs, addSelectedIDs, removeSelectedIDs, transformMode, setTransformMode, transformSpace, setTransformSpace, overrideInteractions, setOverrideInteractions, shiftPressed, setSceneChildren, removeSceneChildren}
@@ -79,15 +110,19 @@ function EditorManager() {
                     </EditorViewport>
                 </div>
             </MagicDiv>
-            <MagicDiv className="absolute w-[500px] flex flex-col p-4 overflow-clip">
-                <div className="editor-embedded-widget text-2xl font-bold flex flex-row gap-4">
-                    <div className='text-3xl'>Editor</div>
-                    <MagicButton solid>update</MagicButton>
-                    <div className="ml-auto cursor-pointer text-xl select-none" onClick={()=>{setEditorExpanded(!editorExpanded)}}>{editorExpanded ? "-" : "+"}</div>    
+            <MagicDiv className="absolute w-[500px] h-full flex flex-col p-8 overflow-clip">
+                <div className="editor-embedded-widget text-2xl font-bold">
+                    <div className="flex flex-row gap-4">
+                        <div className='text-3xl'>Editor</div>
+                        {overwriteWarning ? <MagicButton solid onClick={pull}>{pullLabel}</MagicButton> : null}
+                        <MagicButton disabled={!changed} onClick={push}>{updateLabel}</MagicButton>
+                        <div className="ml-auto cursor-pointer text-xl select-none" onClick={()=>{setEditorExpanded(!editorExpanded)}}>{editorExpanded ? "-" : "+"}</div>    
+                    </div>
+                    {(overwriteWarning && buffer) ? <div className="font-bold text-yellow-400 text-sm pt-2">{overwriteLabel}</div> : null}
                 </div>
                 {
                     editorExpanded ?
-                    <div>
+                    <div className='overflow-auto'>
                         <EditorComponentGraph/>
                         <EditorComponentProperties/>
                         <EditorOptions/>

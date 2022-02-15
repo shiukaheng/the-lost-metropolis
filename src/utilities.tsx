@@ -176,30 +176,10 @@ const usePost = (id) => {
     return [post, setPost]
 }
 
-const useWriteCheck = (source) => {
-    const now = Date.now()
-    const oldRef = useRef([now, cloneDeep(source)])
-    const newRef = useRef([now, cloneDeep(source)])
-    const [changed, setChanged] = useState(false)
-    // useEffect(() => {
-    //     console.log(changed)
-    // }, [changed])
-    // useEffect(()=>{
-    //     const check = cloneDeep(source) // Mask what to check for changes
-    //     const newChanged = !isEqual(oldRef.current[1], check) // Check if changed from reference
-    //     setChanged(newChanged)
-    //     if (newChanged) { // If changed, update newSnap
-    //         newRef.current = [Date.now(), check]
-    //     }
-    // }, [source])
-    const sync = () => {
-        oldRef.current = newRef.current
-        setChanged(false)
-    }
-    return [changed, (changed ? newRef.current[0] : oldRef.current[0]), sync]
-}
-
 function filterProps(target, props=[]) {
+    if (target === undefined) {
+        return undefined
+    }
     const filtered = {}
     props.forEach((prop) => {
         if (target[prop] !== undefined) {
@@ -211,32 +191,61 @@ function filterProps(target, props=[]) {
     return filtered
 }
 
-const useBufferedPost = (id, props=[]) => { // Todo: use useWriteCheck to monitor changes to post
+const useBufferedPost = (id, props=[], onBufferChange=(buffer)=>{}, onPull=(buffer)=>{}, onPush=(buffer)=>{}) => { // Todo: use useWriteCheck to monitor changes to post
     // Returns buffer, setBuffer (stores new post in buffer), post (the post in the database), push function (syncs database with buffer, returns null if no edit permission), pull function (syncs buffer with database), changed (if buffer deviates from post), and overwriteWarning (true if database has changed since buffer was last synced)
     const {posts, editablePosts} = useContext(ContentContext)
     const postResult = posts.find((p) => p.id === id)
     const editablePostResult = editablePosts.find((p) => p.id === id)
-    const [updateCount, setUpdateCount] = useState(0)
     const post = postResult || editablePostResult
     const filteredPost = filterProps(post, props)
     const [buffer, _setBuffer] = useState(filteredPost)
+    // Tracking changes to buffer / post
+    // const [initialBuffer, setInitialBuffer] = useState(filteredPost)
+    const initialBufferRef = useRef(filteredPost)
+    const postTriggersRef = useRef(0)
+    const postChangesRef = useRef(null)
     const setBuffer = (newBuffer) => {
         // Inject
         _setBuffer(filterProps(newBuffer, props))
+        onBufferChange(newBuffer)
     }
-    const [bufferChanged, bufferChangedTime, updateReference] = useWriteCheck(buffer)
-    const [postChanged, postChangedTime, updatePostReference] = useWriteCheck(filteredPost)
+    const [overwriteWarning, setOverwriteWarning] = useState(false)
+    useEffect(()=>{
+        if (postTriggersRef.current > 0) {
+            // console.log("post updated")
+            if (!isEqual(post, postChangesRef.current)) {
+                // console.log("post changed")
+                if (!isEqual(buffer, filterProps(post, props))) {
+                    setOverwriteWarning(true)
+                }
+                postChangesRef.current = post
+            }
+        } else {
+            // console.log("post initial update")
+            postChangesRef.current = post
+        }
+        postTriggersRef.current++
+    }, [post])
+    // To determine changed: If buffer is different than initially fetched
+    // To determine overwriteWarning: If initial buffer is older than post, warn user that they may overwrite data if they push
     const push = editablePostResult ? async () => {
+        initialBufferRef.current = buffer
         await updatePost(id, buffer)
-        updateReference()
-        updatePostReference()
+        setOverwriteWarning(false)
+        onPush(buffer)
     } : null
     const pull = () => {
+        console.log("pulled")
         setBuffer(filteredPost)
-        updateReference()
-        updatePostReference()
+        initialBufferRef.current = filteredPost
+        setOverwriteWarning(false)
+        onBufferChange(filteredPost)
+        onPull(filteredPost)
     }
-    return [buffer, setBuffer, post, push, pull, bufferChanged || postChanged, postChanged]
+    // console.log(bufferChanged, postChanged)
+    // Change describes mismatch between buffer and post, OverwriteWarning indicates database has newer version than buffer
+    const changed = !isEqual(buffer, initialBufferRef.current)
+    return [buffer, setBuffer, post, push, pull, changed, (overwriteWarning && post !== undefined)]
 }
 
 const useConfirm = (defaultText="default", confirmText="confirm", pendingText="pending", onConfirm=()=>{}, onTimeout=()=>{}) => {
@@ -293,4 +302,4 @@ const createEmptyMultilangString = () => {
     }, {})
 }
 
-export { formatRGBCSS, useKeyPress, useAsyncKeyPress, useAsyncReference, KeyPressCallback, LinearToSRGB, SRGBToLinear, useStickyState, useFollowMouse, useSubscription, useMultilang, usePost, useBufferedPost, useConfirm, createEmptyMultilangString, useWriteCheck };
+export { formatRGBCSS, useKeyPress, useAsyncKeyPress, useAsyncReference, KeyPressCallback, LinearToSRGB, SRGBToLinear, useStickyState, useFollowMouse, useSubscription, useMultilang, usePost, useBufferedPost, useConfirm, createEmptyMultilangString };

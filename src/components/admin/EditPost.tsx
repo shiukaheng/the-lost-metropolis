@@ -110,21 +110,27 @@ function EditingForm({className="", editor3dMode=false}) {
     const deleteConfirmationLabel = useMultilang({"en": "click to confirm", "zh": "點擊確認"});
     const deletePendingLabel = useMultilang({"en": "deleting...", "zh": "刪除中..."});
     const overwriteLabel = useMultilang({
-        "en": "Warning: The post has changed while you were editing. Saving will overwrite the changes.",
+        "en": "warning: the post has changed while you were editing. saving will overwrite the changes.",
         "zh": "注意: 您正在編輯的文章已經被修改，若按更新將覆蓋修改。"
     })
+    const pullLabel = useMultilang({"en": "update to latest version", "zh": "獲取最新版本"});
     const [deleteLabel, deleteTrigger] = useConfirm(deleteDefaultLabel, deleteConfirmationLabel, deletePendingLabel, async ()=>{
         console.log(id)
         await deletePost(id)
         navigate("/dashboard")
     })
+    // console.log(buffer)
     return (
         // Return table with inputs for title, description, and published
         <div className={twMerge("border rounded-3xl overflow-clip relative h-full flex flex-col", className)}>
             <EditorSceneOverlay value={buffer.data} setValue={(value) => setBuffer({...buffer, data: value})} hidden={!editor3dMode}/>
             <EmbeddedTabs options={languages} activeOption={activeLanguage} onUpdate={setActiveLanguage} className="border-b"/>
             <div className="px-8 py-8 flex flex-col gap-4">
-                {overwriteWarning ? <div className="font-bold text-yellow-400">{overwriteLabel}</div> : null}
+                {overwriteWarning ? 
+                <div className="flex flex-row">
+                    <div className="font-bold text-yellow-400">{overwriteLabel}</div>
+                    <MagicButton solid className="ml-auto" onClick={()=>{pull()}}>{pullLabel}</MagicButton>
+                </div> : null}
                 <table className="w-full">
                     <tbody className="post-editor">
                         <tr>

@@ -67,7 +67,7 @@
 }
 
 .post-editor * td:last-child {
-    @apply w-full mr-0 pr-8
+    @apply w-full pr-0
 }
 
 /* width */

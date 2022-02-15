@@ -29,7 +29,7 @@ function Login() {
                     async ()=>{
                         try {
                             await signInWithEmailAndPassword(auth, email, password);
-                            navigate("/admin")
+                            navigate("/dashboard")
                         } catch (error) {
                             console.warn(error);
                             setButtonText("try again")

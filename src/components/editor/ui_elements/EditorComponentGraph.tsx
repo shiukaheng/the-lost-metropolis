@@ -47,7 +47,7 @@ export default function EditorComponentGraph() {
         option: (provided, state) => ({
             ...provided,
             fontSize: "15px",
-            backgroundColor: formatRGBCSS(theme.backgroundColor),
+            // backgroundColor: formatRGBCSS(theme.backgroundColor),
             color: formatRGBCSS(theme.foregroundColor)
         }),
         control: (provided, state) => ({

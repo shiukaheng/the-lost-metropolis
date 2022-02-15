@@ -108,7 +108,6 @@ const useSerialize = () => {
 const useDeserialize = () => { 
     const {setSceneChildren, setDefaultCameraProps, setPotreePointBudget} = useContext(ViewerContext)
     return (obj) => {
-        console.log(obj)
         setSceneChildren(deserializeChildren(obj.sceneChildren));
         setDefaultCameraProps(obj.defaultCameraProps);
         setPotreePointBudget(obj.potreePointBudget);
