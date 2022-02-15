@@ -2,6 +2,7 @@ import { addDoc, collection, deleteDoc, onSnapshot, Timestamp, updateDoc, doc } 
 import { auth, db, storage } from "./firebase-config";
 import { signOut } from "firebase/auth";
 import { collection, query, where } from "firebase/firestore";
+import { createEmptyMultilangString } from "./utilities";
 
 // Functions to further abstract API calls to firebase for easier understanding / maintenance / migration
 
@@ -39,7 +40,7 @@ import { collection, query, where } from "firebase/firestore";
 function filterObjectStructure(target, reference) {
     const filtered = {};
     for (const key in reference) {
-        if (target[key]) {
+        if (target[key] !== undefined) {
             filtered[key] = target[key];
         }
     }
@@ -131,24 +132,15 @@ export const subscribeToEditablePosts = (callback) => {
 // }
 
 // - Update post -> update document in posts collection
-export const updatePost = async (id, title, description, data, viewers, editors, published) => {
+export const updatePost = async (id, content) => {
     const postRef = doc(db, "posts", id)
-    const post = {
-        title: title,
-        description: description,
-        data: data,
-        updatedAt: new Date().toISOString(),
-        viewers: viewers,
-        editors: editors,
-        published: published,
-    }
-    await updateDoc(postRef, inverseTransformPost(post)) // https://firebase.google.com/docs/firestore/manage-data/update-data#update_a_document
+    await updateDoc(postRef, inverseTransformPost(content)) // https://firebase.google.com/docs/firestore/manage-data/update-data#update_a_document
 }
 
-export const createPost = async (title, description, data, viewers, editors, published) => {
+export const createPost = async ({title=createEmptyMultilangString(), description=createEmptyMultilangString(), data="", viewers=[], editors=[], published=false}={}) => { // Todo: dynamically create template data
     const postsRef = collection(db, "posts")
     const created =  new Date().toISOString()
-    const docRef = await addDoc(postsRef, inverseTransformPost({
+    const object = {
         title: title,
         description: description,
         data: data,
@@ -158,7 +150,9 @@ export const createPost = async (title, description, data, viewers, editors, pub
         viewers: viewers,
         editors: editors,
         published: published,
-    }))
+    }
+    console.log(inverseTransformPost(object))
+    const docRef = await addDoc(postsRef, inverseTransformPost(object))
     return docRef.id
 }
 

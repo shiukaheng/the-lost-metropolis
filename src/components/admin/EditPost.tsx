@@ -100,7 +100,7 @@ function EditorSceneOverlay({hidden, value, setValue}) {
 function EditingForm({className="", editor3dMode=false}) {
     const { id } = useParams();
     const navigate = useNavigate()
-    const [buffer, setBuffer, post, push, pull, changed, overwriteWarning] = useBufferedPost(id);
+    const [buffer, setBuffer, post, push, pull, changed, overwriteWarning] = useBufferedPost(id, ["title", "description", "published"]);
     const titleLabel = useMultilang({"en": "title", "zh": "標題"});
     const descriptionLabel = useMultilang({"en": "description", "zh": "描述"});
     const publishedLabel = useMultilang({"en": "published", "zh": "公開"});
@@ -109,6 +109,10 @@ function EditingForm({className="", editor3dMode=false}) {
     const deleteDefaultLabel = useMultilang({"en": "delete", "zh": "刪除"});
     const deleteConfirmationLabel = useMultilang({"en": "click to confirm", "zh": "點擊確認"});
     const deletePendingLabel = useMultilang({"en": "deleting...", "zh": "刪除中..."});
+    const overwriteLabel = useMultilang({
+        "en": "Warning: The post has changed while you were editing. Saving will overwrite the changes.",
+        "zh": "注意: 您正在編輯的文章已經被修改，若按更新將覆蓋修改。"
+    })
     const [deleteLabel, deleteTrigger] = useConfirm(deleteDefaultLabel, deleteConfirmationLabel, deletePendingLabel, async ()=>{
         console.log(id)
         await deletePost(id)
@@ -120,25 +124,7 @@ function EditingForm({className="", editor3dMode=false}) {
             <EditorSceneOverlay value={buffer.data} setValue={(value) => setBuffer({...buffer, data: value})} hidden={!editor3dMode}/>
             <EmbeddedTabs options={languages} activeOption={activeLanguage} onUpdate={setActiveLanguage} className="border-b"/>
             <div className="px-8 py-8 flex flex-col gap-4">
-                {/* <div className="flex flex-row">
-                    <div className="w-10 md:w-20">{titleLabel}</div>
-                    <div className="grow">
-                        <Input typeName="string" value={buffer.title[activeLanguage]} setValue={(value) => setBuffer({...buffer, title: {...buffer.title, [activeLanguage]: value}})} />
-                    </div>
-                </div>
-                <div className="flex flex-row">
-                    <div className="w-10 md:w-20">{descriptionLabel}</div>
-                    <div className="grow">
-                        <Input typeName="multiline-string" value={buffer.description[activeLanguage]} setValue={(value) => setBuffer({...buffer, description: {...buffer.description, [activeLanguage]: value}})} />
-                    </div>
-                </div>
-                <div className="flex flex-row">
-                    <div className="w-10 md:w-20">{publishedLabel}</div>
-                    <div className="grow">
-                        <Input typeName="boolean" value={buffer.published} setValue={(value) => setBuffer({...buffer, published: value})} />
-                    </div>
-                </div> */}
-                {/* Rewrite to use table instead */}
+                {overwriteWarning ? <div className="font-bold text-yellow-400">{overwriteLabel}</div> : null}
                 <table className="w-full">
                     <tbody className="post-editor">
                         <tr>

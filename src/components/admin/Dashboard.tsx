@@ -5,11 +5,11 @@ import GenericPage from "../utilities/GenericPage"
 import LoadingScreen from "../utilities/LoadingScreen"
 import MagicButton from "../utilities/MagicButton"
 import MagicDiv from "../utilities/MagicDiv"
-import { createEmptyPost } from "../../utilities"
 import PostList from "../utilities/PostList"
 import { SettingsContext } from "../App"
 import MagicIcon from "../utilities/MagicIcon"
 import { EyeIcon, EyeOffIcon } from "@heroicons/react/outline"
+import { createPost } from "../../api"
 
 function DashboardHeader() {
     const navigate = useNavigate()
@@ -21,7 +21,7 @@ function DashboardHeader() {
             <MagicButton languageSpecificChildren={
                 {"en": "+ create post", "zh": "+ 新增文章"}
             } onClick={async ()=>{
-                const id = await createEmptyPost()
+                const id = await createPost()
                 navigate(`/edit/${id}`)
             }} className="ml-auto"/>
         </div>

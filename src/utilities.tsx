@@ -171,27 +171,27 @@ const usePost = (id) => {
     const editablePostResult = editablePosts.find((p) => p.id === id)
     const post = postResult || editablePostResult
     const setPost = editablePostResult ? (newPost) => {               
-        updatePost(id, newPost.title, newPost.description, newPost.content, newPost.viewers, newPost.editors, newPost.published)
+        updatePost(id, newPost)
     } : null
     return [post, setPost]
 }
 
-const useWriteCheck = (source, checkMask) => {
+const useWriteCheck = (source) => {
     const now = Date.now()
-    const oldRef = useRef([now, checkMask(cloneDeep(source))])
-    const newRef = useRef([now, checkMask(cloneDeep(source))])
+    const oldRef = useRef([now, cloneDeep(source)])
+    const newRef = useRef([now, cloneDeep(source)])
     const [changed, setChanged] = useState(false)
-    useEffect(() => {
-        console.log(changed)
-    }, [changed])
-    useEffect(()=>{
-        const check = checkMask(cloneDeep(source)) // Mask what to check for changes
-        const newChanged = !isEqual(oldRef.current[1], check) // Check if changed from reference
-        setChanged(newChanged)
-        if (newChanged) { // If changed, update newSnap
-            newRef.current = [Date.now(), check]
-        }
-    }, [source, checkMask])
+    // useEffect(() => {
+    //     console.log(changed)
+    // }, [changed])
+    // useEffect(()=>{
+    //     const check = cloneDeep(source) // Mask what to check for changes
+    //     const newChanged = !isEqual(oldRef.current[1], check) // Check if changed from reference
+    //     setChanged(newChanged)
+    //     if (newChanged) { // If changed, update newSnap
+    //         newRef.current = [Date.now(), check]
+    //     }
+    // }, [source])
     const sync = () => {
         oldRef.current = newRef.current
         setChanged(false)
@@ -199,41 +199,44 @@ const useWriteCheck = (source, checkMask) => {
     return [changed, (changed ? newRef.current[0] : oldRef.current[0]), sync]
 }
 
-const usePushPullCompare = (int, ext) => {
-    // Returns true if int is newer than ext or vice versa
-
+function filterProps(target, props=[]) {
+    const filtered = {}
+    props.forEach((prop) => {
+        if (target[prop] !== undefined) {
+            filtered[prop] = target[prop]
+        } else {
+            console.warn(`${prop} is not defined`)
+        }
+    })
+    return filtered
 }
 
-const useBufferedPost = (id, updateMask=(x)=>{return x}) => {
+const useBufferedPost = (id, props=[]) => { // Todo: use useWriteCheck to monitor changes to post
     // Returns buffer, setBuffer (stores new post in buffer), post (the post in the database), push function (syncs database with buffer, returns null if no edit permission), pull function (syncs buffer with database), changed (if buffer deviates from post), and overwriteWarning (true if database has changed since buffer was last synced)
     const {posts, editablePosts} = useContext(ContentContext)
     const postResult = posts.find((p) => p.id === id)
     const editablePostResult = editablePosts.find((p) => p.id === id)
     const [updateCount, setUpdateCount] = useState(0)
     const post = postResult || editablePostResult
-    const [buffer, _setBuffer] = useState(post)
+    const filteredPost = filterProps(post, props)
+    const [buffer, _setBuffer] = useState(filteredPost)
     const setBuffer = (newBuffer) => {
         // Inject
-        _setBuffer(newBuffer)
+        _setBuffer(filterProps(newBuffer, props))
     }
-    const [bufferChanged, bufferChangedTime, updateReference] = useWriteCheck(buffer, updateMask)
-    useEffect(() => {
-        if (!!post) {
-            // Inject
-            if (updateCount === 0) {
-                setBuffer(post)
-            }
-        }
-    }, [post])
+    const [bufferChanged, bufferChangedTime, updateReference] = useWriteCheck(buffer)
+    const [postChanged, postChangedTime, updatePostReference] = useWriteCheck(filteredPost)
     const push = editablePostResult ? async () => {
-        await updatePost(id, buffer.title, buffer.description, buffer.data, buffer.viewers, buffer.editors, buffer.published)
+        await updatePost(id, buffer)
         updateReference()
+        updatePostReference()
     } : null
     const pull = () => {
-        setBuffer(post)
+        setBuffer(filteredPost)
         updateReference()
+        updatePostReference()
     }
-    return [buffer, setBuffer, post, push, pull, bufferChanged, false]
+    return [buffer, setBuffer, post, push, pull, bufferChanged || postChanged, postChanged]
 }
 
 const useConfirm = (defaultText="default", confirmText="confirm", pendingText="pending", onConfirm=()=>{}, onTimeout=()=>{}) => {
@@ -290,8 +293,4 @@ const createEmptyMultilangString = () => {
     }, {})
 }
 
-const createEmptyPost = () => {
-    return createPost(createEmptyMultilangString(), createEmptyMultilangString(), "", [], [], false)
-}
-
-export { formatRGBCSS, useKeyPress, useAsyncKeyPress, useAsyncReference, KeyPressCallback, LinearToSRGB, SRGBToLinear, useStickyState, useFollowMouse, useSubscription, useMultilang, usePost, useBufferedPost, useConfirm, createEmptyPost, useWriteCheck };
+export { formatRGBCSS, useKeyPress, useAsyncKeyPress, useAsyncReference, KeyPressCallback, LinearToSRGB, SRGBToLinear, useStickyState, useFollowMouse, useSubscription, useMultilang, usePost, useBufferedPost, useConfirm, createEmptyMultilangString, useWriteCheck };
