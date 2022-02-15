@@ -3,6 +3,7 @@ import { createPost, updatePost } from "./api";
 import { AuthContext } from "./components/admin/AuthProvider";
 import { languages, SettingsContext } from "./components/App";
 import { ContentContext } from "./components/providers/ContentProvider";
+import { cloneDeep, isEqual } from "lodash"
 
 function formatRGBCSS(color: number[]): string {
     return "rgb(" + color[0] + "," + color[1] + "," + color[2] + ")";
@@ -109,6 +110,7 @@ function useStickyState(defaultValue, key) {
     });
     useEffect(() => {
         window.localStorage.setItem(key, JSON.stringify(value));
+        // Todo: Warn when value has values which will be turned into strings
     }, [key, value]);
     return [value, setValue];
 }
@@ -174,39 +176,64 @@ const usePost = (id) => {
     return [post, setPost]
 }
 
-const useBufferedPost = (id) => {
+const useWriteCheck = (source, checkMask) => {
+    const now = Date.now()
+    const oldRef = useRef([now, checkMask(cloneDeep(source))])
+    const newRef = useRef([now, checkMask(cloneDeep(source))])
+    const [changed, setChanged] = useState(false)
+    useEffect(() => {
+        console.log(changed)
+    }, [changed])
+    useEffect(()=>{
+        const check = checkMask(cloneDeep(source)) // Mask what to check for changes
+        const newChanged = !isEqual(oldRef.current[1], check) // Check if changed from reference
+        setChanged(newChanged)
+        if (newChanged) { // If changed, update newSnap
+            newRef.current = [Date.now(), check]
+        }
+    }, [source, checkMask])
+    const sync = () => {
+        oldRef.current = newRef.current
+        setChanged(false)
+    }
+    return [changed, (changed ? newRef.current[0] : oldRef.current[0]), sync]
+}
+
+const usePushPullCompare = (int, ext) => {
+    // Returns true if int is newer than ext or vice versa
+
+}
+
+const useBufferedPost = (id, updateMask=(x)=>{return x}) => {
     // Returns buffer, setBuffer (stores new post in buffer), post (the post in the database), push function (syncs database with buffer, returns null if no edit permission), pull function (syncs buffer with database), changed (if buffer deviates from post), and overwriteWarning (true if database has changed since buffer was last synced)
     const {posts, editablePosts} = useContext(ContentContext)
-    const [updateCount, setUpdateCount] = useState(0)
-    const [changeCount, setChangeCount] = useState(0)
     const postResult = posts.find((p) => p.id === id)
     const editablePostResult = editablePosts.find((p) => p.id === id)
+    const [updateCount, setUpdateCount] = useState(0)
     const post = postResult || editablePostResult
     const [buffer, _setBuffer] = useState(post)
     const setBuffer = (newBuffer) => {
-        setChangeCount(changeCount+1)
+        // Inject
         _setBuffer(newBuffer)
     }
+    const [bufferChanged, bufferChangedTime, updateReference] = useWriteCheck(buffer, updateMask)
     useEffect(() => {
         if (!!post) {
+            // Inject
             if (updateCount === 0) {
                 setBuffer(post)
             }
-            setUpdateCount(updateCount + 1)
         }
     }, [post])
     const push = editablePostResult ? async () => {
-        console.log("buffer", buffer)
         await updatePost(id, buffer.title, buffer.description, buffer.data, buffer.viewers, buffer.editors, buffer.published)
-        setUpdateCount(0)
-        setChangeCount(0)
+        updateReference()
     } : null
     const pull = () => {
         setBuffer(post)
-        setUpdateCount(0)
-        setChangeCount(0)
+        updateReference()
     }
-    return [buffer, setBuffer, post, push, pull, (changeCount > 1), (updateCount > 1)]
+    return [buffer, setBuffer, post, push, pull, bufferChanged, false]
 }
 
 const useConfirm = (defaultText="default", confirmText="confirm", pendingText="pending", onConfirm=()=>{}, onTimeout=()=>{}) => {
@@ -267,4 +294,4 @@ const createEmptyPost = () => {
     return createPost(createEmptyMultilangString(), createEmptyMultilangString(), "", [], [], false)
 }
 
-export { formatRGBCSS, useKeyPress, useAsyncKeyPress, useAsyncReference, KeyPressCallback, LinearToSRGB, SRGBToLinear, useStickyState, useFollowMouse, useSubscription, useMultilang, usePost, useBufferedPost, useConfirm, createEmptyPost };
+export { formatRGBCSS, useKeyPress, useAsyncKeyPress, useAsyncReference, KeyPressCallback, LinearToSRGB, SRGBToLinear, useStickyState, useFollowMouse, useSubscription, useMultilang, usePost, useBufferedPost, useConfirm, createEmptyPost, useWriteCheck };

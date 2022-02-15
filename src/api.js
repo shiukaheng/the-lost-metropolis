@@ -1,5 +1,4 @@
 import { addDoc, collection, deleteDoc, onSnapshot, Timestamp, updateDoc, doc } from "firebase/firestore";
-import { transform } from "lodash";
 import { auth, db, storage } from "./firebase-config";
 import { signOut } from "firebase/auth";
 import { collection, query, where } from "firebase/firestore";
@@ -36,6 +35,17 @@ import { collection, query, where } from "firebase/firestore";
 //   }
 // ]
 
+// Given a target object, remove all properties that are not in the reference object
+function filterObjectStructure(target, reference) {
+    const filtered = {};
+    for (const key in reference) {
+        if (target[key]) {
+            filtered[key] = target[key];
+        }
+    }
+    return filtered;
+}
+
 // Transform post from firebase format to platform agnostic format
 function transformPost(doc) {
     const id = doc.id;
@@ -45,8 +55,8 @@ function transformPost(doc) {
         title: data.title,
         description: data.description,
         data: data.data,
-        createdAt: data.createdAt.toDate(),
-        updatedAt: data.updatedAt.toDate(),
+        createdAt: data.createdAt.toDate().toISOString(),
+        updatedAt: data.updatedAt.toDate().toISOString(),
         owner: data.owner,
         viewers: data.viewers,
         editors: data.editors,
@@ -54,19 +64,19 @@ function transformPost(doc) {
     };
 }
 
-// Transform post from platform agnostic format to firebase format
+// Transform post from platform agnostic format to firebase format, filters out all properties that are not in the reference object for partial updates
 function inverseTransformPost(obj) {
-    return {
+    return filterObjectStructure({
         title: obj.title,
         description: obj.description,
         data: obj.data,
-        createdAt: Timestamp.fromDate(obj.createdAt),
-        updatedAt: Timestamp.fromDate(obj.updatedAt),
+        createdAt: Timestamp.fromDate(new Date(obj.createdAt)),
+        updatedAt: Timestamp.fromDate(new Date(obj.updatedAt)),
         owner: obj.owner,   
         viewers: obj.viewers,
         editors: obj.editors,
         published: obj.published,
-    };
+    }, obj);
 }
 
 export const subscribeToPosts = (callback) => {
@@ -127,19 +137,18 @@ export const updatePost = async (id, title, description, data, viewers, editors,
         title: title,
         description: description,
         data: data,
-        updatedAt: Timestamp.now(),
+        updatedAt: new Date().toISOString(),
         viewers: viewers,
         editors: editors,
         published: published,
     }
-    console.log(post)
-    await updateDoc(postRef, post) // https://firebase.google.com/docs/firestore/manage-data/update-data#update_a_document
+    await updateDoc(postRef, inverseTransformPost(post)) // https://firebase.google.com/docs/firestore/manage-data/update-data#update_a_document
 }
 
 export const createPost = async (title, description, data, viewers, editors, published) => {
     const postsRef = collection(db, "posts")
-    const created = Timestamp.now()
-    const docRef = await addDoc(postsRef, {
+    const created =  new Date().toISOString()
+    const docRef = await addDoc(postsRef, inverseTransformPost({
         title: title,
         description: description,
         data: data,
@@ -149,7 +158,7 @@ export const createPost = async (title, description, data, viewers, editors, pub
         viewers: viewers,
         editors: editors,
         published: published,
-    })
+    }))
     return docRef.id
 }
 

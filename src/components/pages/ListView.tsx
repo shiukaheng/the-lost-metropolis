@@ -25,7 +25,7 @@ function ListView() {
                 columnMakers={[
                     (post, index) => index,
                     (post, index) => (post.title[settings.lang]),
-                    (post, index) => post.createdAt.toLocaleDateString("en-UK"),
+                    (post, index) => new Date(post.createdAt).toLocaleDateString("en-UK"),
                 ]}/>
             </LoadingScreen>
         </GenericPage>

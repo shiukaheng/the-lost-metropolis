@@ -39,7 +39,7 @@ export default function Dashboard() {
                 <PostList posts={editablePosts} onPostClick={(post)=>{navigate(`/edit/${post.id}`)}} columnMakers={[
                     (post, index) => index,
                     (post, index) => post.title[settings.lang],
-                    (post, index) => post.createdAt.toLocaleDateString("en-UK"),
+                    (post, index) => new Date(post.createdAt).toLocaleDateString("en-UK"),
                     (post, index) => post.published ? <MagicIcon IconComponent={EyeIcon}/> : <MagicIcon IconComponent={EyeOffIcon}/>
                 ]}/>
             </LoadingScreen>

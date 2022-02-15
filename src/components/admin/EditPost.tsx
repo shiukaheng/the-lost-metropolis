@@ -70,7 +70,7 @@ function EmbeddedButton({children, onClick=()=>{}, disabled=false, className="",
     return (
         <div className={twMerge(`relative flex justify-center items-center h-12 w-full ${disabled ? "cursor-not-allowed" : "cursor-pointer"}`, className)}
         // foregroundColorCSSProps={["backgroundColor"]}
-        onClick={onClick}>
+        onClick={disabled ? ()=>{} : onClick}>
             
             <MagicDiv overrideTheme={overrideTheme} mergeTransitions foregroundColorCSSProps={["backgroundColor"]} className={`absolute w-full h-full transition-opacity duration-500 ${disabled ? "opacity-50" : "hover:opacity-70"}`}/>
             <MagicDiv overrideTheme={overrideTheme} mergeTransitions foregroundColorCSSProps={[]} backgroundColorCSSProps={["color"]} className={`absolute w-full h-full pointer-events-none m-auto font-bold text-xl flex ${disabled ? "opacity-50"  : ""}`}>
@@ -88,7 +88,7 @@ function EditorSceneOverlay({hidden, value, setValue}) {
     return (
         <div className={`absolute w-full h-full z-10 ${hidden ? "hidden" : ""}`}>
             <FullScreen handle={handle}>
-                <Editor value={value} setValue={setValue}/>
+                <Editor/>
             </FullScreen>
             <div className="absolute w-full h-full p-8 pointer-events-none">
                 <MagicIcon IconComponent={ ArrowsExpandIcon } className="w-8 h-8 ml-auto pointer-events-auto" clickable onClick={handle.enter}/>

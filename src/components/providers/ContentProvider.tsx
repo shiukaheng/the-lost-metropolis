@@ -10,7 +10,7 @@ export const ContentContext = createContext({
 export const ContentProvider = ({children}) => {
     const posts = useSubscription(subscribeToPosts, false, "posts");
     const editablePosts = useSubscription(subscribeToEditablePosts, true, "editablePosts");
-    console.log("Content updated:", posts, editablePosts)
+    // console.log("Content updated:", posts, editablePosts)
     return (
         <ContentContext.Provider value={{ posts, editablePosts }}>
             {children}
