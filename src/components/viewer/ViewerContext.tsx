@@ -22,6 +22,8 @@ const defaultViewerContext = {
     updateSceneChildren: (children:[]) => { },
     potreePointBudget: 1000000,
     setPotreePointBudget: (budget:number) => {},
+    potreeOptimisePointBudget: false,
+    setPotreeOptimisePointBudget: (optimise:boolean) => {},
 }
 
 const ViewerContext = createContext(defaultViewerContext)

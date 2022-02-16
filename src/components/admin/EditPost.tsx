@@ -115,7 +115,7 @@ function EditingForm({className="", editor3dMode=false}) {
     })
     const pullLabel = useMultilang({"en": "update to latest version", "zh": "獲取最新版本"});
     const [deleteLabel, deleteTrigger] = useConfirm(deleteDefaultLabel, deleteConfirmationLabel, deletePendingLabel, async ()=>{
-        console.log(id)
+        // console.log(id)
         await deletePost(id)
         navigate("/dashboard")
     })

@@ -5,6 +5,7 @@ import { AudioListener } from "three"
 import { useDeserialize } from "../editor/ui_elements/EditorIO"
 import Viewport from "./Viewport"
 import { FirstPersonControls, OrbitControls, PointerLockControls } from "@react-three/drei"
+import GameControls from "../utilities/GameControls"
 
 function ViewerManager({children}) {
     // Helps to manage Viewer state (camera initial position, post processing, etc), seperated to be reused in Editor and Viewer
@@ -48,9 +49,10 @@ function ViewerManager({children}) {
 
     // Args for Potree
     const [potreePointBudget, setPotreePointBudget] = useState(1e6)
+    const [potreeOptimisePointBudget, setPotreeOptimisePointBudget] = useState(false)
 
     return (
-        <ViewerContext.Provider value={{defaultCameraProps, setDefaultCameraProps, cameraRef, sceneChildren, setSceneChildren, addSceneChildren, removeSceneChildren, updateSceneChildren, audioListener, potreePointBudget, setPotreePointBudget}}>
+        <ViewerContext.Provider value={{defaultCameraProps, setDefaultCameraProps, cameraRef, sceneChildren, setSceneChildren, addSceneChildren, removeSceneChildren, updateSceneChildren, audioListener, potreePointBudget, setPotreePointBudget, potreeOptimisePointBudget, setPotreeOptimisePointBudget}}>
             {children}
         </ViewerContext.Provider>
     );
@@ -65,7 +67,7 @@ function ViewerUI({post, ...props}) {
     return (
         <Viewport {...props}>
             {/* <FirstPersonControls activeLook={false}/> */}
-            <PointerLockControls/>
+            <GameControls/>
             
             {sceneChildren}
         </Viewport>
