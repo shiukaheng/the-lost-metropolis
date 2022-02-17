@@ -6,6 +6,7 @@ import { Fade } from "react-reveal";
 import { useNavigate } from "react-router-dom";
 import GenericPage from "../utilities/GenericPage";
 import MagicButton from "../utilities/MagicButton";
+import { EmbeddedButton, RoundedContainer } from "../utilities/EmbeddedUI";
 
 function Login() {
     const [buttonText, setButtonText] = useState("log in")
@@ -13,20 +14,19 @@ function Login() {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     return (
-        <GenericPage className="flex flex-col gap-8 border rounded-3xl p-8 overflow-clip w-[20rem]">
-            <Fade top cascade>
-                <MagicDiv className={"text-5xl font-black"} languageSpecificChildren={{"en": "member login", "zh": "會員登錄"}}/>
-            </Fade>
-            {/* Login form */}
-            <form className="flex flex-col gap-2 w-full">
-                <input type="email" name="email" placeholder="email" value={email} onChange={(e)=>{
-                    setEmail(e.target.value)
-                }} className="w-full rounded-2xl px-3 py-1 border bg-transparent"/>
-                <input type="password" name="password" placeholder="password" value={password} onChange={(e)=>{
-                    setPassword(e.target.value)
-                }} className="w-full rounded-2xl px-3 py-1 border bg-transparent"/>
-                <MagicButton solid onClick={
-                    async ()=>{
+        <GenericPage>
+            <RoundedContainer className="w-[32rem]">
+                <MagicDiv className={"text-5xl font-black pt-8 px-8"} languageSpecificChildren={{"en": "member login", "zh": "會員登錄"}}/>
+                {/* Login form */}
+                <form className="flex flex-col gap-2 w-full px-8 py-8">
+                    <input type="email" name="email" placeholder="email" value={email} onChange={(e)=>{
+                        setEmail(e.target.value)
+                    }} className="w-full rounded-2xl px-3 py-1 border bg-transparent"/>
+                    <input type="password" name="password" placeholder="password" value={password} onChange={(e)=>{
+                        setPassword(e.target.value)
+                    }} className="w-full rounded-2xl px-3 py-1 border bg-transparent"/>
+                </form>
+                <EmbeddedButton position="bottom" className="h-12" onClick={async ()=>{
                         try {
                             await signInWithEmailAndPassword(auth, email, password);
                             navigate("/dashboard")
@@ -34,9 +34,8 @@ function Login() {
                             console.warn(error);
                             setButtonText("try again")
                         }
-                    }
-                }>{buttonText}</MagicButton>
-            </form>
+                    }}>{buttonText}</EmbeddedButton>
+            </RoundedContainer>
         </GenericPage>
     );
 }

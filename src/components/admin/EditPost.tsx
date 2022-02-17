@@ -12,6 +12,7 @@ import { Editor } from "../editor/Editor";
 import { FullScreen, useFullScreenHandle } from "react-full-screen";
 import MagicIcon from "../utilities/MagicIcon";
 import { ArrowsExpandIcon } from "@heroicons/react/outline";
+import { EmbeddedButton, EmbeddedRow, EmbeddedTabs, RoundedContainer } from "../utilities/EmbeddedUI";
  
 export function EditPost() {
     const navigate = useNavigate()
@@ -38,48 +39,6 @@ export function EditPost() {
             </div>
             <EditingForm editor3dMode={editor3dMode}/>
         </GenericPage>
-    )
-}
-
-function EmbeddedTab({highlight=false, onClick, children=null, className=""}) {
-    return (
-        <MagicDiv mergeTransitions className={twMerge("relative justify-between grow h-full flex cursor-pointer", className)} 
-        backgroundColorCSSProps={highlight ? ["color"] : []}
-        onClick={onClick}>
-            <div className="m-auto font-bold text-xl">{children}</div>
-            <MagicDiv mergeTransitions foregroundColorCSSProps={highlight ? ["backgroundColor"] : []} className="absolute w-full h-full opacity-30"/>
-        </MagicDiv>
-    )
-}
-
-function EmbeddedTabs({options=[], activeOption="", onUpdate=(option)=>{}, className=""}) {
-    return (
-        <div className={twMerge("flex flex-row h-12", className)}>
-            {
-                options.map((option, index)=>{
-                    return (
-                        <EmbeddedTab key={index} onClick={()=>{onUpdate(option)}} highlight={activeOption===option} className={`${index > 0 ? "border-l" : ""}`}>{option}</EmbeddedTab>
-                    )
-                })
-            }
-        </div>
-    )
-}
-
-function EmbeddedButton({children, onClick=()=>{}, disabled=false, className="", overrideTheme={}}) {
-    return (
-        <div className={twMerge(`relative flex justify-center items-center h-12 w-full ${disabled ? "cursor-not-allowed" : "cursor-pointer"}`, className)}
-        // foregroundColorCSSProps={["backgroundColor"]}
-        onClick={disabled ? ()=>{} : onClick}>
-            
-            <MagicDiv overrideTheme={overrideTheme} mergeTransitions foregroundColorCSSProps={["backgroundColor"]} className={`absolute w-full h-full transition-opacity duration-500 ${disabled ? "opacity-50" : "hover:opacity-70"}`}/>
-            <MagicDiv overrideTheme={overrideTheme} mergeTransitions foregroundColorCSSProps={[]} backgroundColorCSSProps={["color"]} className={`absolute w-full h-full pointer-events-none m-auto font-bold text-xl flex ${disabled ? "opacity-50"  : ""}`}>
-                <div className="m-auto">
-                    {children}
-                </div>
-            </MagicDiv>
-            {/* <div className={`m-auto font-bold text-xl ${disabled ? "opacity-50"  : ""}`}>{children}</div> */}
-        </div>
     )
 }
 
@@ -122,10 +81,10 @@ function EditingForm({className="", editor3dMode=false}) {
     // console.log(buffer)
     return (
         // Return table with inputs for title, description, and published
-        <div className={twMerge("border rounded-3xl overflow-clip relative h-full flex flex-col", className)}>
+        <RoundedContainer className="relative">
             <EditorSceneOverlay value={buffer.data} setValue={(value) => setBuffer({...buffer, data: value})} hidden={!editor3dMode}/>
-            <EmbeddedTabs options={languages} activeOption={activeLanguage} onUpdate={setActiveLanguage} className="border-b"/>
-            <div className="px-8 py-8 flex flex-col gap-4">
+            <EmbeddedTabs position="top" options={languages} activeOption={activeLanguage} onUpdate={setActiveLanguage} className="h-16"/>
+            <div className="px-8 py-8 flex flex-col gap-4 grow">
                 {overwriteWarning ? 
                 <div className="flex flex-row">
                     <div className="font-bold text-yellow-400">{overwriteLabel}</div>
@@ -154,10 +113,11 @@ function EditingForm({className="", editor3dMode=false}) {
                     </tbody>
                 </table>
             </div>
-            <div className="flex flex-row border-t mt-auto">
+            
+            <EmbeddedRow position="bottom" className="h-16">
                 <EmbeddedButton className="basis-3/4" onClick={push} disabled={!changed}>{saveLabel}</EmbeddedButton>
-                <EmbeddedButton className="basis-1/4 border-l" overrideTheme={{foregroundColor: [209, 54, 70]}} onClick={deleteTrigger}>{deleteLabel}</EmbeddedButton>
-            </div>
-        </div>
+                <EmbeddedButton className="basis-1/4 border-l" backgroundColor={[209, 54, 70]} onClick={deleteTrigger}>{deleteLabel}</EmbeddedButton>
+            </EmbeddedRow>
+        </RoundedContainer>
     )
 }
