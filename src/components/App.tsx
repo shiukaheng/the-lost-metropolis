@@ -21,6 +21,7 @@ import Dashboard from "./admin/Dashboard";
 import { ContentContext, ContentProvider } from "./providers/ContentProvider";
 import { EditPost } from "./admin/EditPost";
 import LoadingScreen from "./utilities/LoadingScreen";
+import { preloadFont } from "troika-three-text";
 
 const defaultSettings = {
     lang: "en"
@@ -56,6 +57,14 @@ const SettingsContext = createContext(defaultSettingsContext)
 // const options = { frequency: 60, referenceFrame: 'device' };
 // const sensor = new RelativeOrientationSensor(options);
 
+preloadFont(
+    {
+        font: "https://fonts.gstatic.com/s/notoseriftc/v20/XLYgIZb5bJNDGYxLBibeHZ0BhnQ.woff"
+    },
+    () => {
+    }
+)
+
 const content_array = [
     {
         "title": {
@@ -71,6 +80,8 @@ const content_array = [
         "link": "http://tlmhk.synology.me/state/",
     }
 ]
+
+
 
 function App():FC {
     // Theme defines the background color and foreground color, as well as the background video. It is not persistent between sessions and is defined by what content the user is viewing.
