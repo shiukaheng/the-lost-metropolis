@@ -3,6 +3,7 @@ import { useFrame } from "@react-three/fiber";
 import { useRef } from "react";
 import { Vector3 } from "three"
 import { useKeyPress } from "../../utilities";
+import { CustomPointerLockControls } from "./CustomPointerLockControls";
 
 // WASD / Arrow Keys + Shift (down) + Space (up) + Pointer Lock controls
 export default function GameControls({mass=1, force=1, friction=0.99}) {
@@ -40,6 +41,6 @@ export default function GameControls({mass=1, force=1, friction=0.99}) {
         cameraVelocityRef.current.multiplyScalar(friction);
     })
     return (
-        <PointerLockControls/>
+        <CustomPointerLockControls/>
     )
 }
