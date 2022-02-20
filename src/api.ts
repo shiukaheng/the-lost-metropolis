@@ -1,8 +1,9 @@
-import { addDoc, collection, deleteDoc, onSnapshot, Timestamp, updateDoc, doc } from "firebase/firestore";
+import { addDoc, collection, deleteDoc, onSnapshot, Timestamp, updateDoc, doc, collection, query, where, setDoc } from "firebase/firestore";
 import { auth, db, storage } from "./firebase-config";
+import { ref, uploadBytes, uploadBytesResumable } from "firebase/storage";
 import { signOut } from "firebase/auth";
-import { collection, query, where } from "firebase/firestore";
 import { createEmptyMultilangString } from "./utilities";
+import { v4 as uuidv4 } from "uuid";
 
 // Functions to further abstract API calls to firebase for easier understanding / maintenance / migration
 
@@ -162,21 +163,69 @@ export const deletePost = async (id) => {
     await deleteDoc(postRef) // https://firebase.google.com/docs/firestore/manage-data/delete-data#delete_a_document
 }
 
-// - Upload asset -> Creates entry in assets collection and uploads file to storage, marking ready as true
-// - Upload packaged asset -> Creates entry in assets collection, and uploads zip file to storage, marking ready as false. Relies on cloud function to unpack files to folder and mark ready as true. Promised based and resolve only when ready is true.
-// - Resolve asset -> Resolves the relative paths from the resources object from the database, to get absolute path for the storage bucket. Returns asset object in the format:
-// {
-//   id: <str>,
-//   name: <str>,
-//   type: <str>,
-//   metadata: <str>,
-//   resolvedResources: <array>,
-//   ready: <bool>,
-//   createdAt: <str>,
-//   updatedAt: <str>,
-//   owner: <str>,
-//   readCollaborators: <array>,
-//   writeCollaborators: <array>,
-// }
-// - Delete asset -> Deletes asset from assets collection and deletes file from storage
-// - Update asset -> Updates asset in assets collection
+type Progress = {
+    currentStage: string,
+    stages: string[],
+    currentProgress: number
+}
+
+// - Upload asset -> Creates entry in assets collection and uploads zip to storage -> Cloud function gets triggered to unzip files to folder -> Updates document in assets collection
+export const uploadAsset = async (file, waitUntilProcessed=true, onProgress=(progress:Progress)=>{}) => {
+    const name = uuidv4()
+    const stages = waitUntilProcessed ? ["upload", "process"] : ["upload"]
+    // Make a reference for the zip file
+    const zipRef = ref(storage, `pendingAssets/${name}`)
+    // Create entry in assets collection
+    await setDoc(doc(db, "assets", name), {
+        owner: auth.currentUser.uid,
+        createdAt: Timestamp.fromDate(new Date()),
+        pending: true, // Means to be picked up by the cloud function
+        processed: false, // Means it has been processed by the cloud function
+        processedProgress: 0, // Progress of the processing
+        metaData: null // This will be filled in by the cloud function
+    })
+    // Upload zip file to storage
+    const uploadTask = uploadBytesResumable(zipRef, file)
+    // Wait for upload to finish
+    uploadTask.on("state_changed", (snapshot)=>{
+        const progress = snapshot.bytesTransferred / snapshot.totalBytes
+        onProgress({ // Updating upload progress
+            currentStage: "upload",
+            stages: stages,
+            currentProgress: progress
+        })
+    }, (error)=>{
+        console.warn("Upload unsucessful", error)
+    }, async ()=>{
+        // Upload finished
+        console.log("Upload finished")
+        if (waitUntilProcessed) {
+            await waitForProcessing(stages, name, onProgress)
+        }
+        return name
+    })
+}
+
+function waitForProcessing(stages: any, name: any, onProgress: (progress: Progress) => void) {
+    return new Promise((resolve, reject) => {
+        // Monitor cloud function progress by subscribing to the document
+        const unsub = onSnapshot(doc(db, "assets", name), (docRef)=>{
+            const {processed, processedProgress} = docRef.data() // Updating processing progress if required
+            if (processed) {
+                unsub()
+                onProgress({
+                    currentStage: "process",
+                    stages: stages,
+                    currentProgress: 1
+                })
+                resolve(name)
+            } else {
+                onProgress({
+                    currentStage: "process",
+                    stages: stages,
+                    currentProgress: processedProgress
+                })
+            }
+        })
+    })
+}
