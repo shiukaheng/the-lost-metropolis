@@ -8,7 +8,7 @@ import MagicDiv from '../utilities/MagicDiv';
 import EditorTransformControls from './ui_elements/EditorTransformControls';
 import EditorOptions from './ui_elements/EditorOptions';
 import { deserializeChildren, EditorIO, exportChildren, useDeserialize, useSerialize } from './ui_elements/EditorIO';
-import { KeyPressCallback, useBufferedPost, useKeyPress, useMultilang } from '../../utilities';
+import { Condition, KeyPressCallback, useBufferedPost, useKeyPress, useMultilang } from '../../utilities';
 import EditorSceneSettings from './ui_elements/EditorSceneSettings';
 import { EditorContext } from './EditorContext';
 import { ViewerManager } from '../viewer/Viewer';
@@ -115,8 +115,10 @@ function EditorManager() {
                 <div className="editor-embedded-widget text-2xl font-bold">
                     <div className="flex flex-row gap-4">
                         <div className='text-3xl'>{heading}</div>
-                        {overwriteWarning ? <MagicButton solid onClick={pull}>{pullLabel}</MagicButton> : null}
-                        <MagicButton disabled={!changed} onClick={push}>{updateLabel}</MagicButton>
+                        <Condition condition={post.role === "owner" || post.role === "editor"}>
+                            {overwriteWarning ? <MagicButton solid onClick={pull}>{pullLabel}</MagicButton> : null}
+                            <MagicButton disabled={!changed} onClick={push}>{updateLabel}</MagicButton>
+                        </Condition>
                         <div className="ml-auto cursor-pointer text-xl select-none" onClick={()=>{setEditorExpanded(!editorExpanded)}}>{editorExpanded ? "-" : "+"}</div>    
                     </div>
                     {(overwriteWarning && buffer) ? <div className="font-bold text-yellow-400 text-sm pt-2">{overwriteLabel}</div> : null}

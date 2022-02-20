@@ -16,10 +16,10 @@ function View({ ...props}) {
         <div className='absolute w-full h-full'>
             <Viewer post={post.data} className="absolute w-full h-full"/>
             <Fade>
-                <div className="absolute w-full h-full p-8 pointer-events-none">
+                <div className="absolute w-full h-full p-8 md:p-20 pointer-events-none">
                     <div className="flex flex-row place-content-between h-12">
                         <MagicDiv className='text-3xl md:text-4xl font-black'>{title}</MagicDiv>
-                        <MagicButton className='ml-auto pointer-events-auto' onClick={()=>{navigate(`/browse/${id}`)}} languageSpecificChildren={{"en": "back", "zh": "返回"}}>
+                        <MagicButton className='ml-auto pointer-events-auto' onClick={(e)=>{e.stopPropagation(); navigate(`/browse/${id}`);}} languageSpecificChildren={{"en": "back", "zh": "返回"}}>
                         </MagicButton>
                     </div>
                 </div>

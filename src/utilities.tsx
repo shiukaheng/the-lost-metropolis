@@ -139,16 +139,20 @@ function useFollowMouse(onMouseMove=null) {
  * @param provider A function that subscribes a callback to updates
  * @returns void
  */
-const useSubscription = (provider, isPrivate=false, cachingKey=null) => {
-    const {currentUser} = useContext(AuthContext);
+const useSubscription = (provider, requriesAuth=false, cachingKey=null) => {
+    const {currentUser} = useContext(AuthContext)
     const [posts, setPosts] = (cachingKey === null ? useState(null) : useStickyState(null, cachingKey))
     const unsubRef = useRef(null);
     useEffect(() => {
-        if (!!unsubRef.current) {
-            unsubRef.current
+        if (unsubRef.current) {
+            unsubRef.current()
         }
-        if (!!currentUser || !isPrivate) {
+        if (currentUser || !requriesAuth) {
             unsubRef.current = provider(setPosts);
+            // console.log("Subscribed to updates")
+        } else {
+            // console.log("Not subscribed to updates because not logged in")
+            setPosts([]) // Returning an empty array instead of null because its that user does not have permission, not that we cant load posts
         }
         return () => {
             if (unsubRef.current) {
@@ -166,13 +170,11 @@ const useMultilang = (content) => {
 
 const usePost = (id) => {
     // Returns post and setter, setter returns null if no edit permission
-    const {posts, editablePosts} = useContext(ContentContext)
-    const postResult = posts.find((p) => p.id === id)
-    const editablePostResult = editablePosts.find((p) => p.id === id)
-    const post = postResult || editablePostResult
-    const setPost = editablePostResult ? (newPost) => {               
-        updatePost(id, newPost)
-    } : null
+    const posts = useContext(ContentContext)
+    const post = posts.find((p) => p.id === id)
+    const setPost = async (newPost) => {               
+        await updatePost(id, newPost)
+    }
     return [post, setPost]
 }
 
@@ -193,10 +195,7 @@ function filterProps(target, props=[]) {
 
 const useBufferedPost = (id, props=[], onBufferChange=(buffer)=>{}, onPull=(buffer)=>{}, onPush=(buffer)=>{}) => { // Todo: use useWriteCheck to monitor changes to post
     // Returns buffer, setBuffer (stores new post in buffer), post (the post in the database), push function (syncs database with buffer, returns null if no edit permission), pull function (syncs buffer with database), changed (if buffer deviates from post), and overwriteWarning (true if database has changed since buffer was last synced)
-    const {posts, editablePosts} = useContext(ContentContext)
-    const postResult = posts.find((p) => p.id === id)
-    const editablePostResult = editablePosts.find((p) => p.id === id)
-    const post = postResult || editablePostResult
+    const [post, setPost] = usePost(id)
     const filteredPost = filterProps(post, props)
     const [buffer, _setBuffer] = useState(filteredPost)
     // Tracking changes to buffer / post
@@ -228,12 +227,12 @@ const useBufferedPost = (id, props=[], onBufferChange=(buffer)=>{}, onPull=(buff
     }, [post])
     // To determine changed: If buffer is different than initially fetched
     // To determine overwriteWarning: If initial buffer is older than post, warn user that they may overwrite data if they push
-    const push = editablePostResult ? async () => {
+    const push = async () => {
         initialBufferRef.current = buffer
-        await updatePost(id, buffer)
+        await setPost(buffer)
         setOverwriteWarning(false)
         onPush(buffer)
-    } : null
+    }
     const pull = () => {
         console.log("pulled")
         setBuffer(filteredPost)
@@ -316,4 +315,8 @@ const useTheme = (targetTheme) => {
     }, [])
 }
 
-export { formatRGBCSS, useKeyPress, useAsyncKeyPress, useAsyncReference, KeyPressCallback, LinearToSRGB, SRGBToLinear, useStickyState, useFollowMouse, useSubscription, useMultilang, usePost, useBufferedPost, useConfirm, createEmptyMultilangString, useTheme };
+function Condition({condition, children}) {
+    return condition ? children : null
+}
+
+export { formatRGBCSS, useKeyPress, useAsyncKeyPress, useAsyncReference, KeyPressCallback, LinearToSRGB, SRGBToLinear, useStickyState, useFollowMouse, useSubscription, useMultilang, usePost, useBufferedPost, useConfirm, createEmptyMultilangString, useTheme, Condition };

@@ -1,5 +1,5 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { useBufferedPost, useConfirm, useMultilang, usePost } from "../../utilities";
+import { Condition, useBufferedPost, useConfirm, useMultilang, usePost } from "../../utilities";
 import GenericPage from "../utilities/GenericPage";
 import { Input } from "../utilities/Input";
 import MagicDiv from "../utilities/MagicDiv";
@@ -15,6 +15,7 @@ import { ArrowsExpandIcon } from "@heroicons/react/outline";
 import { EmbeddedButton, EmbeddedRow, EmbeddedTabs, RoundedContainer } from "../utilities/EmbeddedUI";
  
 export function EditPost() {
+    const {id} = useParams()
     const navigate = useNavigate()
     const [editor3dMode, setEditor3dMode] = useState(false)
     return (
@@ -23,6 +24,11 @@ export function EditPost() {
                 <MagicDiv languageSpecificChildren={
                     {"en": "edit post", "zh": "編輯文章"}
                 } className="text-5xl font-black"/>
+                <MagicButton languageSpecificChildren={
+                    {"en": "< back", "zh": "< 返回"}
+                } onClick={async ()=>{
+                    navigate(`/dashboard`)
+                }} className="ml-auto"/>
                 <MagicButton solid languageSpecificChildren={
                     editor3dMode ?
                     {"en": "2d editor", "zh": "2d 編輯器"}
@@ -30,11 +36,6 @@ export function EditPost() {
                     {"en": "3d editor", "zh": "3d 編輯器"}
                 } onClick={async ()=>{
                     setEditor3dMode(!editor3dMode)
-                }} className="ml-auto"/>
-                <MagicButton languageSpecificChildren={
-                    {"en": "< back", "zh": "< 返回"}
-                } onClick={async ()=>{
-                    navigate("/dashboard")
                 }} className="ml-4"/>
             </div>
             <EditingForm editor3dMode={editor3dMode}/>
@@ -59,10 +60,10 @@ function EditorSceneOverlay({hidden, value, setValue}) {
 function EditingForm({className="", editor3dMode=false}) {
     const { id } = useParams();
     const navigate = useNavigate()
-    const [buffer, setBuffer, post, push, pull, changed, overwriteWarning] = useBufferedPost(id, ["title", "description", "published"]);
+    const [buffer, setBuffer, post, push, pull, changed, overwriteWarning] = useBufferedPost(id, ["title", "description", "public"]);
     const titleLabel = useMultilang({"en": "title", "zh": "標題"});
     const descriptionLabel = useMultilang({"en": "description", "zh": "描述"});
-    const publishedLabel = useMultilang({"en": "published", "zh": "公開"});
+    const publicLabel = useMultilang({"en": "public", "zh": "公開"});
     const saveLabel = useMultilang({"en": "update", "zh": "更新"});
     const [activeLanguage, setActiveLanguage] = useState(languages[0]);
     const deleteDefaultLabel = useMultilang({"en": "delete", "zh": "刪除"});
@@ -80,7 +81,7 @@ function EditingForm({className="", editor3dMode=false}) {
     })
     // console.log(buffer)
     return (
-        // Return table with inputs for title, description, and published
+        // Return table with inputs for title, description, and public
         <RoundedContainer className="relative">
             <EditorSceneOverlay value={buffer.data} setValue={(value) => setBuffer({...buffer, data: value})} hidden={!editor3dMode}/>
             <EmbeddedTabs position="top" options={languages} activeOption={activeLanguage} onUpdate={setActiveLanguage} className="h-16"/>
@@ -105,19 +106,20 @@ function EditingForm({className="", editor3dMode=false}) {
                             </td>
                         </tr>
                         <tr>
-                            <td>{publishedLabel}</td>
+                            <td>{publicLabel}</td>
                             <td>
-                                <Input typeName="boolean" value={buffer.published} setValue={(value) => setBuffer({...buffer, published: value})} />
+                                <Input typeName="boolean" value={buffer.public} setValue={(value) => setBuffer({...buffer, public: value})} />
                             </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
-            
-            <EmbeddedRow position="bottom" className="h-16">
-                <EmbeddedButton className="basis-3/4" onClick={push} disabled={!changed}>{saveLabel}</EmbeddedButton>
-                <EmbeddedButton className="basis-1/4 border-l" backgroundColor={[209, 54, 70]} onClick={deleteTrigger}>{deleteLabel}</EmbeddedButton>
-            </EmbeddedRow>
+            <Condition condition={post.role === "editor" || post.role === "owner"}>
+                <EmbeddedRow position="bottom" className="h-16">
+                    <EmbeddedButton className="basis-3/4" onClick={push} disabled={!changed}>{saveLabel}</EmbeddedButton>
+                    <EmbeddedButton className="basis-1/4 border-l" backgroundColor={[209, 54, 70]} onClick={deleteTrigger}>{deleteLabel}</EmbeddedButton>
+                </EmbeddedRow>
+            </Condition>
         </RoundedContainer>
     )
 }

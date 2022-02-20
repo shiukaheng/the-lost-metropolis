@@ -14,7 +14,7 @@ function MagicButton({ languageSpecificChildren=null, style={}, solid=false, chi
     const additionalTransition = foregroundColorCSSProps.concat(backgroundColorCSSProps).map((val) => (val.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()+` ${theme.transitionDuration}s`)).join(", ")
     const [pending, setPending] = useState(false)
 
-    const buttonClassnames = `select-none px-4 rounded-3xl ${(disabled || pending) ? "opacity-50" : "md:hover:opacity-50 cursor-pointer"} font-serif font-bold md:text-xl h-8 md:h-9 transition-opacity duration-500`
+    const buttonClassnames = `select-none px-4 rounded-3xl ${(disabled || pending) ? "opacity-50" : "md:hover:opacity-50 cursor-pointer"} font-serif font-bold md:text-xl h-9 md:h-10 transition-opacity duration-500`
     const solidButtonClassnames = ""
     const nonSolidButtonClassnames = "border bg-transparent"
 

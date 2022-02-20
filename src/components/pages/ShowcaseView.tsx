@@ -11,7 +11,7 @@ import LoadingScreen from '../utilities/LoadingScreen';
 import MagicDiv from '../utilities/MagicDiv';
 
 function ShowcaseView() {
-    const { posts } = useContext(ContentContext);
+    const posts = useContext(ContentContext);
     return (
         <LoadingScreen ready={posts!==null} loadingDivClassname="page-margins">
             <ShowcasePanel/>
@@ -22,7 +22,7 @@ function ShowcaseView() {
 export default ShowcaseView;
 
 function ShowcasePanel() {
-    const { posts } = useContext(ContentContext);
+    const posts = useContext(ContentContext);
     const { theme } = useContext(ThemeContext);
     const { id } = useParams();
     const navigate = useNavigate();

@@ -109,9 +109,9 @@ function App():FC {
 export { App, ThemeContext, SettingsContext }
 
 function SiteRouter() {
-    const {posts, editablePosts} = useContext(ContentContext)
+    const posts = useContext(ContentContext)
     return <Router>
-        <LoadingScreen ready={(posts!==null || editablePosts!==null)}>
+        <LoadingScreen ready={posts !== null}>
             <KeyPressCallback keyName={"F9"} onDown={(()=>{console.log("hi")})}/>
             <div className="absolute w-full h-full">
                 <AnimatedSwitch pathPreprocessor={(path) => {

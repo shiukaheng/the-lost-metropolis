@@ -1,4 +1,5 @@
-import { addDoc, collection, deleteDoc, onSnapshot, Timestamp, updateDoc, doc, collection, query, where, setDoc } from "firebase/firestore";
+import { subscribeToEditablePosts } from './api';
+import { addDoc, collection, deleteDoc, onSnapshot, Timestamp, updateDoc, doc, query, where, setDoc, getDoc } from "firebase/firestore";
 import { auth, db, storage } from "./firebase-config";
 import { ref, uploadBytes, uploadBytesResumable } from "firebase/storage";
 import { signOut } from "firebase/auth";
@@ -9,12 +10,12 @@ import { v4 as uuidv4 } from "uuid";
 
 // General use
 
-// - Subscribe to all posts that are published -> Subscribe to query posts collection and return all posts with published = true
+// - Subscribe to all posts that are public -> Subscribe to query posts collection and return all posts with public = true
 // This will call a callback with a list of posts in the format from the database whenever there are changes:
 // [
 //   Document {
 //     data: <function>,
-//     published: <bool>,
+//     public: <bool>,
 //     createdAt: <str>,
 //     updatedAt: <str>,
 //     owner: <str>,
@@ -62,7 +63,7 @@ function transformPost(doc) {
         owner: data.owner,
         viewers: data.viewers,
         editors: data.editors,
-        published: data.published,
+        public: data.public,
     };
 }
 
@@ -77,18 +78,25 @@ function inverseTransformPost(obj) {
         owner: obj.owner,   
         viewers: obj.viewers,
         editors: obj.editors,
-        published: obj.published,
+        public: obj.public,
     }, obj);
 }
 
-export const subscribeToPosts = (callback) => {
+function subscribeToQuery(collection, queryConstraints, callback) {
+    const queryRef = query(collection, ...queryConstraints)
+    return onSnapshot(queryRef, callback)
+}
+
+function subscribeToPostQuery(queryConstraints, callback) {
     const postsRef = collection(db, "posts")
-    const queryRef = query(postsRef, where("published", "==", true))
-    const unsub = onSnapshot(queryRef, (docsRef) => {
+    return subscribeToQuery(postsRef, queryConstraints, (docsRef)=>{
         callback(docsRef.docs.map(transformPost))
     })
-    return unsub
 }
+
+export const publicPostProvider = (callback) => subscribeToPostQuery([where("public", "==", true)], callback)
+
+// From this point on all functions are admin only
 
 // - Check if is logged in
 export const isLoggedIn = () => {
@@ -116,29 +124,14 @@ export const logOut = async () => {
 //     editors: <array>,
 //   }
 // ]
-export const subscribeToEditablePosts = (callback) => {
-    const postsRef = collection(db, "posts")
-    const queryRef = query(postsRef, where("owner", "==", auth.currentUser.uid, "OR", "editors", "array-contains", auth.currentUser.uid))
-    const unsub = onSnapshot(queryRef, (docsRef) => {
-        callback(docsRef.docs.map(transformPost))
-    })
-    return unsub
-}
+export const ownerPostProvider = (callback) => subscribeToPostQuery([where("owner", "==", auth.currentUser ? auth.currentUser.uid : null)], callback)
+export const editorPostProvider = (callback) => subscribeToPostQuery([where("editors", "array-contains", auth.currentUser ? auth.currentUser.uid : null)], callback)
+export const viewerPostProvider = (callback) => subscribeToPostQuery([where("viewers", "array-contains", auth.currentUser ? auth.currentUser.uid : null)], callback)
 
 // // - Create post -> create document in posts collection, returns document id
-// export const createPost = async (postObj) => {
-//     const postsRef = collection(db, "posts")
-//     const docRef = await addDoc(postsRef, {...inverseTransformPost(postObj), owner: auth.currentUser.uid}) // https://firebase.google.com/docs/firestore/manage-data/add-data#add_a_document
-//     return docRef.id
-// }
 
 // - Update post -> update document in posts collection
-export const updatePost = async (id, content) => {
-    const postRef = doc(db, "posts", id)
-    await updateDoc(postRef, inverseTransformPost(content)) // https://firebase.google.com/docs/firestore/manage-data/update-data#update_a_document
-}
-
-export const createPost = async ({title=createEmptyMultilangString(), description=createEmptyMultilangString(), data=null, viewers=[], editors=[], published=false}={}) => { // Todo: dynamically create template data
+export const createPost = async ({title=createEmptyMultilangString(), description=createEmptyMultilangString(), data=null, viewers=[], editors=[], isPublic=false}={}) => { // Todo: dynamically create template data
     const postsRef = collection(db, "posts")
     const created =  new Date().toISOString()
     const object = {
@@ -150,11 +143,16 @@ export const createPost = async ({title=createEmptyMultilangString(), descriptio
         owner: auth.currentUser.uid,
         viewers: viewers,
         editors: editors,
-        published: published,
+        public: isPublic,
     }
     // console.log(inverseTransformPost(object))
     const docRef = await addDoc(postsRef, inverseTransformPost(object))
     return docRef.id
+}
+
+export const updatePost = async (id, content) => {
+    const postRef = doc(db, "posts", id)
+    await updateDoc(postRef, inverseTransformPost(content)) // https://firebase.google.com/docs/firestore/manage-data/update-data#update_a_document
 }
 
 // - Delete post -> delete document in posts collection
@@ -170,19 +168,22 @@ type Progress = {
 }
 
 // - Upload asset -> Creates entry in assets collection and uploads zip to storage -> Cloud function gets triggered to unzip files to folder -> Updates document in assets collection
-export const uploadAsset = async (file, waitUntilProcessed=true, onProgress=(progress:Progress)=>{}) => {
-    const name = uuidv4()
+export const uploadAsset = async (file, waitUntilProcessed=true, onProgress=(progress:Progress)=>{}, viewers=[], editors=[], isPublic=false) => {
+    const id = uuidv4()
     const stages = waitUntilProcessed ? ["upload", "process"] : ["upload"]
     // Make a reference for the zip file
-    const zipRef = ref(storage, `pendingAssets/${name}`)
+    const zipRef = ref(storage, `pendingAssets/${id}`)
     // Create entry in assets collection
-    await setDoc(doc(db, "assets", name), {
+    await setDoc(doc(db, "assets", id), {
         owner: auth.currentUser.uid,
         createdAt: Timestamp.fromDate(new Date()),
         pending: true, // Means to be picked up by the cloud function
         processed: false, // Means it has been processed by the cloud function
         processedProgress: 0, // Progress of the processing
-        metaData: null // This will be filled in by the cloud function
+        metaData: null, // This will be filled in by the cloud function
+        viewers: viewers,
+        editors: editors,
+        public: isPublic,
     })
     // Upload zip file to storage
     const uploadTask = uploadBytesResumable(zipRef, file)
@@ -200,16 +201,16 @@ export const uploadAsset = async (file, waitUntilProcessed=true, onProgress=(pro
         // Upload finished
         console.log("Upload finished")
         if (waitUntilProcessed) {
-            await waitForProcessing(stages, name, onProgress)
+            await waitForProcessing(stages, id, onProgress)
         }
-        return name
+        return id
     })
 }
 
-function waitForProcessing(stages: any, name: any, onProgress: (progress: Progress) => void) {
+function waitForProcessing(stages: any, id: any, onProgress: (progress: Progress) => void) {
     return new Promise((resolve, reject) => {
         // Monitor cloud function progress by subscribing to the document
-        const unsub = onSnapshot(doc(db, "assets", name), (docRef)=>{
+        const unsub = onSnapshot(doc(db, "assets", id), (docRef)=>{
             const {processed, processedProgress} = docRef.data() // Updating processing progress if required
             if (processed) {
                 unsub()
@@ -218,7 +219,7 @@ function waitForProcessing(stages: any, name: any, onProgress: (progress: Progre
                     stages: stages,
                     currentProgress: 1
                 })
-                resolve(name)
+                resolve(id)
             } else {
                 onProgress({
                     currentStage: "process",
@@ -229,3 +230,17 @@ function waitForProcessing(stages: any, name: any, onProgress: (progress: Progre
         })
     })
 }
+
+export const getAsset = async (id) => {
+    // Get asset from assets collection, return null if not found or throw error if its still pending
+    const assetRef = doc(db, "assets", id)
+    const asset = await getDoc(assetRef)
+    if (asset.data().pending) {
+        throw new Error("Asset is still pending")
+    }
+    return asset
+}
+
+// export const listEditableAssets = async (callback) => {
+//     // Returns a list of assets that the current user can edit
+//     const assetsRef = collection(db, "assets")
