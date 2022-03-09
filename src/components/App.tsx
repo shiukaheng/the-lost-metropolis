@@ -1,3 +1,5 @@
+
+// import React from "react" // Not sure why this is required but ok
 import { BrowserRouter as Router, Route } from "react-router-dom";
 import NavigationBar from "./utilities/NavigationBar"
 import AppContainer from "./utilities/AppContainer"
@@ -22,6 +24,7 @@ import { ContentContext, ContentProvider } from "./providers/ContentProvider";
 import { EditPost } from "./admin/EditPost";
 import LoadingScreen from "./utilities/LoadingScreen";
 import { preloadFont } from "troika-three-text";
+import UploadAssetPage from "./development/UploadAssetTest";
 
 const defaultSettings = {
     lang: "en"
@@ -141,6 +144,7 @@ function SiteRouter() {
                                 <Route path="/login" element={<Login />} />
                                 <Route path="/dashboard" element={<Dashboard />} />
                                 <Route path="/edit/:id" element={<EditPost/>} />
+                                <Route path="/uploadTest" element={<UploadAssetPage/>} />
                             </AnimatedSwitch>
                         </AppContainer>
                     </div>} />

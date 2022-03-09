@@ -34,6 +34,7 @@ export const ContentProvider = ({children}) => {
     const viewerPosts = mapPostRole(useSubscription(viewerPostProvider, true, "viewerPosts"), "viewer");
     const publicPosts = mapPostRole(useSubscription(publicPostProvider, false, "publicPosts"), "public");
     const allPosts = concatenatePosts(ownerPosts, editorPosts, viewerPosts, publicPosts);
+    // 
     return (
         <ContentContext.Provider value={allPosts}>
             {children}

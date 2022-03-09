@@ -4,40 +4,61 @@ import { AuthContext } from "./components/admin/AuthProvider";
 import { languages, SettingsContext, ThemeContext } from "./components/App";
 import { ContentContext } from "./components/providers/ContentProvider";
 import { cloneDeep, isEqual } from "lodash"
+import { useFrame } from "@react-three/fiber";
+import { Maybe, Post, SubscriptionProvider } from "./types";
 
-function formatRGBCSS(color: number[]): string {
+export function formatRGBCSS(color: number[]): string {
     return "rgb(" + color[0] + "," + color[1] + "," + color[2] + ")";
 }
 
-function useKeyPress(targetKey) {
-    // State for keeping track of whether key is pressed
-    const [keyPressed, setKeyPressed] = useState<boolean>(false);
-    // If pressed key is our target key then set to true
-    function downHandler({ key }) {
-        if (key === targetKey) {
-            setKeyPressed(true);
-        }
+// function useKeyPress(targetKey) {
+//     // State for keeping track of whether key is pressed
+//     const [keyPressed, setKeyPressed] = useState<boolean>(false);
+//     // If pressed key is our target key then set to true
+//     function downHandler({ key }) {
+//         if (key === targetKey) {
+//             console.log("Key pressed: " + key)
+//             setKeyPressed(true);
+//         }
+//     }
+//     // If released key is our target key then set to false
+//     const upHandler = ({ key }) => {
+//         if (key === targetKey) {
+//             console.log("Key released: " + key)
+//             setKeyPressed(false);
+//         }
+//     };
+//     // Add event listeners
+//     useEffect(() => {
+//         window.addEventListener("keydown", downHandler);
+//         window.addEventListener("keyup", upHandler);
+//         // Remove event listeners on cleanup
+//         return () => {
+//             window.removeEventListener("keydown", downHandler);
+//             window.removeEventListener("keyup", upHandler);
+//         };
+//         }, []); // Empty array ensures that effect is only run on mount and unmount
+//     return keyPressed;
+// }
+
+export function useKeyPress(targetKey: string) {
+    const [pressed, setPressed] = useState(false);
+    const onDownRef = useRef(() => {
+        setPressed(true)
+    })
+    const onUpRef = useRef(() => {
+        setPressed(false)
+    })
+    if (targetKey.length === 1 && targetKey.toLowerCase() === targetKey) {
+        useAsyncKeyPress(targetKey.toLowerCase(), onDownRef, onUpRef)
+        useAsyncKeyPress(targetKey.toUpperCase(), onDownRef, onUpRef)
+    } else {
+        useAsyncKeyPress(targetKey, onDownRef, onUpRef)
     }
-    // If released key is our target key then set to false
-    const upHandler = ({ key }) => {
-        if (key === targetKey) {
-            setKeyPressed(false);
-        }
-    };
-    // Add event listeners
-    useEffect(() => {
-        window.addEventListener("keydown", downHandler);
-        window.addEventListener("keyup", upHandler);
-        // Remove event listeners on cleanup
-        return () => {
-            window.removeEventListener("keydown", downHandler);
-            window.removeEventListener("keyup", upHandler);
-        };
-        }, []); // Empty array ensures that effect is only run on mount and unmount
-    return keyPressed;
+    return pressed;
 }
 
-function useAsyncKeyPress(targetKey, onKeyDownRef, onKeyUpRef) {
+export function useAsyncKeyPress(targetKey, onKeyDownRef, onKeyUpRef) {
     // State for keeping track of whether key is pressed
     const [keyPressed, setKeyPressed] = useState<boolean>(false);
     // If pressed key is our target key then set to true
@@ -67,7 +88,7 @@ function useAsyncKeyPress(targetKey, onKeyDownRef, onKeyUpRef) {
     return keyPressed;
 }
 
-function useAsyncReference(value) {
+export function useAsyncReference(value) {
     const ref = useRef(value);
     const [, forceRender] = useState(false);
   
@@ -79,7 +100,7 @@ function useAsyncReference(value) {
     return [ref, updateState];
 }
 
-function KeyPressCallback({keyName, onDown=()=>{}, onUp=()=>{}}) {
+export function KeyPressCallback({keyName, onDown=()=>{}, onUp=()=>{}}) {
     const onDownRef = useRef(null)
     const onUpRef = useRef(null)
     useEffect(()=>{
@@ -91,17 +112,17 @@ function KeyPressCallback({keyName, onDown=()=>{}, onUp=()=>{}}) {
 }
 
 // Linear color to sRGB color conversion (From Github Copilot ??!)
-function SRGBToLinear( c_arr ) {
+export function SRGBToLinear( c_arr ) {
 	return c_arr.map((c)=>(( c < 0.04045 ) ? c * 0.0773993808 : Math.pow( c * 0.9478672986 + 0.0521327014, 2.4 )));
 
 }
 
-function LinearToSRGB( c_arr ) {
+export function LinearToSRGB( c_arr ) {
 	return c_arr.map((c)=>(( c < 0.0031308 ) ? c * 12.92 : 1.055 * ( Math.pow( c, 0.41666 ) ) - 0.055));
 
 }
 
-function useStickyState(defaultValue, key) {
+export function useStickyState(defaultValue, key) {
     const [value, setValue] = useState(() => {
         const stickyValue = window.localStorage.getItem(key);
         return stickyValue !== null
@@ -115,7 +136,7 @@ function useStickyState(defaultValue, key) {
     return [value, setValue];
 }
 
-function useFollowMouse(onMouseMove=null) {
+export function useFollowMouse(onMouseMove=null) {
     const mousePosRef = useRef([0,0])
     useLayoutEffect(() => {
         const body = document.querySelector("body")
@@ -135,11 +156,13 @@ function useFollowMouse(onMouseMove=null) {
 }
 
 /**
- * Used to get data that is subscribed to changes
- * @param provider A function that subscribes a callback to updates
- * @returns void
+ * Hook that provides a list of documents given a provider
+ * @param provider - Any subscription provider
+ * @param requriesAuth - If enabled, it does not query the provider if the user is not logged in 
+ * @param cachingKey - If not null, it will cache the result in localStorage with the given key
+ * @returns An array of posts or null if it's not loaded
  */
-const useSubscription = (provider, requriesAuth=false, cachingKey=null) => {
+export function useSubscription(provider:SubscriptionProvider, requriesAuth=false, cachingKey:null|string=null):Post[]|null {
     const {currentUser} = useContext(AuthContext)
     const [posts, setPosts] = (cachingKey === null ? useState(null) : useStickyState(null, cachingKey))
     const unsubRef = useRef(null);
@@ -163,12 +186,12 @@ const useSubscription = (provider, requriesAuth=false, cachingKey=null) => {
     return posts;
 }
 
-const useMultilang = (content) => {
+export const useMultilang = (content) => {
     const {settings} = useContext(SettingsContext)
     return content[settings.lang]
 }
 
-const usePost = (id) => {
+export const usePost = (id) => {
     // Returns post and setter, setter returns null if no edit permission
     const posts = useContext(ContentContext)
     const post = posts.find((p) => p.id === id)
@@ -178,7 +201,7 @@ const usePost = (id) => {
     return [post, setPost]
 }
 
-function filterProps(target, props=[]) {
+export function filterProps(target, props=[]) {
     if (target === undefined) {
         return undefined
     }
@@ -193,7 +216,7 @@ function filterProps(target, props=[]) {
     return filtered
 }
 
-const useBufferedPost = (id, props=[], onBufferChange=(buffer)=>{}, onPull=(buffer)=>{}, onPush=(buffer)=>{}) => { // Todo: use useWriteCheck to monitor changes to post
+export const useBufferedPost = (id, props=[], onBufferChange=(buffer)=>{}, onPull=(buffer)=>{}, onPush=(buffer)=>{}) => { // Todo: use useWriteCheck to monitor changes to post
     // Returns buffer, setBuffer (stores new post in buffer), post (the post in the database), push function (syncs database with buffer, returns null if no edit permission), pull function (syncs buffer with database), changed (if buffer deviates from post), and overwriteWarning (true if database has changed since buffer was last synced)
     const [post, setPost] = usePost(id)
     const filteredPost = filterProps(post, props)
@@ -247,7 +270,7 @@ const useBufferedPost = (id, props=[], onBufferChange=(buffer)=>{}, onPull=(buff
     return [buffer, setBuffer, post, push, pull, changed, (overwriteWarning && post !== undefined)]
 }
 
-const useConfirm = (defaultText="default", confirmText="confirm", pendingText="pending", onConfirm=()=>{}, onTimeout=()=>{}) => {
+export const useConfirm = (defaultText="default", confirmText="confirm", pendingText="pending", onConfirm=()=>{}, onTimeout=()=>{}) => {
     const [deleteState, setDeleteState] = useState(0) // 0: not deleted, 1: confirm (otherwise countdown), 2: requested
     const [countdown, setCountdown] = useState(3)
     const countdownRef = useRef(null)
@@ -293,7 +316,7 @@ const useConfirm = (defaultText="default", confirmText="confirm", pendingText="p
     return [text, trigger]
 }
 
-const createEmptyMultilangString = () => {
+export const createEmptyMultilangString = () => {
     // Transform languages array to an object with each language as key and empty string as value; languages is already imported
     return languages.reduce((obj, lang) => {
         obj[lang] = ""
@@ -301,7 +324,7 @@ const createEmptyMultilangString = () => {
     }, {})
 }
 
-const useTheme = (targetTheme) => {
+export const useTheme = (targetTheme) => {
     const {theme, setTheme} = useContext(ThemeContext)
     const originalThemeRef = useRef(theme)
     useEffect(()=>{
@@ -315,8 +338,6 @@ const useTheme = (targetTheme) => {
     }, [])
 }
 
-function Condition({condition, children}) {
+export function Condition({condition, children}) {
     return condition ? children : null
 }
-
-export { formatRGBCSS, useKeyPress, useAsyncKeyPress, useAsyncReference, KeyPressCallback, LinearToSRGB, SRGBToLinear, useStickyState, useFollowMouse, useSubscription, useMultilang, usePost, useBufferedPost, useConfirm, createEmptyMultilangString, useTheme, Condition };
