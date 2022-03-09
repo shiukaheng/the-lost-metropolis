@@ -9,7 +9,7 @@ type PotreeObjectProps = JSX.IntrinsicElements["group"] & {
     pointShape?: number
 }
 
-function PotreeObject({cloudName="cloud.js", baseUrl, pointSize=1, pointSizeType=1, pointShape=0, id, ...props}:PotreeObjectProps) {
+function PotreeObject({cloudName="cloud.js", baseUrl, pointSize=1, pointSizeType=2, pointShape=2, id, ...props}:PotreeObjectProps) {
     const {potree, setPointCloud: setManagerPointCloud} = useContext(PotreeContext)
     const [pointCloud, setPointCloud] = useState(null)
     const objectGroup = useRef(null)
@@ -42,9 +42,10 @@ function PotreeObject({cloudName="cloud.js", baseUrl, pointSize=1, pointSizeType
     }, [cloudName, baseUrl])
     useEffect(() => {
         // Get last element in pointCloudBuffer
+        // window.pco = pointCloud
         if (pointCloud) {
             pointCloud.material.size = pointSize
-            pointCloud.material.pointSizeType = pointSizeType
+            pointCloud.pointSizeType = pointSizeType
             pointCloud.material.shape = pointShape
         }
     }, [pointSize, pointSizeType, pointShape, pointCloud])
