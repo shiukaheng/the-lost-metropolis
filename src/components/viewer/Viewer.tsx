@@ -66,9 +66,7 @@ function ViewerUI({post, ...props}) {
     }, [post])
     return (
         <Viewport {...props}>
-            {/* <FirstPersonControls activeLook={false}/> */}
-            <GameControls/>
-            
+            <GameControls force={10} friction={0.97}/>
             {sceneChildren}
         </Viewport>
     )
