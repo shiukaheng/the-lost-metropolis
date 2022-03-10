@@ -1,15 +1,14 @@
 import { cloneElement, useRef, useState, useContext, useEffect } from "react"
 import { joinChildren } from "../editor/utilities"
-import { ViewerContext } from "./ViewerContext"
+import { DefaultCameraPropType, ViewerContext } from "./ViewerContext"
 import { AudioListener } from "three"
-import { useDeserialize } from "../editor/ui_elements/EditorIO"
+import { useStatefulDeserialize } from "../editor/ui_elements/EditorIO"
 import Viewport from "./Viewport"
-import { FirstPersonControls, OrbitControls, PointerLockControls } from "@react-three/drei"
 import GameControls from "../utilities/GameControls"
 
 function ViewerManager({children}) {
     // Helps to manage Viewer state (camera initial position, post processing, etc), seperated to be reused in Editor and Viewer
-    const [defaultCameraProps, setDefaultCameraProps] = useState({
+    const [defaultCameraProps, setDefaultCameraProps] = useState<DefaultCameraPropType>({
         position: [0,0,1],
         rotation: [0,0,0],
         fov: 50
@@ -20,7 +19,7 @@ function ViewerManager({children}) {
 
     const updateSceneChildren = (newChildren) => {
         setSceneChildren(sceneChildren.map(child => {
-            const newChild = newChildren.find(newChild => newChild.props.id === child.props.id)
+            const newChild = newChildren.find(newChild => newChild.props.objectID === child.props.objectID)
             if (newChild) {
                 return cloneElement(
                     child,
@@ -60,7 +59,7 @@ function ViewerManager({children}) {
 
 function ViewerUI({post, ...props}) {
     const {sceneChildren} = useContext(ViewerContext)
-    const deserialize = useDeserialize()
+    const deserialize = useStatefulDeserialize()
     useEffect(()=>{
         deserialize(post)
     }, [post])

@@ -1,15 +1,15 @@
 import EditorEmbeddedWidget from "./EditorEmbeddedWidget";
 import Select from 'react-select';
 import MagicDiv from "../../utilities/MagicDiv";
-import { createElement, useEffect, useRef, useState, useContext } from "react";
+import { createElement, useState, useContext } from "react";
 import { v4 as uuidv4 } from 'uuid';
 import { useKeyPress, KeyPressCallback, formatRGBCSS, useMultilang } from "../../../utilities";
 import { ThemeContext } from "../../App"
 import { EditorContext } from "../EditorContext";
 import { ViewerContext } from "../../viewer/ViewerContext";
-import { getLabelFromComponent, supportedComponents } from "../../viewer/ComponentDeclarations"
+import { components, VaporComponent, VaporInputsType } from "../../viewer/ComponentDeclarations"
 
-function getDefaultInputs(inputObject) {
+function getDefaultInputs(inputObject:VaporInputsType) {
     var defaultInputs = {}
     Object.entries(inputObject).map(([key, value])=>{
         if (value.type.typeCheck(value.default)) {
@@ -21,18 +21,20 @@ function getDefaultInputs(inputObject) {
     return defaultInputs
 }
 
-function generateKey({...props}) {
-    var uuid = uuidv4()
-    return {
+function generateProps(vaporComponent:VaporComponent) {
+    const defaultInputs = getDefaultInputs(vaporComponent.inputs)
+    const uuid = uuidv4()
+    const props = {
         key: uuid,
-        id: uuid,
-        ...props
+        objectID: uuid,
+        ...defaultInputs
     }
+    return props
 }
 
 function SceneChildItem({child, onClick, selected}) {
     return (
-        <div className={`px-2 cursor-pointer select-none rounded-3xl ${selected ? "bg-blue-600" : "bg-transparent"}`} onClick={onClick}>{`${child.props.name} - [${getLabelFromComponent(child.type)}]`}</div>
+        <div className={`px-2 cursor-pointer select-none rounded-3xl ${selected ? "bg-blue-600" : "bg-transparent"}`} onClick={onClick}>{`${child.props.name} - [${child.type.displayName}]`}</div>
     )
 }
 
@@ -40,8 +42,12 @@ function SceneChildItem({child, onClick, selected}) {
 export default function EditorComponentGraph() {
     const {sceneChildren} = useContext(ViewerContext)
     const {selectedIDs, setSelectedIDs, addSelectedIDs, removeSelectedIDs, shiftPressed, setSceneChildren} = useContext(EditorContext)
-    const [addChildrenType, setAddChildrenType] = useState(null)
+    const [addChildrenType, setAddChildrenType] = useState<null|VaporComponent>(null)
     const heading = useMultilang({"en": "components", "zh": "組件"})
+    const componentOptions = components.map(component => ({
+        label: component.displayName,
+        value: component
+    }))
 
     const {theme} = useContext(ThemeContext)
     const customStyles = {
@@ -77,12 +83,19 @@ export default function EditorComponentGraph() {
     return (
         <EditorEmbeddedWidget title={heading}>
             <KeyPressCallback keyName="Delete" onDown={()=>{
-                setSceneChildren(sceneChildren.filter(child => !(selectedIDs.includes(child.props.id))))
+                setSceneChildren(sceneChildren.filter(child => !(selectedIDs.includes(child.props.objectID))))
             }}/>
             <div className="flex flex-row gap-2">
-                <Select className="flex-grow" options={supportedComponents} styles={customStyles} onChange={(value, _)=>{setAddChildrenType(value.value)}}/>
+                <Select className="flex-grow" options={componentOptions} styles={customStyles} onChange={(value, _)=>setAddChildrenType(() => value.value)}/>
                 <MagicDiv mergeTransitions className={`editor-secondary-button ${(addChildrenType===null) ? "disabled" : ""}`} onClick={()=>{
-                    setSceneChildren(sceneChildren.concat([createElement(addChildrenType.component, generateKey(getDefaultInputs(addChildrenType.inputs)), null)]))
+                    const generatedProps = generateProps(addChildrenType)
+                    setSceneChildren(
+                        sceneChildren.concat(
+                            [
+                                createElement(addChildrenType, generatedProps, [])
+                            ]
+                        )
+                    )
                 }} languageSpecificChildren={{
                     "en": "add",
                     "zh": "新增"
@@ -91,16 +104,16 @@ export default function EditorComponentGraph() {
             <div className="gap-2">
                 {
                     sceneChildren.map((child) => (
-                        <SceneChildItem selected={selectedIDs.includes(child.props.id)} key={uuidv4()} child={child} onClick={
+                        <SceneChildItem selected={selectedIDs.includes(child.props.objectID)} key={uuidv4()} child={child} onClick={
                             ()=>{
                                 if (shiftPressed) {
-                                    if (selectedIDs.includes(child.props.id)) {
-                                        removeSelectedIDs(child.props.id)
+                                    if (selectedIDs.includes(child.props.objectID)) {
+                                        removeSelectedIDs(child.props.objectID)
                                     } else {
-                                        addSelectedIDs(child.props.id)
+                                        addSelectedIDs(child.props.objectID)
                                     }
                                 } else {
-                                    setSelectedIDs([child.props.id])
+                                    setSelectedIDs([child.props.objectID])
                                 }
                             }
                         }/>

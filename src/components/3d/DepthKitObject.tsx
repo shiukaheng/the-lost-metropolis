@@ -5,13 +5,16 @@ import * as THREE from "three";
 import { ViewerContext } from "../viewer/ViewerContext";
 import ErrorObject from "./subcomponents/ErrorObject";
 import DepthKitMaterial from "./materials/DepthKitMaterial";
+import { VaporComponent, VaporComponentProps } from "../viewer/ComponentDeclarations";
+import { genericInputs } from "../viewer/genericInputs"
+import { BooleanType, NumberType, URLType, Vector3Type } from "../viewer/ArgumentTypes";
 
 const VERTS_WIDE = 256;
 const VERTS_TALL = 256;
 
 extend({ DepthKitMaterial });
 
-type DepthKitObjectProps = JSX.IntrinsicElements["mesh"] & {
+type DepthKitObjectProps = VaporComponentProps & {
   metaUrl: string;
   videoUrl: string;
   posterUrl?: string;
@@ -21,10 +24,10 @@ type DepthKitObjectProps = JSX.IntrinsicElements["mesh"] & {
   audioPositionOffset?: Vector3;
 }
 
-function DepthKitObject(props:DepthKitObjectProps) {
+export const DepthKitObject: VaporComponent = (props:DepthKitObjectProps) => {
   return (
   <ErrorBoundary fallbackRender={({error, resetErrorBoundary}) => (
-    <ErrorObject error={error} position={props.position} scale={props.scale} onClick={resetErrorBoundary} id={props.id}/>
+    <ErrorObject error={error} position={props.position} scale={props.scale} onClick={resetErrorBoundary} objectID={props.objectID}/>
   )}>
     <_DepthKitObject {...props} />
   </ErrorBoundary>);
@@ -84,6 +87,35 @@ function _DepthKitObject({ metaUrl="", videoUrl="", posterUrl="", autoplay=true,
   );
 }
 
+type metaInfType = {
+  width: number;
+  height: number;
+  nearClip: number;
+  farClip: number;
+  depthFocalLength: { x: number; y: number };
+  depthPrincipalPoint: { x: number; y: number };
+  depthImageSize: { x: number; y: number };
+  crop: { x: number; y: number; z: number; w: number };
+  extrinsics: {
+    e00: number;
+    e01: number;
+    e02: number;
+    e03: number;
+    e10: number;
+    e11: number;
+    e12: number;
+    e13: number;
+    e20: number;
+    e21: number;
+    e22: number;
+    e23: number;
+    e30: number;
+    e31: number;
+    e32: number;
+    e33: number;
+  };
+}
+
 // Wrapper for the cool videoTexture
 function AdvancedVideoTexture({
   videoUrl = "",
@@ -107,7 +139,6 @@ function AdvancedVideoTexture({
     // Override default source node with video element
     newPositionalAudio.setMediaElementSource(video);
     setPositionalAudio(newPositionalAudio);
-    console.log(newPositionalAudio)
     return video;
   });
   useEffect(() => {
@@ -204,6 +235,40 @@ function buildGeometry(verts_wide = VERTS_WIDE, verts_tall = VERTS_TALL) {
   return geometry;
 }
 
+DepthKitObject.displayName = "DepthKit Object";
+DepthKitObject.componentID = "DepthKitObject";
+DepthKitObject.inputs = {
+  ...genericInputs,
+  metaUrl: {
+      type: URLType,
+      default: "http://localhost/depthkit.json"
+  },
+  videoUrl: {
+      type: URLType,
+      default: "http://localhost/depthkit.mp4"
+  },
+  posterUrl: {
+      type: URLType,
+      default: "http://localhost/depthkit.jpg"
+  },
+  autoplay: {
+      type: BooleanType,
+      default: true
+  },
+  loop: {
+      type: BooleanType,
+      default: true
+  },
+  muted: {
+      type: BooleanType,
+      default: false
+  },
+  audioPositionOffset: {
+      type: Vector3Type,
+      default: [0, 0, 0]
+  }
+}
+
 // Thanks so much to https://github.com/DennisSmolek for fixing the loading issues!!!
 
-export { DepthKitObject, VERTS_TALL, VERTS_WIDE, DepthKitObjectProps };
+export { VERTS_TALL, VERTS_WIDE, DepthKitObjectProps };

@@ -1,9 +1,9 @@
 function joinChildren(sceneChildren, childrenToUpdate) {
     // return new sceneChildren but with the children whose props.id is in updateChildren
-    const idsToBeUpdated = childrenToUpdate.map(child => child.props.id)
+    const idsToBeUpdated = childrenToUpdate.map(child => child.props.objectID)
     return sceneChildren.map(child => {
-        if (idsToBeUpdated.includes(child.props.id)) {
-            return childrenToUpdate.find(item => item.props.id === child.props.id)
+        if (idsToBeUpdated.includes(child.props.objectID)) {
+            return childrenToUpdate.find(item => item.props.objectID === child.props.objectID)
         } else {
             return child
         }

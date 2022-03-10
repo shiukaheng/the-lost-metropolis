@@ -115,7 +115,6 @@ function SiteRouter() {
     const posts = useContext(ContentContext)
     return <Router>
         <LoadingScreen ready={posts !== null}>
-            <KeyPressCallback keyName={"F9"} onDown={(()=>{console.log("hi")})}/>
             <div className="absolute w-full h-full">
                 <AnimatedSwitch pathPreprocessor={(path) => {
                     if (path.split("/")[1] !== "view") {

@@ -1,19 +1,27 @@
-import { Text, Image, Billboard } from "@react-three/drei"
-import { useRef, useLayoutEffect, useState, Suspense } from "react"
-import { useTransition, config, animated, useSpring } from "react-spring"
-import { a } from "@react-spring/three"
-import { useFrame, useLoader } from "@react-three/fiber"
-import { TextureLoader } from "three"
-import LabelIconObject from "./LabelIconObject"
+import { Billboard } from "@react-three/drei"
+import LabelIconObject from "./subcomponents/LabelIconObject"
+import { VaporComponent, VaporComponentProps } from "../viewer/ComponentDeclarations"
+import { genericInputs } from "../viewer/genericInputs"
+import { StringType } from "../viewer/ArgumentTypes"
 
-type LinkObjectProps = JSX.IntrinsicElements["group"] & {
+type LinkObjectProps = VaporComponentProps & {
     url: string
 }
 
-export default function LinkObject({url, ...props}:LinkObjectProps) {
+export const LinkObject: VaporComponent = ({url, ...props}:LinkObjectProps) => {
     return (
         <Billboard follow>
             <LabelIconObject scale={0.25} onClick={()=>{window.open(url, "_blank").focus()}} iconUrl="/static/viewport/link-icon.png"/>
         </Billboard>
     )
+}
+
+LinkObject.displayName = "Link object"
+LinkObject.componentID = "LinkObject"
+LinkObject.inputs = {
+    ...genericInputs,
+    url: {
+        type: StringType,
+        default: "https://www.google.com"
+    }
 }

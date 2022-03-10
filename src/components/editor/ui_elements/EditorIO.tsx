@@ -1,5 +1,5 @@
 import MagicDiv from "../../utilities/MagicDiv";
-import { getComponentPropInfo, supportedComponents, getComponentPropInfoFromName, getComponentFromName} from "../../viewer/ComponentDeclarations";
+import { components, getComponentFromID, VaporInputsType} from "../../viewer/ComponentDeclarations";
 import EditorEmbeddedWidget from "./EditorEmbeddedWidget";
 import { createElement, useContext, useRef } from "react";
 import FileSaver from "file-saver"
@@ -16,32 +16,31 @@ import { useMultilang } from "../../../utilities";
 
 // Serialization: reading from sceneChildren and outputting to a JSON compatible object
 
-function exportChild(child, componentClasses) {
+export function exportChild(child) {
     const {type, props} = child;
     const newProps = {...props};
-    if (!(componentClasses.includes(type))) {
-        throw "Component type not supported for export";
+    if (!(components.includes(type))) {
+        throw `Component type ${type} not supported for export`;
     }
-    const propInfo = getComponentPropInfo(type)
-    fixProps(newProps, propInfo);
+    fixProps(newProps, type.inputs);
     // Note: We export type variable as string
     return {
-        type: type.name,
+        type: type.componentID,
         props: newProps
     };
 }
 
-function fixProps(newProps, propInfo) {
+export function fixProps(newProps, propInfo:VaporInputsType) {
     Object.entries(newProps).forEach(([key, value]) => {
         // Check whether prop exists in propInfo, if not, remove it and warn, except for id. The children prop should be removed silently.
-        if (!(key in propInfo) && key !== "id") {
+        if (!(key in propInfo) && key !== "objectID") {
             if (key !== "children") {
                 console.warn(`Prop ${key} not supported for export`);
             }
             delete newProps[key];
         } else {
             // Check each prop with respective typeCheck function, if not valid, replace with default value (except id, which we spare)
-            if (key !== "id") {
+            if (key !== "objectID") {
                 const typeCheck = propInfo[key].type.typeCheck;
                 if (typeCheck) {
                     if (!typeCheck(value)) {
@@ -60,43 +59,43 @@ function fixProps(newProps, propInfo) {
         }
     });
     // Check whether id prop is missing, if so generate from uuidv4
-    if (!("id" in newProps)) {
-        console.warn(`ID prop missing, generating one to fill in`);
-        newProps["id"] = uuidv4();
+    if (!("objectID" in newProps)) {
+        console.warn(`componentID missing, generating one to fill in`);
+        newProps["objectID"] = uuidv4();
     }
 }
 
-function exportChildren(childrenArray) {
-    const componentClasses = supportedComponents.map(component => component.value.component);
-    return childrenArray.map(child => exportChild(child, componentClasses));
+export function exportChildren(childrenArray) {
+    return childrenArray.map(child => exportChild(child));
 }
 
 // Deserialization: Reading from JSON compatible object, matching them to components from supportedComponents, and instantiating them with createElement 
 
-function deserializeChild(child, componentClasses) {
-    const {type: typeName, props} = child;
+export function deserializeChild(child, componentIDs) {
+    const {type: typeID, props} = child;
     // Check whether type is supported
-    if (!(componentClasses.includes(typeName))) {
-        throw `Component type ${typeName} not supported for import`;
+    if (!(componentIDs.includes(typeID))) {
+        throw new Error(`Component type ${typeID} not supported for import`);
     }
     // Clone props to avoid modifying the original props object
     const newProps = {...props};
     // Do the same checks as in exportChild, paying notice that the type is a string
-    const propInfo = getComponentPropInfoFromName(typeName);
+    const component = getComponentFromID(typeID);
+    const propInfo = component.inputs;
     fixProps(newProps, propInfo);
     // Inject key prop which should be the same as the id
-    newProps.key = newProps.id;
+    newProps.key = newProps.objectID;
     // Get the component from the name
-    const type = getComponentFromName(typeName);
-    return createElement(type, newProps);
+    // console.log(type)
+    return createElement(component, newProps);
 }
 
-function deserializeChildren(childrenArray) {
-    const componentClasses = supportedComponents.map(component => component.value.component.name);
-    return childrenArray.map(child => deserializeChild(child, componentClasses));
+export function deserializeChildren(childrenArray) {
+    const componentIDs = components.map(c => c.componentID)
+    return childrenArray.map(child => deserializeChild(child, componentIDs));
 }
 
-const useSerialize = () => {
+export const useStatefulSerialize = () => {
     const {sceneChildren, defaultCameraProps, potreePointBudget} = useContext(ViewerContext)
     return () => {
     return {
@@ -106,7 +105,7 @@ const useSerialize = () => {
     }
 }}
 
-const useDeserialize = () => { 
+export const useStatefulDeserialize = () => { 
     const {setSceneChildren, setDefaultCameraProps, setPotreePointBudget} = useContext(ViewerContext)
     return (obj) => {
         setSceneChildren(deserializeChildren(obj.sceneChildren));
@@ -115,14 +114,14 @@ const useDeserialize = () => {
     }
 }
 
-function EditorIO() {
+export function EditorIO() {
     const inputFile = useRef(null) 
     const onButtonClick = () => {
         // `current` points to the mounted file input element
        inputFile.current.click();
     };
-    const serialize = useSerialize();
-    const deserialize = useDeserialize();
+    const serialize = useStatefulSerialize();
+    const deserialize = useStatefulDeserialize();
     const heading = useMultilang({"en": "import / export", "zh": "導入 / 導出"});
     const importLabel = useMultilang({"en": "import", "zh": "導入"});
     const exportLabel = useMultilang({"en": "export", "zh": "導出"});
@@ -151,6 +150,4 @@ function EditorIO() {
             </div>
         </EditorEmbeddedWidget>
     );
-}
-
-export { EditorIO, exportChildren, deserializeChildren, useSerialize, useDeserialize  };;    
+} 

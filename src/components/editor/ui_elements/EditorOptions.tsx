@@ -1,6 +1,6 @@
-import Translate from "../svgs/translate.svg"
-import Rotate from "../svgs/rotate.svg"
-import Scale from "../svgs/scale.svg"
+import { ReactComponent as Translate } from "../svgs/translate.svg"
+import { ReactComponent as Rotate } from "../svgs/rotate.svg"
+import { ReactComponent as Scale } from "../svgs/scale.svg"
 import { ThemeContext } from "../../App"
 import { formatRGBCSS, useMultilang } from "../../../utilities";
 import MagicDiv from "../../utilities/MagicDiv"

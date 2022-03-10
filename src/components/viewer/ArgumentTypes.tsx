@@ -86,3 +86,5 @@ const MultilineString: EditorInputType = {
 export {
     EditorInputType, NumberType, Vector3Type, Vector4Type, Vector2Type, ColorType, QuaternionType, EulerType, Matrix3Type, Matrix4Type, StringType, URLType, VectorType, MatrixType, BooleanType, MultilineString
 }
+
+export type ArgumentLiteral = "number" | "string" | "url" | "vector" | "vector3" | "vector4" | "vector2" | "color" | "quaternion" | "euler" | "matrix3" | "matrix4" | "matrix" | "boolean" | "multiline-string"

@@ -1,7 +1,7 @@
 import MagicDiv from '../utilities/MagicDiv'
 import HighlightViewport from './Home/HighlightViewport'
 import GenericPage from '../utilities/GenericPage'
-import PotreeObject from '../3d/PotreeObject'
+import { PotreeObject } from '../3d/PotreeObject'
 import { useTheme } from '../../utilities'
 
 function Home() {

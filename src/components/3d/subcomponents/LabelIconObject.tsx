@@ -5,8 +5,9 @@ import { a } from "@react-spring/three"
 import { useLoader } from "@react-three/fiber"
 import { TextureLoader } from "three"
 import UnifiedInteractive from "./UnifiedInteractive"
+import { VaporComponentProps } from "../../viewer/ComponentDeclarations"
 
-type LabelIconObjectProps = JSX.IntrinsicElements["group"] & {
+type LabelIconObjectProps = VaporComponentProps & {
     onClick?: () => void
     iconUrl: string
     iconScale?: number
@@ -23,7 +24,7 @@ export default function LabelIconObject({onClick=()=>{}, iconUrl="/static/viewpo
         config: config.gentle
     })
     return (
-        <UnifiedInteractive onClick={onClick} onHover={()=>{setHovered(true)}} onBlur={()=>{setHovered(false)}} parentID={props.id} position={props.position} scale={props.scale}>
+        <UnifiedInteractive onClick={onClick} onHover={()=>{setHovered(true)}} onBlur={()=>{setHovered(false)}} parentObjectID={props.objectID} position={props.position} scale={props.scale}>
             <Billboard>
                 <mesh scale={iconScale} renderOrder={1}>
                     <planeGeometry attach="geometry" args={[1, 1]}/>

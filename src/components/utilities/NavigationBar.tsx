@@ -5,7 +5,6 @@ import { AuthContext } from '../admin/AuthProvider';
 import { SettingsContext, ThemeContext } from '../App';
 import Logo from "./Logo"
 import MagicDiv from './MagicDiv';
-import _ from "lodash"
 import { Condition } from '../../utilities';
 
 function MultiLangNavLink({text, to, className="", ...props}) {

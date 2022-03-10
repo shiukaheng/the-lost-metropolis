@@ -1,7 +1,8 @@
-import { createContext } from "react"
+import { Camera } from "@react-three/fiber"
+import { createContext, ReactElement, RefObject } from "react"
 
 // Define viewer context
-const defaultViewerContext = {
+const defaultViewerContext: ViewerContextProps = {
     // Default camera props
     defaultCameraProps: {
         position: [0,0,1],
@@ -13,7 +14,7 @@ const defaultViewerContext = {
     cameraRef: {
         current: null
     },
-    audioListener: AudioListener,
+    audioListener: null,
     // Managing scene contents
     sceneChildren: [],
     setSceneChildren: (children:[]) => { },
@@ -24,6 +25,29 @@ const defaultViewerContext = {
     setPotreePointBudget: (budget:number) => {},
     potreeOptimisePointBudget: false,
     setPotreeOptimisePointBudget: (optimise:boolean) => {},
+}
+
+export type DefaultCameraPropType = {
+    position: [number, number, number],
+    rotation: [number, number, number],
+    fov: number
+}
+
+interface ViewerContextProps {
+    defaultCameraProps: DefaultCameraPropType,
+    setDefaultCameraProps: (props) => void,
+    cameraRef: RefObject<Camera>,
+    audioListener: AudioListener | null,
+    // Let sceneChildren be a list of VaporComponent instances
+    sceneChildren: ReactElement<any>[],
+    setSceneChildren: (children:ReactElement<any>[]) => void,
+    addSceneChildren: (children:ReactElement<any>[]) => void,
+    removeSceneChildren: (children:ReactElement<any>[]) => void,
+    updateSceneChildren: (children:ReactElement<any>[]) => void,
+    potreePointBudget: number,
+    setPotreePointBudget: (budget:number) => void,
+    potreeOptimisePointBudget: boolean,
+    setPotreeOptimisePointBudget: (optimise:boolean) => void,
 }
 
 const ViewerContext = createContext(defaultViewerContext)

@@ -1,7 +1,10 @@
 import { useContext, useEffect, useRef, useState } from "react";
+import { NumberType, StringType, URLType } from "../viewer/ArgumentTypes";
+import { VaporComponent, VaporComponentProps } from "../viewer/ComponentDeclarations";
+import { genericInputs } from "../viewer/genericInputs"
 import { PotreeContext } from "./managers/PotreeManager";
 
-type PotreeObjectProps = JSX.IntrinsicElements["group"] & {
+type PotreeObjectProps = VaporComponentProps & {
     cloudName?: string
     baseUrl: string
     pointSize?: number
@@ -9,7 +12,7 @@ type PotreeObjectProps = JSX.IntrinsicElements["group"] & {
     pointShape?: number
 }
 
-function PotreeObject({cloudName="cloud.js", baseUrl, pointSize=1, pointSizeType=2, pointShape=2, id, ...props}:PotreeObjectProps) {
+export const PotreeObject: VaporComponent = ({cloudName="cloud.js", baseUrl, pointSize=1, pointSizeType=2, pointShape=2, id, ...props}:PotreeObjectProps) => {
     const {potree, setPointCloud: setManagerPointCloud} = useContext(PotreeContext)
     const [pointCloud, setPointCloud] = useState(null)
     const objectGroup = useRef(null)
@@ -55,4 +58,20 @@ function PotreeObject({cloudName="cloud.js", baseUrl, pointSize=1, pointSizeType
     );
 }
 
-export default PotreeObject;
+PotreeObject.displayName = "Potree object"
+PotreeObject.componentID = "PotreeObject"
+PotreeObject.inputs = {
+    ...genericInputs,
+    cloudName: {
+        type: StringType,
+        default: "cloud.js"
+    },
+    baseUrl: {
+        type: URLType,
+        default: "http://localhost/"
+    },
+    pointSize: {
+        type: NumberType,
+        default: 1
+    }
+}

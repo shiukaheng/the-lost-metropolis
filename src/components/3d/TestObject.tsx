@@ -1,16 +1,20 @@
 // JSX of magenta wireframe cube using react-three-fiber
 
+import { Color } from "@react-three/fiber";
 import { useContext } from "react";
 import { EditorContext } from "../editor/EditorContext";
+import { ColorType } from "../viewer/ArgumentTypes";
+import { VaporComponent, VaporComponentProps } from "../viewer/ComponentDeclarations";
+import { genericInputs } from "../viewer/genericInputs"
 import UnifiedInteractive from "./subcomponents/UnifiedInteractive";
 
-type TestObjectProps = JSX.IntrinsicElements['group']
+type TestObjectProps = VaporComponentProps & {color: Color, wireframe: boolean}
 
-function TestObject({color, wireframe, ...props}:TestObjectProps): JSX.Element {
+export const TestObject: VaporComponent = ({color, wireframe, position, rotation, scale, ...props}: TestObjectProps) => {
     const editorContext = useContext(EditorContext)
     return (
-        <UnifiedInteractive onClick={()=>{console.log(`${props.name} clicked.`)}} parentID={props.id}>
-            <mesh {...props}>
+        <UnifiedInteractive onClick={()=>{console.log(`${props.displayName} clicked.`)}} parentObjectID={props.objectID}>
+            <mesh {...{position, rotation, scale}}>
                 <boxBufferGeometry attach="geometry" args={[1, 1, 1]} />
                 <meshBasicMaterial attach="material" color={color} wireframe={wireframe}/>
             </mesh>
@@ -18,4 +22,12 @@ function TestObject({color, wireframe, ...props}:TestObjectProps): JSX.Element {
     )
 }
 
-export default TestObject;
+TestObject.displayName = "Test object"
+TestObject.componentID = "TestObject"
+TestObject.inputs = {
+    ...genericInputs,
+    "color": {
+        "type": ColorType,
+        "default": [1, 1, 1]
+    }
+}

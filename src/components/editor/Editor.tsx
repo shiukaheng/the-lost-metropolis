@@ -7,7 +7,7 @@ import EditorComponentProperties from './ui_elements/EditorComponentProperties';
 import MagicDiv from '../utilities/MagicDiv';
 import EditorTransformControls from './ui_elements/EditorTransformControls';
 import EditorOptions from './ui_elements/EditorOptions';
-import { deserializeChildren, EditorIO, exportChildren, useDeserialize, useSerialize } from './ui_elements/EditorIO';
+import { deserializeChildren, EditorIO, exportChildren, useStatefulDeserialize, useStatefulSerialize } from './ui_elements/EditorIO';
 import { Condition, KeyPressCallback, useBufferedPost, useKeyPress, useMultilang } from '../../utilities';
 import EditorSceneSettings from './ui_elements/EditorSceneSettings';
 import { EditorContext } from './EditorContext';
@@ -46,7 +46,7 @@ function EditorManager() {
 
     const setSceneChildren = (newChildren) => {
         // Filter out selected IDs that don't exist in the new scene
-        const newSelectedIDs = selectedIDs.filter(id => newChildren.find(child => child.props.id === id))
+        const newSelectedIDs = selectedIDs.filter(id => newChildren.find(child => child.props.objectID === id))
         setSelectedIDs(newSelectedIDs)
         // Update the scene
         _setSceneChildren(newChildren)
@@ -56,10 +56,10 @@ function EditorManager() {
         setSceneChildren(sceneChildren.filter(child => !childrenToRemove.includes(child)))
     }
 
-    // Wrap children whose child.props.id is in selectedIDs with TransformControls
+    // Wrap children whose child.props.objectID is in selectedIDs with TransformControls
     const wrappedSceneChildren = sceneChildren.map(child => {
         return (
-            <EditorTransformControls enabled={selectedIDs.includes(child.props.id)} key={child.props.id}>
+            <EditorTransformControls enabled={selectedIDs.includes(child.props.objectID)} key={child.props.objectID}>
                 {child}
             </EditorTransformControls>
         )
@@ -67,8 +67,8 @@ function EditorManager() {
 
     const [editorExpanded, setEditorExpanded] = useState(true)
 
-    const serialize = useSerialize()
-    const deserialize = useDeserialize()
+    const serialize = useStatefulSerialize()
+    const deserialize = useStatefulDeserialize()
 
     const { id } = useParams();
     const [buffer, setBuffer, post, push, pull, changed, overwriteWarning] = useBufferedPost(id, ["data"], undefined, (buffer) => {
