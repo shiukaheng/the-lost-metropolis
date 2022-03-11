@@ -51,7 +51,7 @@ const uploadFolderToBucket = async (localPath:string, bucket:Bucket, bucketUploa
     // Get all the files in the localPath directory
     const files = fs.readdirSync(localPath)
     // Get an array of file sizes
-    const fileSizes = files.map(file => fs.statSync(path.join(localPath, file)).size)
+    // const fileSizes = files.map(file => fs.statSync(path.join(localPath, file)).size)
     // For each file, create a new filename that includes the path used in the bucket, and upload the file to the bucket
     for (const file of files) {
         const localFilePath = path.join(localPath, file)
@@ -165,8 +165,11 @@ export const handleNewFile = functions.storage.object().onFinalize(async (object
         }
     } catch (error) {
         functions.logger.error(error)
-        throw error
+        // throw error
     }
+    // Delete the uploaded file from the bucket
+    const bucket = admin.storage().bucket()
+    object.name && await bucket.file(object.name).delete()
 })
 
 

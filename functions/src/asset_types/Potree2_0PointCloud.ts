@@ -1,7 +1,4 @@
-import { AssetConverterFunction, AssetType } from "./AssetType";
-// Import path, os, fs
-import * as path from "path";
-import * as os from "os";
+import { AssetType } from "./AssetType";
 import * as fs from "fs";
 
 export class Potree2_0PointCloud extends AssetType {
