@@ -43,3 +43,19 @@ export type Asset = {
     public: boolean;
 }
 
+export type RawAssetDocument = {
+    createdAt: any;
+    name: string;
+    sourceAssetType: string;
+    targetAssetType: string;
+    assetData: object;
+    uploaded: boolean;
+    pending: boolean;
+    processedProgress: number;
+    processed: boolean;
+    viewers: string[];
+    editors: string[];
+    owner: string;
+    public: boolean;
+}
+
