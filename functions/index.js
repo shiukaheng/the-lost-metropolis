@@ -16,10 +16,40 @@ const fs = require('fs');
 // });
 
 // Listen for new files uploaded to the default storage bucket.
-// Delete the file if any of the following conditions are false:
-// 1. The file is a zip file
-// 2. The file's name excluding the extension has a corresponding document of the same name in the assets collection
-// 2. The file contains a metadata.json file
-// 3. The metadata.json can be parsed
-// 4. The metadata json is valid (check with validateMetadata function)
-// 5. All the files referenced in the metadata.json exist in the zip file
+
+// On file creation, try to get corresponding asset document from firestore using getAssetDocument function, if it returns null, throw an error
+// If it returns a document, set it to a variable and use a try catch block to do the following:
+// try {
+    // Update document pending property to false
+    // Download the file from the bucket and unzip it
+    // Throw an error if the zip does not contain a metadata.json at the root
+    // Try parse the metadata.json file
+    // Run getProcessor function, which also validates the metadata
+    // Update assetData, sourceAssetType, targetAssetType, name, from the metadata.json
+    // Process the asset using processAsset function, which updates processedProgress regularly
+    // Update processedProgress to 1 and processed to true
+    // Upload the processed asset to the target bucket
+    // Update document ready property to true
+// catch (error) {
+    // Set the asset document's ready property to false, and set the error property to the error message. Also throw an error.
+// }
+
+const getAsset = (assetFileName) => {
+    if (assetFileName.endsWith('.zip')) {
+        return admin.firestore().collection('assets').doc(assetFileName).get()
+    } else {
+        return null
+    }
+}
+
+const sourceTypes = ["lasPointCloud", "potree2.0"]
+const targetTypes = ["potree2.0"]
+
+const getProcessor = (metadata) => {
+    // Check if sourceType and targetType are valid, whether there is a mapping between them, and whether the name is valid
+    // Finally run sourceType specific validation if it exists: sourceTypeValidator(metadata, rootPath)
+    // Return the processor function
+}
+
+
+

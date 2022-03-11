@@ -15,8 +15,8 @@ export type MultiLangString = {
 export type Role = "owner" | "editor" | "viewer" | "public"
 
 export type Post = {
-    createdAt: any;
-    updatedAt: any;
+    createdAt: string;
+    updatedAt: string;
     title: MultiLangString;
     description: MultiLangString;
     data: object;
@@ -28,8 +28,18 @@ export type Post = {
 }
 
 export type Asset = {
-    createdAt: any;
-    data: object;
-    
+    createdAt: string;
+    name: string;
+    sourceAssetType: string;
+    targetAssetType: string;
+    assetData: object;
+    uploaded: boolean; // Marked when uploaded to firebase by client
+    pending: boolean; // Marked as true initially, update to false when cloud function recognizes uploaded asset
+    processedProgress: number; // 0 to 1, updated by cloud function
+    processed: boolean; // Marked as true when all processing completed
+    viewers: string[]; // Note permission controls are disabled for now, all assets will be publically viewable
+    editors: string[];
+    owner: string;
+    public: boolean;
 }
 
