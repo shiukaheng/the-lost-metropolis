@@ -62,7 +62,7 @@ const uploadFolderToBucket = async (localPath:string, bucket:Bucket, bucketUploa
     // No progress tracking for now
 }
 
-export const handleNewFile = functions.storage.object().onFinalize(async (object) => {
+export const handleNewFile = functions.region("asia-east1").storage.object().onFinalize(async (object) => {
     try {
         // Fetch the document corresponding to the uploaded file
         if (!(typeof object.name === "string")) {
@@ -85,7 +85,7 @@ export const handleNewFile = functions.storage.object().onFinalize(async (object
             }
             // Mount buckets, the default bucket as bucket, and the static bucket (the-lost-metropolis-static) as staticBucket
             const bucket = admin.storage().bucket()
-            const staticBucket = admin.storage().bucket('the-lost-metropolis-static')
+            const staticBucket = admin.storage().bucket('the-lost-metropolis-production-static')
             // Unzip the file to /<temp>/asset-unzip/
             const assetUnzippedPath = path.join(os.tmpdir(), "asset-unzip")
             await bucket.file(object.name).download({destination: assetUnzippedPath})

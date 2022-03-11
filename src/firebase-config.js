@@ -11,13 +11,13 @@ import { getStorage } from "firebase/storage"
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyClNjD0uFDgapYKOnsMkmj212PBbeSIA5s",
-  authDomain: "the-lost-metropolis.firebaseapp.com",
-  projectId: "the-lost-metropolis",
-  storageBucket: "the-lost-metropolis.appspot.com",
-  messagingSenderId: "796499308381",
-  appId: "1:796499308381:web:ffee9756612bea6ec842b4",
-  measurementId: "G-9GNB7T4RG4",
+  apiKey: "AIzaSyBN4OPeQly_ei-ttR9pliK8Rvt1Oem2ARg",
+  authDomain: "the-lost-metropolis-prod-c48c6.firebaseapp.com",
+  projectId: "the-lost-metropolis-prod-c48c6",
+  storageBucket: "the-lost-metropolis-prod-c48c6.appspot.com",
+  messagingSenderId: "1056722334454",
+  appId: "1:1056722334454:web:5d3395266c2ca560e432d7",
+  measurementId: "G-3QRQW5LVCQ"
 };
 
 // Initialize Firebase
