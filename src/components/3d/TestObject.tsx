@@ -13,7 +13,7 @@ type TestObjectProps = VaporComponentProps & {color: Color, wireframe: boolean}
 export const TestObject: VaporComponent = ({color, wireframe, position, rotation, scale, ...props}: TestObjectProps) => {
     const editorContext = useContext(EditorContext)
     return (
-        <UnifiedInteractive onClick={()=>{console.log(`${props.displayName} clicked.`)}} parentObjectID={props.objectID}>
+        <UnifiedInteractive onClick={()=>{console.log(`${props.name} clicked.`)}} parentObjectID={props.objectID}>
             <mesh {...{position, rotation, scale}}>
                 <boxBufferGeometry attach="geometry" args={[1, 1, 1]} />
                 <meshBasicMaterial attach="material" color={color} wireframe={wireframe}/>

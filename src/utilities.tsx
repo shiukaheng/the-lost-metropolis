@@ -43,6 +43,9 @@ export function formatRGBCSS(color: number[]): string {
 
 export function useKeyPress(targetKey: string) {
     const [pressed, setPressed] = useState(false);
+    useOnLoseFocus(()=>{
+        setPressed(false);
+    })
     const onDownRef = useRef(() => {
         setPressed(true)
     })
@@ -56,6 +59,18 @@ export function useKeyPress(targetKey: string) {
         useAsyncKeyPress(targetKey, onDownRef, onUpRef)
     }
     return pressed;
+}
+
+export const useOnLoseFocus = (onLoseFocus: () => void) => {
+    const onFocus = useCallback(() => {
+        onLoseFocus()
+    }, [onLoseFocus])
+    useEffect(() => {
+        window.addEventListener("blur", onFocus)
+        return () => {
+            window.removeEventListener("blur", onFocus)
+        }
+    }, [onFocus])
 }
 
 export function useAsyncKeyPress(targetKey, onKeyDownRef, onKeyUpRef) {
