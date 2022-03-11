@@ -7,7 +7,7 @@ import * as fs from "fs";
 export class Potree2_0PointCloud extends AssetType {
     static conversionMap = new Map()
     static assetTypeName = "Potree2_0PointCloud";
-    static validate(assetData, rootPath) {
+    static validate(assetData:object, rootPath:string) {
         // Check that rootPath is actually a directory
         if (!fs.lstatSync(rootPath).isDirectory()) {
             throw `rootPath ${rootPath} is not a directory`

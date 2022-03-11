@@ -1,4 +1,9 @@
-export type AssetConverterFunction = (sourceMetadata: object, sourceRootPath: string, targetRootPath: string, progressCallback?:(number)=>void) => Promise<void>;
+export type AssetConverterFunction = (
+    sourceMetadata: object, 
+    sourceRootPath: string, 
+    targetRootPath: string, 
+    progressCallback?:(progress: number)=>void
+    ) => Promise<void>;
 export abstract class AssetType {
     static conversionMap: Map<AssetType, AssetConverterFunction>;
     static assetTypeName: string;

@@ -1,13 +1,9 @@
-import { AssetConverterFunction } from './asset_types/AssetType';
 import { Potree2_0PointCloud } from './asset_types/Potree2_0PointCloud';
-import { Asset, RawAssetDocument } from './../../src/types';
 import * as functions from "firebase-functions";
-import admin from "firebase-admin"
-import { Source } from "postcss";
+import * as admin from "firebase-admin"
 import * as path from "path";
 import * as os from "os";
 import * as fs from "fs";
-import { FSWatcher } from 'vite';
 import { Bucket } from "@google-cloud/storage"
 admin.initializeApp()
 
@@ -50,7 +46,7 @@ admin.initializeApp()
 
 export const assetTypes = [Potree2_0PointCloud]
 
-const uploadFolderToBucket = async (localPath:string, bucket:Bucket, bucketUploadPath:string, progressCallback?:(number)=>any) => {
+const uploadFolderToBucket = async (localPath:string, bucket:Bucket, bucketUploadPath:string, progressCallback?:(progress: number)=>any) => {
     // Maps all the files recursively in the localPath directory, and uploads them to the bucket in the same folder structure:
     // Get all the files in the localPath directory
     const files = fs.readdirSync(localPath)
@@ -69,7 +65,13 @@ const uploadFolderToBucket = async (localPath:string, bucket:Bucket, bucketUploa
 export const handleNewFile = functions.storage.object().onFinalize(async (object) => {
     try {
         // Fetch the document corresponding to the uploaded file
-        const assetFileName = path.basename(object.name)
+        if (!(typeof object.name === "string")) {
+            throw new Error("Invalid file name")
+        }
+        const assetFileName = path.basename(object.name).split(".")[0]
+        if (assetFileName.length === 0) {
+            throw new Error("Invalid file name after stripping extension and path") 
+        }
         const assetDocumentRef = admin.firestore().collection("assets").doc(assetFileName)
         // Throw error if document does not exist
         const assetDocument = await assetDocumentRef.get()
@@ -132,6 +134,9 @@ export const handleNewFile = functions.storage.object().onFinalize(async (object
                 await uploadFolderToBucket(path.join(assetUnzippedPath, "data"), staticBucket, `${assetFileName}`)
             } else {
                 // If conversion is needed, convert the asset to the targetAssetType and upload the converted data to the static bucket
+                if (converter === undefined) {
+                    throw new Error(`File ${assetFileName} cannot be converted to ${targetAssetType.assetTypeName}`)
+                }
                 const assetConvertedDataPath = path.join(os.tmpdir(), "asset-converted-data")
                 await converter(assetData, path.join(assetUnzippedPath, "data"), assetConvertedDataPath, (progress) => {
                     assetDocumentRef.update({
