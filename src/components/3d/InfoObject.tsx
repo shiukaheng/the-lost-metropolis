@@ -42,7 +42,7 @@ export const InfoObject: VaporComponent = ({text="", iconSize=0.1, fontSize=0.1,
 }
 
 InfoObject.displayName = "Info object"
-InfoObject.componentID = "InfoObject"
+InfoObject.componentType = "InfoObject"
 InfoObject.inputs = {
     ...genericInputs,
     text: {

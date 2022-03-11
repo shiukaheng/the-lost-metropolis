@@ -25,7 +25,7 @@ export type VaporInputsType = Record<string, VaporInputType>
 
 export interface VaporComponent extends FunctionComponent<VaporComponentProps> {
     displayName: string,
-    componentID: string,
+    componentType: string,
     inputs: VaporInputsType
 }
 
@@ -38,7 +38,7 @@ export const components = [
     DebugPlane
 ]
 
-export function getComponentFromID(componentID) {
+export function getComponentFromTypeName(componentType) {
     // return componentSpecifications.find(item => item.value.component.name === componentName).value.inputs // 
-    return components.find(item => item.componentID === componentID)
+    return components.find(item => item.componentType === componentType)
 }

@@ -236,7 +236,7 @@ function buildGeometry(verts_wide = VERTS_WIDE, verts_tall = VERTS_TALL) {
 }
 
 DepthKitObject.displayName = "DepthKit Object";
-DepthKitObject.componentID = "DepthKitObject";
+DepthKitObject.componentType = "DepthKitObject";
 DepthKitObject.inputs = {
   ...genericInputs,
   metaUrl: {

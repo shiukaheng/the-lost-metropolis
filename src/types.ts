@@ -27,3 +27,9 @@ export type Post = {
     role?: Role;
 }
 
+export type Asset = {
+    createdAt: any;
+    data: object;
+    
+}
+

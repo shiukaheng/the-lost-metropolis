@@ -23,7 +23,7 @@ export const TestObject: VaporComponent = ({color, wireframe, position, rotation
 }
 
 TestObject.displayName = "Test object"
-TestObject.componentID = "TestObject"
+TestObject.componentType = "TestObject"
 TestObject.inputs = {
     ...genericInputs,
     "color": {

@@ -17,7 +17,7 @@ export const LinkObject: VaporComponent = ({url, ...props}:LinkObjectProps) => {
 }
 
 LinkObject.displayName = "Link object"
-LinkObject.componentID = "LinkObject"
+LinkObject.componentType = "LinkObject"
 LinkObject.inputs = {
     ...genericInputs,
     url: {

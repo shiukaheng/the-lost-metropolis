@@ -23,7 +23,7 @@ export const DebugPlane: VaporComponent = ({width=10, height=10, width_segments=
 }
 
 DebugPlane.displayName = "Debug plane"
-DebugPlane.componentID = "DebugPlane"
+DebugPlane.componentType = "DebugPlane"
 DebugPlane.inputs = {
     ...genericInputs,
     width: {

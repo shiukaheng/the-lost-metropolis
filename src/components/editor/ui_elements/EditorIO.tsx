@@ -1,5 +1,5 @@
 import MagicDiv from "../../utilities/MagicDiv";
-import { components, getComponentFromID, VaporInputsType} from "../../viewer/ComponentDeclarations";
+import { components, getComponentFromTypeName, VaporInputsType} from "../../viewer/ComponentDeclarations";
 import EditorEmbeddedWidget from "./EditorEmbeddedWidget";
 import { createElement, useContext, useRef } from "react";
 import FileSaver from "file-saver"
@@ -25,7 +25,7 @@ export function exportChild(child) {
     fixProps(newProps, type.inputs);
     // Note: We export type variable as string
     return {
-        type: type.componentID,
+        componentType: type.componentType,
         props: newProps
     };
 }
@@ -60,7 +60,7 @@ export function fixProps(newProps, propInfo:VaporInputsType) {
     });
     // Check whether id prop is missing, if so generate from uuidv4
     if (!("objectID" in newProps)) {
-        console.warn(`componentID missing, generating one to fill in`);
+        console.warn(`componentType missing, generating one to fill in`);
         newProps["objectID"] = uuidv4();
     }
 }
@@ -71,16 +71,16 @@ export function exportChildren(childrenArray) {
 
 // Deserialization: Reading from JSON compatible object, matching them to components from supportedComponents, and instantiating them with createElement 
 
-export function deserializeChild(child, componentIDs) {
-    const {type: typeID, props} = child;
+export function deserializeChild(child, componentTypes) {
+    const {componentType, props} = child;
     // Check whether type is supported
-    if (!(componentIDs.includes(typeID))) {
-        throw new Error(`Component type ${typeID} not supported for import`);
+    if (!(componentTypes.includes(componentType))) {
+        throw new Error(`Component type ${componentType} not supported for import`);
     }
     // Clone props to avoid modifying the original props object
     const newProps = {...props};
     // Do the same checks as in exportChild, paying notice that the type is a string
-    const component = getComponentFromID(typeID);
+    const component = getComponentFromTypeName(componentType);
     const propInfo = component.inputs;
     fixProps(newProps, propInfo);
     // Inject key prop which should be the same as the id
@@ -91,8 +91,8 @@ export function deserializeChild(child, componentIDs) {
 }
 
 export function deserializeChildren(childrenArray) {
-    const componentIDs = components.map(c => c.componentID)
-    return childrenArray.map(child => deserializeChild(child, componentIDs));
+    const componentTypes = components.map(c => c.componentType)
+    return childrenArray.map(child => deserializeChild(child, componentTypes));
 }
 
 export const useStatefulSerialize = () => {

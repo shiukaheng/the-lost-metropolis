@@ -59,7 +59,7 @@ export const PotreeObject: VaporComponent = ({cloudName="cloud.js", baseUrl, poi
 }
 
 PotreeObject.displayName = "Potree object"
-PotreeObject.componentID = "PotreeObject"
+PotreeObject.componentType = "PotreeObject"
 PotreeObject.inputs = {
     ...genericInputs,
     cloudName: {
