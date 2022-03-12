@@ -15,6 +15,7 @@ import { ViewerManager } from '../viewer/Viewer';
 import { ViewerContext } from '../viewer/ViewerContext';
 import MagicButton from '../utilities/MagicButton';
 import { useParams } from 'react-router-dom';
+import EditorAssetManager from './ui_elements/EditorAssetManager';
 
 function Editor() {
     return (
@@ -103,38 +104,42 @@ function EditorManager() {
             {selectedIDs, setSelectedIDs, addSelectedIDs, removeSelectedIDs, transformMode, setTransformMode, transformSpace, setTransformSpace, overrideInteractions, setOverrideInteractions, shiftPressed, setSceneChildren, removeSceneChildren}
         }>
             <KeyPressCallback keyName={"Escape"} onDown={()=>{setSelectedIDs([])}}/>
-            <MagicDiv backgroundColorCSSProps={["backgroundColor"]} className="absolute w-full h-full">
-                <div className="absolute w-full h-full bg-black" onClick={()=>{audioListener.context.resume()}}>
-                    <EditorViewport className="w-full h-full">
-                        <DebugPlane rotation={[Math.PI/2, 0, 0]}/>
-                        {wrappedSceneChildren}
-                    </EditorViewport>
-                </div>
-            </MagicDiv>
-            <MagicDiv className="absolute w-[500px] h-full flex flex-col p-8 overflow-clip select-none">
-                <div className="editor-embedded-widget text-2xl font-bold">
-                    <div className="flex flex-row gap-4">
-                        <div className='text-3xl'>{heading}</div>
-                        <Condition condition={post.role === "owner" || post.role === "editor"}>
-                            {overwriteWarning ? <MagicButton solid onClick={pull}>{pullLabel}</MagicButton> : null}
-                            <MagicButton disabled={!changed} onClick={push}>{updateLabel}</MagicButton>
-                        </Condition>
-                        <div className="ml-auto cursor-pointer text-xl select-none" onClick={()=>{setEditorExpanded(!editorExpanded)}}>{editorExpanded ? "-" : "+"}</div>    
+            <div className="flex flex-row absolute w-full h-full overflow-hidden">
+                <MagicDiv backgroundColorCSSProps={["backgroundColor"]} className="w-[450px] h-full flex flex-col overflow-clip select-none shrink-0 border-r">
+                    <div className="border-b border-white text-2xl font-bold p-8 pb-4">
+                        <div className="flex flex-row gap-4">
+                            <div className='text-3xl'>{heading}</div>
+                            <Condition condition={post?.role === "owner" || post?.role === "editor"}>
+                                {overwriteWarning ? <MagicButton solid onClick={pull}>{pullLabel}</MagicButton> : null}
+                                <MagicButton disabled={!changed} onClick={push}>{updateLabel}</MagicButton>
+                            </Condition>
+                            <div className="ml-auto cursor-pointer text-xl select-none" onClick={()=>{setEditorExpanded(!editorExpanded)}}>{editorExpanded ? "-" : "+"}</div>    
+                        </div>
+                        {(overwriteWarning && buffer) ? <div className="font-bold text-yellow-400 text-sm pt-2">{overwriteLabel}</div> : null}
                     </div>
-                    {(overwriteWarning && buffer) ? <div className="font-bold text-yellow-400 text-sm pt-2">{overwriteLabel}</div> : null}
-                </div>
-                {
-                    editorExpanded ?
-                    <div className='overflow-auto'>
-                        <EditorComponentGraph/>
-                        <EditorComponentProperties/>
-                        <EditorOptions/>
-                        <EditorIO/>
-                        <EditorSceneSettings/>
+                    {
+                        editorExpanded ?
+                        <div className='overflow-auto p-8 pt-0'>
+                            <EditorComponentGraph/>
+                            <EditorAssetManager/>
+                            <EditorComponentProperties/>
+                            <EditorOptions/>
+                            <EditorIO/>
+                            <EditorSceneSettings/>
+                        </div>
+                        : null
+                    }
+                </MagicDiv>
+                <MagicDiv backgroundColorCSSProps={["backgroundColor"]} className="relative w-full h-full overflow-clip">
+                    <div className="bg-black w-full h-full" onClick={()=>{audioListener.context.resume()}}>
+                        <EditorViewport className="w-full h-full">
+                            <DebugPlane rotation={[Math.PI/2, 0, 0]}/>
+                            {wrappedSceneChildren}
+                        </EditorViewport>
                     </div>
-                    : null
-                }
-            </MagicDiv>
+                </MagicDiv>
+                
+            </div>
         </EditorContext.Provider>
     );
 }

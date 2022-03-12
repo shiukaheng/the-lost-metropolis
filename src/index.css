@@ -9,7 +9,7 @@
 }
 
 .editor-embedded-widget {
-    @apply border-b border-white py-2
+    @apply border-b border-white py-2;
 }
 
 .page-margins {

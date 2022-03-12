@@ -8,6 +8,5 @@ export default defineConfig({
   plugins: [react(), glsl(), svgrPlugin()],
   build: {
     sourcemap: true,
-    // minify: false
   }
 })

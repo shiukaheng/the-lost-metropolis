@@ -114,7 +114,7 @@ function EditingForm({className="", editor3dMode=false}) {
                     </tbody>
                 </table>
             </div>
-            <Condition condition={post.role === "editor" || post.role === "owner"}>
+            <Condition condition={post?.role === "editor" || post?.role === "owner"}>
                 <EmbeddedRow position="bottom" className="h-16">
                     <EmbeddedButton className="basis-3/4" onClick={push} disabled={!changed}>{saveLabel}</EmbeddedButton>
                     <EmbeddedButton className="basis-1/4 border-l" backgroundColor={[209, 54, 70]} onClick={deleteTrigger}>{deleteLabel}</EmbeddedButton>

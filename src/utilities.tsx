@@ -5,7 +5,7 @@ import { languages, SettingsContext, ThemeContext } from "./components/App";
 import { ContentContext } from "./components/providers/ContentProvider";
 import { cloneDeep, isEqual } from "lodash"
 import { useFrame } from "@react-three/fiber";
-import { Maybe, Post, SubscriptionProvider } from "./types";
+import { Post, SubscriptionProvider } from "./types";
 
 export function formatRGBCSS(color: number[]): string {
     return "rgb(" + color[0] + "," + color[1] + "," + color[2] + ")";
@@ -73,7 +73,16 @@ export const useOnLoseFocus = (onLoseFocus: () => void) => {
     }, [onFocus])
 }
 
-export function useAsyncKeyPress(targetKey, onKeyDownRef, onKeyUpRef) {
+export function useRefState(initialValue) {
+    const [value, setValue] = useState(initialValue);
+    const ref = useRef(initialValue);
+    useEffect(()=>{
+        ref.current = value;
+    }, value)
+    return [ref, value, setValue]
+}
+
+export function useAsyncKeyPress(targetKey, onKeyDownRef={current:()=>{}}, onKeyUpRef={current: ()=>{}}) {
     // State for keeping track of whether key is pressed
     const [keyPressed, setKeyPressed] = useState<boolean>(false);
     // If pressed key is our target key then set to true
@@ -355,4 +364,23 @@ export const useTheme = (targetTheme) => {
 
 export function Condition({condition, children}) {
     return condition ? children : null
+}
+
+export function useChooseFile(): [()=>void, File] {
+    // Returns createPrompt function and file object
+    const [file, setFile] = useState(null)
+    // Create an input DOM object that will be used to trigger the file upload prompt
+    const inputRef = useRef(null)
+    useEffect(()=>{
+        inputRef.current = document.createElement("input")
+        inputRef.current.type = "file"
+        inputRef.current.style.display = "none"
+        inputRef.current.addEventListener("change", (e) => {
+            setFile(e.target.files[0])
+        })
+    }, [])
+    const createPrompt = () => {
+        inputRef.current.click()
+    }
+    return [createPrompt, file]
 }

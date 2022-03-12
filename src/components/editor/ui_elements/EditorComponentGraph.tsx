@@ -3,7 +3,7 @@ import Select from 'react-select';
 import MagicDiv from "../../utilities/MagicDiv";
 import { createElement, useState, useContext } from "react";
 import { v4 as uuidv4 } from 'uuid';
-import { useKeyPress, KeyPressCallback, formatRGBCSS, useMultilang } from "../../../utilities";
+import { KeyPressCallback, formatRGBCSS, useMultilang } from "../../../utilities";
 import { ThemeContext } from "../../App"
 import { EditorContext } from "../EditorContext";
 import { ViewerContext } from "../../viewer/ViewerContext";
@@ -55,28 +55,28 @@ export default function EditorComponentGraph() {
             ...provided,
             fontSize: "15px",
             // backgroundColor: formatRGBCSS(theme.backgroundColor),
-            color: formatRGBCSS(theme.foregroundColor)
+            color: formatRGBCSS(theme.backgroundColor)
         }),
         control: (provided, state) => ({
             // none of react-select's styles are passed to <Control />
             ...provided,
             borderRadius: "999px",
-            backgroundColor: formatRGBCSS(theme.backgroundColor),
+            backgroundColor: formatRGBCSS(theme.foregroundColor),
             color: formatRGBCSS(theme.foregroundColor)
         }),
         singleValue: (provided, state) => {
             const opacity = state.isDisabled ? 0.5 : 1;
             const transition = 'opacity 300ms';
-            const color = formatRGBCSS(theme.foregroundColor);
+            const color = formatRGBCSS(theme.backgroundColor);
             return { ...provided, opacity, transition, color };
         },
         menu: (provided, state) => ({
             ...provided,
             borderRadius: "20px",
             overflow: "clip",
-            backgroundColor: formatRGBCSS(theme.backgroundColor),
-            color: formatRGBCSS(theme.foregroundColor),
-            borderColor: formatRGBCSS(theme.foregroundColor),
+            backgroundColor: formatRGBCSS(theme.foregroundColor),
+            color: formatRGBCSS(theme.backgroundColor),
+            // borderColor: formatRGBCSS(theme.backgroundColor),
             borderWidth: "1px",
         })
     }

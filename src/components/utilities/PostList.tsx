@@ -10,9 +10,11 @@ import { AuthContext } from "../admin/AuthProvider"
 import { Condition } from "../../utilities"
 
 const StyledRow = tw.tr`border-b border-t border-current md:hover:opacity-50 transition-opacity duration-500 cursor-pointer table-row text-ellipsis`
+const StyledHeaderRow = tw.tr`border-b border-current table-row text-ellipsis`
 const StyledCell = tw.td`text-left font-serif md:text-lg font-semibold pt-2 pb-6 table-cell`
+const StyledHeaderCell = tw.td`text-left font-serif md:text-lg font-bold pt-2 pb-2 table-cell`
 
-function PostList({posts, onPostClick=(post)=>{}, columnMakers=[], createButton=false}) {
+function PostList({posts, onPostClick=(post)=>{}, columnMakers=[], createButton=false, headers=[]}) {
     const [searchTerm, setSearchTerm] = useState("")
     const {settings} = useContext(SettingsContext)
     const placeholder = {
@@ -36,6 +38,18 @@ function PostList({posts, onPostClick=(post)=>{}, columnMakers=[], createButton=
             </div>
             <table className="w-full">
                 <tbody>
+                    {
+                        headers ?
+                        (<StyledHeaderRow>
+                            {
+                                headers.map(column => (
+                                    <StyledHeaderCell key={column}>
+                                        {column}
+                                    </StyledHeaderCell>
+                                ))
+                            }
+                        </StyledHeaderRow>) : null
+                    }
                     {
                         postList.map((post, postIndex) => (
                             <StyledRow key={postIndex} onClick={()=>{onPostClick(post)}}>
