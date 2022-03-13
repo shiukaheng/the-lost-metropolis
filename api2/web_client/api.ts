@@ -1,5 +1,5 @@
 import { RecursivePartial } from "../utility_types";
-import { Instance, InstanceID, Post } from "../types";
+import { Instance, InstanceID, Post, isValidPost, postSchema } from "../types";
 import { PostDocData } from "./types";
 
 export default class VaporAPI {
@@ -27,17 +27,20 @@ export default class VaporAPI {
     }
 
     // Utilities
-    static subscribePosts(getPostCallback): () => void {
+    static subscribePosts(getPostCallback: (postInstances: Array<Instance<Post>>) => void): () => void {
         // returns unsubscriber
     }
     static exportPost(post: RecursivePartial<Post>, fillDefaults=false): Partial<PostDocData> {
         // returns raw post
+        let actualPost: Post
+        if (isValidPost(post)) {
+            actualPost = post
+        } else {
+            actualPost = postSchema.cast(post) as Post
+        }
     }
     static importPost(rawPost:PostDocData): Post {
         // returns post
-    }
-    static isValidPost(partialPost: RecursivePartial<Post>): partialPost is Post {
-        // returns bool
     }
 }
 
