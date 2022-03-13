@@ -1,0 +1,10 @@
+WIP!
+
+Posts have a owner, lists of viewers and editors, and a public bool. These determine the permissions to edit and view the post.
+Posts have an attached assets list, which is a list of assets attached to the post.
+
+[] = Client side logic
+<> = Server side logic
+
+Post -> Add asset -> [Create initial asset object] -> [upload asset to folder with post id as name] -> 
+<Find corresponding asset object and update asset data with file contents>

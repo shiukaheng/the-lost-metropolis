@@ -11,36 +11,6 @@ export function formatRGBCSS(color: number[]): string {
     return "rgb(" + color[0] + "," + color[1] + "," + color[2] + ")";
 }
 
-// function useKeyPress(targetKey) {
-//     // State for keeping track of whether key is pressed
-//     const [keyPressed, setKeyPressed] = useState<boolean>(false);
-//     // If pressed key is our target key then set to true
-//     function downHandler({ key }) {
-//         if (key === targetKey) {
-//             console.log("Key pressed: " + key)
-//             setKeyPressed(true);
-//         }
-//     }
-//     // If released key is our target key then set to false
-//     const upHandler = ({ key }) => {
-//         if (key === targetKey) {
-//             console.log("Key released: " + key)
-//             setKeyPressed(false);
-//         }
-//     };
-//     // Add event listeners
-//     useEffect(() => {
-//         window.addEventListener("keydown", downHandler);
-//         window.addEventListener("keyup", upHandler);
-//         // Remove event listeners on cleanup
-//         return () => {
-//             window.removeEventListener("keydown", downHandler);
-//             window.removeEventListener("keyup", upHandler);
-//         };
-//         }, []); // Empty array ensures that effect is only run on mount and unmount
-//     return keyPressed;
-// }
-
 export function useKeyPress(targetKey: string) {
     const [pressed, setPressed] = useState(false);
     useOnLoseFocus(()=>{
