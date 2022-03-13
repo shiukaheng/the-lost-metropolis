@@ -1,42 +1,11 @@
-import { subscribeToEditablePosts } from './api';
+import { PostDoc, RawPost } from '../api/implementation_types';
 import { addDoc, collection, deleteDoc, onSnapshot, Timestamp, updateDoc, doc, query, where, setDoc, getDoc } from "firebase/firestore";
 import { auth, db, storage } from "./firebase-config";
-import { ref, uploadBytes, uploadBytesResumable } from "firebase/storage";
+import { ref, uploadBytesResumable } from "firebase/storage";
 import { signOut } from "firebase/auth";
 import { createEmptyMultilangString } from "./utilities";
 import { v4 as uuidv4 } from "uuid";
-
-// Functions to further abstract API calls to firebase for easier understanding / maintenance / migration
-
-// General use
-
-// - Subscribe to all posts that are public -> Subscribe to query posts collection and return all posts with public = true
-// This will call a callback with a list of posts in the format from the database whenever there are changes:
-// [
-//   Document {
-//     data: <function>,
-//     public: <bool>,
-//     createdAt: <str>,
-//     updatedAt: <str>,
-//     owner: <str>,
-//     viewers: <array>,
-//     editors: <array>,
-//   }
-// ]
-// Which needs to transformed into the format:
-// [
-//   {
-//     id: <str>, - from document.id
-//     title: <str>,
-//     description: <str>,
-//     data: <str>, - serialized 3D content
-//     createdAt: <str>,
-//     updatedAt: <str>,
-//     owner: <str>,
-//     viewers: <array>,
-//     editors: <array>,
-//   }
-// ]
+import { Asset, PostID, Post, SubscriberCallback, AssetID, UserID, Permissions, AbstractVaporAPI, AssetStatus, WithRole } from '../api/types';
 
 // Given a target object, remove all properties that are not in the reference object
 function filterObjectStructure(target, reference) {
@@ -107,23 +76,6 @@ export const logOut = async () => {
     await signOut(auth)
 }
 
-// Admin / creating data
-
-// Subscribe to all editable posts -> Subscribe to query posts collection and return all posts where owner = currentUser or readCollaborators contains currentUser
-// This will call a callback with a list of posts in the format from the database whenever there are changes:
-// [
-//   {
-//     id: <str>, - from document.id
-//     title: <str>,
-//     description: <str>,
-//     data: <str>, - serialized 3D content
-//     createdAt: <str>,
-//     updatedAt: <str>,
-//     owner: <str>,
-//     viewers: <array>,
-//     editors: <array>,
-//   }
-// ]
 export const ownerPostProvider = (callback) => subscribeToPostQuery([where("owner", "==", auth.currentUser ? auth.currentUser.uid : null)], callback)
 export const editorPostProvider = (callback) => subscribeToPostQuery([where("editors", "array-contains", auth.currentUser ? auth.currentUser.uid : null)], callback)
 export const viewerPostProvider = (callback) => subscribeToPostQuery([where("viewers", "array-contains", auth.currentUser ? auth.currentUser.uid : null)], callback)
@@ -160,87 +112,3 @@ export const deletePost = async (id) => {
     const postRef = doc(db, "posts", id)
     await deleteDoc(postRef) // https://firebase.google.com/docs/firestore/manage-data/delete-data#delete_a_document
 }
-
-type Progress = {
-    currentStage: string,
-    stages: string[],
-    currentProgress: number
-}
-
-// - Upload asset -> Creates entry in assets collection and uploads zip to storage -> Cloud function gets triggered to unzip files to folder -> Updates document in assets collection
-export const uploadAsset = async (file, waitUntilProcessed=true, onProgress=(progress:Progress)=>{}, viewers=[], editors=[], isPublic=false) => {
-    const id = uuidv4()
-    const stages = waitUntilProcessed ? ["upload", "process"] : ["upload"]
-    // Make a reference for the zip file
-    const zipRef = ref(storage, `pendingAssets/${id}`)
-    // Create entry in assets collection
-    await setDoc(doc(db, "assets", id), {
-        owner: auth.currentUser.uid,
-        createdAt: Timestamp.fromDate(new Date()),
-        pending: true, // Means to be picked up by the cloud function
-        processed: false, // Means it has been processed by the cloud function
-        processedProgress: 0, // Progress of the processing
-        metaData: null, // This will be filled in by the cloud function
-        viewers: viewers,
-        editors: editors,
-        public: isPublic,
-    })
-    // Upload zip file to storage
-    const uploadTask = uploadBytesResumable(zipRef, file)
-    // Wait for upload to finish
-    uploadTask.on("state_changed", (snapshot)=>{
-        const progress = snapshot.bytesTransferred / snapshot.totalBytes
-        onProgress({ // Updating upload progress
-            currentStage: "upload",
-            stages: stages,
-            currentProgress: progress
-        })
-    }, (error)=>{
-        console.warn("Upload unsucessful", error)
-    }, async ()=>{
-        // Upload finished
-        console.log("Upload finished")
-        if (waitUntilProcessed) {
-            await waitForProcessing(stages, id, onProgress)
-        }
-        return id
-    })
-}
-
-function waitForProcessing(stages: any, id: any, onProgress: (progress: Progress) => void) {
-    return new Promise((resolve, reject) => {
-        // Monitor cloud function progress by subscribing to the document
-        const unsub = onSnapshot(doc(db, "assets", id), (docRef)=>{
-            const {processed, processedProgress} = docRef.data() // Updating processing progress if required
-            if (processed) {
-                unsub()
-                onProgress({
-                    currentStage: "process",
-                    stages: stages,
-                    currentProgress: 1
-                })
-                resolve(id)
-            } else {
-                onProgress({
-                    currentStage: "process",
-                    stages: stages,
-                    currentProgress: processedProgress
-                })
-            }
-        })
-    })
-}
-
-export const getAsset = async (id) => {
-    // Get asset from assets collection, return null if not found or throw error if its still pending
-    const assetRef = doc(db, "assets", id)
-    const asset = await getDoc(assetRef)
-    if (asset.data().pending) {
-        throw new Error("Asset is still pending")
-    }
-    return asset
-}
-
-// export const listEditableAssets = async (callback) => {
-//     // Returns a list of assets that the current user can edit
-//     const assetsRef = collection(db, "assets")

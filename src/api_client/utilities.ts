@@ -177,3 +177,87 @@ export function rolify(obj: Roleable): WithRole<Roleable> {
     clone.role = interpretRole(obj)
     return (clone as WithRole<Roleable>)
 }
+
+export function asyncWaitForReady(tasks: TaskSequence, docRef: DocumentReference<DocumentData>, progressCallback?: TaskProgressCallback) {
+    return new Promise((resolve: (asset: Asset) => void, reject) => {
+        const doneCallback = (asset: Asset) => {
+            resolve(asset);
+        };
+        try {
+            requestWaitForReady(tasks, doneCallback, docRef, progressCallback);
+        } catch (error) {
+            reject(error);
+        }
+    });
+}
+
+export function requestWaitForReady(tasks: TaskSequence, doneCallback: (asset: Asset) => void, docRef: DocumentReference<DocumentData>, progressCallback?: TaskProgressCallback) {
+    let unsub: Unsubscribe;
+    const changeCb = (asset: Asset) => {
+        if (!(asset.metadata.status.pending)) { // Update await processing task
+            tasks[1].progress = 1;
+        }
+        tasks[2].progress = asset.metadata.status.processedProgress; // Update processing task
+        if (asset.metadata.status.processed) { // Force update processing task to 1 if finished
+            tasks[2].progress = 1;
+        }
+        // Todo: Add progress update upload to cdn task
+        if (asset.metadata.status.ready) { // Force update upload to cdn task to 1 if finished
+            // Final stage is done
+            tasks[3].progress = 1;
+            unsub();
+            doneCallback(asset);
+        }
+        if (progressCallback) {
+            progressCallback(tasks);
+        }
+    };
+    unsub = subDocData(docRef, changeCb);
+}
+
+export async function uploadAsset(tasks: TaskSequence, fileRef, file: File, progressCallback: TaskProgressCallback | undefined) {
+    let doneUpload;
+    const upload = new Promise((resolve, reject) => {
+        doneUpload = resolve;
+    });
+
+    const onFinishUpload = () => {
+        // Upload finished
+        tasks[0].progress = 1;
+        doneUpload();
+    };
+
+    uploadFileWithProgress(fileRef, file, tasks, onFinishUpload, progressCallback);
+    await upload;
+}
+
+export function uploadFileWithProgress(fileRef, file: File, tasks: TaskSequence, onFinishUpload: () => void, progressChangeCallback?: TaskProgressCallback) {
+    const uploadTask = uploadBytesResumable(fileRef, file);
+    uploadTask.on("state_changed", (snapshot) => {
+        const progress = snapshot.bytesTransferred / snapshot.totalBytes;
+        tasks[0].progress = progress;
+        if (progressChangeCallback !== undefined) {
+            progressChangeCallback(tasks)
+        }
+    }, (error) => {
+        throw error;
+    }, onFinishUpload);
+}
+
+export async function createAssetDocument(assetsRef:CollectionReference<DocumentData>, permissions: Permissions | undefined): Promise<[DocumentReference<DocumentData>, Asset]> {
+    const uid = (auth as Auth)?.currentUser?.uid;
+    if (uid === undefined || uid === null) {
+        throw new Error("Not logged in");
+    }
+    const actualPermissions = permissions || {
+        owner: uid
+    };
+    const placeholderData = Defaults.fillPartials(Defaults.defaultAsset, {
+        metadata: {
+            createdAt: new Date().toISOString(),
+            permissions: actualPermissions
+        }
+    });
+    const newDoc = await addDoc(assetsRef, placeholderData);
+    return [newDoc, placeholderData];
+}
