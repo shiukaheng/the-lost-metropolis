@@ -1,5 +1,8 @@
 {
     "compilerOptions": {
-      "strictNullChecks": true
+      // Add .tsx / .jsx support
+      "strictNullChecks": true,
+      "jsx": "react-jsx"
     }
+    
 }

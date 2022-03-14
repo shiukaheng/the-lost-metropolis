@@ -1,0 +1,3 @@
+const export assetMetadataFileSchema = object({
+    
+})

@@ -1,8 +1,8 @@
 import { Post, postSchema } from '../../api/types/Post';
 import { Instance, RecursivePartial } from "../../api/utility_types";
-import { addDoc, collection, deleteDoc, doc, getDoc, Timestamp, updateDoc, arrayUnion, arrayRemove } from "firebase/firestore";
+import { addDoc, collection, deleteDoc, doc, getDoc, Timestamp, updateDoc, arrayUnion, arrayRemove, where } from "firebase/firestore";
 import { PostDocData, postDocDataSchema } from './types/PostDocData';
-import { naiveExport } from './utilities';
+import { naiveExport, subToRefWithRoleAuthSensitive } from './utilities';
 import { db, storage } from '../firebase-config'
 import { instance, uninstance } from '../../api/utilities';
 import _ = require('lodash');
@@ -15,6 +15,8 @@ export default class VaporAPI {
 
     private static postsRef = collection(db, "posts");
     private static storageRef = storage;
+    private static publicPostsRoleQueryMap = new Map()
+    .set("public", [where("public", "==", true)])
 
     // Post CRUD
     /**
@@ -89,11 +91,11 @@ export default class VaporAPI {
         const postDocRef = doc(VaporAPI.postsRef, postID)
         // Use arrayUnion and addDoc to add the asset to the assets array
         await updateDoc(postDocRef, { assets: arrayUnion(assetInstance) })
-        // Use storageRef to upload the file to /<postID>/<assetID>
+        // Use storageRef to upload the file to /<postID>/<assetID>, although the name is not important. Just to avoid collisions.
         const fileRef = ref(VaporAPI.storageRef, `${postID}/${assetID}`)
         const uploadFile: Promise<void> = new Promise((resolve, reject) => {
             try {
-                const uploadTask = uploadBytesResumable(fileRef, file)
+                const uploadTask = uploadBytesResumable(fileRef, file, {contentType: "application/zip", customMetadata: {assetID, postID}})
                 uploadTask.on("state_changed", (snapshot) => {
                     const progress = snapshot.bytesTransferred / snapshot.totalBytes;
                     if (onUploadProgress !== undefined) {
@@ -137,8 +139,21 @@ export default class VaporAPI {
      * @param getPostCallback callback for new arrays of {@link Post} wrapped in {@link Instance} and {@link Roled}
      */
     static subscribePosts(getPostCallback: (postInstances: Array<Instance<Roled<Post>>>) => void): () => void {
-        // returns unsubscriber
-        throw ("not implemented")
+        return subToRefWithRoleAuthSensitive(
+            VaporAPI.postsRef, 
+            (user) => {
+                if (user !== null && user !== undefined) {
+                    return new Map()
+                    .set("owner", [where("owner", "==", user.uid)])
+                    .set("editor", [where("editors", "array-contains", user.uid)])
+                    .set("viewer", [where("viewers", "array-contains", user.uid)])
+                    .set("public", [where("public", "==", true)]);
+                } else {
+                    return this.publicPostsRoleQueryMap;
+                }
+            },
+            VaporAPI.importPost,
+            getPostCallback)
     }
 
     /**

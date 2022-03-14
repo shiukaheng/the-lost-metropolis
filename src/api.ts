@@ -1,11 +1,7 @@
-import { PostDoc, RawPost } from '../api_old/implementation_types';
-import { addDoc, collection, deleteDoc, onSnapshot, Timestamp, updateDoc, doc, query, where, setDoc, getDoc } from "firebase/firestore";
-import { auth, db, storage } from "./firebase-config";
-import { ref, uploadBytesResumable } from "firebase/storage";
+import { addDoc, collection, deleteDoc, onSnapshot, Timestamp, updateDoc, doc, query, where } from "firebase/firestore";
+import { auth, db } from "./firebase-config";
 import { signOut } from "firebase/auth";
-import { createEmptyMultilangString } from "./utilities";
-import { v4 as uuidv4 } from "uuid";
-import { Asset, PostID, Post, SubscriberCallback, AssetID, UserID, Permissions, AbstractVaporAPI, AssetStatus, WithRole } from '../api_old/types';
+import { createEmptyMultilangString } from './utilities';
 
 // Given a target object, remove all properties that are not in the reference object
 function filterObjectStructure(target, reference) {

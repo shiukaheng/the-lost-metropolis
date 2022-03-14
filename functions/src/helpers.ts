@@ -1,3 +1,5 @@
+import { AssetConverterFunction } from './../../api2/cloud_functions/types/AssetType';
+import { assetZipMetadataSchema, AssetZipMetadata } from './../../api/types/AssetZipMetadata';
 import { AssetFileMetadata } from '../../api_old/implementation_types';
 import { Potree2_0PointCloud } from '../../api/cloud_functions/types/asset_types/Potree2';
 import * as functions from "firebase-functions";
@@ -27,23 +29,24 @@ export const uploadFolderToBucket = async (localPath:string, bucket:Bucket, buck
 
 
 export async function initHandleNewFile(object: functions.storage.ObjectMetadata) {
+    // Check if the object name exists
     if (!(typeof object.name === "string")) {
         throw new Error("Invalid file name");
     }
-    const assetFileName = path.basename(object.name).split(".")[0];
-    if (assetFileName.length === 0) {
-        throw new Error("Invalid file name after stripping extension and path");
+    if (!assetZipMetadataSchema.isValidSync(object.metadata)) {
+        throw new Error("Invalid file metadata")
     }
-    const assetDocumentRef = admin.firestore().collection("assets").doc(assetFileName);
+    let metadata: AssetZipMetadata = object.metadata
+    const assetDocumentRef = admin.firestore().collection("assets").doc(metadata.assetID);
     // Throw error if document does not exist
     const assetDocument = await assetDocumentRef.get();
     if (!assetDocument.exists) {
-        throw new Error(`Asset document ${assetFileName} does not exist`);
+        throw new Error(`Asset document ${metadata.assetID} does not exist`);
     }
-    return { assetFileName, assetDocumentRef, assetDocument };
+    return { assetDocumentRef, assetDocument, metadata };
 }
 
-export async function processAsset(sourceAssetClass: typeof Potree2_0PointCloud, targetAssetClass: typeof Potree2_0PointCloud, assetDocumentRef: FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>, assetUnzippedPath: string, staticBucket: Bucket, assetFileName: string, converter: import("../../api/cloud_functions/AssetType").AssetConverterFunction | undefined, assetData: object) {
+export async function processAsset(sourceAssetClass: typeof Potree2_0PointCloud, targetAssetClass: typeof Potree2_0PointCloud, assetDocumentRef: FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>, assetUnzippedPath: string, staticBucket: Bucket, assetFileName: string, converter: AssetConverterFunction | undefined, assetData: object) {
     if (sourceAssetClass === targetAssetClass) {
         // Update processedProgress to 1 and processed to true
         await assetDocumentRef.update({
