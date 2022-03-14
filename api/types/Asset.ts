@@ -5,16 +5,16 @@ export const assetSchema = object({
     data: object().required(),
     metadata: object({
         name: string().required().default("untitled asset"),
-        sourceAssetType: sourceAssetLiteralSchema.required(),
-        targetAssetType: targetAssetLiteralSchema.required(),
-        createdAt: string().required(),
+        sourceAssetType: sourceAssetLiteralSchema.required().default(null),
+        targetAssetType: targetAssetLiteralSchema.required().default(null),
+        createdAt: string().required().default(() => new Date().toISOString()),
         status: object({
-            uploaded: boolean().required(),
-            processedProgress: number().required().min(0).max(1),
-            processed: boolean().required(),
-            ready: boolean().required(),
-            pending: boolean().required()
-        })
+            uploaded: boolean().required().default(false),
+            processedProgress: number().required().min(0).max(1).default(0),
+            processed: boolean().required().default(false),
+            ready: boolean().required().default(false),
+            pending: boolean().required().default(true)
+        }).required()
     }).required()
 })
 
