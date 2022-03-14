@@ -1,4 +1,4 @@
-import { AssetLiteral } from '../../types/AssetLiteral';
+import { AssetLiteral } from "../../../../api/types/AssetLiteral";
 
 export type AssetConverterFunction = (
     sourceMetadata: object, 

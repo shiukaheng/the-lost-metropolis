@@ -1,6 +1,6 @@
 import { AssetConverterFunction, AssetType } from "../AssetType";
 import * as fs from "fs";
-import { AssetLiteral } from "../../../types/AssetLiteral";
+import { AssetLiteral } from "../../../../../api/types/AssetLiteral";
 
 export class Potree2 extends AssetType {
     static conversionMap: Map<AssetType, AssetConverterFunction> = new Map();

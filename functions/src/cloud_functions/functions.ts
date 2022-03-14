@@ -1,11 +1,12 @@
 import * as admin from "firebase-admin"
 import * as functions from "firebase-functions"
-import { checkConversion, getAssetClasses, getBuckets, initHandleNewFile, parseMetadataFile, processAsset, unzipFile, updateAssetDocument } from './helpers';
+import { checkConversion, getAssetClasses, getBuckets, initHandleNewFile, parseMetadataFile, processAsset, unzipFile, updateAssetDocument } from "../helpers";
+import { AssetMetadataFile } from "./types/AssetMetadataFile";
 
-const onNewFile = async (object: functions.storage.ObjectMetadata) => {
+export const onNewFile = async (object: functions.storage.ObjectMetadata) => {
     try {
         // Fetch the document corresponding to the uploaded file
-        const { assetDocumentRef, assetDocument, metadata } = await initHandleNewFile(object);
+        const { assetDocumentRef, assetDocument, metadata } = await initHandleNewFile(object); // TODO: remove assetDocumentRef
         try {
             // Check if uploaded file is actually zip
             if (object.contentType !== 'application/zip') {
@@ -18,14 +19,14 @@ const onNewFile = async (object: functions.storage.ObjectMetadata) => {
             const assetUnzippedPath = await unzipFile(bucket, object, `${metadata.postID}/${metadata.assetID}`);
 
             // Parse the metadata.json file
-            const metadataFile: AssetFileMetadata = parseMetadataFile(assetUnzippedPath)
+            const metadataFile: AssetMetadataFile = parseMetadataFile(assetUnzippedPath)
             const { sourceAssetClass, targetAssetClass } = getAssetClasses(metadataFile);
             
             // Check if sourceAssetType can be converted to targetAssetType
             let converter = checkConversion(sourceAssetClass, targetAssetClass);
 
             // Update asset document assetData, sourceAssetType, targetAssetType, name, from the metadata.json file
-            const assetData: object = await updateAssetDocument(metadataFile, assetDocumentRef, sourceAssetClass, targetAssetClass);
+            const assetData: object = await updateAssetDocument(metadataFile, assetDocumentRef, sourceAssetClass, targetAssetClass); // TODO: Adapt this to update the post document instead, and type
 
             // Process the asset using processAsset function, which updates processedProgress regularly
             await processAsset(sourceAssetClass, targetAssetClass, assetDocumentRef, assetUnzippedPath, staticBucket, `${metadata.postID}/${metadata.assetID}`, converter, assetData);
