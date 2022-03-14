@@ -1,6 +1,7 @@
 import { RecursivePartial } from "../utility_types";
 import { Instance, InstanceID, Post, isValidPost, postSchema } from "../types";
 import { PostDocData } from "./types";
+import { Timestamp } from "firebase/firestore";
 
 export default class VaporAPI {
 
@@ -37,8 +38,8 @@ export default class VaporAPI {
                 description: post.data.description,
                 data: post.data,
                 assets: [],
-                createdAt: new Timestamp,
-                updatedAt: new Timestamp,
+                // createdAt: new Timestamp(),
+                // updatedAt: new Timestamp(),
                 owner: "",
                 editors: [],
                 viewers: [],

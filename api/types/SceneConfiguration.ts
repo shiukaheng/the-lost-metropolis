@@ -1,5 +1,5 @@
-import { cameraPropsSchema } from './../types';
 import { InferType, number, object } from "yup";
+import { cameraPropsSchema } from "./CameraProps";
 
 export const sceneConfigurationSchema = object({
     defaultCameraProps: cameraPropsSchema.required(),

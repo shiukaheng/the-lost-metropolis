@@ -17,3 +17,8 @@ export type RecursivePartial<T> = {
       T[P] extends object ? RecursivePartial<T[P]> :
       T[P];
 };
+
+export type Instance<T> = {
+    id: string,
+    data: T
+}
