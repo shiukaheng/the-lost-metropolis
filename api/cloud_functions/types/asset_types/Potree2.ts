@@ -1,10 +1,13 @@
-import { AssetType } from "./AssetType";
+import { AssetConverterFunction, AssetType } from "../AssetType";
 import * as fs from "fs";
+import { AssetLiteral } from "../../../types/AssetLiteral";
 
-export class Potree2_0PointCloud extends AssetType {
-    static conversionMap = new Map()
-    static assetTypeName = "Potree2_0PointCloud";
-    static validate(assetData:object, rootPath:string) {
+export class Potree2 extends AssetType {
+    static conversionMap: Map<AssetType, AssetConverterFunction> = new Map();
+    static assetLiteral: AssetLiteral = "Potree2";
+    static target: true;
+    static source: true;
+    static validate(assetData: object, rootPath: string): void {
         // Check that rootPath is actually a directory
         if (!fs.lstatSync(rootPath).isDirectory()) {
             throw `rootPath ${rootPath} is not a directory`

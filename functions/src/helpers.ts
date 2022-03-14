@@ -1,5 +1,5 @@
-import { AssetFileMetadata } from '../../api/implementation_types';
-import { Potree2_0PointCloud } from './asset_types/Potree2_0PointCloud';
+import { AssetFileMetadata } from '../../api_old/implementation_types';
+import { Potree2_0PointCloud } from '../../api/cloud_functions/types/asset_types/Potree2';
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin"
 import * as path from "path";
@@ -43,7 +43,7 @@ export async function initHandleNewFile(object: functions.storage.ObjectMetadata
     return { assetFileName, assetDocumentRef, assetDocument };
 }
 
-export async function processAsset(sourceAssetClass: typeof Potree2_0PointCloud, targetAssetClass: typeof Potree2_0PointCloud, assetDocumentRef: FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>, assetUnzippedPath: string, staticBucket: Bucket, assetFileName: string, converter: import("c:/Users/shiuk/Documents/GitHub/the-lost-metropolis-draft/functions/src/asset_types/AssetType").AssetConverterFunction | undefined, assetData: object) {
+export async function processAsset(sourceAssetClass: typeof Potree2_0PointCloud, targetAssetClass: typeof Potree2_0PointCloud, assetDocumentRef: FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>, assetUnzippedPath: string, staticBucket: Bucket, assetFileName: string, converter: import("../../api/cloud_functions/AssetType").AssetConverterFunction | undefined, assetData: object) {
     if (sourceAssetClass === targetAssetClass) {
         // Update processedProgress to 1 and processed to true
         await assetDocumentRef.update({

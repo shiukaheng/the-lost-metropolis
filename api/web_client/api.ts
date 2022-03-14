@@ -11,7 +11,7 @@ export default class VaporAPI {
     static async readPost(id: InstanceID): Promise<Instance<Post>> {
         // returns promise of post
     }
-    static async updatePost(postInstance: Instance<Post>): Promise<void> {
+    static async updatePost(postInstance: Instance<Post>, whitelist?: (keyof PostDocData)[], blacklist?: (keyof PostDocData)[]): Promise<void> {
         // returns promise of void
     }
     static async deletePost(id: InstanceID): Promise<void> {
@@ -30,13 +30,20 @@ export default class VaporAPI {
     static subscribePosts(getPostCallback: (postInstances: Array<Instance<Post>>) => void): () => void {
         // returns unsubscriber
     }
-    static exportPost(post: RecursivePartial<Post>, fillDefaults=false): Partial<PostDocData> {
-        // returns raw post
-        let actualPost: Post
+    static exportPost(post: RecursivePartial<Post>, cast=false): PostDocData { // Always return a full PostDocData, for partial updates, use PostDocData mask
         if (isValidPost(post)) {
-            actualPost = post
-        } else {
-            actualPost = postSchema.cast(post) as Post
+            return {
+                title: post.data.title,
+                description: post.data.description,
+                data: post.data,
+                assets: [],
+                createdAt: new Timestamp,
+                updatedAt: new Timestamp,
+                owner: "",
+                editors: [],
+                viewers: [],
+                public: false
+            }
         }
     }
     static importPost(rawPost:PostDocData): Post {

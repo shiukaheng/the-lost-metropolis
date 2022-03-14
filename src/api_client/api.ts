@@ -1,13 +1,13 @@
-import { FetchedPost, IdentifyingPost, FetchedAsset, InputPost, RecursivePartial } from './../../api/types';
-import { AssetDoc, PostDoc, PostDocData, AssetDocData, WrapSnap } from "../../api/implementation_types";
+import { FetchedPost, IdentifyingPost, FetchedAsset, InputPost, RecursivePartial } from '../../api_old/types';
+import { AssetDoc, PostDoc, PostDocData, AssetDocData, WrapSnap } from "../../api_old/implementation_types";
 import { addDoc, collection, CollectionReference, deleteDoc, doc, DocumentReference, getDoc, onSnapshot, Timestamp, updateDoc, where } from "firebase/firestore";
-import { Permissions, Asset, Post, SubscriberCallback, AbstractVaporAPI, AssetStatus, WithRole, MultiLangString, PostData, Role, PostID, AssetID, TaskProgressCallback, TaskSequence, WithOptionalRole } from '../../api/types';
+import { Permissions, Asset, Post, SubscriberCallback, AbstractVaporAPI, AssetStatus, WithRole, MultiLangString, PostData, Role, PostID, AssetID, TaskProgressCallback, TaskSequence, WithOptionalRole } from '../../api_old/types';
 import { db, storage, auth } from '../firebase-config';
 import { createPostObject, createTaskSequence, readPostFromRef, subToRefWithRoleAuthSensitive } from './utilities';
 import { rolify } from "./utilities"
 import { DocumentData, DocumentSnapshot } from '@google-cloud/firestore';
 import { ref, uploadBytesResumable } from "firebase/storage";
-import Defaults from "../../api/defaults";
+import Defaults from "../../api_old/defaults";
 import { Auth, Unsubscribe } from "firebase/auth";
 
 const subDocData = (docRef: DocumentReference, callback: (data: Asset) => void):Unsubscribe => {

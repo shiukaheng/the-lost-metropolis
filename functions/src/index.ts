@@ -1,4 +1,4 @@
-import { AssetFileMetadata } from '../../api/implementation_types';
+import { AssetFileMetadata } from '../../api_old/implementation_types';
 import * as admin from "firebase-admin"
 import * as functions from "firebase-functions";
 import { checkConversion, getAssetClasses, getBuckets, initHandleNewFile, parseMetadataFile, processAsset, unzipFile, updateAssetDocument } from './helpers';

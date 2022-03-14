@@ -1,15 +1,15 @@
-import { WithOptionalRole, InputPost } from './../../api/types';
-import { Asset, TaskSequence } from '../../api/types';
+import { WithOptionalRole, InputPost } from '../../api_old/types';
+import { Asset, TaskSequence } from '../../api_old/types';
 import { MultiLangString } from './../types';
 import { VaporAPI } from './api';
 import { cloneDeep, merge } from 'lodash';
-import { Post, Role } from '../../api/types';
+import { Post, Role } from '../../api_old/types';
 import { CollectionReference, deleteDoc, doc, DocumentData, DocumentReference, getDoc, onSnapshot, query, QueryConstraint, setDoc, Timestamp, Unsubscribe, updateDoc } from "firebase/firestore";
-import { Maybe, WithID, WithRole } from "../../api/types";
+import { Maybe, WithID, WithRole } from "../../api_old/types";
 import { auth } from "../firebase-config";
 import { onAuthStateChanged, User as FBUser } from 'firebase/auth';
-import Defaults from '../../api/defaults';
-import { WrappedSnap } from '../../api/implementation_types';
+import Defaults from '../../api_old/defaults';
+import { WrappedSnap } from '../../api_old/implementation_types';
 
 function mapRole<T>(array:Array<T>, role: Role): Array<WithRole<T>> {
     return array.map((post) => ({...post, role}));
