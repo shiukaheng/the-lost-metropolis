@@ -4,7 +4,8 @@ import { postDocDataSchema } from "../../../api/web_client/types/PostDocData";
 import * as admZip from "adm-zip";
 import { AssetMetadataFile, assetMetadataFileSchema } from "./types/AssetMetadataFile";
 import { AssetZipMetadata, assetZipMetadataSchema } from "./types/AssetZipMetadata";
-import { promises as fs } from "fs";
+import { promises as fsAsync } from "fs";
+import * as fs from "fs";
 import { Instance } from "../../../api/utility_types";
 import { Asset } from "../../../api/types/Asset";
 import { cloneDeep } from "lodash";
@@ -65,7 +66,7 @@ export async function unzipAsset(object: functions.storage.ObjectMetadata, postR
     // Unzip to temp folder
     await unzip(zipDestination, unzippedPath);
     // Parse metadata.json
-    const metadataRaw = await fs.readFile(`${unzippedPath}/metadata.json`, "utf8");
+    const metadataRaw = await fsAsync.readFile(`${unzippedPath}/metadata.json`, "utf8");
     const metadataFile = JSON.parse(metadataRaw);
     if (!assetMetadataFileSchema.isValidSync(metadataFile)) {
         throw new Error(`Metadata file is not valid`);
@@ -164,15 +165,18 @@ export async function uploadAssetToCDN(processedPath: any, metadata: AssetZipMet
     // Get static bucket reference and upload all files (recursive) of processedPath to the bucket under the folder `${postID}/${assetID}/`
     const bucket = admin.storage().bucket("the-lost-metropolis-production-static");
     const assetPath = generateAssetFolderPath(metadata.postID, metadata.assetID);
-    const files = await fs.readdir(processedPath);
+    const files = await fsAsync.readdir(processedPath);
     for (const file of files) {
         await bucket.upload(`${processedPath}/${file}`, {
             destination: `${assetPath}/${file}`
         });
     }
 }
-export function cleanupAssetTemp(unzippedPath: string, processedPath: string) {
-    // Delete unzippedPath and processedPath
-    fs.rmdir(unzippedPath, { recursive: true });
-    fs.rmdir(processedPath, { recursive: true });
+export async function cleanupFolders(paths: string[]) {
+    for (const path of paths) {
+        // Check if path exists
+        if (fs.existsSync(path)) {
+            await fsAsync.rmdir(path, { recursive: true });
+        }
+    }
 }

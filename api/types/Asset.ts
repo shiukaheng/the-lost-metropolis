@@ -13,8 +13,8 @@ export const assetSchema = object({
             processedProgress: number().required().min(0).max(1).default(0),
             processed: boolean().required().default(false),
             ready: boolean().required().default(false),
-            pending: boolean().required().default(true)
-            // TODO: Missing ERROR component
+            pending: boolean().required().default(true),
+            error: string().nullable().default(null)
         }).required()
     }).required()
 })

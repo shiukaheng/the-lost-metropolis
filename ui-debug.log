@@ -1,0 +1,18 @@
+node:events:368
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EACCES: permission denied 127.0.0.1:4000
+    at Server.setupListenHandle [as _listen2] (node:net:1317:21)
+    at listenInCluster (node:net:1382:12)
+    at GetAddrInfoReqWrap.doListen [as callback] (node:net:1520:7)
+    at GetAddrInfoReqWrap.onlookup [as oncomplete] (node:dns:73:8)
+Emitted 'error' event on Server instance at:
+    at emitErrorNT (node:net:1361:8)
+    at processTicksAndRejections (node:internal/process/task_queues:83:21) {
+  code: 'EACCES',
+  errno: -4092,
+  syscall: 'listen',
+  address: '127.0.0.1',
+  port: 4000
+}

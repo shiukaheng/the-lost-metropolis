@@ -1,10 +1,10 @@
-import { Timestamp } from 'firebase/firestore';
 import { array, mixed, object, string, boolean, SchemaOf } from 'yup';
 import { Asset, assetSchema } from "../../types/Asset"
 import { makeRequiredMultiLangStringSchema, MultiLangString, multiLangStringSchema } from "../../types/MultiLangString"
 import { Instance } from '../../utility_types';
 import { SceneConfiguration, sceneConfigurationSchema } from '../../types/SceneConfiguration';
 import { SceneChild, sceneChildSchema } from '../../types/SceneChild';
+import { Timestamp } from '@google-cloud/firestore';
 
 /**
  * the schema for the DocumentData that will be retrieved from firebase

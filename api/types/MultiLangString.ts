@@ -1,11 +1,9 @@
-import { lazy, object, string, SchemaOf, AnySchema } from 'yup';
-import Lazy from 'yup/lib/Lazy';
-import { OptionalObjectSchema, TypeOfShape } from 'yup/lib/object';
-import { AnyObject } from 'yup/lib/types';
+import { lazy, object, string, SchemaOf } from 'yup';
 import { LanguageLiteral, languageLiteral } from './LanguageLiteral';
 
 function getMultiLangStringSchema() {
-    const schemaShape = {};
+    // schemaShape will have keys that are the language literals, and values that are the schema for the string
+    const schemaShape: { [key: string]: SchemaOf<string> } = {};
     languageLiteral.forEach(x => {
         schemaShape[x] = string().required()
     })
@@ -25,7 +23,7 @@ export const multiLangStringSchema = lazy(getMultiLangStringSchema)
  * Kinda forced.. but ok!
  */
 export const makeRequiredMultiLangStringSchema = (defaultValue: MultiLangString = {"en": "", "zh": ""}) => lazy(()=>{
-    const schemaShape = {};
+    const schemaShape: { [key: string]: SchemaOf<string> } = {};
     languageLiteral.forEach(x => {
         schemaShape[x] = string().required()
     })

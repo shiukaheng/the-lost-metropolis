@@ -1,5 +1,5 @@
 import { vector3Schema } from './Vector3';
-import { array, number, object, InferType, TypeOf, SchemaOf } from 'yup';
+import { number, object, InferType } from 'yup';
 
 export const cameraPropsSchema = object({
     fov: number().required(),

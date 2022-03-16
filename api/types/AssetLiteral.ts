@@ -1,5 +1,5 @@
 import { mixed } from 'yup';
-import { tuple, nullable_tuple } from './utilities';
+import { nullable_tuple } from './utilities';
 
 // Declare all asset literals here
 
