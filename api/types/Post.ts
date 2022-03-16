@@ -13,17 +13,19 @@ export const postSchema = object({
         }),
         description: makeRequiredMultiLangStringSchema(),
         configuration: sceneConfigurationSchema.required(),
-        sceneChildren: array(sceneChildSchema).required(),
+        sceneChildren: array(sceneChildSchema).required().default([]),
         assets: array(object({
             id: string().required(),
             data: assetSchema.required()
-        }).required()).required()
+        }).required()).required().default([])
     }),
     metadata: object({
-        createdAt: string().required(),
-        updatedAt: string().required(),
+        createdAt: string().required().default(()=>new Date().toISOString()),
+        updatedAt: string().required().default(()=>new Date().toISOString()),
         permissions: permissionsSchema.required()
     })
 })
 
 export type Post = InferType<typeof postSchema>
+
+console.log(postSchema.getDefault())

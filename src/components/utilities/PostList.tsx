@@ -8,6 +8,10 @@ import { useNavigate } from "react-router-dom"
 import { createPost } from "../../api"
 import { AuthContext } from "../admin/AuthProvider"
 import { Condition } from "../../utilities"
+import VaporAPI from "../../api_client/api"
+import { auth } from "../../firebase-config"
+import { Post, postSchema } from "../../../api/types/Post"
+import { Instance } from "../../../api/utility_types"
 
 const StyledRow = tw.tr`border-b border-t border-current md:hover:opacity-50 transition-opacity duration-500 cursor-pointer table-row text-ellipsis`
 const StyledHeaderRow = tw.tr`border-b border-current table-row text-ellipsis`
@@ -31,7 +35,13 @@ function PostList({posts, onPostClick=(post)=>{}, columnMakers=[], createButton=
                     <MagicButton solid languageSpecificChildren={
                     {"en": "+ create post", "zh": "+ 新增文章"}
                     } onClick={async ()=>{
-                        const id = await createPost()
+                        const id = await VaporAPI.createPost(postSchema.cast({
+                            metadata: {
+                                permissions: {
+                                    owner: auth.currentUser.uid,
+                                }
+                            }
+                        }))
                         navigate(`/edit/${id}`)
                     }} className="ml-auto h-12 md:h-12"/>
                 </Condition>
@@ -69,11 +79,11 @@ function PostList({posts, onPostClick=(post)=>{}, columnMakers=[], createButton=
     )
 }
 
-function matchSearch(post, searchTerm) {
+function matchSearch(post:Instance<Post>, searchTerm: string): boolean {
     // Searches whether the post's title or description has search term as a substring, simultaneously search for all languages
     return (
-        Object.entries(post.title).some(([lang, title]) => title.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        Object.entries(post.description).some(([lang, description]) => description.toLowerCase().includes(searchTerm.toLowerCase()))
+        Object.entries(post.data.data.title).some(([lang, title]) => title.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        Object.entries(post.data.data.description).some(([lang, description]) => description.toLowerCase().includes(searchTerm.toLowerCase()))
     )
 }
 

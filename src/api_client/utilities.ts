@@ -96,7 +96,16 @@ function subToRefWithRole<T>(ref:CollectionReference, queryRoleMap:RoleMap, deco
     queryRoleMap.forEach((constraints, role) => {
         const queryRef = query(ref, ...constraints)
         const unsub = onSnapshot(queryRef, (snapshot) => {
-            queryResultMap.set(role, snapshot.docs.map(doc => instance(decoder(doc.data()), doc.id)));
+            const decodedPosts: Array<Instance<T>> = []
+            snapshot.docs.forEach(doc => {
+                try {
+                    const data = decoder(doc.data())
+                    decodedPosts.push(instance(data, doc.id))
+                } catch (e) {
+                    console.warn("Failed to decode post, skipping", doc.data(), e);
+                }
+            })
+            queryResultMap.set(role, decodedPosts);
             buildResults()
             callback(builtResult);
         })

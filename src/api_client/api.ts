@@ -5,8 +5,8 @@ import { PostDocData, postDocDataSchema } from './types/PostDocData';
 import { naiveExport, subToRefWithRoleAuthSensitive } from './utilities';
 import { db, storage } from '../firebase-config'
 import { instance, uninstance } from '../../api/utilities';
-import _ = require('lodash');
-import { uuidv4 as v4 } from "uuid";
+import { omit, pick } from "lodash"
+import { v4 as uuidv4 } from "uuid";
 import { Asset, assetSchema } from '../../api/types/Asset';
 import { ref, uploadBytesResumable } from 'firebase/storage';
 import { Roled } from './types/Role';
@@ -24,8 +24,14 @@ export default class VaporAPI {
      * @param post the {@link Post} object to create the post upon
      * @returns the ID of the post
      */
-    static async createPost(post: Post): Promise<string> {
-        const doc = await addDoc(VaporAPI.postsRef, VaporAPI.exportPost(post))
+    static async createPost(post?: Post): Promise<string> {
+        if (post === undefined) {
+            post = postSchema.getDefault()
+        }
+        const exported = VaporAPI.exportPost(post);
+        // const cloned = JSON.parse(JSON.stringify(exported))
+        // console.log(exported, cloned)
+        const doc = await addDoc(VaporAPI.postsRef, exported)
         return doc.id
     }
 
@@ -57,9 +63,9 @@ export default class VaporAPI {
         const [post, id] = uninstance(postInstance)
         let data: Partial<PostDocData> = VaporAPI.exportPost(post)
         if (blacklist) {
-            data = _.omit(data, blacklist)
+            data = omit(data, blacklist)
         } else if (whitelist) {
-            data = _.pick(data, whitelist)
+            data = pick(data, whitelist)
         }
         await updateDoc(doc(VaporAPI.postsRef, id), data)
     }
@@ -82,7 +88,7 @@ export default class VaporAPI {
      */
     static async uploadAsset(postID: string, file: File, onUploadProgress: (number)=>void): Promise<string> {
         // Generate a uuidv4 as an id for the asset
-        const assetID = v4()
+        const assetID = uuidv4()
         // Create an empty Asset object using the assetSchema
         const asset: Asset = assetSchema.getDefault()
         // Wrap the Asset object in an instance with the uuid
@@ -169,6 +175,7 @@ export default class VaporAPI {
             if (cast) {
                 return naiveExport(postSchema.validateSync(post))
             } else {
+                console.warn(`Malformed post:`, post)
                 throw new Error("Post object is not well formed, yet cast is not enabled")
             }
         }
@@ -205,4 +212,3 @@ export default class VaporAPI {
         }
     }
 }
-

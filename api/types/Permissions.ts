@@ -2,10 +2,10 @@ import { array, boolean, InferType, object } from 'yup';
 import { userIDSchema } from './UserID';
 
 export const permissionsSchema = object({
-    owner: userIDSchema.required(),
-    viewers: array(userIDSchema).required(),
-    editors: array(userIDSchema).required(),
-    public: boolean().required()
+    owner: userIDSchema.defined().default(""),
+    viewers: array(userIDSchema).required().default([]),
+    editors: array(userIDSchema).required().default([]),
+    public: boolean().required().default(false)
 })
 
 export type Permissions = InferType<typeof permissionsSchema>

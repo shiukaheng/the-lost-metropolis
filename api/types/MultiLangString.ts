@@ -5,7 +5,7 @@ function getMultiLangStringSchema() {
     // schemaShape will have keys that are the language literals, and values that are the schema for the string
     const schemaShape: { [key: string]: SchemaOf<string> } = {};
     languageLiteral.forEach(x => {
-        schemaShape[x] = string().required()
+        schemaShape[x] = string().defined().default("")
     })
     return object(schemaShape) as SchemaOf<MultiLangString>
 }
@@ -22,10 +22,10 @@ export const multiLangStringSchema = lazy(getMultiLangStringSchema)
 /**
  * Kinda forced.. but ok!
  */
-export const makeRequiredMultiLangStringSchema = (defaultValue: MultiLangString = {"en": "", "zh": ""}) => lazy(()=>{
+export const makeRequiredMultiLangStringSchema = (defaultValue: MultiLangString = {"en": "", "zh": ""}) => {
     const schemaShape: { [key: string]: SchemaOf<string> } = {};
     languageLiteral.forEach(x => {
-        schemaShape[x] = string().required()
+        schemaShape[x] = string().default(defaultValue[x]).defined()
     })
-    return object(schemaShape).default(defaultValue) as SchemaOf<MultiLangString>
-})
+    return object(schemaShape) as SchemaOf<MultiLangString>
+}
