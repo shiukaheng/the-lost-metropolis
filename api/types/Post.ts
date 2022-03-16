@@ -1,5 +1,4 @@
 import { array, InferType, object, SchemaOf, string } from "yup";
-import { instanceSchema } from "../utilities";
 import {  assetSchema } from "./Asset";
 import { makeRequiredMultiLangStringSchema } from "./MultiLangString";
 import { permissionsSchema } from "./Permissions";
@@ -15,7 +14,10 @@ export const postSchema = object({
         description: makeRequiredMultiLangStringSchema(),
         configuration: sceneConfigurationSchema.required(),
         sceneChildren: array(sceneChildSchema).required(),
-        assets: array(instanceSchema(assetSchema.required()).required()).required()
+        assets: array(object({
+            id: string().required(),
+            data: assetSchema.required()
+        }).required()).required()
     }),
     metadata: object({
         createdAt: string().required(),

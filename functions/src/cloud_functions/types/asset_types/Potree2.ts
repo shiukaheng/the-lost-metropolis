@@ -3,7 +3,7 @@ import * as fs from "fs";
 import { AssetLiteral } from "../../../../../api/types/AssetLiteral";
 
 export class Potree2 extends AssetType {
-    static conversionMap: Map<AssetType, AssetConverterFunction> = new Map();
+    static conversionMap: Map<typeof AssetType, AssetConverterFunction> = new Map();
     static assetLiteral: AssetLiteral = "Potree2";
     static target: true;
     static source: true;

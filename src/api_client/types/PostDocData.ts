@@ -4,7 +4,6 @@ import { assetSchema } from "../../../api/types/Asset"
 import { makeRequiredMultiLangStringSchema } from "../../../api/types/MultiLangString"
 import { sceneConfigurationSchema } from '../../../api/types/SceneConfiguration';
 import { sceneChildSchema } from '../../../api/types/SceneChild';
-import { instanceSchema } from '../../../api/utilities';
 
 
 // export type PostDocData = {
@@ -32,7 +31,10 @@ export const postDocDataSchema = object({
     configuration: sceneConfigurationSchema.required(),
     sceneChildren: array(sceneChildSchema.required()).required(),
     assets: array(
-        instanceSchema(assetSchema.required()).required()
+        object({
+            id: string().required(),
+            data: assetSchema.required()
+        }).required()
     ).required(),
     createdAt: mixed<Timestamp>().required(),
     updatedAt: mixed<Timestamp>().required(),

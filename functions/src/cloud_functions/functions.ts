@@ -1,51 +1,41 @@
 import * as admin from "firebase-admin"
 import * as functions from "firebase-functions"
-import { checkConversion, getAssetClasses, getBuckets, initHandleNewFile, parseMetadataFile, processAsset, unzipFile, updateAssetDocument } from "../helpers";
-import { AssetMetadataFile } from "./types/AssetMetadataFile";
+import { EventContext } from "firebase-functions";
+import { QueryDocumentSnapshot } from "firebase-functions/v1/firestore";
+// import * as yauzl from "yauzl"
+
+// import { checkConversion, getAssetClasses, getBuckets, initHandleNewFile, parseMetadataFile, processAsset, unzipFile, updateAssetDocument } from "../helpers";
+import { assetZipMetadataSchema } from "./types/AssetZipMetadata";
+export const db = admin.firestore();
+import { checkAssetRequested, unzipAsset, processAsset, uploadAssetToCDN, modifyAsset, cleanupAssetTemp, generatePostFolderPath } from "./utilities";
 
 export const onNewFile = async (object: functions.storage.ObjectMetadata) => {
-    try {
-        // Fetch the document corresponding to the uploaded file
-        const { assetDocumentRef, assetDocument, metadata } = await initHandleNewFile(object); // TODO: remove assetDocumentRef
-        try {
-            // Check if uploaded file is actually zip
-            if (object.contentType !== 'application/zip') {
-                throw new Error(`File ${object.name} is not a zip file`)
-            }
-            // Mount buckets, the default bucket as bucket, and the static bucket (the-lost-metropolis-static) as staticBucket
-            const { bucket, staticBucket } = getBuckets();
-
-            // Unzip the file to /<temp>/asset-unzip/
-            const assetUnzippedPath = await unzipFile(bucket, object, `${metadata.postID}/${metadata.assetID}`);
-
-            // Parse the metadata.json file
-            const metadataFile: AssetMetadataFile = parseMetadataFile(assetUnzippedPath)
-            const { sourceAssetClass, targetAssetClass } = getAssetClasses(metadataFile);
-            
-            // Check if sourceAssetType can be converted to targetAssetType
-            let converter = checkConversion(sourceAssetClass, targetAssetClass);
-
-            // Update asset document assetData, sourceAssetType, targetAssetType, name, from the metadata.json file
-            const assetData: object = await updateAssetDocument(metadataFile, assetDocumentRef, sourceAssetClass, targetAssetClass); // TODO: Adapt this to update the post document instead, and type
-
-            // Process the asset using processAsset function, which updates processedProgress regularly
-            await processAsset(sourceAssetClass, targetAssetClass, assetDocumentRef, assetUnzippedPath, staticBucket, `${metadata.postID}/${metadata.assetID}`, converter, assetData);
-        }
-        catch (error) {
-            await assetDocument.ref.update({
-                pending: false,
-                error: error
-            })
-            throw error
-        }
-    } catch (error) {
-        functions.logger.error(error)
-        // throw error
+    if (!assetZipMetadataSchema.isValidSync(object.metadata)) {
+        throw new Error("Invalid zip metadata")
     }
-    // Delete the uploaded file from the bucket
-    const bucket = admin.storage().bucket()
-    object.name && await bucket.file(object.name).delete()
+    // Check if asset is requested, if not, throw error
+    const {postRef, postSnap, asset} = await checkAssetRequested(object) // Implemented!
+    // Unzip asset to local temp folder, and parse metadata.json to a variable and updating post doc too
+    const {unzippedPath, metadataFile} = await unzipAsset(object, postRef)
+    // Take metadata and unzipped path as variable and get receiving directory of what to upload to CDN, and update processProgress
+    const processedPath = await processAsset(unzippedPath, metadataFile, postRef, asset.id)
+    // Upload to CDN and mark asset as ready
+    await uploadAssetToCDN(processedPath, object.metadata)
+    // Mark asset as ready
+    modifyAsset(postRef, asset.id, asset => {
+        asset.metadata.status.ready = true
+        return asset
+    })
+    // Cleanup temp directories
+    await cleanupAssetTemp(unzippedPath, processedPath)
 }
 
+export const onPostDocumentDelete = async (snapshot: QueryDocumentSnapshot, context: EventContext) {
+    const postID = snapshot.id
+    const bucket = admin.storage().bucket("the-lost-metropolis-production-static")
+    bucket.deleteFiles({
+        prefix: generatePostFolderPath(postID)+"/"
+    })
+}
 
 

@@ -1,10 +1,9 @@
-import { SceneConfiguration } from './../../../api_old/types';
 import { Timestamp } from 'firebase/firestore';
 import { array, mixed, object, string, boolean, SchemaOf } from 'yup';
-import { Asset } from "../../types/Asset"
+import { Asset, assetSchema } from "../../types/Asset"
 import { makeRequiredMultiLangStringSchema, MultiLangString, multiLangStringSchema } from "../../types/MultiLangString"
 import { Instance } from '../../utility_types';
-import { sceneConfigurationSchema } from '../../types/SceneConfiguration';
+import { SceneConfiguration, sceneConfigurationSchema } from '../../types/SceneConfiguration';
 import { SceneChild, sceneChildSchema } from '../../types/SceneChild';
 
 /**
@@ -31,7 +30,10 @@ export const postDocDataSchema = object({
     description: makeRequiredMultiLangStringSchema(),
     configuration: sceneConfigurationSchema.required(),
     sceneChildren: array(sceneChildSchema.required()).required(),
-    // assets: instanceSchema(array(assetSchema)).required(),
+    assets: array(object({
+        id: string().required(),
+        data: assetSchema.required()
+    }).required()).required(),
     createdAt: mixed<Timestamp>().required(),
     updatedAt: mixed<Timestamp>().required(),
     owner: string().required(),

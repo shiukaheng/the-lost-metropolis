@@ -9,7 +9,7 @@ import { Potree2 } from './cloud_functions/types/asset_types/Potree2';
 import { AssetConverterFunction, AssetType } from './cloud_functions/types/AssetType';
 import { assetMetadataFileSchema, AssetMetadataFile } from './cloud_functions/types/AssetMetadataFile';
 
-export const assetTypes = [Potree2]
+// export const assetTypes = [Potree2]
 
 export const uploadFolderToBucket = async (localPath:string, bucket:Bucket, bucketUploadPath:string, progressCallback?:(progress: number)=>any) => {
     // Maps all the files recursively in the localPath directory, and uploads them to the bucket in the same folder structure:
@@ -120,12 +120,12 @@ export function getAssetClasses(metadataFile: AssetMetadataFile) {
     return { sourceAssetClass, targetAssetClass };
 }
 
-export async function unzipFile(bucket: Bucket, object: functions.storage.ObjectMetadata, assetFileName: string) {
+export async function unzipFile(object: functions.storage.ObjectMetadata, assetFileName: string) {
     if (object.name === undefined) {
         throw new Error(`File ${assetFileName} does not have a name`)
     }
     const assetUnzippedPath = path.join(os.tmpdir(), "asset-unzip");
-    await bucket.file(object.name).download({ destination: assetUnzippedPath });
+    await admin.storage().bucket().file(object.name).download({ destination: assetUnzippedPath });
     // Throw error if the zip does not contain a metadata.json at the root in the temp folder
     if (!(fs.existsSync(path.join(assetUnzippedPath, "metadata.json")) && fs.lstatSync(path.join(assetUnzippedPath, "metadata.json")).isFile())) {
         throw new Error(`File ${assetFileName} does not contain a metadata.json file`);

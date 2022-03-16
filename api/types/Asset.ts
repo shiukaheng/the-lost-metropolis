@@ -14,6 +14,7 @@ export const assetSchema = object({
             processed: boolean().required().default(false),
             ready: boolean().required().default(false),
             pending: boolean().required().default(true)
+            // TODO: Missing ERROR component
         }).required()
     }).required()
 })
