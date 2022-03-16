@@ -1,6 +1,6 @@
 import { Post, postSchema } from '../../api/types/Post';
 import { Instance, RecursivePartial } from "../../api/utility_types";
-import { addDoc, collection, deleteDoc, doc, getDoc, Timestamp, updateDoc, arrayUnion, arrayRemove, where } from "firebase/firestore";
+import { addDoc, collection, deleteDoc, doc, getDoc, updateDoc, arrayUnion, arrayRemove, where } from "firebase/firestore";
 import { PostDocData, postDocDataSchema } from './types/PostDocData';
 import { naiveExport, subToRefWithRoleAuthSensitive } from './utilities';
 import { db, storage } from '../firebase-config'
