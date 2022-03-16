@@ -1,5 +1,9 @@
-import { createContext } from "react";
+import { createContext, useEffect, useState } from "react";
+import { Post } from "../../../api/types/Post";
+import { Instance } from "../../../api/utility_types";
 import { editorPostProvider, ownerPostProvider, publicPostProvider, viewerPostProvider } from "../../api";
+import VaporAPI from "../../api_client/api";
+import { Roled } from "../../api_client/types/Role";
 import { useSubscription } from "../../utilities";
 
 export const ContentContext = createContext([]);
@@ -29,14 +33,16 @@ function mapPostRole(array, role) {
 }
 
 export const ContentProvider = ({children}) => {
-    const ownerPosts = mapPostRole(useSubscription(ownerPostProvider, true, "ownerPosts"), "owner");
-    const editorPosts = mapPostRole(useSubscription(editorPostProvider, true, "editorPosts"), "editor");
-    const viewerPosts = mapPostRole(useSubscription(viewerPostProvider, true, "viewerPosts"), "viewer");
-    const publicPosts = mapPostRole(useSubscription(publicPostProvider, false, "publicPosts"), "public");
-    const allPosts = concatenatePosts(ownerPosts, editorPosts, viewerPosts, publicPosts);
+    const [posts, setPosts] = useState<Instance<Roled<Post>>[]>(null);
+    useEffect(()=>{
+        VaporAPI.subscribePosts((posts) => {
+            setPosts(posts);
+            // console.log(posts)
+        })
+    }, [])
     // 
     return (
-        <ContentContext.Provider value={allPosts}>
+        <ContentContext.Provider value={posts}>
             {children}
         </ContentContext.Provider>
     )

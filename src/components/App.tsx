@@ -1,3 +1,4 @@
+import { MainRouter } from './MainRouter';
 
 // import React from "react" // Not sure why this is required but ok
 import { BrowserRouter as Router, Route } from "react-router-dom";
@@ -86,7 +87,7 @@ const content_array = [
 
 
 
-function App():FC {
+function App() {
     // Theme defines the background color and foreground color, as well as the background video. It is not persistent between sessions and is defined by what content the user is viewing.
     const [theme, setTheme] = useState(defaultTheme)
     // Settings defines user preferences persistent between sessions.
@@ -106,7 +107,7 @@ function App():FC {
                 </SettingsContext.Provider>
             </ContentProvider>
         </AuthProvider>
-  )
+    )
 }
 
 export { App, ThemeContext, SettingsContext }
