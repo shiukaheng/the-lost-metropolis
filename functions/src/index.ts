@@ -1,12 +1,11 @@
 import * as admin from "firebase-admin"
 import * as functions from "firebase-functions";
-import { checkConversion, getAssetClasses, getBuckets, initHandleNewFile, parseMetadataFile, processAsset, unzipFile, updateAssetDocument } from './helpers';
+import { onNewFile, onPostDocumentDelete } from "./lib/functions";
 
 admin.initializeApp()
 
-export const handleNewFile = functions.region("asia-east1").storage.object().onFinalize(async (object) => {
-
-})
+export const handleNewFile = functions.region("asia-east1").storage.object().onFinalize(onNewFile)
+export const handlePostDocumentDelete = functions.region("asia-east1").firestore.document("posts/{postID}").onDelete(onPostDocumentDelete)
 
 
 

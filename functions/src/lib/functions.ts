@@ -14,7 +14,7 @@ export const onNewFile = async (object: functions.storage.ObjectMetadata) => {
         throw new Error("Invalid zip metadata")
     }
     // Check if asset is requested, if not, throw error
-    const {postRef, postSnap, asset} = await checkAssetRequested(object) // Implemented!
+    const {postRef, asset} = await checkAssetRequested(object) // Implemented!
     // Unzip asset to local temp folder, and parse metadata.json to a variable and updating post doc too
     const {unzippedPath, metadataFile} = await unzipAsset(object, postRef)
     // Take metadata and unzipped path as variable and get receiving directory of what to upload to CDN, and update processProgress
@@ -30,7 +30,7 @@ export const onNewFile = async (object: functions.storage.ObjectMetadata) => {
     await cleanupAssetTemp(unzippedPath, processedPath)
 }
 
-export const onPostDocumentDelete = async (snapshot: QueryDocumentSnapshot, context: EventContext) {
+export const onPostDocumentDelete = async (snapshot: QueryDocumentSnapshot, context: EventContext) => {
     const postID = snapshot.id
     const bucket = admin.storage().bucket("the-lost-metropolis-production-static")
     bucket.deleteFiles({
