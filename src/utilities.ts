@@ -7,7 +7,7 @@ import { useFrame } from "@react-three/fiber";
 import { Post, postSchema } from "../api/types/Post";
 import VaporAPI from "./api_client/api";
 import { uninstance, instance } from "../api/utilities";
-import { PostDocData } from "./api_client/types/PostDocData";
+import { PostDocData } from "../api/implementation_types/PostDocData";
 
 export function formatRGBCSS(color: number[]): string {
     return "rgb(" + color[0] + "," + color[1] + "," + color[2] + ")";
@@ -187,7 +187,7 @@ export const useMultilang = (content) => {
     return content[settings.lang]
 }
 
-export function usePost(id: string, whitelist?: (keyof PostDocData)[], blacklist?: (keyof PostDocData)[]): [Post, (newPost:Post)=>Promise<void>] {
+export function usePost(id: string, whitelist?: (keyof Post)[], blacklist?: (keyof Post)[]): [Post, (newPost:Post)=>Promise<void>] {
     // Returns post and setter, setter returns null if no edit permission
     const posts = useContext(ContentContext)
     const post: Post = postSchema.cast(uninstance(posts.find((p) => p.id === id)), {stripUnknown: true})
