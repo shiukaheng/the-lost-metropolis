@@ -99,8 +99,8 @@ export function useAsyncReference(value) {
 }
 
 export function KeyPressCallback({keyName, onDown=()=>{}, onUp=()=>{}}) {
-    const onDownRef = useRef(null)
-    const onUpRef = useRef(null)
+    const onDownRef = useRef(onDown)
+    const onUpRef = useRef(onUp)
     useEffect(()=>{
         onDownRef.current = onDown
         onUpRef.current = onUp
@@ -134,7 +134,7 @@ export function useStickyState(defaultValue, key) {
     return [value, setValue];
 }
 
-export function useFollowMouse(onMouseMove=null) {
+export function useFollowMouse(onMouseMove:Function|null=null) {
     const mousePosRef = useRef([0,0])
     useLayoutEffect(() => {
         const body = document.querySelector("body")
@@ -144,6 +144,9 @@ export function useFollowMouse(onMouseMove=null) {
             if (onMouseMove) {
                 onMouseMove(mousePosRef.current)
             }
+        }
+        if (body === null) {
+            return ()=>{}
         }
         body.addEventListener("mousemove", mouseMoveHandler)
         return () => {
