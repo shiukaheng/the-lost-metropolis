@@ -7,6 +7,9 @@ import { ViewerContext } from "../../viewer/ViewerContext";
 import { v4 as uuidv4 } from 'uuid';
 import MagicButton from "../../utilities/MagicButton";
 import { useMultilang } from "../../../utilities";
+import { Post } from "../../../../api/types/Post";
+import { SceneChild } from "../../../../api/types/SceneChild";
+import { CameraProps } from "../../../../api/types/CameraProps";
 
 // Utilties and components for import / export
 
@@ -16,7 +19,7 @@ import { useMultilang } from "../../../utilities";
 
 // Serialization: reading from sceneChildren and outputting to a JSON compatible object
 
-export function exportChild(child) {
+export function exportChild(child): SceneChild {
     const {type, props} = child;
     const newProps = {...props};
     if (!(components.includes(type))) {
@@ -71,14 +74,14 @@ export function exportChildren(childrenArray) {
 
 // Deserialization: Reading from JSON compatible object, matching them to components from supportedComponents, and instantiating them with createElement 
 
-export function deserializeChild(child, componentTypes) {
+export function deserializeChild(child: SceneChild, componentTypes: {[key:string]: any}) {
     const {componentType, props} = child;
     // Check whether type is supported
     if (!(componentTypes.includes(componentType))) {
         throw new Error(`Component type ${componentType} not supported for import`);
     }
     // Clone props to avoid modifying the original props object
-    const newProps = {...props};
+    const newProps: any = {...props};
     // Do the same checks as in exportChild, paying notice that the type is a string
     const component = getComponentFromTypeName(componentType);
     const propInfo = component.inputs;
@@ -90,64 +93,79 @@ export function deserializeChild(child, componentTypes) {
     return createElement(component, newProps);
 }
 
-export function deserializeChildren(childrenArray) {
+export function deserializeChildren(childrenArray: SceneChild[]) {
     const componentTypes = components.map(c => c.componentType)
     return childrenArray.map(child => deserializeChild(child, componentTypes));
 }
 
-export const useStatefulSerialize = () => {
-    const {sceneChildren, defaultCameraProps, potreePointBudget} = useContext(ViewerContext)
-    return () => {
-    return {
-        sceneChildren: exportChildren(sceneChildren),
-        defaultCameraProps: defaultCameraProps,
-        potreePointBudget: potreePointBudget,
-    }
-}}
+/**
+ * Portions of the {@link Post} object that changes scene look / behavior
+ */
+export type PostScene = Pick<Post, "sceneChildren" | "configuration">;
 
-export const useStatefulDeserialize = () => { 
+/**
+ * Creates function that serializes the scene in {@link ViewerContext} to a {@link PostScene} object
+ * @returns serialization function
+ */
+export function useStatefulSerialize(): ()=>PostScene {
+    const {sceneChildren, defaultCameraProps, potreePointBudget} = useContext(ViewerContext)
+    return () => ({
+        sceneChildren: exportChildren(sceneChildren),
+        configuration: {
+            defaultCameraProps: defaultCameraProps,
+            potreePointBudget: potreePointBudget,
+        }
+    })
+}
+
+/**
+ * 
+ * @returns function that deserializes a {@link PostScene} object to the scene in {@link ViewerContext}
+ */
+export function useStatefulDeserialize(): (PostScene) => void { 
     const {setSceneChildren, setDefaultCameraProps, setPotreePointBudget} = useContext(ViewerContext)
-    return (obj) => {
-        setSceneChildren(deserializeChildren(obj.sceneChildren));
-        setDefaultCameraProps(obj.defaultCameraProps);
-        setPotreePointBudget(obj.potreePointBudget);
+    return (post: PostScene) => {
+        setSceneChildren(deserializeChildren(post.sceneChildren));
+        // Scene configuration
+        setDefaultCameraProps(post.configuration.defaultCameraProps);
+        setPotreePointBudget(post.configuration.potreePointBudget);
     }
 }
 
-export function EditorIO() {
-    const inputFile = useRef(null) 
-    const onButtonClick = () => {
-        // `current` points to the mounted file input element
-       inputFile.current.click();
-    };
-    const serialize = useStatefulSerialize();
-    const deserialize = useStatefulDeserialize();
-    const heading = useMultilang({"en": "import / export", "zh": "導入 / 導出"});
-    const importLabel = useMultilang({"en": "import", "zh": "導入"});
-    const exportLabel = useMultilang({"en": "export", "zh": "導出"});
-    return (
-        <EditorEmbeddedWidget title={heading}>
-            <div className="flex flex-row gap-2">
-                <input type='file' id='file' ref={inputFile} style={{display: 'none'}} onChange={(e)=>{
-                    var reader = new FileReader();
-                    reader.onload = (e2) => {
-                        const json = JSON.parse(e2.target.result);
-                        deserialize(json)
-                    }
-                    reader.readAsText(e.target.files[0]);
-                }}/>
-                <MagicDiv mergeTransitions className="editor-secondary-button" onClick={()=>{
-                    onButtonClick();
-                }}>
-                    {importLabel}
-                </MagicDiv>
-                <MagicDiv mergeTransitions className="editor-secondary-button" onClick={()=>{
-                    const blob = new Blob([JSON.stringify(serialize())], {type: "text/plain;charset=utf-8"});
-                    FileSaver.saveAs(blob, "scene.json");
-                }}>
-                    {exportLabel}
-                </MagicDiv>
-            </div>
-        </EditorEmbeddedWidget>
-    );
-} 
+// export function EditorIO() {
+//     const inputFile = useRef(null) 
+//     const onButtonClick = () => {
+//         // `current` points to the mounted file input element
+//        inputFile.current.click();
+//     };
+//     const serialize = useStatefulSerialize();
+//     const deserialize = useStatefulDeserialize();
+//     const heading = useMultilang({"en": "import / export", "zh": "導入 / 導出"});
+//     const importLabel = useMultilang({"en": "import", "zh": "導入"});
+//     const exportLabel = useMultilang({"en": "export", "zh": "導出"});
+//     return (
+//         <EditorEmbeddedWidget title={heading}>
+//             <div className="flex flex-row gap-2">
+//                 <input type='file' id='file' ref={inputFile} style={{display: 'none'}} onChange={(e)=>{
+//                     var reader = new FileReader();
+//                     reader.onload = (e2) => {
+//                         const json = JSON.parse(e2.target.result);
+//                         deserialize(json)
+//                     }
+//                     reader.readAsText(e.target.files[0]);
+//                 }}/>
+//                 <MagicDiv mergeTransitions className="editor-secondary-button" onClick={()=>{
+//                     onButtonClick();
+//                 }}>
+//                     {importLabel}
+//                 </MagicDiv>
+//                 <MagicDiv mergeTransitions className="editor-secondary-button" onClick={()=>{
+//                     const blob = new Blob([JSON.stringify(serialize())], {type: "text/plain;charset=utf-8"});
+//                     FileSaver.saveAs(blob, "scene.json");
+//                 }}>
+//                     {exportLabel}
+//                 </MagicDiv>
+//             </div>
+//         </EditorEmbeddedWidget>
+//     );
+// } 
