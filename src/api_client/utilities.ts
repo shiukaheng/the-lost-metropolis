@@ -1,7 +1,7 @@
 import { CollectionReference, onSnapshot, query, QueryConstraint, Timestamp, Unsubscribe } from "firebase/firestore";
 import { Post } from "../../api/types/Post";
-import { PostDocData } from "./types/PostDocData";
-import { Role, Roled } from "./types/Role";
+import { PostDocData } from "../../api/implementation_types/PostDocData";
+import { Role, Roled } from "../../api/implementation_types/Role";
 import { Instance } from "../../api/utility_types";
 import { instance, uninstance } from "../../api/utilities";
 import { onAuthStateChanged, User } from "firebase/auth";
@@ -9,17 +9,17 @@ import { auth } from '../firebase-config'
 
 export function naiveExport(post: Post): PostDocData {
     return {
-        title: post.data.title,
-        description: post.data.description,
-        configuration: post.data.configuration,
-        sceneChildren: post.data.sceneChildren,
-        assets: post.data.assets,
-        createdAt: Timestamp.fromDate(new Date(post.metadata.createdAt)),
-        updatedAt: Timestamp.fromDate(new Date(post.metadata.updatedAt)),
-        owner: post.metadata.permissions.owner,
-        editors: post.metadata.permissions.editors,
-        viewers: post.metadata.permissions.viewers,
-        public: post.metadata.permissions.public
+        title: post.title,
+        description: post.description,
+        configuration: post.configuration,
+        sceneChildren: post.sceneChildren,
+        assets: post.assets,
+        createdAt: Timestamp.fromDate(new Date(post.createdAt)),
+        updatedAt: Timestamp.fromDate(new Date(post.updatedAt)),
+        owner: post.owner,
+        editors: post.editors,
+        viewers: post.viewers,
+        public: post.public
     }
 }
 

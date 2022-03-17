@@ -1,7 +1,7 @@
 import { Post, postSchema } from '../../api/types/Post';
 import { Instance, RecursivePartial } from "../../api/utility_types";
 import { addDoc, collection, deleteDoc, doc, getDoc, updateDoc, arrayUnion, arrayRemove, where } from "firebase/firestore";
-import { PostDocData, postDocDataSchema } from './types/PostDocData';
+import { PostDocData, postDocDataSchema } from '../../api/implementation_types/PostDocData';
 import { naiveExport, subToRefWithRoleAuthSensitive } from './utilities';
 import { db, storage } from '../firebase-config'
 import { instance, uninstance } from '../../api/utilities';
@@ -9,7 +9,7 @@ import { omit, pick } from "lodash"
 import { v4 as uuidv4 } from "uuid";
 import { Asset, assetSchema } from '../../api/types/Asset';
 import { ref, uploadBytesResumable } from 'firebase/storage';
-import { Roled } from './types/Role';
+import { Roled } from '../../api/implementation_types/Role';
 
 export default class VaporAPI {
 
@@ -132,7 +132,7 @@ export default class VaporAPI {
         // Import the post document's data
         const post = VaporAPI.importPost(postDocData as PostDocData)
         // Get the asset instance
-        const assetInstance = post.data.assets.find(asset => asset.id === assetID)
+        const assetInstance = post.assets.find(asset => asset.id === assetID)
         // Delete the asset from the post
         await updateDoc(postDocRef, { assets: arrayRemove(assetInstance) })
         // Note: Could be optimized to use an existing assetInstance that could be supplied as a parameter
@@ -192,23 +192,17 @@ export default class VaporAPI {
             throw new Error("Error parsing post document")
         }
         return {
-            data: {
-                title: docData.title,
-                description: docData.description,
-                configuration: docData.configuration,
-                sceneChildren: docData.sceneChildren,
-                assets: docData.assets
-            },
-            metadata: {
-                createdAt: docData.createdAt.toDate().toISOString(),
-                updatedAt: docData.updatedAt.toDate().toISOString(),
-                permissions: {
-                    owner: docData.owner,
-                    viewers: docData.viewers,
-                    editors: docData.editors,
-                    public: docData.public
-                }
-            }
+            title: docData.title,
+            description: docData.description,
+            configuration: docData.configuration,
+            sceneChildren: docData.sceneChildren,
+            assets: docData.assets,
+            owner: docData.owner,
+            editors: docData.editors,
+            viewers: docData.viewers,
+            public: docData.public,
+            createdAt: docData.createdAt.toDate().toISOString(),
+            updatedAt: docData.updatedAt.toDate().toISOString()
         }
     }
 }

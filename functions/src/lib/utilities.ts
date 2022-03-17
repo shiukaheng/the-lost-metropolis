@@ -1,6 +1,5 @@
 import * as admin from "firebase-admin";
 import * as functions from "firebase-functions";
-import { postDocDataSchema } from "../../../api/web_client/types/PostDocData";
 import * as admZip from "adm-zip";
 import { AssetMetadataFile, assetMetadataFileSchema } from "./types/AssetMetadataFile";
 import { AssetZipMetadata, assetZipMetadataSchema } from "./types/AssetZipMetadata";
@@ -12,6 +11,7 @@ import { cloneDeep } from "lodash";
 import { assetTypes } from "./types/AssetType";
 import * as path from "path";
 import { db } from "./functions";
+import { PostDocData, postDocDataSchema } from "../../../api/implementation_types/PostDocData"
 
 export function generatePostFolderPath(postID: string): string {
     return `${postID}`;
@@ -32,12 +32,12 @@ export async function checkAssetRequested(object: functions.storage.ObjectMetada
         throw new Error(`Post with id ${metadata.postID} does not exist`);
     }
     // Validate post document
-    const postSnap = doc.data();
+    const postSnap: PostDocData = doc.data();
     if (!postDocDataSchema.isValidSync(postSnap)) {
         throw new Error(`Post with id ${metadata.postID} does not have valid data`);
     }
     // Check if asset exists on post.assets with id metadata.assetID, if not, throw error
-    const asset = postSnap.assets.find(asset => asset.id === metadata.assetID);
+    const asset: Instance<Asset> | undefined = postSnap.assets.find((asset: Instance<Asset>) => asset.id === metadata.assetID);
     if (!asset) {
         throw new Error(`Asset with id ${metadata.assetID} does not exist on post with id ${metadata.postID}`);
     }

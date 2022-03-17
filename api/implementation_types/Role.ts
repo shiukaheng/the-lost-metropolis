@@ -1,5 +1,5 @@
 import { mixed } from 'yup';
-import { tuple } from '../../../api/types/utilities';
+import { tuple } from '../types/utilities';
 
 export const role = tuple("owner", "editor", "viewer", "public")
 export type Role = typeof role[number]

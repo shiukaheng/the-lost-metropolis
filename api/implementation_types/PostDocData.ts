@@ -1,9 +1,9 @@
 import { Timestamp } from 'firebase/firestore';
 import { array, mixed, object, string, boolean, InferType } from 'yup';
-import { assetSchema } from "../../../api/types/Asset"
-import { makeRequiredMultiLangStringSchema } from "../../../api/types/MultiLangString"
-import { sceneConfigurationSchema } from '../../../api/types/SceneConfiguration';
-import { sceneChildSchema } from '../../../api/types/SceneChild';
+import { assetSchema } from "../types/Asset"
+import { makeRequiredMultiLangStringSchema } from "../types/MultiLangString"
+import { sceneConfigurationSchema } from '../types/SceneConfiguration';
+import { sceneChildSchema } from '../types/SceneChild';
 
 
 // export type PostDocData = {
