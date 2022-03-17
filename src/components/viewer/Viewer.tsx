@@ -5,7 +5,11 @@ import { AudioListener } from "three"
 import { useStatefulDeserialize } from "../editor/ui_elements/EditorIO"
 import Viewport from "./Viewport"
 import GameControls from "../utilities/GameControls"
+import { Post } from "../../../api/types/Post"
 
+/**
+ * Non-visual component that manages the viewer state, including scene configuration and scene children.
+ */
 function ViewerManager({children}) {
     // Helps to manage Viewer state (camera initial position, post processing, etc), seperated to be reused in Editor and Viewer
     const [defaultCameraProps, setDefaultCameraProps] = useState<DefaultCameraPropType>({
@@ -57,7 +61,10 @@ function ViewerManager({children}) {
     );
 }
 
-function ViewerUI({post, ...props}) {
+/**
+ * Responsible for reading sceneChildren and configuration from ViewerContext, and providing GameControls.
+ */
+function ViewerUI({post, ...props}: ViewerProps) {
     const {sceneChildren} = useContext(ViewerContext)
     const deserialize = useStatefulDeserialize()
     useEffect(()=>{
@@ -71,7 +78,16 @@ function ViewerUI({post, ...props}) {
     )
 }
 
-function Viewer({post, ...props}) {
+interface ViewerProps {
+    post: Post
+    // Allow extra props to be passed to Viewport
+    [key: string]: any
+}
+
+/**
+ * Composite component that combines ViewerManager and ViewerUI
+ */
+function Viewer({post, ...props}: ViewerProps) {
     return (
         <ViewerManager {...props}>
             <ViewerUI post={post} {...props}/>
