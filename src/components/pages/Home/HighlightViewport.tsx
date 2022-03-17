@@ -26,8 +26,9 @@ function HighlightViewport({children, posOffsetIntensity=[1, 1], rotOffsetIntens
     const rigRef = useRef(null)
     return (
         <div {...props}>
+            {/* Todo: Need to replace this with something derived with ViewerManager */}
             <Canvas>
-                <PotreeManager pointBudget={1000000}>
+                <PotreeManager>
                     <FollowMouse object={rigRef} posOffsetIntensity={posOffsetIntensity} rotOffsetIntensity={rotOffsetIntensity} lambda={lambda} captureMode={captureMode}/>
                     <group ref={rigRef}>
                         {children}
