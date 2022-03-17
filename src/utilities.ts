@@ -375,21 +375,27 @@ export function Condition({condition, children}) {
     return condition ? children : null
 }
 
-export function useChooseFile(): [()=>void, File] {
+export function useChooseFile(): [()=>void, File | null] {
     // Returns createPrompt function and file object
-    const [file, setFile] = useState(null)
+    const [file, setFile] = useState<File|null>(null)
     // Create an input DOM object that will be used to trigger the file upload prompt
-    const inputRef = useRef(null)
+    const inputRef = useRef<HTMLInputElement|null>(null)
     useEffect(()=>{
         inputRef.current = document.createElement("input")
         inputRef.current.type = "file"
         inputRef.current.style.display = "none"
         inputRef.current.addEventListener("change", (e) => {
-            setFile(e.target.files[0])
+            if (e.target === null) {
+                return
+            }
+            const files = (e.target as HTMLInputElement).files
+            if (files !== null && files.length > 0) {
+                setFile(files[0])
+            }
         })
     }, [])
     const createPrompt = () => {
-        inputRef.current.click()
+        inputRef.current && inputRef.current.click()
     }
     return [createPrompt, file]
 }
