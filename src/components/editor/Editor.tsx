@@ -123,7 +123,8 @@ function EditorManager() {
                         editorExpanded ?
                         <div className='overflow-auto p-8 pt-0'>
                             <EditorComponentGraph/>
-                            <EditorAssetManager/>
+                            {/* Post ID and assets are passed in as props because they are not part of Post */}
+                            <EditorAssetManager postID={id} assets={post?.assets}/>
                             <EditorComponentProperties/>
                             <EditorOptions/>
                             <EditorSceneSettings/>

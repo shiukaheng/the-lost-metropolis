@@ -387,9 +387,10 @@ export function Condition({condition, children}) {
     return condition ? children : null
 }
 
-export function useChooseFile(): [()=>void, File | null] {
+export function useChooseFile(validifier?: (file: File)=>boolean): [createPrompt:()=>void, file:File | null, valid:boolean | null, clearFiles:()=>void] {
     // Returns createPrompt function and file object
     const [file, setFile] = useState<File|null>(null)
+    const [valid, setValid] = useState<boolean|null>(null)
     // Create an input DOM object that will be used to trigger the file upload prompt
     const inputRef = useRef<HTMLInputElement|null>(null)
     useEffect(()=>{
@@ -397,19 +398,31 @@ export function useChooseFile(): [()=>void, File | null] {
         inputRef.current.type = "file"
         inputRef.current.style.display = "none"
         inputRef.current.addEventListener("change", (e) => {
-            if (e.target === null) {
+            if (e.target === null) { // If the event is not triggered by the input element
                 return
             }
             const files = (e.target as HTMLInputElement).files
-            if (files !== null && files.length > 0) {
+            if (files !== null && files.length > 0) { // If there is a file
                 setFile(files[0])
+                if (validifier) {
+                    setValid(validifier(files[0]))
+                } else {
+                    setValid(null)
+                }
+            } else { // If there is no file
+                setFile(null)
+                setValid(null)
             }
         })
     }, [])
     const createPrompt = () => {
         inputRef.current && inputRef.current.click()
     }
-    return [createPrompt, file]
+    const clearFiles = () => {
+        setFile(null)
+        setValid(null)
+    }
+    return [createPrompt, file, valid, clearFiles]
 }
 
 export async function logOut() {

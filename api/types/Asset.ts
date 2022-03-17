@@ -2,11 +2,11 @@ import { sourceAssetLiteralSchema, targetAssetLiteralSchema } from './AssetLiter
 import { boolean, InferType, number, object, string } from "yup";
 
 export const assetSchema = object({
-    data: object().required(),
+    data: object().nullable().defined().default(null),
     metadata: object({
-        name: string().required().default("untitled asset"),
-        sourceAssetType: sourceAssetLiteralSchema.required().default(null),
-        targetAssetType: targetAssetLiteralSchema.required().default(null),
+        name: string().defined().default("untitled asset"),
+        sourceAssetType: sourceAssetLiteralSchema.defined().nullable().default(null),
+        targetAssetType: targetAssetLiteralSchema.defined().nullable().default(null),
         createdAt: string().required().default(() => new Date().toISOString()),
         status: object({
             uploaded: boolean().required().default(false),
