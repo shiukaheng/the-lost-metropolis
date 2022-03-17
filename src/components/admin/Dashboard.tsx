@@ -13,9 +13,6 @@ import MagicIcon from '../utilities/MagicIcon';
 import { EyeIcon, EyeOffIcon } from '@heroicons/react/outline';
 import { useMultilang } from '../../utilities';
 
-const StyledRow = tw.tr`border-b border-t border-current md:hover:opacity-50 transition-opacity duration-500 cursor-pointer table-row`
-const StyledCell = tw.td`text-left font-serif md:text-lg font-semibold pt-2 pb-6 table-cell`
-
 function Dashboard() {
     const navigate = useNavigate();
     const posts = useContext(ContentContext)

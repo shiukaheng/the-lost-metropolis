@@ -4,7 +4,10 @@ import { languages, SettingsContext, ThemeContext } from "./components/App";
 import { ContentContext } from "./components/providers/ContentProvider";
 import { cloneDeep, isEqual } from "lodash"
 import { useFrame } from "@react-three/fiber";
-import { Post } from "../api/types/Post";
+import { Post, postSchema } from "../api/types/Post";
+import VaporAPI from "./api_client/api";
+import { uninstance, instance } from "../api/utilities";
+import { PostDocData } from "./api_client/types/PostDocData";
 
 export function formatRGBCSS(color: number[]): string {
     return "rgb(" + color[0] + "," + color[1] + "," + color[2] + ")";
@@ -184,15 +187,20 @@ export const useMultilang = (content) => {
     return content[settings.lang]
 }
 
-export function usePost(id: string): [Post, (newPost:Post)=>Promise<void>] {
+export function usePost(id: string, whitelist?: (keyof PostDocData)[], blacklist?: (keyof PostDocData)[]): [Post, (newPost:Post)=>Promise<void>] {
     // Returns post and setter, setter returns null if no edit permission
     const posts = useContext(ContentContext)
-    const post = posts.find((p) => p.id === id)
-    const setPost = async (newPost) => {               
-        await updatePost(id, newPost)
+    const post: Post = postSchema.cast(uninstance(posts.find((p) => p.id === id)), {stripUnknown: true})
+    const setPost = async (newPost: Post) => {               
+        // await updatePost(id, newPost)
+        await VaporAPI.updatePost(
+            instance(newPost, id),
+            whitelist,
+            blacklist
+        )
     }
     return [post, setPost]
-}
+} // Reviewed, should be consistent with new API
 
 export function filterProps(target, props=[]) {
     if (target === undefined) {
@@ -209,8 +217,21 @@ export function filterProps(target, props=[]) {
     return filtered
 }
 
-export const useBufferedPost = (id, props=[], onBufferChange=(buffer)=>{}, onPull=(buffer)=>{}, onPush=(buffer)=>{}) => { // Todo: use useWriteCheck to monitor changes to post
-    // Returns buffer, setBuffer (stores new post in buffer), post (the post in the database), push function (syncs database with buffer, returns null if no edit permission), pull function (syncs buffer with database), changed (if buffer deviates from post), and overwriteWarning (true if database has changed since buffer was last synced)
+/**
+ * Logic for updating posts in an editor
+ * @param id the id of the post to update
+ * @param props which props on the post document to modify
+ * @param onBufferChange a function that is called when the buffer (used for user input) changes
+ * @param onPull callback for when user pulls new post from server
+ * @param onPush callback when user pushes post to server
+ */
+export function useBufferedPost (
+    id, 
+    props:(keyof PostDocData)[]=[], 
+    onBufferChange=(buffer: Post)=>{}, 
+    onPull=(buffer: Post)=>{}, 
+    onPush=(buffer: Post)=>{})
+    {
     const [post, setPost] = usePost(id)
     const filteredPost = filterProps(post, props)
     const [buffer, _setBuffer] = useState(filteredPost)

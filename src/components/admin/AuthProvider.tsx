@@ -1,33 +1,38 @@
-import React, { createContext, useEffect, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 import { auth } from "../../firebase-config"
-import { onAuthStateChanged } from "firebase/auth"
-import { useStickyState } from "../../utilities";
+import { onAuthStateChanged, User } from "firebase/auth"
+// import { useStickyState } from "../../utilities";
 
-export const AuthContext = createContext(null);
+type AuthContextValue = {
+    currentUser: User | null;
+}
+
+export const AuthContext = createContext<AuthContextValue>({
+    currentUser: null
+});
 
 export const AuthProvider = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState(null);
-  const [pending, setPending] = useState(true);
+    const [currentUser, setCurrentUser] = useState<User|null>(null);
+    const [pending, setPending] = useState<boolean>(true);
 
-  useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
-      // console.log("Auth updated", user)
-      setCurrentUser(user)
-      setPending(false)
-    });
-  }, []);
+    useEffect(() => {
+        onAuthStateChanged(auth, (user) => {
+            setCurrentUser(user)
+            setPending(false)
+        });
+    }, []);
 
-  if(pending){
-    return <>Loading...</>
-  }
+    if(pending){
+       return <>Loading...</>
+    }
 
-  return (
-    <AuthContext.Provider
-      value={{
-        currentUser
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
-  );
+    return (
+        <AuthContext.Provider
+            value={{
+                currentUser
+            }}
+        >
+            {children}
+        </AuthContext.Provider>
+    );
 };

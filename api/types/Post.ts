@@ -5,6 +5,8 @@ import { permissionsSchema } from "./Permissions";
 import { sceneChildSchema } from "./SceneChild";
 import { sceneConfigurationSchema } from "./SceneConfiguration";
 
+// TODO: Just unify Post shape with PostDocData shape, but allow different types. Easier to think about.
+
 export const postSchema = object({
     data: object({
         title: makeRequiredMultiLangStringSchema({
