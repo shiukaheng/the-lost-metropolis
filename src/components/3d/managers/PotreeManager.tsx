@@ -3,6 +3,7 @@ import { Potree } from "potree-loader"
 import { useFrame } from '@react-three/fiber';
 import { createContext, useEffect, useRef, ReactNode, useState, useContext } from 'react';
 import { ViewerContext } from '../../viewer/ViewerContext';
+import { Object3D } from "three"
 const PotreeContext = createContext(null)
 
 type PotreeManagerProps = {
@@ -17,7 +18,7 @@ function PotreeManager({children}:PotreeManagerProps) {
     const frameTimeRef = useRef([])
     // Set target framerate at 60fps
     const [targetFrameRate, setTargetFrameRate] = useState(60)
-    const setPointCloud = (cloud, childID) => {setPointClouds((oldPointClouds)=>{oldPointClouds[childID] = cloud; return oldPointClouds})}
+    const setPointCloud = (cloud: Object3D, childID:string) => {setPointClouds((oldPointClouds)=>{oldPointClouds[childID] = cloud; return oldPointClouds})}
     useFrame((state, delta) => {
         potree.updatePointClouds(Object.values(pointClouds).filter(x => (x !== null && x !== undefined)), state.camera, state.gl)
     })

@@ -3,6 +3,7 @@ import { NumberType, StringType, URLType } from "../viewer/ArgumentTypes";
 import { VaporComponent, VaporComponentProps } from "../viewer/ComponentDeclarations";
 import { genericInputs } from "../viewer/genericInputs"
 import { PotreeContext } from "./managers/PotreeManager";
+import { uuidv4 as v4 } from "uuid"
 
 type PotreeObjectProps = VaporComponentProps & {
     cloudName?: string
@@ -12,21 +13,23 @@ type PotreeObjectProps = VaporComponentProps & {
     pointShape?: number
 }
 
-export const PotreeObject: VaporComponent = ({cloudName="cloud.js", baseUrl, pointSize=1, pointSizeType=2, pointShape=2, id, ...props}:PotreeObjectProps) => {
+export const PotreeObject: VaporComponent = ({cloudName="cloud.js", baseUrl, pointSize=1, pointSizeType=2, pointShape=2, ...props}:PotreeObjectProps) => {
     const {potree, setPointCloud: setManagerPointCloud} = useContext(PotreeContext)
     const [pointCloud, setPointCloud] = useState(null)
     const objectGroup = useRef(null)
     const isValid = useRef(true)
+    const cloudIDRef = useRef<string>(null)
 
     // Use useEffect to update pointCloud variable on cloudName, baseUrl changes
     useEffect(()=>{
+        cloudIDRef.current = v4()
         // Request new point with new cloudName and baseUrl asynchronously, then update pointCloud. In the asynchrnous callback, check if isValid is true. If it is, set pointCloud to the new pointCloud.
         const loadNewPointCloud = async () => {
             try {
                 const newPointCloud = await potree.loadPointCloud(cloudName, relativeUrl => `${baseUrl}${relativeUrl}`)
                 if (isValid.current) {
                     // Update manager references
-                    setManagerPointCloud(newPointCloud, id)
+                    setManagerPointCloud(newPointCloud, cloudIDRef.current)
                     // Update self references
                     setPointCloud(newPointCloud)
                     // Clear old point cloud
@@ -40,7 +43,7 @@ export const PotreeObject: VaporComponent = ({cloudName="cloud.js", baseUrl, poi
         }
         loadNewPointCloud()
         return ()=>{
-            setManagerPointCloud(null, id)
+            setManagerPointCloud(null, cloudIDRef.current)
         }
     }, [cloudName, baseUrl])
     useEffect(() => {
