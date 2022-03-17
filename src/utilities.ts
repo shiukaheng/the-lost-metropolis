@@ -221,7 +221,10 @@ export function usePost(id: string | null, whitelist?: (keyof Post)[], blacklist
     return [post, post === null ? null : setPost]
 }
 
-export function filterProps(target:Partial<Post>, props:(keyof Post)[]=[]):Partial<Post> {
+export function filterProps(target:Partial<Post>|null, props:(keyof Post)[]=[]):Partial<Post>|null {
+    if (target === null) {
+        return null
+    }
     const filtered = {}
     props.forEach((prop) => {
         if (target[prop] !== undefined) {
@@ -247,61 +250,64 @@ export function useBufferedPost (
     onBufferChange=(buffer: Partial<Post>)=>{}, 
     onPull=(buffer: Partial<Post>)=>{}, 
     onPush=(buffer: Partial<Post>)=>{}):
-    [Partial<Post>, (post: Partial<Post>)=>void, Partial<Post>, ()=>Promise<void>, ()=>void, boolean, boolean]
+    [Partial<Post>, (post: Partial<Post>)=>void, Partial<Post> | null, ()=>Promise<void>, ()=>void, boolean, boolean]
     {
     const [post, setPost] = usePost(id, props)
-    if (post === null) {
-        throw new Error("Post not found in useBufferedPost")
-    }
     const filteredPost = filterProps(post, props)
-    const [buffer, _setBuffer] = useState(filteredPost)
+    const [buffer, _setBuffer] = useState<Partial<Post>>(filteredPost === null ? (postSchema.getDefault() as Partial<Post>) : filteredPost) // filteredPost should not be null unless it is instantly deleted
     // Tracking changes to buffer / post
     const initialBufferRef = useRef(filteredPost)
     const postTriggersRef = useRef(0)
     const postChangesRef = useRef<Post|null>(null)
     const setBuffer = (newBuffer: Partial<Post>) => {
         // Inject
-        _setBuffer(filterProps(newBuffer, props))
+        _setBuffer(filterProps(newBuffer, props) as Partial<Post>)
         onBufferChange(newBuffer)
     }
     const [overwriteWarning, setOverwriteWarning] = useState(false)
     useEffect(()=>{
-        if (postTriggersRef.current > 0) {
-            // console.log("post updated")
-            if (!isEqual(post, postChangesRef.current)) {
-                // console.log("post changed")
-                if (!isEqual(buffer, filterProps(post, props))) {
-                    setOverwriteWarning(true)
+        if (post !== null) {
+            if (postTriggersRef.current > 0) {
+                // console.log("post updated")
+                if (!isEqual(post, postChangesRef.current)) {
+                    // console.log("post changed")
+                    if (!isEqual(buffer, filterProps(post, props))) {
+                        setOverwriteWarning(true)
+                    }
+                    postChangesRef.current = post
                 }
+            } else {
+                // Post initial update
                 postChangesRef.current = post
             }
-        } else {
-            // Post initial update
-            postChangesRef.current = post
+            postTriggersRef.current++
         }
-        postTriggersRef.current++
     }, [post])
     // To determine changed: If buffer is different than initially fetched
     // To determine overwriteWarning: If initial buffer is older than post, warn user that they may overwrite data if they push
     const push = async () => {
-        initialBufferRef.current = buffer
-        if (setPost === null) {
-            throw new Error("Post not found in useBufferedPost")
+        if (post !== null) {
+            initialBufferRef.current = buffer
+            if (setPost === null) {
+                throw new Error("Post not found in useBufferedPost")
+            }
+            if (buffer === null) {
+                throw new Error("Buffer is somehow not initialized")
+            }
+            await setPost(buffer)
+            setOverwriteWarning(false)
+            onPush(buffer)
         }
-        if (buffer === null) {
-            throw new Error("Buffer is somehow not initialized")
-        }
-        await setPost(buffer)
-        setOverwriteWarning(false)
-        onPush(buffer)
     }
     const pull = () => {
-        console.log("pulled")
-        setBuffer(filteredPost)
-        initialBufferRef.current = filteredPost
-        setOverwriteWarning(false)
-        onBufferChange(filteredPost)
-        onPull(filteredPost)
+        if (post !== null && filteredPost !== null) {
+            console.log("pulled")
+            setBuffer(filteredPost)
+            initialBufferRef.current = filteredPost
+            setOverwriteWarning(false)
+            onBufferChange(filteredPost)
+            onPull(filteredPost)
+        }
     }
     // console.log(bufferChanged, postChanged)
     // Change describes mismatch between buffer and post, OverwriteWarning indicates database has newer version than buffer

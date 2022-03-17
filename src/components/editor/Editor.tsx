@@ -90,7 +90,8 @@ function EditorManager() {
     }, [])
     // Update the buffer when internal state changes, will have one redundant update on mount because of initial fetch, but what the heck
     useEffect(() => {
-        setBuffer({sceneChildren: sceneChildren, configuration: {defaultCameraProps, potreePointBudget}})
+        const newBuffer = serialize()
+        setBuffer(newBuffer)
     }, [sceneChildren, defaultCameraProps, potreePointBudget])
     // Update internal state when buffer changes, which only happens if we change sceneChildren (handled), and pull
     const updateLabel = useMultilang({"en": "update", "zh": "更新"})
