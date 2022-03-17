@@ -1,16 +1,11 @@
 import tw from "tailwind-styled-components"
 import { useState, useContext } from "react"
-import MagicIcon from "./MagicIcon"
 import { SettingsContext } from "../App"
-import { EyeIcon, EyeOffIcon } from "@heroicons/react/outline"
 import MagicButton from "./MagicButton"
 import { useNavigate } from "react-router-dom"
-import { createPost } from "../../api"
-import { AuthContext } from "../admin/AuthProvider"
 import { Condition } from "../../utilities"
-import VaporAPI from "../../api_client/api"
-import { auth } from "../../firebase-config"
-import { Post, postSchema } from "../../../api/types/Post"
+import { Post } from "../../../api/types/Post"
+import { Roled } from "../../api_client/types/Role"
 import { Instance } from "../../../api/utility_types"
 
 const StyledRow = tw.tr`border-b border-t border-current md:hover:opacity-50 transition-opacity duration-500 cursor-pointer table-row text-ellipsis`
@@ -18,7 +13,17 @@ const StyledHeaderRow = tw.tr`border-b border-current table-row text-ellipsis`
 const StyledCell = tw.td`text-left font-serif md:text-lg font-semibold pt-2 pb-6 table-cell`
 const StyledHeaderCell = tw.td`text-left font-serif md:text-lg font-bold pt-2 pb-2 table-cell`
 
-function PostList({posts, onPostClick=(post)=>{}, columnMakers=[], createButton=false, headers=[]}) {
+export type ColumnMaker = (post: Instance<Roled<Post>>, index: number) => JSX.Element
+
+interface PostListProps {
+    posts: Instance<Roled<Post>>[]
+    onPostClick?: (post: Instance<Roled<Post>>) => void
+    columnMakers?: ColumnMaker[]
+    createButton?: boolean
+    headers?: string[]
+}
+
+function PostList({posts, onPostClick=(post)=>{}, columnMakers=[], createButton=false, headers=[]}: PostListProps) {
     const [searchTerm, setSearchTerm] = useState("")
     const {settings} = useContext(SettingsContext)
     const placeholder = {
@@ -35,13 +40,7 @@ function PostList({posts, onPostClick=(post)=>{}, columnMakers=[], createButton=
                     <MagicButton solid languageSpecificChildren={
                     {"en": "+ create post", "zh": "+ 新增文章"}
                     } onClick={async ()=>{
-                        const id = await VaporAPI.createPost(postSchema.cast({
-                            metadata: {
-                                permissions: {
-                                    owner: auth.currentUser.uid,
-                                }
-                            }
-                        }))
+                        const id = await createPost()
                         navigate(`/edit/${id}`)
                     }} className="ml-auto h-12 md:h-12"/>
                 </Condition>
@@ -79,7 +78,7 @@ function PostList({posts, onPostClick=(post)=>{}, columnMakers=[], createButton=
     )
 }
 
-function matchSearch(post:Instance<Post>, searchTerm: string): boolean {
+function matchSearch(post: Instance<Roled<Post>>, searchTerm: string) {
     // Searches whether the post's title or description has search term as a substring, simultaneously search for all languages
     return (
         Object.entries(post.data.data.title).some(([lang, title]) => title.toLowerCase().includes(searchTerm.toLowerCase())) ||

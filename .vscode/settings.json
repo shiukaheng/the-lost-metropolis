@@ -15,6 +15,7 @@
         ".gitignore": true,
         ".env": true,
         "scripts": true,
+        "node_modules": true,
         "dist": true,
         ".vscode": true,
         "functions/node_modules": true,
@@ -23,8 +24,7 @@
         "functions/.gitignore": true,
         "functions/package-lock.json": true,
         "functions/tsconfig.dev.json": true,
-        "functions/src/lib/old_helpers.ts": true,
-        "node_modules": true
+        "functions/src/lib/old_helpers.ts": true
     },
     "hide-files.files": [
         ".firebase",
@@ -36,6 +36,7 @@
         ".gitignore",
         ".env",
         "scripts",
+        "node_modules",
         "dist",
         ".vscode",
         "functions/node_modules",
@@ -44,7 +45,6 @@
         "functions/.gitignore",
         "functions/package-lock.json",
         "functions/tsconfig.dev.json",
-        "functions/src/lib/old_helpers.ts",
-        "node_modules"
+        "functions/src/lib/old_helpers.ts"
     ]
 }
