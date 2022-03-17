@@ -14,7 +14,7 @@ function View({ ...props}) {
     const title = useMultilang(post.title)
     return (
         <div className='absolute w-full h-full'>
-            <Viewer post={post.data} className="absolute w-full h-full"/>
+            <Viewer post={post} className="absolute w-full h-full"/>
             <Fade>
                 <div className="absolute w-full h-full p-8 md:p-20 pointer-events-none">
                     <div className="flex flex-row place-content-between h-12">
