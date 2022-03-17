@@ -3,7 +3,7 @@ import { NumberType, StringType, URLType } from "../viewer/ArgumentTypes";
 import { VaporComponent, VaporComponentProps } from "../viewer/ComponentDeclarations";
 import { genericInputs } from "../viewer/genericInputs"
 import { PotreeContext } from "./managers/PotreeManager";
-import { uuidv4 as v4 } from "uuid"
+import { v4 } from "uuid"
 
 type PotreeObjectProps = VaporComponentProps & {
     cloudName?: string

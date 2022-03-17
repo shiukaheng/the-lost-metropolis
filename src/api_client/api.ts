@@ -6,7 +6,7 @@ import { naiveExport, subToRefWithRoleAuthSensitive } from './utilities';
 import { db, storage } from '../firebase-config'
 import { instance, uninstance } from '../../api/utilities';
 import { omit, pick } from "lodash"
-import { v4 as uuidv4 } from "uuid";
+import { v4 } from "uuid";
 import { Asset, assetSchema } from '../../api/types/Asset';
 import { ref, uploadBytesResumable } from 'firebase/storage';
 import { Roled } from '../../api/implementation_types/Role';
@@ -91,7 +91,7 @@ export default class VaporAPI {
      */
     static async uploadAsset(postID: string, file: File, onUploadProgress: (number)=>void): Promise<string> {
         // Generate a uuidv4 as an id for the asset
-        const assetID = uuidv4()
+        const assetID = v4()
         // Create an empty Asset object using the assetSchema
         const asset: Asset = assetSchema.getDefault()
         // Wrap the Asset object in an instance with the uuid

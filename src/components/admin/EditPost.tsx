@@ -5,14 +5,13 @@ import { Input } from "../utilities/Input";
 import MagicDiv from "../utilities/MagicDiv";
 import { languages } from "../App"
 import { useState,  useCallback } from "react";
-import { twMerge } from "tailwind-merge"
-import { deletePost } from "../../api";
 import MagicButton from "../utilities/MagicButton";
 import { Editor } from "../editor/Editor";
 import { FullScreen, useFullScreenHandle } from "react-full-screen";
 import MagicIcon from "../utilities/MagicIcon";
 import { ArrowsExpandIcon } from "@heroicons/react/outline";
 import { EmbeddedButton, EmbeddedRow, EmbeddedTabs, RoundedContainer } from "../utilities/EmbeddedUI";
+import VaporAPI from "../../api_client/api";
  
 export function EditPost() {
     const {id} = useParams()
@@ -76,7 +75,10 @@ function EditingForm({className="", editor3dMode=false}) {
     const pullLabel = useMultilang({"en": "update to latest version", "zh": "獲取最新版本"});
     const [deleteLabel, deleteTrigger] = useConfirm(deleteDefaultLabel, deleteConfirmationLabel, deletePendingLabel, async ()=>{
         // console.log(id)
-        await deletePost(id)
+        if (id === undefined) {
+            throw new Error("ID undefined")
+        }
+        await VaporAPI.deletePost(id)
         navigate("/dashboard")
     })
     // console.log(buffer)

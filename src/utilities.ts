@@ -10,6 +10,8 @@ import { uninstance, instance } from "../api/utilities";
 import { PostDocData } from "../api/implementation_types/PostDocData";
 import { Roled } from "../api/implementation_types/Role";
 import { MultiLangString } from "../api/types/MultiLangString";
+import { auth } from "./firebase-config.js"
+import { signOut } from "firebase/auth";
 
 export function formatRGBCSS(color: number[]): string {
     return "rgb(" + color[0] + "," + color[1] + "," + color[2] + ")";
@@ -402,4 +404,8 @@ export function useChooseFile(): [()=>void, File | null] {
         inputRef.current && inputRef.current.click()
     }
     return [createPrompt, file]
+}
+
+export async function logOut() {
+    await signOut(auth)
 }
