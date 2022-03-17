@@ -83,7 +83,6 @@ function EditorManager() {
     // Fetch data from buffer during mount
     useEffect(() => {
         if (buffer) {
-            // console.log("Deserializing buffer", buffer.data)
             deserialize(buffer)
         } else {
             // console.log("No buffer data, not deserializing", buffer)

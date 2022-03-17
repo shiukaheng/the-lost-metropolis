@@ -3,7 +3,7 @@ import { PotreeManager } from "../3d/managers/PotreeManager"
 import { Children, useContext, useEffect, useLayoutEffect, useRef, useState } from "react"
 import CompositeSuspense from "../3d/subcomponents/CompositeSuspense"
 import { EditorContext } from "../editor/EditorContext"
-import { Canvas, useThree } from "@react-three/fiber"
+import { Canvas, useFrame, useThree } from "@react-three/fiber"
 import { ViewerContext } from "../viewer/ViewerContext"
 
 function CameraHelper() {
