@@ -4,10 +4,9 @@ import tw from 'tailwind-styled-components';
 import { useNavigate } from 'react-router-dom';
 import { useContext } from 'react';
 import { SettingsContext } from "../App";
-import MagicDiv from '../utilities/MagicDiv';
 import GenericPage from '../utilities/GenericPage';
 import LoadingScreen from '../utilities/LoadingScreen';
-import PostList from '../utilities/PostList';
+import PostList, { ColumnMaker } from '../utilities/PostList';
 import { ContentContext } from '../providers/ContentProvider';
 import { AuthContext } from '../admin/AuthProvider';
 import MagicIcon from '../utilities/MagicIcon';
@@ -28,18 +27,18 @@ function Dashboard() {
         "viewer": useMultilang({"en": "viewer", "zh": "閱讀者"}),
         "public": ""
     }
-    const columnMakers = currentUser ?
+    const columnMakers: ColumnMaker[] = currentUser ?
     [
         (post, index) => index,
-        (post, index) => (post.title[settings.lang]),
-        (post, index) => new Date(post.createdAt).toLocaleDateString("en-UK"),
-        (post, index) => roleDisplay[post.role],
-        (post, index) => post.public ? <MagicIcon IconComponent={EyeIcon}/> : <MagicIcon IconComponent={EyeOffIcon}/>,
+        (post, index) => (post.data.data.title[settings.lang]),
+        (post, index) => new Date(post.data.metadata.createdAt).toLocaleDateString("en-UK"),
+        (post, index) => roleDisplay[post.data.role],
+        (post, index) => post.data.metadata.permissions.public ? <MagicIcon IconComponent={EyeIcon}/> : <MagicIcon IconComponent={EyeOffIcon}/>,
     ] :
     [
         (post, index) => index,
-        (post, index) => (post.title[settings.lang]),
-        (post, index) => new Date(post.createdAt).toLocaleDateString("en-UK"),
+        (post, index) => (post.data.data.title[settings.lang]),
+        (post, index) => new Date(post.data.metadata.createdAt).toLocaleDateString("en-UK"),
     ]
     return ( 
         <GenericPage className="flex flex-col gap-4 md:gap-8">

@@ -1,8 +1,9 @@
 import { createContext } from "react";
-import { editorPostProvider, ownerPostProvider, publicPostProvider, viewerPostProvider } from "../../api";
-import { useSubscription } from "../../utilities";
+import { Post } from "../../../api/types/Post";
+import { Instance } from "../../../api/utility_types";
+import { Roled } from "../../api_client/types/Role";
 
-export const ContentContext = createContext([]);
+export const ContentContext = createContext<Instance<Roled<Post>>[]>([]);
 
 function concatenatePosts(...postArrays) {
     // Concatenates all posts from all post arrays, but prevent duplicates by checking post.id
@@ -29,10 +30,6 @@ function mapPostRole(array, role) {
 }
 
 export const ContentProvider = ({children}) => {
-    const ownerPosts = mapPostRole(useSubscription(ownerPostProvider, true, "ownerPosts"), "owner");
-    const editorPosts = mapPostRole(useSubscription(editorPostProvider, true, "editorPosts"), "editor");
-    const viewerPosts = mapPostRole(useSubscription(viewerPostProvider, true, "viewerPosts"), "viewer");
-    const publicPosts = mapPostRole(useSubscription(publicPostProvider, false, "publicPosts"), "public");
     const allPosts = concatenatePosts(ownerPosts, editorPosts, viewerPosts, publicPosts);
     // 
     return (

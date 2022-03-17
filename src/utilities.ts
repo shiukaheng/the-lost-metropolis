@@ -1,11 +1,10 @@
 import { useState, useEffect, useRef, useLayoutEffect, useContext, useCallback } from "react"
-import { createPost, updatePost } from "./api";
 import { AuthContext } from "./components/admin/AuthProvider";
 import { languages, SettingsContext, ThemeContext } from "./components/App";
 import { ContentContext } from "./components/providers/ContentProvider";
 import { cloneDeep, isEqual } from "lodash"
 import { useFrame } from "@react-three/fiber";
-import { Post, SubscriptionProvider } from "./types";
+import { Post } from "../api/types/Post";
 
 export function formatRGBCSS(color: number[]): string {
     return "rgb(" + color[0] + "," + color[1] + "," + color[2] + ")";
@@ -149,43 +148,43 @@ export function useFollowMouse(onMouseMove=null) {
     return mousePosRef
 }
 
-/**
- * Hook that provides a list of documents given a provider
- * @param provider - Any subscription provider
- * @param requriesAuth - If enabled, it does not query the provider if the user is not logged in 
- * @param cachingKey - If not null, it will cache the result in localStorage with the given key
- * @returns An array of posts or null if it's not loaded
- */
-export function useSubscription(provider:SubscriptionProvider, requriesAuth=false, cachingKey:null|string=null):Post[]|null {
-    const {currentUser} = useContext(AuthContext)
-    const [posts, setPosts] = (cachingKey === null ? useState(null) : useStickyState(null, cachingKey))
-    const unsubRef = useRef(null);
-    useEffect(() => {
-        if (unsubRef.current) {
-            unsubRef.current()
-        }
-        if (currentUser || !requriesAuth) {
-            unsubRef.current = provider(setPosts);
-            // console.log("Subscribed to updates")
-        } else {
-            // console.log("Not subscribed to updates because not logged in")
-            setPosts([]) // Returning an empty array instead of null because its that user does not have permission, not that we cant load posts
-        }
-        return () => {
-            if (unsubRef.current) {
-                unsubRef.current();
-            }
-        };
-    }, [currentUser]);
-    return posts;
-}
+// /**
+//  * Hook that provides a list of documents given a provider
+//  * @param provider - Any subscription provider
+//  * @param requriesAuth - If enabled, it does not query the provider if the user is not logged in 
+//  * @param cachingKey - If not null, it will cache the result in localStorage with the given key
+//  * @returns An array of posts or null if it's not loaded
+//  */
+// export function useSubscription(provider:SubscriptionProvider, requriesAuth=false, cachingKey:null|string=null):Post[]|null {
+//     const {currentUser} = useContext(AuthContext)
+//     const [posts, setPosts] = (cachingKey === null ? useState(null) : useStickyState(null, cachingKey))
+//     const unsubRef = useRef(null);
+//     useEffect(() => {
+//         if (unsubRef.current) {
+//             unsubRef.current()
+//         }
+//         if (currentUser || !requriesAuth) {
+//             unsubRef.current = provider(setPosts);
+//             // console.log("Subscribed to updates")
+//         } else {
+//             // console.log("Not subscribed to updates because not logged in")
+//             setPosts([]) // Returning an empty array instead of null because its that user does not have permission, not that we cant load posts
+//         }
+//         return () => {
+//             if (unsubRef.current) {
+//                 unsubRef.current();
+//             }
+//         };
+//     }, [currentUser]);
+//     return posts;
+// }
 
 export const useMultilang = (content) => {
     const {settings} = useContext(SettingsContext)
     return content[settings.lang]
 }
 
-export const usePost = (id) => {
+export function usePost(id: string): [Post, (newPost:Post)=>Promise<void>] {
     // Returns post and setter, setter returns null if no edit permission
     const posts = useContext(ContentContext)
     const post = posts.find((p) => p.id === id)
