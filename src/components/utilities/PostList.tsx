@@ -5,7 +5,7 @@ import MagicButton from "./MagicButton"
 import { useNavigate } from "react-router-dom"
 import { Condition } from "../../utilities"
 import { Post } from "../../../api/types/Post"
-import { Roled } from "../../api_client/types/Role"
+import { Roled } from "../../../api/implementation_types/Role"
 import { Instance } from "../../../api/utility_types"
 
 const StyledRow = tw.tr`border-b border-t border-current md:hover:opacity-50 transition-opacity duration-500 cursor-pointer table-row text-ellipsis`

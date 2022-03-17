@@ -1,7 +1,7 @@
 import { createContext } from "react";
 import { Post } from "../../../api/types/Post";
 import { Instance } from "../../../api/utility_types";
-import { Roled } from "../../api_client/types/Role";
+import { Roled } from "../../../api/implementation_types/Role";
 
 export const ContentContext = createContext<Instance<Roled<Post>>[]>([]);
 
