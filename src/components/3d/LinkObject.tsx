@@ -3,6 +3,7 @@ import LabelIconObject from "./subcomponents/LabelIconObject"
 import { VaporComponent, VaporComponentProps } from "../viewer/ComponentDeclarations"
 import { genericInputs } from "../viewer/genericInputs"
 import { StringType } from "../viewer/ArgumentTypes"
+import linkIconUrl from "../../../static/viewport/link-icon.png"
 
 type LinkObjectProps = VaporComponentProps & {
     url: string
@@ -11,7 +12,7 @@ type LinkObjectProps = VaporComponentProps & {
 export const LinkObject: VaporComponent = ({url, ...props}:LinkObjectProps) => {
     return (
         <Billboard follow>
-            <LabelIconObject scale={0.25} onClick={()=>{window.open(url, "_blank").focus()}} iconUrl="/static/viewport/link-icon.png"/>
+            <LabelIconObject scale={0.25} onClick={()=>{window.open(url, "_blank").focus()}} iconUrl={linkIconUrl}/>
         </Billboard>
     )
 }

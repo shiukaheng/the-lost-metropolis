@@ -10,7 +10,7 @@ import { EditorInputType } from "./ArgumentTypes"
 export interface VaporComponentProps {
     position?: [number, number, number],
     rotation?: [number, number, number],
-    scale?: [number, number, number],
+    scale?: [number, number, number] | number,
     name?: string,
     objectID: string,
     [key: string]: any

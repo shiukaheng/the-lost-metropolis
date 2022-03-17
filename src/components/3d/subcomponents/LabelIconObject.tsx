@@ -6,6 +6,7 @@ import { useLoader } from "@react-three/fiber"
 import { TextureLoader } from "three"
 import UnifiedInteractive from "./UnifiedInteractive"
 import { VaporComponentProps } from "../../viewer/ComponentDeclarations"
+import infoIconUrl from "../../../../static/viewport/info-icon.png"
 
 type LabelIconObjectProps = VaporComponentProps & {
     onClick?: () => void
@@ -15,7 +16,7 @@ type LabelIconObjectProps = VaporComponentProps & {
     skirtHidden?: boolean
 }
 
-export default function LabelIconObject({onClick=()=>{}, iconUrl="/static/viewport/info-icon.png", iconScale=0.1, iconOpacity=1, skirtHidden=false, ...props}:LabelIconObjectProps) {
+export default function LabelIconObject({onClick=()=>{}, iconUrl=infoIconUrl, iconScale=0.1, iconOpacity=1, skirtHidden=false, ...props}:LabelIconObjectProps) {
     const texture = useLoader(TextureLoader, iconUrl)
     const [hovered, setHovered] = useState(false)
     const { iconExtHoverScale, iconExtHoverOpacity } = useSpring({
