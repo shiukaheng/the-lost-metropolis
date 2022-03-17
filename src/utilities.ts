@@ -302,8 +302,8 @@ export function useBufferedPost (
     const changed = !isEqual(buffer, initialBufferRef.current)
     return [buffer, setBuffer, post, push, pull, changed, (overwriteWarning && post !== undefined)]
 }
-
-export const useConfirm = (defaultText="default", confirmText="confirm", pendingText="pending", onConfirm=()=>{}, onTimeout=()=>{}) => {
+type GenericCallback = ((...args:any[]) => void) | ((...args:any[]) => Promise<void>)
+export const useConfirm = (defaultText="default", confirmText="confirm", pendingText="pending", onConfirm:GenericCallback=()=>{}, onTimeout=()=>{}) => {
     const [deleteState, setDeleteState] = useState(0) // 0: not deleted, 1: confirm (otherwise countdown), 2: requested
     const [countdown, setCountdown] = useState(3)
     const countdownRef = useRef<number|null>(null)
@@ -330,18 +330,18 @@ export const useConfirm = (defaultText="default", confirmText="confirm", pending
             startDeleteCountdown()
         } else if (deleteState === 1) {
             if (onConfirm.constructor.name === "AsyncFunction") {
-                setDeleteState(2)
-                onConfirm().then(() => {
-                    setDeleteState(0)
-                    setCountdown(3)
+                setDeleteState(2);
+                (onConfirm() as Promise<any>).then(() => {
+                    setDeleteState(0);
+                    setCountdown(3);
                 })
             } else if (onConfirm.constructor.name === "Function") {
-                onConfirm()
-                setDeleteState(0)
-                setCountdown(3)
+                onConfirm();
+                setDeleteState(0);
+                setCountdown(3);
             }
             if (intervalCb) {
-                clearInterval(intervalCb)
+                clearInterval(intervalCb);
             }
         }
     }
