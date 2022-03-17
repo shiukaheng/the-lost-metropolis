@@ -1,11 +1,26 @@
-import { SettingsContext, ThemeContext } from "../App"
+import { SettingsContext, Theme, ThemeContextType, ThemeContext } from "../App"
 import { useContext, useLayoutEffect, useRef, useState } from "react"
 import { formatRGBCSS } from "../../utilities"
+import { MultiLangString } from "../../../api/types/MultiLangString"
+import { CSSProperties } from "react"
+
+interface MagicDivProps {
+    debug: boolean,
+    languageSpecificChildren?: MultiLangString,
+    style: CSSProperties,
+    foregroundColorCSSProps: (keyof CSSProperties)[],
+    backgroundColorCSSProps: (keyof CSSProperties)[],
+    children: React.ReactNode,
+    className?: string,
+    mergeTransitions?: boolean,
+    autoColor?: boolean,
+    overrideTheme?: Partial<Theme>
+}
 
 // Dynamically color div css attributes based on theme, but note that its not compatible with external transitions due to use of element css which overrides classes
-function MagicDiv({ debug=false, languageSpecificChildren=null, style=undefined, foregroundColorCSSProps=["color", "borderColor"], backgroundColorCSSProps=[], children=undefined, className="", mergeTransitions=false, autoColor=true, overrideTheme={}, ...props }) {
+function MagicDiv({ debug=false, languageSpecificChildren, style={}, foregroundColorCSSProps=["color", "borderColor"], backgroundColorCSSProps=[], children=null, className="", mergeTransitions=false, autoColor=true, overrideTheme={}, ...props }: MagicDivProps) {
     const {settings} = useContext(SettingsContext)
-    const {theme: defaultTheme} = useContext(ThemeContext)
+    const {theme: defaultTheme} = useContext<ThemeContextType>(ThemeContext)
     const theme = {...defaultTheme, ...overrideTheme}
     const div = useRef(null)
     const [existingTransition, setExistingTransition] = useState("")
@@ -32,7 +47,7 @@ function MagicDiv({ debug=false, languageSpecificChildren=null, style=undefined,
                 ...style
             } : {...style}
         }>
-            {[languageSpecificChildren!==null ? languageSpecificChildren[settings.lang] : children].concat(mergeTransitions ? [<div ref={div} className={className} style={{display: "none"}} />].map((elem, index) => (Object.assign({}, elem, {key: index}))) : [])}
+            {[languageSpecificChildren!==undefined ? languageSpecificChildren[settings.lang] : children].concat(mergeTransitions ? [<div ref={div} className={className} style={{display: "none"}} />].map((elem, index) => (Object.assign({}, elem, {key: index}))) : [])}
         </div>
     );
 }
