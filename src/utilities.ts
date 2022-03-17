@@ -8,6 +8,8 @@ import { Post, postSchema } from "../api/types/Post";
 import VaporAPI from "./api_client/api";
 import { uninstance, instance } from "../api/utilities";
 import { PostDocData } from "../api/implementation_types/PostDocData";
+import { Roled } from "../api/implementation_types/Role";
+import { MultiLangString } from "../api/types/MultiLangString";
 
 export function formatRGBCSS(color: number[]): string {
     return "rgb(" + color[0] + "," + color[1] + "," + color[2] + ")";
@@ -182,16 +184,28 @@ export function useFollowMouse(onMouseMove=null) {
 //     return posts;
 // }
 
-export const useMultilang = (content) => {
+export const useMultilang = (content?: MultiLangString) => {
     const {settings} = useContext(SettingsContext)
+    if (content === undefined || content === null) {
+        return ""
+    }
     return content[settings.lang]
 }
 
-export function usePost(id: string, whitelist?: (keyof Post)[], blacklist?: (keyof Post)[]): [Post, (newPost:Post)=>Promise<void>] {
+/**
+ * Hook that provides a post and a method to update it given an id and properties you want to update
+ */
+export function usePost(id: string | null, whitelist?: (keyof Post)[], blacklist?: (keyof Post)[]): [Post | null, ((newPost:Partial<Post>)=>Promise<void>) | null] {
     // Returns post and setter, setter returns null if no edit permission
     const posts = useContext(ContentContext)
-    const post: Post = postSchema.cast(uninstance(posts.find((p) => p.id === id)), {stripUnknown: true})
-    const setPost = async (newPost: Post) => {               
+    if (posts === null) {
+        return [null, null]
+    }
+    if (id === null) {
+        return [null, null]
+    }
+    const post = posts.find((p) => p.id === id)?.data || null
+    const setPost = async (newPost: Partial<Post>) => {               
         // await updatePost(id, newPost)
         await VaporAPI.updatePost(
             instance(newPost, id),
@@ -199,13 +213,10 @@ export function usePost(id: string, whitelist?: (keyof Post)[], blacklist?: (key
             blacklist
         )
     }
-    return [post, setPost]
-} // Reviewed, should be consistent with new API
+    return [post, post === null ? null : setPost]
+}
 
-export function filterProps(target, props=[]) {
-    if (target === undefined) {
-        return undefined
-    }
+export function filterProps(target:Partial<Post>, props:(keyof Post)[]=[]):Partial<Post> {
     const filtered = {}
     props.forEach((prop) => {
         if (target[prop] !== undefined) {
@@ -228,19 +239,21 @@ export function filterProps(target, props=[]) {
 export function useBufferedPost (
     id, 
     props:(keyof PostDocData)[]=[], 
-    onBufferChange=(buffer: Post)=>{}, 
-    onPull=(buffer: Post)=>{}, 
-    onPush=(buffer: Post)=>{})
+    onBufferChange=(buffer: Partial<Post>)=>{}, 
+    onPull=(buffer: Partial<Post>)=>{}, 
+    onPush=(buffer: Partial<Post>)=>{})
     {
     const [post, setPost] = usePost(id)
+    if (post === null) {
+        throw new Error("Post not found in useBufferedPost")
+    }
     const filteredPost = filterProps(post, props)
     const [buffer, _setBuffer] = useState(filteredPost)
     // Tracking changes to buffer / post
-    // const [initialBuffer, setInitialBuffer] = useState(filteredPost)
     const initialBufferRef = useRef(filteredPost)
     const postTriggersRef = useRef(0)
-    const postChangesRef = useRef(null)
-    const setBuffer = (newBuffer) => {
+    const postChangesRef = useRef<Post|null>(null)
+    const setBuffer = (newBuffer: Partial<Post>) => {
         // Inject
         _setBuffer(filterProps(newBuffer, props))
         onBufferChange(newBuffer)
@@ -257,7 +270,7 @@ export function useBufferedPost (
                 postChangesRef.current = post
             }
         } else {
-            // console.log("post initial update")
+            // Post initial update
             postChangesRef.current = post
         }
         postTriggersRef.current++
@@ -266,6 +279,12 @@ export function useBufferedPost (
     // To determine overwriteWarning: If initial buffer is older than post, warn user that they may overwrite data if they push
     const push = async () => {
         initialBufferRef.current = buffer
+        if (setPost === null) {
+            throw new Error("Post not found in useBufferedPost")
+        }
+        if (buffer === null) {
+            throw new Error("Buffer is somehow not initialized")
+        }
         await setPost(buffer)
         setOverwriteWarning(false)
         onPush(buffer)
@@ -287,8 +306,8 @@ export function useBufferedPost (
 export const useConfirm = (defaultText="default", confirmText="confirm", pendingText="pending", onConfirm=()=>{}, onTimeout=()=>{}) => {
     const [deleteState, setDeleteState] = useState(0) // 0: not deleted, 1: confirm (otherwise countdown), 2: requested
     const [countdown, setCountdown] = useState(3)
-    const countdownRef = useRef(null)
-    const [intervalCb, setIntervalCb] = useState(null)
+    const countdownRef = useRef<number|null>(null)
+    const [intervalCb, setIntervalCb] = useState<null|ReturnType<typeof setInterval>>(null)
     useEffect(()=>{
         countdownRef.current = countdown
     }, [countdown])

@@ -25,8 +25,11 @@ export default class VaporAPI {
      * @returns the ID of the post
      */
     static async createPost(post?: Post): Promise<string> {
+        let actualPost: Post;
         if (post === undefined) {
-            post = postSchema.getDefault()
+            actualPost = postSchema.getDefault()
+        } else {
+            actualPost = post
         }
         const exported = VaporAPI.exportPost(post);
         // const cloned = JSON.parse(JSON.stringify(exported))
@@ -59,9 +62,9 @@ export default class VaporAPI {
      * @param whitelist optional whitelist of {@link PostDocData} properties that should be updated
      * @param blacklist optional blacklist of {@link PostDocData} properties that should not be updated, if defined the whitelist will be ignored
      */
-    static async updatePost(postInstance: Instance<Post>, whitelist?: (keyof PostDocData)[], blacklist?: (keyof PostDocData)[]): Promise<void> {
+    static async updatePost(postInstance: Instance<Partial<Post>>, whitelist?: (keyof PostDocData)[], blacklist?: (keyof PostDocData)[]): Promise<void> {
         const [post, id] = uninstance(postInstance)
-        let data: Partial<PostDocData> = VaporAPI.exportPost(post)
+        let data: Partial<PostDocData> = VaporAPI.exportPost(post, true)
         if (blacklist) {
             data = omit(data, blacklist)
         } else if (whitelist) {
