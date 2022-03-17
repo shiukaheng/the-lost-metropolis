@@ -30,7 +30,7 @@ function ShowcasePanel() {
     // If no specified ID, show the first post. If no posts, set activeID and activeIndex to null
     const [activeID, setActiveID] = useState(id || (posts && posts.length > 0 ? posts[0].id : null));
     // If has activeID, find the index of the post with that ID, otherwise set to null
-    const activeIndex = (posts && posts.length > 0) ? posts.findIndex(post => post.id === activeID) : null;
+    const activeIndex: number | null = (posts && posts.length > 0) ? posts.findIndex(post => post.id === activeID) : null;
     const setActiveIndex = (index) => {
         setActiveID(posts[index].id);
         navigate(`/browse/${posts[index].id}`);
