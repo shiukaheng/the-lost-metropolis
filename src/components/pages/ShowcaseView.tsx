@@ -35,6 +35,7 @@ function ShowcasePanel() {
         setActiveID(posts[index].id);
         navigate(`/browse/${posts[index].id}`);
     }
+    // TODO: Fix the case of potentially null activeIndex
     return (
         <div className="w-full h-full relative">
             <div className="flex flex-col h-full w-full absolute justify-between">

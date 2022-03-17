@@ -1,7 +1,7 @@
 import { createContext } from "react"
 
 const defaultEditorContext = {
-    selectedIDs: [],
+    selectedIDs: [] as string[],
     setSelectedIDs: (ids:[]) => { },
     addSelectedIDs: (ids:[]) => { },
     removeSelectedIDs: (ids:[]) => { },

@@ -1,6 +1,6 @@
-import React, { useContext } from 'react'
+import { useContext } from 'react'
 import { useNavigate } from 'react-router-dom';
-import { logOut } from '../../api';
+import { logOut } from '../../api'; // Todo: Fix this missing function
 import { AuthContext } from '../admin/AuthProvider';
 import { SettingsContext, ThemeContext } from '../App';
 import Logo from "./Logo"

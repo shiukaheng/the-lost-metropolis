@@ -7,7 +7,7 @@ import EditorComponentProperties from './ui_elements/EditorComponentProperties';
 import MagicDiv from '../utilities/MagicDiv';
 import EditorTransformControls from './ui_elements/EditorTransformControls';
 import EditorOptions from './ui_elements/EditorOptions';
-import { deserializeChildren, exportChildren, useStatefulDeserialize, useStatefulSerialize } from './ui_elements/EditorIO';
+import { deserializeChildren, exportChildren, PostScene, useStatefulDeserialize, useStatefulSerialize } from './ui_elements/EditorIO';
 import { Condition, KeyPressCallback, useBufferedPost, useKeyPress, useMultilang } from '../../utilities';
 import EditorSceneSettings from './ui_elements/EditorSceneSettings';
 import { EditorContext } from './EditorContext';
@@ -16,6 +16,8 @@ import { ViewerContext } from '../viewer/ViewerContext';
 import MagicButton from '../utilities/MagicButton';
 import { useParams } from 'react-router-dom';
 import EditorAssetManager from './ui_elements/EditorAssetManager';
+import { Roled } from '../../../api/implementation_types/Role';
+import { Post } from '../../../api/types/Post';
 
 function Editor() {
     return (
@@ -74,22 +76,22 @@ function EditorManager() {
     const { id } = useParams();
     const [buffer, setBuffer, post, push, pull, changed, overwriteWarning] = useBufferedPost(id, ["sceneChildren"], undefined, (buffer) => {
         if (buffer.configuration !== undefined && buffer.sceneChildren !== undefined) {
-            deserialize(buffer)
+            deserialize(buffer as PostScene) // Dirty hack for bad types! Todo: Fix!
         }
-    });
+    }) as [PostScene, (newBuffer: PostScene)=>void, Roled<Post>, ()=>Promise<void>, ()=>void, boolean, boolean]; // Yet another dirty hack!
     // Syncing internal state with buffer
     // Fetch data from buffer during mount
     useEffect(() => {
-        if (buffer.data) {
+        if (buffer) {
             // console.log("Deserializing buffer", buffer.data)
-            deserialize(buffer.data)
+            deserialize(buffer)
         } else {
             // console.log("No buffer data, not deserializing", buffer)
         }
     }, [])
     // Update the buffer when internal state changes, will have one redundant update on mount because of initial fetch, but what the heck
     useEffect(() => {
-        setBuffer({data: serialize()})
+        setBuffer({sceneChildren: sceneChildren, configuration: {defaultCameraProps, potreePointBudget}})
     }, [sceneChildren, defaultCameraProps, potreePointBudget])
     // Update internal state when buffer changes, which only happens if we change sceneChildren (handled), and pull
     const updateLabel = useMultilang({"en": "update", "zh": "更新"})

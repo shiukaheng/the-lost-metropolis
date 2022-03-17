@@ -1,5 +1,6 @@
 import { Camera } from "@react-three/fiber"
 import { createContext, ReactElement, RefObject } from "react"
+import { SceneChild } from "../../../api/types/SceneChild"
 
 // Define viewer context
 const defaultViewerContext: ViewerContextProps = {
@@ -39,7 +40,7 @@ interface ViewerContextProps {
     cameraRef: RefObject<Camera>,
     audioListener: AudioListener | null,
     // Let sceneChildren be a list of VaporComponent instances
-    sceneChildren: ReactElement<any>[],
+    sceneChildren: SceneChild[],
     setSceneChildren: (children:ReactElement<any>[]) => void,
     addSceneChildren: (children:ReactElement<any>[]) => void,
     removeSceneChildren: (children:ReactElement<any>[]) => void,

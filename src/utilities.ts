@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useLayoutEffect, useContext, useCallback } from "react"
 import { AuthContext } from "./components/admin/AuthProvider";
-import { languages, SettingsContext, ThemeContext } from "./components/App";
+import { languages, SettingsContext, ThemeContext, ThemeContextType } from "./components/App";
 import { ContentContext } from "./components/providers/ContentProvider";
 import { cloneDeep, isEqual } from "lodash"
 import { useFrame } from "@react-three/fiber";
