@@ -7,7 +7,7 @@ import { SettingsContext } from "../App";
 import MagicDiv from '../utilities/MagicDiv';
 import GenericPage from '../utilities/GenericPage';
 import LoadingScreen from '../utilities/LoadingScreen';
-import PostList from '../utilities/PostList';
+import PostList, { ColumnMaker } from '../utilities/PostList';
 import { ContentContext } from '../providers/ContentProvider';
 import { AuthContext } from '../admin/AuthProvider';
 import MagicIcon from '../utilities/MagicIcon';
@@ -28,10 +28,10 @@ function ListView() {
         "viewer": useMultilang({"en": "viewer", "zh": "閱讀者"}),
         "public": ""
     }
-    const columnMakers = [
+    const columnMakers: ColumnMaker[] = [
         (post, index) => index,
-        (post, index) => (post.title[settings.lang]),
-        (post, index) => new Date(post.createdAt).toLocaleDateString("en-UK"),
+        (post, index) => (post.data.title[settings.lang]),
+        (post, index) => new Date(post.data.createdAt).toLocaleDateString("en-UK"),
     ]
     return ( 
         <GenericPage className="flex flex-col gap-4 md:gap-8">
