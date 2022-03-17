@@ -4,9 +4,11 @@ import { SettingsContext } from "../App"
 import MagicButton from "./MagicButton"
 import { useNavigate } from "react-router-dom"
 import { Condition } from "../../utilities"
-import { Post } from "../../../api/types/Post"
+import { Post, postSchema } from "../../../api/types/Post"
 import { Roled } from "../../../api/implementation_types/Role"
 import { Instance } from "../../../api/utility_types"
+import VaporAPI from "../../api_client/api"
+import { auth } from "../../firebase-config.js"
 
 const StyledRow = tw.tr`border-b border-t border-current md:hover:opacity-50 transition-opacity duration-500 cursor-pointer table-row text-ellipsis`
 const StyledHeaderRow = tw.tr`border-b border-current table-row text-ellipsis`
@@ -40,7 +42,9 @@ function PostList({posts, onPostClick=(post)=>{}, columnMakers=[], createButton=
                     <MagicButton solid languageSpecificChildren={
                     {"en": "+ create post", "zh": "+ 新增文章"}
                     } onClick={async ()=>{
-                        const id = await createPost()
+                        const id: string = await VaporAPI.createPost(postSchema.validateSync({
+                            owner: auth.currentUser!.uid,
+                        }))
                         navigate(`/edit/${id}`)
                     }} className="ml-auto h-12 md:h-12"/>
                 </Condition>
