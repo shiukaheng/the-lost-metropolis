@@ -3,7 +3,7 @@ import { Fragment } from "react";
 import { useNavigate } from 'react-router-dom';
 import MagicButton from "../../utilities/MagicButton";
 import { Instance } from "../../../../api/utility_types";
-import { Roled } from "../../../api_client/types/Role";
+import { Roled } from "../../../../api/implementation_types/Role";
 import { Post } from "../../../../api/types/Post";
 
 function ShowcaseContentCard({post}: {post: Instance<Roled<Post>>}) {
