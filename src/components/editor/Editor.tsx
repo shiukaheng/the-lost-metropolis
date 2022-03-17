@@ -7,7 +7,7 @@ import EditorComponentProperties from './ui_elements/EditorComponentProperties';
 import MagicDiv from '../utilities/MagicDiv';
 import EditorTransformControls from './ui_elements/EditorTransformControls';
 import EditorOptions from './ui_elements/EditorOptions';
-import { deserializeChildren, EditorIO, exportChildren, useStatefulDeserialize, useStatefulSerialize } from './ui_elements/EditorIO';
+import { deserializeChildren, exportChildren, useStatefulDeserialize, useStatefulSerialize } from './ui_elements/EditorIO';
 import { Condition, KeyPressCallback, useBufferedPost, useKeyPress, useMultilang } from '../../utilities';
 import EditorSceneSettings from './ui_elements/EditorSceneSettings';
 import { EditorContext } from './EditorContext';
@@ -124,7 +124,6 @@ function EditorManager() {
                             <EditorAssetManager/>
                             <EditorComponentProperties/>
                             <EditorOptions/>
-                            <EditorIO/>
                             <EditorSceneSettings/>
                         </div>
                         : null
