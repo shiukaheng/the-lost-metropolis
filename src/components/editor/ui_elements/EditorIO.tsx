@@ -8,8 +8,10 @@ import { v4 as uuidv4 } from 'uuid';
 import MagicButton from "../../utilities/MagicButton";
 import { useMultilang } from "../../../utilities";
 import { Post } from "../../../../api/types/Post";
-import { SceneChild } from "../../../../api/types/SceneChild";
+import { SceneChild, sceneChildSchema } from "../../../../api/types/SceneChild";
 import { CameraProps } from "../../../../api/types/CameraProps";
+import { sceneConfigurationSchema } from "../../../../api/types/SceneConfiguration";
+import { array, InferType, object, SchemaOf } from "yup";
 
 // Utilties and components for import / export
 
@@ -101,7 +103,11 @@ export function deserializeChildren(childrenArray: SceneChild[]) {
 /**
  * Portions of the {@link Post} object that changes scene look / behavior
  */
-export type PostScene = Pick<Post, "sceneChildren" | "configuration">;
+export const postSceneSchema = object({
+    sceneChildren: array(sceneChildSchema.required()).required().default([]),
+    configuration: sceneConfigurationSchema
+})
+export type PostScene = InferType<typeof postSceneSchema>
 
 /**
  * Creates function that serializes the scene in {@link ViewerContext} to a {@link PostScene} object
@@ -122,7 +128,7 @@ export function useStatefulSerialize(): ()=>PostScene {
  * 
  * @returns function that deserializes a {@link PostScene} object to the scene in {@link ViewerContext}
  */
-export function useStatefulDeserialize(): (PostScene) => void { 
+export function useStatefulDeserialize(): (post: PostScene) => void { 
     const {setSceneChildren, setDefaultCameraProps, setPotreePointBudget} = useContext(ViewerContext)
     return (post: PostScene) => {
         setSceneChildren(deserializeChildren(post.sceneChildren));

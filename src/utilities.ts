@@ -244,7 +244,8 @@ export function useBufferedPost (
     props:(keyof PostDocData)[]=[], 
     onBufferChange=(buffer: Partial<Post>)=>{}, 
     onPull=(buffer: Partial<Post>)=>{}, 
-    onPush=(buffer: Partial<Post>)=>{})
+    onPush=(buffer: Partial<Post>)=>{}):
+    [Partial<Post>, (post: Partial<Post>)=>void, Partial<Post>, ()=>Promise<void>, ()=>void, boolean, boolean]
     {
     const [post, setPost] = usePost(id)
     if (post === null) {

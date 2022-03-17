@@ -30,7 +30,7 @@ function Editor() {
 function EditorManager() {
     const {sceneChildren, setSceneChildren: _setSceneChildren, audioListener, defaultCameraProps, setDefaultCameraProps, potreePointBudget, setPotreePointBudget} = useContext(ViewerContext)
     // Setup state for editor
-    const [selectedIDs, setSelectedIDs] = useState([])
+    const [selectedIDs, setSelectedIDs] = useState<string[]>([])
     const [transformMode, setTransformMode] = useState("translate")
     const [transformSpace, setTransformSpace] = useState("world")
     const [overrideInteractions, setOverrideInteractions] = useState(true)
@@ -72,9 +72,9 @@ function EditorManager() {
     const deserialize = useStatefulDeserialize()
 
     const { id } = useParams();
-    const [buffer, setBuffer, post, push, pull, changed, overwriteWarning] = useBufferedPost(id, ["data"], undefined, (buffer) => {
-        if (buffer.data) {
-            deserialize(buffer.data)
+    const [buffer, setBuffer, post, push, pull, changed, overwriteWarning] = useBufferedPost(id, ["sceneChildren"], undefined, (buffer) => {
+        if (buffer.configuration !== undefined && buffer.sceneChildren !== undefined) {
+            deserialize(buffer)
         }
     });
     // Syncing internal state with buffer
