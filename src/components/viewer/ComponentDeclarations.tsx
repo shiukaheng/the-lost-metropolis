@@ -38,7 +38,10 @@ export const components = [
     DebugPlane
 ]
 
-export function getComponentFromTypeName(componentType) {
-    // return componentSpecifications.find(item => item.value.component.name === componentName).value.inputs // 
-    return components.find(item => item.componentType === componentType)
+export function getComponentFromTypeName(componentType): VaporComponent {
+    const result = components.find(item => item.componentType === componentType)
+    if (result === undefined) {
+        throw new Error(`Component type ${componentType} not found`)
+    }
+    return result
 }
