@@ -3,15 +3,18 @@ import { useNavigate } from 'react-router-dom';
 import { useMultilang, usePost } from '../../utilities';
 import MagicButton from '../utilities/MagicButton';
 import MagicDiv from '../utilities/MagicDiv';
-import { Viewer, ViewerManager } from '../viewer/Viewer';
-import Viewport from '../viewer/Viewport';
+import { Viewer } from '../viewer/Viewer';
 import {Fade} from 'react-reveal';
-import { EmbeddedButton, EmbeddedCell, EmbeddedRow, RoundedContainer } from '../utilities/EmbeddedUI';
+
 function View({ ...props}) {
     const { id } = useParams();
-    const [post, _] = usePost(id)
+    const [post, _] = usePost(id || null)
     const navigate = useNavigate();
-    const title = useMultilang(post.title)
+    const title = useMultilang(post?.title)
+    if (post === null) {
+        navigate("/")
+        return null
+    }
     return (
         <div className='absolute w-full h-full'>
             <Viewer post={post} className="absolute w-full h-full"/>
