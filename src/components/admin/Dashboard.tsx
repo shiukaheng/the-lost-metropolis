@@ -27,15 +27,15 @@ function Dashboard() {
     const columnMakers: ColumnMaker[] = currentUser ?
     [
         (post, index) => index,
-        (post, index) => (post.data.data.title[settings.lang]),
-        (post, index) => new Date(post.data.metadata.createdAt).toLocaleDateString("en-UK"),
+        (post, index) => (post.data.title[settings.lang]),
+        (post, index) => new Date(post.data.createdAt).toLocaleDateString("en-UK"),
         (post, index) => roleDisplay[post.data.role],
-        (post, index) => post.data.metadata.permissions.public ? <MagicIcon IconComponent={EyeIcon}/> : <MagicIcon IconComponent={EyeOffIcon}/>,
+        (post, index) => post.data.public ? <MagicIcon IconComponent={EyeIcon}/> : <MagicIcon IconComponent={EyeOffIcon}/>,
     ] :
     [
         (post, index) => index,
-        (post, index) => (post.data.data.title[settings.lang]),
-        (post, index) => new Date(post.data.metadata.createdAt).toLocaleDateString("en-UK"),
+        (post, index) => (post.data.title[settings.lang]),
+        (post, index) => new Date(post.data.createdAt).toLocaleDateString("en-UK"),
     ]
     return ( 
         <GenericPage className="flex flex-col gap-4 md:gap-8">
