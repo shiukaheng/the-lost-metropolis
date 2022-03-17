@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react'
+import { useContext, useEffect } from 'react'
 import { useTheme } from '../../utilities'
 import { ThemeContext } from '../App'
 import GenericPage from '../utilities/GenericPage'
@@ -7,7 +7,7 @@ import GenericPage from '../utilities/GenericPage'
 function About() {
     return (
         <GenericPage>
-            tbd...
+            Coming soon.
         </GenericPage>
     )
 }
