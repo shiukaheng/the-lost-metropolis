@@ -57,5 +57,3 @@ import { userIDSchema } from "./UserID"
 })
 
 export type Post = InferType<typeof postSchema>
-
-console.log(postSchema.getDefault())

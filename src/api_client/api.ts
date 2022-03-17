@@ -70,6 +70,7 @@ export default class VaporAPI {
         } else if (whitelist) {
             data = pick(data, whitelist)
         }
+        // console.log(blacklist, whitelist, data)
         await updateDoc(doc(VaporAPI.postsRef, id), data)
     }
 

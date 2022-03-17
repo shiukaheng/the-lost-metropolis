@@ -5,12 +5,12 @@ import { MultiLangString } from "../../../api/types/MultiLangString"
 import { CSSProperties } from "react"
 
 interface MagicDivProps {
-    debug: boolean,
+    debug?: boolean,
     languageSpecificChildren?: MultiLangString,
-    style: CSSProperties,
-    foregroundColorCSSProps: (keyof CSSProperties)[],
-    backgroundColorCSSProps: (keyof CSSProperties)[],
-    children: React.ReactNode,
+    style?: CSSProperties,
+    foregroundColorCSSProps?: (keyof CSSProperties)[],
+    backgroundColorCSSProps?: (keyof CSSProperties)[],
+    children?: React.ReactNode,
     className?: string,
     mergeTransitions?: boolean,
     autoColor?: boolean,

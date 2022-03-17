@@ -74,7 +74,7 @@ function EditorManager() {
     const deserialize = useStatefulDeserialize()
 
     const { id } = useParams();
-    const [buffer, setBuffer, post, push, pull, changed, overwriteWarning] = useBufferedPost(id, ["sceneChildren"], undefined, (buffer) => {
+    const [buffer, setBuffer, post, push, pull, changed, overwriteWarning] = useBufferedPost(id, ["sceneChildren", "configuration"], undefined, (buffer) => {
         if (buffer.configuration !== undefined && buffer.sceneChildren !== undefined) {
             deserialize(buffer as PostScene) // Dirty hack for bad types! Todo: Fix!
         }

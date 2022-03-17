@@ -249,7 +249,7 @@ export function useBufferedPost (
     onPush=(buffer: Partial<Post>)=>{}):
     [Partial<Post>, (post: Partial<Post>)=>void, Partial<Post>, ()=>Promise<void>, ()=>void, boolean, boolean]
     {
-    const [post, setPost] = usePost(id)
+    const [post, setPost] = usePost(id, props)
     if (post === null) {
         throw new Error("Post not found in useBufferedPost")
     }
