@@ -3,13 +3,14 @@ import { Instance, RecursivePartial } from "../../api/utility_types";
 import { addDoc, collection, deleteDoc, doc, getDoc, updateDoc, arrayUnion, arrayRemove, where } from "firebase/firestore";
 import { PostDocData, postDocDataSchema } from '../../api/implementation_types/PostDocData';
 import { naiveExport, subToRefWithRoleAuthSensitive } from './utilities';
-import { db, storage } from '../firebase-config'
+import { db, storage, functions } from '../firebase-config'
 import { instance, uninstance } from '../../api/utilities';
 import { omit, pick } from "lodash"
 import { v4 } from "uuid";
 import { Asset, assetSchema } from '../../api/types/Asset';
 import { ref, uploadBytesResumable } from 'firebase/storage';
 import { Roled } from '../../api/implementation_types/Role';
+import { httpsCallable } from "firebase/functions"; 
 
 export default class VaporAPI {
 
@@ -140,6 +141,10 @@ export default class VaporAPI {
         // Delete the asset from the post
         await updateDoc(postDocRef, { assets: arrayRemove(assetInstance) })
         // Note: Could be optimized to use an existing assetInstance that could be supplied as a parameter
+        // Note: Could use modifyAsset for this
+        // TODO: Delete the asset from the storage, use a called function to delete unmatched assets on static storage
+        const culler = httpsCallable(functions, "cullUnreferencedAssets");
+        await culler({postID})
     }
 
     // Utilities

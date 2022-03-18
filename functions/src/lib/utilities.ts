@@ -1,6 +1,6 @@
 import * as admin from "firebase-admin";
 import * as functions from "firebase-functions";
-import * as admZip from "adm-zip";
+import * as unzipper from "unzipper";
 import { AssetMetadataFile, assetMetadataFileSchema } from "./types/AssetMetadataFile";
 import { AssetZipMetadata, assetZipMetadataSchema } from "./types/AssetZipMetadata";
 import { promises as fsAsync } from "fs";
@@ -22,7 +22,7 @@ export function generatePostFolderPath(postID: string): string {
  * Used for generating post asset path to upload to CDN
  */
 export function generateAssetFolderPath(postID: string, assetID: string): string {
-    return `${generatePostFolderPath(postID)}/assetID`;
+    return `${generatePostFolderPath(postID)}/${assetID}`;
 }
 export async function checkAssetRequested(object: functions.storage.ObjectMetadata) {
     // Validate object's metadata field
@@ -68,19 +68,26 @@ export async function unzipAsset(object: functions.storage.ObjectMetadata, postR
     await bucket.file(object.name).download({
         destination: zipDestination
     });
+    // Deleting zip from bucket
+    console.log("Deleting zip from bucket")
+    await bucket.file(object.name).delete();
+    // Get the only folder in extracted-asset
     const unzippedPath = path.resolve("extracted-asset");
     // Unzip to temp folder
     console.log("Unzipping")
     try {
         await unzip(zipDestination, unzippedPath);
     } catch (e) {
-        await fsAsync.rmdir(zipDestination, { recursive: true });
-        console.warn(`Unzipping failed, reason: ${e}`);
+        await fsAsync.rm(path.resolve(zipDestination), { recursive: true });
+        console.log(`Unzipping failed, reason: ${e}`);
         throw new Error(`Unable to unzip asset ${object.name}`);
     }
+    console.log("Unzipping successful, deleting")
+    // const unzippedPath = path.resolve(unzippingPath, fs.readdirSync(unzippingPath)[0]);
     // Delete zip
-    await fsAsync.rmdir(zipDestination, { recursive: true });
+    await fsAsync.rm(path.resolve(zipDestination), { recursive: true });
     // Parse metadata.json
+    console.log("Parsing metadata")
     const metadataRaw = await fsAsync.readFile(path.resolve(unzippedPath, "metadata.json"), "utf8");
     const metadataFile = JSON.parse(metadataRaw);
     if (!assetMetadataFileSchema.isValidSync(metadataFile)) {
@@ -103,9 +110,15 @@ export async function unzipAsset(object: functions.storage.ObjectMetadata, postR
 }
 
 async function unzip(zip_destination: string, unzipped_path: string): Promise<void> {
-    const zip = new admZip(zip_destination);
-    await zip.extractAllToAsync(unzipped_path, true);
+    const read: Promise<void> = new Promise((resolve, reject) => {
+        const stream = fs.createReadStream(zip_destination).pipe(unzipper.Extract({ path: path.resolve(unzipped_path) }));
+        stream.on("close", () => {
+            resolve();
+        });
+    })
+    return read;
 }
+
 /**
  * Updates asset from post document
  */
@@ -150,7 +163,7 @@ export async function processAsset(unzippedPath: any, metadataFile: AssetMetadat
         throw new Error("Unrecognized source type");
     }
     if (metadataFile.sourceAssetType === metadataFile.targetAssetType) {
-        sourceType.validate(metadataFile.assetData, path.resolve(unzippedDataPath, "data"));
+        sourceType.validate(metadataFile.assetData, unzippedDataPath);
         modifyAsset(postRef, assetID, (asset => {
             asset.metadata.status.processed = true;
             asset.metadata.status.processedProgress = 1;
@@ -192,7 +205,7 @@ export async function cleanupFolders(paths: string[]) {
     for (const path of paths) {
         // Check if path exists
         if (fs.existsSync(path)) {
-            await fsAsync.rmdir(path, { recursive: true });
+            await fsAsync.rm(path, { recursive: true });
         }
     }
 }

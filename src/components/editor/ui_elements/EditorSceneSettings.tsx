@@ -15,7 +15,7 @@ function EditorSceneSettings() {
     const defaultCameraFOVLabel = useMultilang({"en": "default camera FOV", "zh": "預設攝影機 FOV"});
     const setToCurrentPoseLabel = useMultilang({"en": "set to current pose", "zh": "設定為當前姿態"});
     return (
-        <EditorEmbeddedWidget title={heading}>
+        <EditorEmbeddedWidget title={heading} stickyKey="sceneSettingsExpanded">
             <div className="flex flex-col gap-2">
                 <EditorInput propName={pointBudgetLabel} typeName="number" value={potreePointBudget} setValue={setPotreePointBudget}/>
                 <EditorInput propName={defaultCameraPosLabel} typeName="vector3" value={defaultCameraProps.position} setValue={(position)=>{setDefaultCameraProps({...defaultCameraProps, position})}}/>

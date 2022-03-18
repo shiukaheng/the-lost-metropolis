@@ -1,7 +1,8 @@
 import React, { useState, ReactNode } from "react"
+import { useStickyState } from "../../../utilities"
 
-export default function EditorEmbeddedWidget({title="Title", children}) {
-    const [expanded, setExpanded] = useState(true)
+export default function EditorEmbeddedWidget({title="Title", children, stickyKey, defaultExpanded=true}) {
+    const [expanded, setExpanded] = useStickyState(defaultExpanded, stickyKey)
     return (
         <div className="editor-embedded-widget">
             <div className="flex flex-row">

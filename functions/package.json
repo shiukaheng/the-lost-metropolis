@@ -16,6 +16,7 @@
     "adm-zip": "^0.5.9",
     "firebase-admin": "^10.0.2",
     "firebase-functions": "^3.18.0",
+    "unzipper": "^0.10.11",
     "uuid": "^8.3.2",
     "yup": "^0.32.11"
   },

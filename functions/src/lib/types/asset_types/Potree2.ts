@@ -14,8 +14,18 @@ export class Potree2 implements AssetType {
         }
         // Check that in the rootPath, there is "hierachy.bin", "metadata.json", and "octree.bin", nothing else
         const files = fs.readdirSync(rootPath);
-        if (!files.includes("hierarchy.bin") || !files.includes("metadata.json") || !files.includes("octree.bin")) {
-            throw `rootPath ${rootPath} does not contain "hierarchy.bin", "metadata.json", and "octree.bin"`
+        console.log("readDirSync results:", files);
+        if (!files.includes("hierarchy.bin")) {
+            throw `hierarchy.bin not found in ${rootPath}`
+        }
+        if (!files.includes("metadata.json")) {
+            throw `metadata.json not found in ${rootPath}`
+        }
+        if (!files.includes("octree.bin")) {
+            throw `octree.bin not found in ${rootPath}`
+        }
+        if (files.length !== 3) {
+            throw `${rootPath} has wrong number of files`
         }
     }
     static getConverter(targetAssetType: typeof AssetType): AssetConverterFunction | undefined {

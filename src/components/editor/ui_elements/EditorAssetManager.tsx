@@ -7,6 +7,8 @@ import { useChooseFile, useMultilang } from "../../../utilities";
 import MagicButton from "../../utilities/MagicButton";
 import MagicDiv from "../../utilities/MagicDiv";
 import EditorEmbeddedWidget from "./EditorEmbeddedWidget";
+import { ReactComponent as Trash } from "../svgs/trash.svg"
+import MagicIcon from "../../utilities/MagicIcon";
 
 export default function EditorAssetManager({postID, assets}: {postID?: string, assets?: (Instance<Asset>)[]}) {
     const [createPrompt, file, valid, clearFiles] = useChooseFile((file) => file.name.endsWith(".vaps"))
@@ -28,17 +30,18 @@ export default function EditorAssetManager({postID, assets}: {postID?: string, a
         zh: "上傳",
     })
     return (
-        <EditorEmbeddedWidget title={title}>
+        <EditorEmbeddedWidget title={title} stickyKey="assetManExpanded">
             <div className="flex flex-row gap-2">
                 <MagicButton solid onClick={createPrompt} className="h-9 md:h-9 grow text-base md:text-base font-normal text-left">{(valid === false) ? invalidFile : (file?.name || chooseFile)}</MagicButton>
-                <MagicButton className="h-9 md:h-9" onClick={()=>{
+                <MagicButton className="h-9 md:h-9" onClick={async ()=>{
                     if(file) {
+                        console.log("Started upload")
                         setUploadProgress(0)
-                        VaporAPI.uploadAsset(postID as string, file, (progress: number)=>{
+                        await VaporAPI.uploadAsset(postID as string, file, (progress: number)=>{
                             setUploadProgress(progress)
-                        }).then(()=>{
-                            setUploadProgress(null)
                         })
+                        console.log("Finished upload")
+                        setUploadProgress(null)
                     }
                 }} disabled={(postID !== undefined) && (!(file !== null && valid === true))}>{(uploadProgress === null) ? uploadButtonText : `${Math.round(uploadProgress*100)
                 }%`}</MagicButton>
@@ -46,7 +49,7 @@ export default function EditorAssetManager({postID, assets}: {postID?: string, a
             {
                 (assets !== undefined) && assets.map((asset, index) => {
                     return (
-                        <AssetEntry key={index} asset={asset}/>
+                        <AssetEntry key={index} asset={asset} postID={postID}/>
                     )
                 })
             }
@@ -54,7 +57,7 @@ export default function EditorAssetManager({postID, assets}: {postID?: string, a
     )
 }
 
-function AssetEntry({asset}: {asset: Instance<Asset>}) {
+function AssetEntry({asset, postID}: {asset: Instance<Asset>, postID: string}) {
     const assetLoading = useMultilang({
         en: "unknown",
         zh: "未知",
@@ -80,11 +83,22 @@ function AssetEntry({asset}: {asset: Instance<Asset>}) {
         zh: "錯誤",
     })
     return (
-        <MagicDiv className="flex flex-row">
-            <div title={asset.id}>{`${asset.data.metadata.name || (asset.data.metadata.status.pending === true) ? assetLoading : assetUntitled} - <${asset.data.metadata.targetAssetType || unknownAssetType}>`}</div>
+        <MagicDiv className="flex flex-row gap-2">
+            <div title={asset.id}>{`${asset.data.metadata.name || ((asset.data.metadata.status.pending === true) ? assetLoading : assetUntitled)} - <${asset.data.metadata.targetAssetType || unknownAssetType}>`}</div>
             <div title={(
                 (asset.data.metadata.status.error !== null) ? asset.data.metadata.status.error : undefined
-            )} className={twMerge("ml-auto", ((asset.data.metadata.status.error !== null) && "text-red-600"))}>{(asset.data.metadata.status.error === null) ? `(${(asset.data.metadata.status.pending === true) ? pending : asset.data.metadata.status.processed ? ready : `${Math.round(asset.data.metadata.status.processedProgress*100)}%`})` : `(${error})`}</div>
+            )} className={twMerge("ml-auto", ((asset.data.metadata.status.error !== null) && "text-red-600"))}>
+                {(asset.data.metadata.status.error === null) ?
+                 `(${(asset.data.metadata.status.pending === true) ?
+                 pending : asset.data.metadata.status.processed ?
+                 ready : `${Math.round(asset.data.metadata.status.processedProgress*100)}%`})` : `(${error})`}
+                </div>
+            <div className="cursor-pointer h-5" onClick={()=>{}}>
+                <MagicIcon IconComponent={Trash} clickable onClick={async () => {
+                    await VaporAPI.deleteAsset(postID, asset.id)
+                }
+                }/>
+            </div>
         </MagicDiv>
     )
 }

@@ -81,7 +81,7 @@ export default function EditorComponentGraph() {
         })
     }
     return (
-        <EditorEmbeddedWidget title={heading}>
+        <EditorEmbeddedWidget title={heading} stickyKey="compGraphExpanded">
             <KeyPressCallback keyName="Delete" onDown={()=>{
                 setSceneChildren(sceneChildren.filter(child => !(selectedIDs.includes(child.props.objectID))))
             }}/>

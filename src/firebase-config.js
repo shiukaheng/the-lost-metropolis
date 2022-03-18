@@ -1,9 +1,10 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
-import { getStorage } from "firebase/storage"
+import { connectFunctionsEmulator, getFunctions } from "firebase/functions"
+import { connectAuthEmulator, getAuth } from "firebase/auth";
+import { connectFirestoreEmulator, Firestore, getFirestore, setLogLevel } from "firebase/firestore";
+import { connectStorageEmulator, getStorage } from "firebase/storage"
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -20,15 +21,15 @@ let firebaseConfig = {
   measurementId: "G-3QRQW5LVCQ"
 };
 
-if (location.hostname === 'localhost') {
-  firebaseConfig = {
-    databaseURL: 'http://localhost:9000?ns=the-lost-metropolis-prod-c48c6',
-  }
-}
-
 // Initialize Firebase
 export const app = initializeApp(firebaseConfig);
 export const analytics = getAnalytics(app);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const storage = getStorage(app);
+export const functions = getFunctions(app, "asia-east1");
+
+connectFirestoreEmulator(db, "lvh.me", 5377)
+connectAuthEmulator(auth, "http://lvh.me:5366")
+connectStorageEmulator(storage, "lvh.me", 9199)
+connectFunctionsEmulator(functions, "lvh.me", 5333)

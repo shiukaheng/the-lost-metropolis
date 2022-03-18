@@ -2,7 +2,7 @@
 
 import tw from 'tailwind-styled-components';
 import { useNavigate } from 'react-router-dom';
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import { SettingsContext } from "../App";
 import GenericPage from '../utilities/GenericPage';
 import LoadingScreen from '../utilities/LoadingScreen';
@@ -37,6 +37,12 @@ function Dashboard() {
         (post, index) => (post.data.title[settings.lang]),
         (post, index) => new Date(post.data.createdAt).toLocaleDateString("en-UK"),
     ]
+    useEffect(()=>{
+        if (currentUser === null) {
+            console.log(currentUser)
+            navigate("/login")
+        }
+    }, [currentUser])
     return ( 
         <GenericPage className="flex flex-col gap-4 md:gap-8">
             {/* <DashboardHeader/> */}

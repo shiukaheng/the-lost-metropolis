@@ -58,7 +58,7 @@ export default function EditorOptions() {
     const transformationLabel = useMultilang({"en": "transformation", "zh": "變換"})
     const bypassLabel = useMultilang({"en": "bypass editor interactions", "zh": "跳過編輯器互動"})
     return (
-        <EditorEmbeddedWidget title={heading}>
+        <EditorEmbeddedWidget title={heading} stickyKey="editorOptionsExpanded">
             <div className="flex flex-row gap-2">
                 <div>{transformationLabel}</div>
                 <TransformModeSetter {...{ transformMode, setTransformMode, transformSpace, setTransformSpace }}/>

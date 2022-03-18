@@ -45,6 +45,7 @@ function PostList({posts, onPostClick=(post)=>{}, columnMakers=[], createButton=
                         const id: string = await VaporAPI.createPost(postSchema.validateSync({
                             owner: auth.currentUser!.uid,
                         }))
+                        console.log("created post", id)
                         navigate(`/edit/${id}`)
                     }} className="ml-auto h-12 md:h-12"/>
                 </Condition>
@@ -85,8 +86,8 @@ function PostList({posts, onPostClick=(post)=>{}, columnMakers=[], createButton=
 function matchSearch(post: Instance<Roled<Post>>, searchTerm: string) {
     // Searches whether the post's title or description has search term as a substring, simultaneously search for all languages
     return (
-        Object.entries(post.data.data.title).some(([lang, title]) => title.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        Object.entries(post.data.data.description).some(([lang, description]) => description.toLowerCase().includes(searchTerm.toLowerCase()))
+        Object.entries(post.data.title).some(([lang, title]) => title.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        Object.entries(post.data.description).some(([lang, description]) => description.toLowerCase().includes(searchTerm.toLowerCase()))
     )
 }
 

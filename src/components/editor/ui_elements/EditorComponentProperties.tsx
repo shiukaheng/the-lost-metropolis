@@ -14,7 +14,7 @@ export default function EditorComponentProperties() {
     const { selectedIDs } = useContext(EditorContext);
     const heading = useMultilang({"en": "component properties", "zh": "組件屬性"})
     return (
-        <EditorEmbeddedWidget title={heading}>
+        <EditorEmbeddedWidget title={heading} stickyKey="compPropExpanded">
             <div className="flex flex-col">
                 <div className="flex flex-col gap-2">
                     {
