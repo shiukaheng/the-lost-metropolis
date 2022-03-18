@@ -75,10 +75,15 @@ export const cullUnreferencedAssets = functions.region("asia-east1").https.onCal
     const files = await bucket.getFiles({
         prefix: generatePostFolderPath(postID)
     })
-    // Find all the "subdirectories" of the "folder" of the post from the files list, remove duplicates, and that should be all the assets
-    // Do it nicely, in steps, and with comments please.
-    const subdirectories = files.filter(file => file.name.split("/").length > 1).map(file => file.name.split("/")[0])
-    console.log(subdirectories)
+    const ids = files[0].map(file => file.name.split("/")[1])
+    const ids_distinct = [...new Set(ids)]
+    const ids_to_delete = ids_distinct.filter(id => !assetIDs.includes(id))
+    // Delete all files that has its name start with <postID>/<assetID>/
+    for (const assetID in ids) {
+        await bucket.deleteFiles({
+            prefix: generateAssetFolderPath(postID, assetID)
+        })
+    }
+    return {}
 })
-
 
