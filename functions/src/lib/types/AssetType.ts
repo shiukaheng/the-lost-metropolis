@@ -12,16 +12,18 @@ export abstract class AssetType {
     /**
      * Map of sources to convert from
      */
-    static conversionMap: Map<typeof AssetType, AssetConverterFunction>;
-    static assetLiteral: AssetLiteral;
-    static source: boolean;
-    static target: boolean;
-    static validate(assetData: object, rootPath: string) {
+    public static conversionMap: Map<typeof AssetType, AssetConverterFunction>;
+    public static assetLiteral: AssetLiteral;
+    public static source: boolean;
+    public static target: boolean;
+    public static validate(assetData: object, rootPath: string) {
         throw "not implemented";
     }
-    static getConverter(targetAssetType: typeof AssetType): AssetConverterFunction | undefined {
+    public static getConverter(targetAssetType: typeof AssetType): AssetConverterFunction | undefined {
         return AssetType.conversionMap.get(targetAssetType);
     }
 }
+
+
 
 export const assetTypes: (typeof AssetType)[] = [Potree2]

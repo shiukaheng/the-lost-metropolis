@@ -18,12 +18,12 @@
         "dist": true,
         ".vscode": true,
         "functions/node_modules": true,
-        "functions/lib": true,
         "functions/.eslintrc.js": true,
         "functions/.gitignore": true,
         "functions/package-lock.json": true,
         "functions/tsconfig.dev.json": true,
-        "functions/src/lib/old_helpers.ts": true
+        "functions/src/lib/old_helpers.ts": true,
+        "functions/lib": true
     },
     "hide-files.files": [
         ".firebase",
@@ -38,11 +38,11 @@
         "dist",
         ".vscode",
         "functions/node_modules",
-        "functions/lib",
         "functions/.eslintrc.js",
         "functions/.gitignore",
         "functions/package-lock.json",
         "functions/tsconfig.dev.json",
-        "functions/src/lib/old_helpers.ts"
+        "functions/src/lib/old_helpers.ts",
+        "functions/lib"
     ]
 }

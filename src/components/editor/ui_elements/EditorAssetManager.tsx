@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { twMerge } from "tailwind-merge";
 import { Asset } from "../../../../api/types/Asset";
 import { Instance } from "../../../../api/utility_types";
 import VaporAPI from "../../../api_client/api";
@@ -26,6 +27,34 @@ export default function EditorAssetManager({postID, assets}: {postID?: string, a
         en: "upload",
         zh: "上傳",
     })
+    return (
+        <EditorEmbeddedWidget title={title}>
+            <div className="flex flex-row gap-2">
+                <MagicButton solid onClick={createPrompt} className="h-9 md:h-9 grow text-base md:text-base font-normal text-left">{(valid === false) ? invalidFile : (file?.name || chooseFile)}</MagicButton>
+                <MagicButton className="h-9 md:h-9" onClick={()=>{
+                    if(file) {
+                        setUploadProgress(0)
+                        VaporAPI.uploadAsset(postID as string, file, (progress: number)=>{
+                            setUploadProgress(progress)
+                        }).then(()=>{
+                            setUploadProgress(null)
+                        })
+                    }
+                }} disabled={(postID !== undefined) && (!(file !== null && valid === true))}>{(uploadProgress === null) ? uploadButtonText : `${Math.round(uploadProgress*100)
+                }%`}</MagicButton>
+            </div>
+            {
+                (assets !== undefined) && assets.map((asset, index) => {
+                    return (
+                        <AssetEntry key={index} asset={asset}/>
+                    )
+                })
+            }
+        </EditorEmbeddedWidget>
+    )
+}
+
+function AssetEntry({asset}: {asset: Instance<Asset>}) {
     const assetLoading = useMultilang({
         en: "unknown",
         zh: "未知",
@@ -51,31 +80,11 @@ export default function EditorAssetManager({postID, assets}: {postID?: string, a
         zh: "錯誤",
     })
     return (
-        <EditorEmbeddedWidget title={title}>
-            <div className="flex flex-row gap-2">
-                <MagicButton solid onClick={createPrompt} className="h-9 md:h-9 grow text-base md:text-base font-normal text-left">{(valid === false) ? invalidFile : (file?.name || chooseFile)}</MagicButton>
-                <MagicButton className="h-9 md:h-9" onClick={()=>{
-                    if(file) {
-                        setUploadProgress(0)
-                        VaporAPI.uploadAsset(postID as string, file, (progress: number)=>{
-                            setUploadProgress(progress)
-                        }).then(()=>{
-                            setUploadProgress(null)
-                        })
-                    }
-                }} disabled={(postID !== undefined) && (!(file !== null && valid === true))}>{(uploadProgress === null) ? uploadButtonText : `${Math.round(uploadProgress*100)
-                }%`}</MagicButton>
-            </div>
-            {
-                (assets !== undefined) && assets.map((asset, index) => {
-                    return (
-                        <MagicDiv className="flex flex-row" key={index}>
-                            <div title={asset.id}>{`${asset.data.metadata.name || (asset.data.metadata.status.pending === true) ? assetLoading : assetUntitled} - <${asset.data.metadata.targetAssetType || unknownAssetType}>`}</div>
-                            <div className="ml-auto">{(asset.data.metadata.status.error === null) ? `(${(asset.data.metadata.status.pending === true) ? pending : asset.data.metadata.status.processed ? ready : `${Math.round(asset.data.metadata.status.processedProgress*100)}%`})` : `(${error})`}</div>
-                        </MagicDiv>
-                    )
-                })
-            }
-        </EditorEmbeddedWidget>
+        <MagicDiv className="flex flex-row">
+            <div title={asset.id}>{`${asset.data.metadata.name || (asset.data.metadata.status.pending === true) ? assetLoading : assetUntitled} - <${asset.data.metadata.targetAssetType || unknownAssetType}>`}</div>
+            <div title={(
+                (asset.data.metadata.status.error !== null) ? asset.data.metadata.status.error : undefined
+            )} className={twMerge("ml-auto", ((asset.data.metadata.status.error !== null) && "text-red-600"))}>{(asset.data.metadata.status.error === null) ? `(${(asset.data.metadata.status.pending === true) ? pending : asset.data.metadata.status.processed ? ready : `${Math.round(asset.data.metadata.status.processedProgress*100)}%`})` : `(${error})`}</div>
+        </MagicDiv>
     )
 }

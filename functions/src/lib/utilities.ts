@@ -10,12 +10,17 @@ import { Asset } from "../../../api/types/Asset";
 import { cloneDeep } from "lodash";
 import { assetTypes } from "./types/AssetType";
 import * as path from "path";
-import { db } from "./functions";
 import { PostDocData, postDocDataSchema } from "../../../api/implementation_types/PostDocData"
 
+/**
+ * Used for generating post path to upload to CDN
+ */
 export function generatePostFolderPath(postID: string): string {
     return `${postID}`;
 }
+/**
+ * Used for generating post asset path to upload to CDN
+ */
 export function generateAssetFolderPath(postID: string, assetID: string): string {
     return `${generatePostFolderPath(postID)}/assetID`;
 }
@@ -32,7 +37,7 @@ export async function checkAssetRequested(object: functions.storage.ObjectMetada
         throw new Error(`Post with id ${metadata.postID} does not exist`);
     }
     // Validate post document
-    const postSnap: PostDocData = doc.data();
+    const postSnap: PostDocData = doc.data() as PostDocData;
     if (!postDocDataSchema.isValidSync(postSnap)) {
         throw new Error(`Post with id ${metadata.postID} does not have valid data`);
     }
@@ -58,15 +63,25 @@ export async function unzipAsset(object: functions.storage.ObjectMetadata, postR
     if (!(typeof object.name === "string")) {
         throw new Error(`File ${object.name} does not have a valid name`);
     }
-    const zipDestination = `./${object.name}`;
+    const zipDestination = path.resolve("compressed-asset");
+    console.log("Fetching zip from bucket");
     await bucket.file(object.name).download({
         destination: zipDestination
     });
-    const unzippedPath = "extracted";
+    const unzippedPath = path.resolve("extracted-asset");
     // Unzip to temp folder
-    await unzip(zipDestination, unzippedPath);
+    console.log("Unzipping")
+    try {
+        await unzip(zipDestination, unzippedPath);
+    } catch (e) {
+        await fsAsync.rmdir(zipDestination, { recursive: true });
+        console.warn(`Unzipping failed, reason: ${e}`);
+        throw new Error(`Unable to unzip asset ${object.name}`);
+    }
+    // Delete zip
+    await fsAsync.rmdir(zipDestination, { recursive: true });
     // Parse metadata.json
-    const metadataRaw = await fsAsync.readFile(`${unzippedPath}/metadata.json`, "utf8");
+    const metadataRaw = await fsAsync.readFile(path.resolve(unzippedPath, "metadata.json"), "utf8");
     const metadataFile = JSON.parse(metadataRaw);
     if (!assetMetadataFileSchema.isValidSync(metadataFile)) {
         throw new Error(`Metadata file is not valid`);
@@ -95,9 +110,10 @@ async function unzip(zip_destination: string, unzipped_path: string): Promise<vo
  * Updates asset from post document
  */
 export async function modifyAsset(postRef: FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>, assetID: string, modifier: (x: Asset) => Asset): Promise<void> {
+    const db = admin.firestore();
     try {
-        await db.runTransaction(async (t) => {
-            const postData = (await t.get(postRef)).data();
+        await db.runTransaction(async (transaction: FirebaseFirestore.Transaction) => {
+            const postData = (await transaction.get(postRef)).data();
             if (!postDocDataSchema.isValidSync(postData)) {
                 throw new Error("Invalid post document");
             }
@@ -108,7 +124,7 @@ export async function modifyAsset(postRef: FirebaseFirestore.DocumentReference<F
             }
             const newAssetData: Asset = modifier(cloneDeep(oldAsset.data));
             const newAssets: Instance<Asset>[] = assets.map(asset => (asset.id === assetID) ? { id: assetID, data: newAssetData } : asset);
-            t.update(postRef, {
+            transaction.update(postRef, {
                 assets: newAssets
             });
         });

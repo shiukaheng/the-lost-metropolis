@@ -10,7 +10,7 @@ import { getStorage } from "firebase/storage"
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
+let firebaseConfig = {
   apiKey: "AIzaSyBN4OPeQly_ei-ttR9pliK8Rvt1Oem2ARg",
   authDomain: "the-lost-metropolis-prod-c48c6.firebaseapp.com",
   projectId: "the-lost-metropolis-prod-c48c6",
@@ -19,6 +19,12 @@ const firebaseConfig = {
   appId: "1:1056722334454:web:5d3395266c2ca560e432d7",
   measurementId: "G-3QRQW5LVCQ"
 };
+
+if (location.hostname === 'localhost') {
+  firebaseConfig = {
+    databaseURL: 'http://localhost:9000?ns=the-lost-metropolis-prod-c48c6',
+  }
+}
 
 // Initialize Firebase
 export const app = initializeApp(firebaseConfig);
