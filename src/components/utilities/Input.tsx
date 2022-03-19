@@ -6,6 +6,7 @@ import { range } from "lodash"
 import { createElement } from "react";
 import MagicDiv from '../utilities/MagicDiv';
 import { LinearToSRGB, SRGBToLinear } from '../../utilities';
+import { targetAssetLiteralSchema } from '../../../api/types/AssetLiteral';
 
 // Props for input elements:
 // value is the current value of the property, used to display the current value of the property in the editor
@@ -215,6 +216,24 @@ const QuaternionInput = ({value, setValue}) => VectorInput({length: 4, value, se
 const Matrix3Input = ({value, setValue}) => MatrixInput({rows: 3, columns: 3, value: unflattenMatrix(value, 3, 3), setValue: (value) => setValue(flattenMatrix(value))});
 const Matrix4Input = ({value, setValue}) => MatrixInput({rows: 4, columns: 4, value: unflattenMatrix(value, 4, 4), setValue: (value) => setValue(flattenMatrix(value))});
 
+function AssetInput({value, setValue, data}) {
+    // Check that data is an array of valid assetLiterals (use assetLiteralSchema)
+    if (!Array.isArray(data)) {
+        for (const type of data) {
+            if (!targetAssetLiteralSchema.isValidSync(type)) {
+                console.error("Invalid asset literal", type);
+                return null;
+            }
+        }
+        throw new Error("AssetInput data must be an array of asset literals");
+    }
+    // Use EditorContext to get the current asset library and map it into an options list for Select element
+    // Use if else to check if editorContext actually exists, if it doesnt just return empty list
+    return (
+        null
+    )
+}
+
 const InputComponentMap = {
     "number": NumberInput,
     "string": StringInput,
@@ -228,16 +247,18 @@ const InputComponentMap = {
     "matrix3": Matrix3Input,
     "matrix4": Matrix4Input,
     "boolean": BooleanInput,
-    "multiline-string": MultilineStringInput
+    "multiline-string": MultilineStringInput,
+    "asset": AssetInput
 }
 
 type InputProps = {
     typeName: string
     value: any
     setValue: (value: any) => void
+    data?: any
 }
 
-function Input({typeName, value, setValue}:InputProps) {
+function Input({typeName, value, setValue, data}:InputProps) {
     // Props:
     // propName is the display name of the property, used to display the name of the property in the editor
     // value is the current value of the property, used to display the current value of the property in the editor
@@ -246,7 +267,7 @@ function Input({typeName, value, setValue}:InputProps) {
     return (
         <MagicDiv className="flex flex-row gap-2">
             {
-                createElement(InputComponentMap[typeName], {value, setValue})
+                createElement(InputComponentMap[typeName], {value, setValue, data})
             }
         </MagicDiv>
     )
