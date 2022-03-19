@@ -31,5 +31,5 @@ export const functions = getFunctions(app, "asia-east1");
 
 connectFirestoreEmulator(db, "lvh.me", 5377)
 connectAuthEmulator(auth, "http://lvh.me:5366")
-connectStorageEmulator(storage, "lvh.me", 9199)
+connectStorageEmulator(storage, "lvh.me", 5341)
 connectFunctionsEmulator(functions, "lvh.me", 5333)

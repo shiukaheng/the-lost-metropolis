@@ -29,7 +29,7 @@ const onNewFile = async (object: functions.storage.ObjectMetadata) => {
             asset.metadata.status.error = String(e)
             return asset
         })
-        // await cleanupFolders(usedPaths)
+        await cleanupFolders(usedPaths)
         throw e
     }
     // Mark asset as ready
@@ -38,7 +38,7 @@ const onNewFile = async (object: functions.storage.ObjectMetadata) => {
         return asset
     })
     // Cleanup temp directories
-    // await cleanupFolders(usedPaths)
+    await cleanupFolders(usedPaths)
 }
 
 const onPostDocumentDelete = async (snapshot: QueryDocumentSnapshot, context: EventContext) => {
@@ -79,7 +79,8 @@ export const cullUnreferencedAssets = functions.region("asia-east1").https.onCal
     const ids_distinct = [...new Set(ids)]
     const ids_to_delete = ids_distinct.filter(id => !assetIDs.includes(id))
     // Delete all files that has its name start with <postID>/<assetID>/
-    for (const assetID in ids) {
+    console.log(ids_to_delete)
+    for (const assetID of ids_to_delete) {
         await bucket.deleteFiles({
             prefix: generateAssetFolderPath(postID, assetID)
         })

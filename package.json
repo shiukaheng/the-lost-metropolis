@@ -5,7 +5,12 @@
   "scripts": {
     "start": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "kill-ports": "kill-port --port 5333,5377,5355,5341,5366,4000",
+    "firebase-emu": "firebase emulators:start --only functions,firestore,storage,auth",
+    "functions-watch": "cd functions && npm run watch",
+    "open-browser": "node ./scripts/open_browser.js",
+    "dev": "yarn kill-ports && yarn concurrently \"yarn firebase-emu\" \"yarn start\" \"yarn functions-watch\" \"yarn open-browser\""
   },
   "repository": "https://github.com/shiukaheng/the-lost-metropolis-draft.git",
   "author": "Heng <31088159+shiukaheng@users.noreply.github.com>",
@@ -16,6 +21,7 @@
     "@parcel/transformer-typescript-tsc": "^2.3.2",
     "@types/uuid": "^8.3.4",
     "autoprefixer": "^10.4.2",
+    "kill-port": "^1.6.1",
     "parcel": "^2.3.2",
     "parcel-reporter-static-files-copy": "^1.3.4",
     "postcss": "^8.4.5",
@@ -30,9 +36,11 @@
     "@react-three/xr": "^3.2.0",
     "@types/lodash": "^4.14.179",
     "@vitejs/plugin-react": "^1.2.0",
+    "concurrently": "^7.0.0",
     "file-saver": "^2.0.5",
     "firebase": "^9.6.8",
     "lodash": "^4.17.21",
+    "open": "^8.4.0",
     "potree-loader": "^1.9.1",
     "process": "^0.11.10",
     "react": "^17.0.2",
@@ -56,6 +64,7 @@
     "uuid": "^8.3.2",
     "vite": "^2.8.6",
     "vite-plugin-svgr": "^1.0.1",
+    "wait-port": "^0.2.9",
     "yup": "^0.32.11"
   },
   "staticFiles": {

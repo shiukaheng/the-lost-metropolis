@@ -13,7 +13,6 @@
         ".postcssrc": true,
         ".gitignore": true,
         ".env": true,
-        "scripts": true,
         "node_modules": true,
         "dist": true,
         ".vscode": true,
@@ -23,7 +22,17 @@
         "functions/package-lock.json": true,
         "functions/tsconfig.dev.json": true,
         "functions/src/lib/old_helpers.ts": true,
-        "functions/lib": true
+        "functions/lib": true,
+        ".firebaserc": true,
+        "firestore.indexes.json": true,
+        "ui-debug.log": true,
+        "firestore-debug.log": true,
+        "postcss.config.js": true,
+        "storage.rules": true,
+        "tailwind.config.js": true,
+        "scripts": true,
+        "firebase-debug.log": true,
+        "firestore.rules": true
     },
     "hide-files.files": [
         ".firebase",
@@ -33,7 +42,6 @@
         ".postcssrc",
         ".gitignore",
         ".env",
-        "scripts",
         "node_modules",
         "dist",
         ".vscode",
@@ -43,6 +51,16 @@
         "functions/package-lock.json",
         "functions/tsconfig.dev.json",
         "functions/src/lib/old_helpers.ts",
-        "functions/lib"
+        "functions/lib",
+        ".firebaserc",
+        "firestore.indexes.json",
+        "ui-debug.log",
+        "firestore-debug.log",
+        "postcss.config.js",
+        "storage.rules",
+        "tailwind.config.js",
+        "scripts",
+        "firebase-debug.log",
+        "firestore.rules"
     ]
 }

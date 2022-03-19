@@ -34,7 +34,7 @@ export default function EditorAssetManager({postID, assets}: {postID?: string, a
             <div className="flex flex-row gap-2">
                 <MagicButton solid onClick={createPrompt} className="h-9 md:h-9 grow text-base md:text-base font-normal text-left">{(valid === false) ? invalidFile : (file?.name || chooseFile)}</MagicButton>
                 <MagicButton className="h-9 md:h-9" onClick={async ()=>{
-                    if(file) {
+                    if((file !== null) && (uploadProgress === null)) {
                         console.log("Started upload")
                         setUploadProgress(0)
                         await VaporAPI.uploadAsset(postID as string, file, (progress: number)=>{
@@ -42,8 +42,9 @@ export default function EditorAssetManager({postID, assets}: {postID?: string, a
                         })
                         console.log("Finished upload")
                         setUploadProgress(null)
+                        clearFiles()
                     }
-                }} disabled={(postID !== undefined) && (!(file !== null && valid === true))}>{(uploadProgress === null) ? uploadButtonText : `${Math.round(uploadProgress*100)
+                }} disabled={(file === null) || (uploadProgress !== null)}>{(uploadProgress === null) ? uploadButtonText : `${Math.round(uploadProgress*100)
                 }%`}</MagicButton>
             </div>
             {
@@ -94,7 +95,7 @@ function AssetEntry({asset, postID}: {asset: Instance<Asset>, postID: string}) {
                  ready : `${Math.round(asset.data.metadata.status.processedProgress*100)}%`})` : `(${error})`}
                 </div>
             <div className="cursor-pointer h-5" onClick={()=>{}}>
-                <MagicIcon IconComponent={Trash} clickable onClick={async () => {
+                <MagicIcon fillCurrent IconComponent={Trash} clickable onClick={async () => {
                     await VaporAPI.deleteAsset(postID, asset.id)
                 }
                 }/>
