@@ -1,5 +1,5 @@
 import VaporAPI from "../../../api_client/api";
-import { ClientAsset, clientAssetSchema } from "../../../api_client/types/ResolvedAsset";
+import { ClientAsset, clientAssetSchema } from "../../../api_client/types/ClientAsset";
 import { createAssetType } from "../../viewer/ArgumentTypes";
 import { VaporComponent, VaporComponentProps } from "../../viewer/ComponentDeclarations";
 import { genericInputs } from "../../viewer/genericInputs";

@@ -18,6 +18,9 @@ import { useParams } from 'react-router-dom';
 import EditorAssetManager from './ui_elements/EditorAssetManager';
 import { Roled } from '../../../api/implementation_types/Role';
 import { Post } from '../../../api/types/Post';
+import { Asset } from '../../../api/types/Asset';
+import { ClientAsset } from '../../api_client/types/ClientAsset';
+import { targetAssetLiteralSchema } from '../../../api/types/AssetLiteral';
 
 function Editor() {
     return (
@@ -101,9 +104,26 @@ function EditorManager() {
     })
     const pullLabel = useMultilang({"en": "update to latest version", "zh": "獲取最新版本"});
     const heading = useMultilang({"en": "editor", "zh": "編輯器"})
+    let clientAssets: ClientAsset[] = []
+    if (id) {
+        for (const asset of post.assets) { // TODO: This is unnecesarily complex. Should probably unify Asset and ClientAsset under ths same format but mutated with a WithPostID generic type
+            const type = asset.data.metadata.targetAssetType
+            const ready = asset.data.metadata.status.ready
+            if (targetAssetLiteralSchema.isValidSync(type) && type !== null && ready) {
+                clientAssets.push({
+                    postID: id,
+                    assetID: asset.id,
+                    type: type,
+                    assetData: asset.data.data,
+                    name: asset.data.metadata.name
+                })
+            }
+        }
+    }
+    
     return (
         <EditorContext.Provider value={
-            {selectedIDs, setSelectedIDs, addSelectedIDs, removeSelectedIDs, transformMode, setTransformMode, transformSpace, setTransformSpace, overrideInteractions, setOverrideInteractions, shiftPressed, setSceneChildren, removeSceneChildren}
+            {selectedIDs, setSelectedIDs, addSelectedIDs, removeSelectedIDs, transformMode, setTransformMode, transformSpace, setTransformSpace, overrideInteractions, setOverrideInteractions, shiftPressed, setSceneChildren, removeSceneChildren, clientAssets}
         }>
             <KeyPressCallback keyName={"Escape"} onDown={()=>{setSelectedIDs([])}}/>
             <div className="flex flex-row absolute w-full h-full overflow-hidden">

@@ -1,5 +1,5 @@
 import {ReactNode} from 'react';
-import { clientAssetSchema } from '../../api_client/types/ResolvedAsset';
+import { clientAssetSchema } from '../../api_client/types/ClientAsset';
 
 export type EditorInputType = {
     typeName: string
@@ -93,7 +93,7 @@ export const MultilineStringType: EditorInputType = {
 export function createAssetType(acceptedAssetTypes: string[]): EditorInputType {
     return {
         typeName: "asset",
-        typeCheck: (value) => clientAssetSchema.isValidSync(value) && acceptedAssetTypes.includes(value.type),
+        typeCheck: (value) => (value === null) || (clientAssetSchema.isValidSync(value) && acceptedAssetTypes.includes(value.type)), // Input needs to be able to deal with null, since assets can't have some generic default type
         data: acceptedAssetTypes
     }
 }

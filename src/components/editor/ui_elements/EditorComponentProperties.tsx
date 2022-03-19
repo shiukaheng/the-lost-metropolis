@@ -28,7 +28,7 @@ export default function EditorComponentProperties() {
                             }
                             const propsDescription = child.type.inputs
                             const inputs = Object.entries(propsDescription).map(([propName, propDescription], i) => (
-                                <EditorInput key={selectedIDs[0]+i.toString()} propName={propName} typeName={propDescription.type.typeName} value={child.props[propName]} setValue={(value)=>{
+                                <EditorInput key={selectedIDs[0]+i.toString()} data={propDescription.type.data} propName={propName} typeName={propDescription.type.typeName} value={child.props[propName]} setValue={(value)=>{
                                     setSceneChildren(sceneChildren.map(child => {
                                         if (child.props.objectID === selectedIDs[0]) {
                                             return cloneElement(child, {

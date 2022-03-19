@@ -1,4 +1,5 @@
 import { createContext } from "react"
+import { ClientAsset } from "../../api_client/types/ClientAsset"
 
 const defaultEditorContext = {
     selectedIDs: [] as string[],
@@ -13,7 +14,8 @@ const defaultEditorContext = {
     setOverrideInteractions: (override:boolean) => { },
     shiftPressed: false,
     setSceneChildren: (children:[]) => { },
-    removeSceneChildren: (children:[]) => { }
+    removeSceneChildren: (children:[]) => { },
+    clientAssets: [] as ClientAsset[],
 }
 
 const EditorContext = createContext(defaultEditorContext)

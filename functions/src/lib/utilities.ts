@@ -11,6 +11,7 @@ import { cloneDeep } from "lodash";
 import { assetTypes } from "./types/AssetType";
 import * as path from "path";
 import { PostDocData, postDocDataSchema } from "../../../api/implementation_types/PostDocData"
+import * as os from "os"
 
 /**
  * Used for generating post path to upload to CDN
@@ -52,6 +53,15 @@ export async function checkAssetRequested(object: functions.storage.ObjectMetada
     }
     return { postRef, postSnap, asset };
 }
+
+function getTempDir() {
+    if ( process.env.FUNCTIONS_EMULATOR ) {
+        return os.tmpdir();
+    } else {
+        return "/tmp/";
+    }
+}
+
 /**
  * Unzip asset, parse metadata.json, and update post document
  * @param object
@@ -63,7 +73,7 @@ export async function unzipAsset(object: functions.storage.ObjectMetadata, postR
     if (!(typeof object.name === "string")) {
         throw new Error(`File ${object.name} does not have a valid name`);
     }
-    const tempDir = "/tmp/";
+    const tempDir = getTempDir();
     const zipDestination = path.resolve(tempDir, "compressed-asset");
     console.log("Fetching zip from bucket");
     await bucket.file(object.name).download({
@@ -72,9 +82,8 @@ export async function unzipAsset(object: functions.storage.ObjectMetadata, postR
     // Deleting zip from bucket
     console.log("Deleting zip from bucket")
     await bucket.file(object.name).delete();
-    // Get the only folder in extracted-asset
-    const unzippedPath = path.resolve(tempDir, "extracted-asset");
     // Unzip to temp folder
+    const unzippedPath = path.resolve(tempDir, "extracted-asset");
     console.log("Unzipping")
     try {
         await unzip(zipDestination, unzippedPath);
@@ -154,7 +163,7 @@ export async function modifyAsset(postRef: FirebaseFirestore.DocumentReference<F
  * @param */
 export async function processAsset(unzippedPath: any, metadataFile: AssetMetadataFile, postRef: FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>, assetID: string) {
     const unzippedDataPath = path.resolve(unzippedPath, "data");
-    const tempDir = "/tmp/";
+    const tempDir = getTempDir();
     const convertedDataPath = path.resolve(tempDir, "converted_data");
     const targetType = assetTypes.find(type => type.assetLiteral === metadataFile.targetAssetType);
     if (targetType === undefined) {

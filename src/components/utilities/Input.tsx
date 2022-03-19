@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import {
     NumberType, Vector3Type, Vector4Type, Vector2Type, ColorType, QuaternionType, EulerType, Matrix3Type, Matrix4Type, StringType, URLType, MatrixType, VectorType, EditorInputType, BooleanType
 } from "../viewer/ArgumentTypes"
@@ -7,6 +7,11 @@ import { createElement } from "react";
 import MagicDiv from '../utilities/MagicDiv';
 import { LinearToSRGB, SRGBToLinear } from '../../utilities';
 import { targetAssetLiteralSchema } from '../../../api/types/AssetLiteral';
+import { EditorContext } from '../editor/EditorContext';
+import { ClientAsset } from '../../api_client/types/ClientAsset';
+import Select from 'react-select';
+import { createSelectStyles } from '../editor/utilities';
+import { ThemedSelect } from './ThemedSelect';
 
 // Props for input elements:
 // value is the current value of the property, used to display the current value of the property in the editor
@@ -218,19 +223,30 @@ const Matrix4Input = ({value, setValue}) => MatrixInput({rows: 4, columns: 4, va
 
 function AssetInput({value, setValue, data}) {
     // Check that data is an array of valid assetLiterals (use assetLiteralSchema)
-    if (!Array.isArray(data)) {
+    const { clientAssets } = useContext(EditorContext)
+    if (Array.isArray(data)) {
         for (const type of data) {
             if (!targetAssetLiteralSchema.isValidSync(type)) {
                 console.error("Invalid asset literal", type);
                 return null;
             }
         }
+    } else {
+        console.error("Invalid data value", data)
         throw new Error("AssetInput data must be an array of asset literals");
     }
+    let availableAssets: ClientAsset[] = []
+    if (clientAssets !== null) {
+        availableAssets = clientAssets.filter(asset => data.includes(asset.type)) 
+    }
+    const selectOptions = availableAssets.map(asset => ({
+        label: asset.name,
+        value: asset
+    }))
     // Use EditorContext to get the current asset library and map it into an options list for Select element
     // Use if else to check if editorContext actually exists, if it doesnt just return empty list
     return (
-        null
+        <ThemedSelect options={selectOptions}/>
     )
 }
 

@@ -1,4 +1,5 @@
 import { FunctionComponent } from "react"
+import { PotreeAssetObject } from "../3d/asset_adapters/PotreeAssetObject"
 import DebugPlane from "../3d/DebugPlane"
 import { DepthKitObject } from "../3d/DepthKitObject"
 import InfoObject from "../3d/InfoObject"
@@ -31,7 +32,8 @@ export interface VaporComponent extends FunctionComponent<VaporComponentProps> {
 
 export const components = [
     TestObject,
-    PotreeObject,
+    // PotreeObject,
+    PotreeAssetObject,
     LinkObject,
     InfoObject,
     DepthKitObject,

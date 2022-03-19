@@ -36,9 +36,16 @@ export default function EditorAssetManager({postID, assets}: {postID?: string, a
                 <MagicButton className="h-9 md:h-9" onClick={async ()=>{
                     if((file !== null) && (uploadProgress === null)) {
                         setUploadProgress(0)
-                        await VaporAPI.uploadAsset(postID as string, file, (progress: number)=>{
-                            setUploadProgress(progress)
-                        })
+                        try {
+                            await VaporAPI.uploadAsset(postID as string, file, (progress: number)=>{
+                                setUploadProgress(progress)
+                            })
+                        } catch (e) {
+                            console.warn("Error uploading asset...")
+                            if (window.location.hostname !== "localhost") {
+                                throw e
+                            } 
+                        }
                         setUploadProgress(null)
                         clearFiles()
                     }

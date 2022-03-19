@@ -4,10 +4,11 @@ import MagicDiv from "../../utilities/MagicDiv";
 import { createElement, useState, useContext } from "react";
 import { v4 as uuidv4 } from 'uuid';
 import { KeyPressCallback, formatRGBCSS, useMultilang } from "../../../utilities";
-import { ThemeContext } from "../../App"
+import { Theme, ThemeContext } from "../../App"
 import { EditorContext } from "../EditorContext";
 import { ViewerContext } from "../../viewer/ViewerContext";
 import { components, VaporComponent, VaporInputsType } from "../../viewer/ComponentDeclarations"
+import { createSelectStyles } from "../utilities";
 
 function getDefaultInputs(inputObject:VaporInputsType) {
     var defaultInputs = {}
@@ -50,36 +51,7 @@ export default function EditorComponentGraph() {
     }))
 
     const {theme} = useContext(ThemeContext)
-    const customStyles = {
-        option: (provided, state) => ({
-            ...provided,
-            fontSize: "15px",
-            // backgroundColor: formatRGBCSS(theme.backgroundColor),
-            color: formatRGBCSS(theme.backgroundColor)
-        }),
-        control: (provided, state) => ({
-            // none of react-select's styles are passed to <Control />
-            ...provided,
-            borderRadius: "999px",
-            backgroundColor: formatRGBCSS(theme.foregroundColor),
-            color: formatRGBCSS(theme.foregroundColor)
-        }),
-        singleValue: (provided, state) => {
-            const opacity = state.isDisabled ? 0.5 : 1;
-            const transition = 'opacity 300ms';
-            const color = formatRGBCSS(theme.backgroundColor);
-            return { ...provided, opacity, transition, color };
-        },
-        menu: (provided, state) => ({
-            ...provided,
-            borderRadius: "20px",
-            overflow: "clip",
-            backgroundColor: formatRGBCSS(theme.foregroundColor),
-            color: formatRGBCSS(theme.backgroundColor),
-            // borderColor: formatRGBCSS(theme.backgroundColor),
-            borderWidth: "1px",
-        })
-    }
+    const customStyles = createSelectStyles(theme)
     return (
         <EditorEmbeddedWidget title={heading} stickyKey="compGraphExpanded">
             <KeyPressCallback keyName="Delete" onDown={()=>{

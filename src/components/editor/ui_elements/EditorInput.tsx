@@ -13,17 +13,14 @@ type EditorInputProps = {
     typeName: string
     value: any
     setValue: (value: any) => void
-    
+    data?: any
 }
 
-function EditorInput({propName, typeName, value, setValue}:EditorInputProps) {
+function EditorInput({propName, typeName, value, setValue, data}:EditorInputProps) {
     return (
         <MagicDiv className="flex flex-row gap-2">
             <div className="editor-input-label">{propName}</div>
-            <Input {...{typeName, value, setValue}}/>
-            {/* {
-                createElement(InputComponentMap[typeName], {value, setValue})
-            } */}
+            <Input {...{typeName, value, setValue, data}}/>
         </MagicDiv>
     )
 }

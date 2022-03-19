@@ -271,7 +271,9 @@ export function useBufferedPost (
                 // console.log("post updated")
                 if (!isEqual(post, postChangesRef.current)) {
                     // console.log("post changed")
-                    if (!isEqual(buffer, filterProps(post, props))) {
+                    const filtered = filterProps(post, props)
+                    if (!isEqual(buffer, filtered)) {
+                        console.warn("Buffer and post are not equal", buffer, filtered) // Todo: Fix broken overwrite warning
                         setOverwriteWarning(true)
                     }
                     postChangesRef.current = post

@@ -1,3 +1,6 @@
+import { formatRGBCSS } from "../../utilities"
+import { Theme } from "../App"
+
 function joinChildren(sceneChildren, childrenToUpdate) {
     // return new sceneChildren but with the children whose props.id is in updateChildren
     const idsToBeUpdated = childrenToUpdate.map(child => child.props.objectID)
@@ -43,6 +46,39 @@ function wrapOnBlur(onBlur:(e)=>void, context, id) {
             onBlur(event)
         }
     }
+}
+
+export function createSelectStyles(theme: Theme) {
+    return {
+        option: (provided, state) => ({
+            ...provided,
+            fontSize: "15px",
+            // backgroundColor: formatRGBCSS(theme.backgroundColor),
+            color: formatRGBCSS(theme.backgroundColor)
+        }),
+        control: (provided, state) => ({
+            // none of react-select's styles are passed to <Control />
+            ...provided,
+            borderRadius: "999px",
+            backgroundColor: formatRGBCSS(theme.foregroundColor),
+            color: formatRGBCSS(theme.foregroundColor)
+        }),
+        singleValue: (provided, state) => {
+            const opacity = state.isDisabled ? 0.5 : 1;
+            const transition = 'opacity 300ms';
+            const color = formatRGBCSS(theme.backgroundColor);
+            return { ...provided, opacity, transition, color };
+        },
+        menu: (provided, state) => ({
+            ...provided,
+            borderRadius: "20px",
+            overflow: "clip",
+            backgroundColor: formatRGBCSS(theme.foregroundColor),
+            color: formatRGBCSS(theme.backgroundColor),
+            // borderColor: formatRGBCSS(theme.backgroundColor),
+            borderWidth: "1px"
+        })
+    };
 }
 
 export { joinChildren, wrapOnClick, wrapOnHover, wrapOnBlur }
