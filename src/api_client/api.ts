@@ -210,4 +210,15 @@ export default class VaporAPI {
             updatedAt: docData.updatedAt.toDate().toISOString()
         }
     }
+
+    /**
+     * Resolves an asset's root path given a post ID and an asset ID
+     */
+    static resolveAsset(postID: string, assetID: string): string {
+        if (window.location.hostname === "localhost") {
+            return `http://localhost:5000/assets/${postID}/${assetID}/`
+        } else {
+            return `https://static.thelostmetropolis.org/${postID}/${assetID}/`
+        }
+    }
 }
