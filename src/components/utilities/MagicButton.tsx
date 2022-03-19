@@ -1,6 +1,6 @@
 import { SettingsContext, ThemeContext } from "../App"
 import { Fragment, useContext, useLayoutEffect, useRef, useState } from "react"
-import { formatRGBCSS } from "../../utilities"
+import { formatRGBCSS, useMounted } from "../../utilities"
 import { twMerge } from 'tailwind-merge'
 
 // Dynamically color div css attributes based on theme, but note that its not compatible with external transitions due to use of element css which overrides classes
@@ -17,6 +17,8 @@ function MagicButton({ languageSpecificChildren=null, style={}, solid=false, chi
     const buttonClassnames = `select-none px-4 rounded-3xl ${(disabled || pending) ? "opacity-50" : "md:hover:opacity-50 cursor-pointer"} font-serif font-bold md:text-xl h-9 md:h-10 transition-opacity duration-500`
     const solidButtonClassnames = ""
     const nonSolidButtonClassnames = "border bg-transparent"
+
+    const mountedRef = useMounted()
 
     // Show current calculated transition css property of div
     useLayoutEffect(() => {
@@ -38,7 +40,9 @@ function MagicButton({ languageSpecificChildren=null, style={}, solid=false, chi
                 } else if (onClick.constructor.name === "AsyncFunction") {
                     setPending(true)
                     await onClick(e)
-                    setPending(false)
+                    if (mountedRef.current === true) {
+                        setPending(false)
+                    }
                 }
             }} {...props} type="button" className={mergedClassNames} value={languageSpecificChildren ? languageSpecificChildren[settings.lang] : children} style={
                 autoColor ? {

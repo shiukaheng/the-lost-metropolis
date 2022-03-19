@@ -49,7 +49,10 @@ const onPostDocumentDelete = async (snapshot: QueryDocumentSnapshot, context: Ev
     })
 }
 
-export const handleNewFile = functions.region("asia-east1").storage.object().onFinalize(onNewFile)
+export const handleNewFile = functions.region("asia-east1").runWith({
+    timeoutSeconds: 540,
+    memory: "8GB"
+}).storage.object().onFinalize(onNewFile)
 export const handlePostDocumentDelete = functions.region("asia-east1").firestore.document("posts/{postID}").onDelete(onPostDocumentDelete)
 
 export type CullUnreferencedAssetData = {

@@ -1,5 +1,5 @@
 import { createElement, useContext, useState } from "react";
-import { formatRGBCSS } from "../../utilities";
+import { formatRGBCSS, useMounted } from "../../utilities";
 import { ThemeContext } from "../App";
 import { twMerge } from "tailwind-merge"
 
@@ -15,6 +15,7 @@ export default function MagicIcon({IconComponent, clickable=false, onClick=()=>{
     const {theme} = useContext(ThemeContext);
     const [onClickInProgress, setOnClickInProgress] = useState(false)
     const classnameList = ["h-5 w-5"]
+    const mountedRef = useMounted()
     if (clickable) {
         classnameList.push("cursor-pointer hover:opacity-50 transition-opacity duration-500");
     }
@@ -32,7 +33,9 @@ export default function MagicIcon({IconComponent, clickable=false, onClick=()=>{
                 if (onClick.constructor.name === "AsyncFunction") {
                     setOnClickInProgress(true)
                     await onClick()
-                    setOnClickInProgress(false)
+                    if (mountedRef.current === true) {
+                        setOnClickInProgress(false)
+                    }
                 } else {
                     onClick()
                 }

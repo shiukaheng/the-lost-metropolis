@@ -35,12 +35,10 @@ export default function EditorAssetManager({postID, assets}: {postID?: string, a
                 <MagicButton solid onClick={createPrompt} className="h-9 md:h-9 grow text-base md:text-base font-normal text-left">{(valid === false) ? invalidFile : (file?.name || chooseFile)}</MagicButton>
                 <MagicButton className="h-9 md:h-9" onClick={async ()=>{
                     if((file !== null) && (uploadProgress === null)) {
-                        console.log("Started upload")
                         setUploadProgress(0)
                         await VaporAPI.uploadAsset(postID as string, file, (progress: number)=>{
                             setUploadProgress(progress)
                         })
-                        console.log("Finished upload")
                         setUploadProgress(null)
                         clearFiles()
                     }

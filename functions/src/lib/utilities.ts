@@ -63,7 +63,8 @@ export async function unzipAsset(object: functions.storage.ObjectMetadata, postR
     if (!(typeof object.name === "string")) {
         throw new Error(`File ${object.name} does not have a valid name`);
     }
-    const zipDestination = path.resolve("compressed-asset");
+    const tempDir = "/tmp/";
+    const zipDestination = path.resolve(tempDir, "compressed-asset");
     console.log("Fetching zip from bucket");
     await bucket.file(object.name).download({
         destination: zipDestination
@@ -72,7 +73,7 @@ export async function unzipAsset(object: functions.storage.ObjectMetadata, postR
     console.log("Deleting zip from bucket")
     await bucket.file(object.name).delete();
     // Get the only folder in extracted-asset
-    const unzippedPath = path.resolve("extracted-asset");
+    const unzippedPath = path.resolve(tempDir, "extracted-asset");
     // Unzip to temp folder
     console.log("Unzipping")
     try {
@@ -153,7 +154,8 @@ export async function modifyAsset(postRef: FirebaseFirestore.DocumentReference<F
  * @param */
 export async function processAsset(unzippedPath: any, metadataFile: AssetMetadataFile, postRef: FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>, assetID: string) {
     const unzippedDataPath = path.resolve(unzippedPath, "data");
-    const convertedDataPath = path.resolve("converted_data");
+    const tempDir = "/tmp/";
+    const convertedDataPath = path.resolve(tempDir, "converted_data");
     const targetType = assetTypes.find(type => type.assetLiteral === metadataFile.targetAssetType);
     if (targetType === undefined) {
         throw new Error("Unrecognized target type");

@@ -100,7 +100,6 @@ export default class VaporAPI {
         // Get the post document's reference on firebase
         const postDocRef = doc(VaporAPI.postsRef, postID)
         // Use arrayUnion and addDoc to add the asset to the assets array
-        console.log(assetInstance)
         await updateDoc(postDocRef, { assets: arrayUnion(assetInstance) })
         // Use storageRef to upload the file to /<postID>/<assetID>, although the name is not important. Just to avoid collisions.
         const fileRef = ref(VaporAPI.storageRef, `${postID}/${assetID}`)
