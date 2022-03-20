@@ -1,3 +1,9 @@
+# Todo
+
+- Create asset uploading client
+- Make assets renameable and identifiable by ID -> Improve Assets schema and unify for frontend and backend
+- Make .vaps format support multiple assets within one file
+
 # Creating new types
 
 ## Asset types
