@@ -11,14 +11,18 @@ type PotreeObjectProps = VaporComponentProps & {
     pointSize?: number
     pointSizeType?: number
     pointShape?: number
+    getUrl?: (string) => string
 }
 
-export const PotreeObject: VaporComponent = ({cloudName="cloud.js", baseUrl, pointSize=1, pointSizeType=2, pointShape=2, ...props}:PotreeObjectProps) => {
+export const PotreeObject: VaporComponent = ({cloudName="cloud.js", baseUrl, pointSize=1, pointSizeType=2, pointShape=2, getUrl, ...props}:PotreeObjectProps) => {
     const {potree, setPointCloud: setManagerPointCloud} = useContext(PotreeContext)
     const [pointCloud, setPointCloud] = useState(null)
     const objectGroup = useRef(null)
     const isValid = useRef(true)
     const cloudIDRef = useRef<string>(null)
+    const defaultGetUrl = (relativeUrl) => {
+        return `${baseUrl}${relativeUrl}`
+    }
 
     // Use useEffect to update pointCloud variable on cloudName, baseUrl changes
     useEffect(()=>{
@@ -26,7 +30,7 @@ export const PotreeObject: VaporComponent = ({cloudName="cloud.js", baseUrl, poi
         // Request new point with new cloudName and baseUrl asynchronously, then update pointCloud. In the asynchrnous callback, check if isValid is true. If it is, set pointCloud to the new pointCloud.
         const loadNewPointCloud = async () => {
             try {
-                const newPointCloud = await potree.loadPointCloud(cloudName, relativeUrl => `${baseUrl}${relativeUrl}`)
+                const newPointCloud = await potree.loadPointCloud(cloudName, getUrl || defaultGetUrl)
                 if (isValid.current) {
                     // Update manager references
                     setManagerPointCloud(newPointCloud, cloudIDRef.current)

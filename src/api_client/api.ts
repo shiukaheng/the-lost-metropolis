@@ -216,7 +216,7 @@ export default class VaporAPI {
      */
     static resolveAsset(postID: string, assetID: string): string {
         if (window.location.hostname === "localhost") {
-            return `http://localhost:5000/assets/${postID}/${assetID}/`
+            return `http://localhost:5341/the-lost-metropolis-production-static/${postID}/${assetID}/`
         } else {
             return `https://static.thelostmetropolis.org/${postID}/${assetID}/`
         }

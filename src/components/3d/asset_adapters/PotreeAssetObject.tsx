@@ -14,6 +14,7 @@ type PotreeAssetObjectProps = VaporComponentProps & {
 
 export const PotreeAssetObject: VaporComponent = ({potreeAsset, ...props}: PotreeAssetObjectProps) => {
     // Check assets validity
+    console.log(potreeAsset)
     if (potreeAsset === null) {
         return null
     } else {

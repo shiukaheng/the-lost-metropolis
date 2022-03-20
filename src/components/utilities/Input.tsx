@@ -243,10 +243,13 @@ function AssetInput({value, setValue, data}) {
         label: asset.name,
         value: asset
     }))
+    console.log(selectOptions)
     // Use EditorContext to get the current asset library and map it into an options list for Select element
     // Use if else to check if editorContext actually exists, if it doesnt just return empty list
     return (
-        <ThemedSelect options={selectOptions}/>
+        <ThemedSelect className="flex-grow" options={selectOptions} onChange={(selectedOption, _)=>{
+            setValue(selectedOption.value)
+        }} value={selectOptions.find(entry => entry.value === value)}/>
     )
 }
 
@@ -281,7 +284,7 @@ function Input({typeName, value, setValue, data}:InputProps) {
     // setValue is the function to update the state of the parent component, only call when user input is valid
     // typeName is the type of the property, used to determine which input component to use
     return (
-        <MagicDiv className="flex flex-row gap-2">
+        <MagicDiv className="flex flex-row gap-2 flex-grow">
             {
                 createElement(InputComponentMap[typeName], {value, setValue, data})
             }
