@@ -5,7 +5,7 @@ import {
 import { range } from "lodash"
 import { createElement } from "react";
 import MagicDiv from '../utilities/MagicDiv';
-import { LinearToSRGB, SRGBToLinear } from '../../utilities';
+import { LinearToSRGB, SRGBToLinear, useLazyEffect } from '../../utilities';
 import { targetAssetLiteralSchema } from '../../../api/types/AssetLiteral';
 import { EditorContext } from '../editor/EditorContext';
 import { ClientAsset } from '../../api_client/types/ClientAsset';
@@ -243,6 +243,11 @@ function AssetInput({value, setValue, data}) {
         label: asset.name,
         value: asset
     }))
+    useLazyEffect(()=>{
+        if (!clientAssets.includes(value)) {
+            setValue(null)
+        }
+    }, [clientAssets])
     // Use EditorContext to get the current asset library and map it into an options list for Select element
     // Use if else to check if editorContext actually exists, if it doesnt just return empty list
     return (

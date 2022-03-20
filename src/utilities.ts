@@ -258,29 +258,28 @@ export function useBufferedPost (
     // Tracking changes to buffer / post
     const initialBufferRef = useRef(filteredPost)
     const postTriggersRef = useRef(0)
-    const postChangesRef = useRef<Post|null>(null)
+    const lastPostUpdateRef = useRef<Post|null>(null)
     const setBuffer = (newBuffer: Partial<Post>) => {
         // Inject
         _setBuffer(filterProps(newBuffer, props) as Partial<Post>)
         onBufferChange(newBuffer)
     }
     const [overwriteWarning, setOverwriteWarning] = useState(false)
-    useEffect(()=>{
-        if (post !== null) {
-            if (postTriggersRef.current > 0) {
-                // console.log("post updated")
-                if (!isEqual(post, postChangesRef.current)) {
-                    // console.log("post changed")
-                    const filtered = filterProps(post, props)
-                    if (!isEqual(buffer, filtered)) {
-                        console.warn("Buffer and post are not equal", buffer, filtered) // Todo: Fix broken overwrite warning
+    useEffect(()=>{ // Called whenever "post" updates
+        if (post !== null) { // Makes sure this update is not null, or else its kinda meaningless
+            if (postTriggersRef.current > 0) { // Check if this is NOT the first update. If it is the first update, just do some initializing
+                const filtered = filterProps(post, props)
+                const filteredOld = filterProps(lastPostUpdateRef.current, props)
+                if (!isEqual(filtered, filteredOld)) { // Okay, this is not the first update. Has the post's content actually changed since last time?
+                    if (!isEqual(buffer, filtered)) { // Okay the post content has actually changed! Well, have we changed the content in the meantime which would cause conflicts?
+                        console.warn("Buffer and post are not equal", buffer, filtered)
                         setOverwriteWarning(true)
                     }
-                    postChangesRef.current = post
+                    lastPostUpdateRef.current = post
                 }
             } else {
                 // Post initial update
-                postChangesRef.current = post
+                lastPostUpdateRef.current = post
             }
             postTriggersRef.current++
         }
@@ -440,4 +439,20 @@ export function useMounted() {
         }
     }, [])
     return mounted
+}
+
+export function useLazyEffect(callback, dependencyArray) { // Hacky workaround for the moment
+    const lastArrayContentRef = useRef(null)
+    const numUpdatesRef = useRef(0)
+    useEffect(()=>{
+        if (numUpdatesRef.current > 0) {
+            if (!isEqual(dependencyArray, lastArrayContentRef.current)) {
+                callback()
+            }
+        } else {
+            callback()
+            lastArrayContentRef.current = dependencyArray
+        }
+        numUpdatesRef.current++
+    }, dependencyArray)
 }
