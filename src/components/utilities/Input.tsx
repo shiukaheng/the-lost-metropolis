@@ -243,7 +243,6 @@ function AssetInput({value, setValue, data}) {
         label: asset.name,
         value: asset
     }))
-    console.log(selectOptions)
     // Use EditorContext to get the current asset library and map it into an options list for Select element
     // Use if else to check if editorContext actually exists, if it doesnt just return empty list
     return (
