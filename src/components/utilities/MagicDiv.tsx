@@ -3,6 +3,7 @@ import { useContext, useLayoutEffect, useRef, useState } from "react"
 import { formatRGBCSS } from "../../utilities"
 import { MultiLangString } from "../../../api/types/MultiLangString"
 import { CSSProperties } from "react"
+import { LanguageLiteral } from "../../../api/types/LanguageLiteral"
 
 interface MagicDivProps {
     debug?: boolean,
@@ -14,11 +15,12 @@ interface MagicDivProps {
     className?: string,
     mergeTransitions?: boolean,
     autoColor?: boolean,
-    overrideTheme?: Partial<Theme>
+    overrideTheme?: Partial<Theme>,
+    languageOverride?: LanguageLiteral
 }
 
 // Dynamically color div css attributes based on theme, but note that its not compatible with external transitions due to use of element css which overrides classes
-function MagicDiv({ debug=false, languageSpecificChildren, style={}, foregroundColorCSSProps=["color", "borderColor"], backgroundColorCSSProps=[], children=null, className="", mergeTransitions=false, autoColor=true, overrideTheme={}, ...props }: MagicDivProps) {
+function MagicDiv({ debug=false, languageSpecificChildren, style={}, foregroundColorCSSProps=["color", "borderColor"], backgroundColorCSSProps=[], children=null, className="", mergeTransitions=false, autoColor=true, overrideTheme={}, languageOverride, ...props }: MagicDivProps) {
     const {settings} = useContext(SettingsContext)
     const {theme: defaultTheme} = useContext<ThemeContextType>(ThemeContext)
     const theme = {...defaultTheme, ...overrideTheme}
@@ -47,7 +49,7 @@ function MagicDiv({ debug=false, languageSpecificChildren, style={}, foregroundC
                 ...style
             } : {...style}
         }>
-            {[languageSpecificChildren!==undefined ? languageSpecificChildren[settings.lang] : children].concat(mergeTransitions ? [<div ref={div} className={className} style={{display: "none"}} />].map((elem, index) => (Object.assign({}, elem, {key: index}))) : [])}
+            {[languageSpecificChildren!==undefined ? languageSpecificChildren[languageOverride || settings.lang] : children].concat(mergeTransitions ? [<div ref={div} className={className} style={{display: "none"}} />].map((elem, index) => (Object.assign({}, elem, {key: index}))) : [])}
         </div>
     );
 }

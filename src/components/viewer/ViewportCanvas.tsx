@@ -5,6 +5,7 @@ import CompositeSuspense from "../3d/subcomponents/CompositeSuspense"
 import { EditorContext } from "../editor/EditorContext"
 import { Canvas, useFrame, useThree } from "@react-three/fiber"
 import { ViewerContext } from "../viewer/ViewerContext"
+import { SettingsContext, ThemeContext } from "../App"
 
 function CameraHelper() {
     const {defaultCameraProps, cameraRef, audioListener} = useContext(ViewerContext)
@@ -41,7 +42,7 @@ function CameraHelper() {
 // Convenience component to provide common contexts to viewport children, in the future may include 3DTilesManager, NexusManager, etc which serves to manage 3DTilesObject and NexusObject on each render.
 // TODO: Provide a way to change the child manager's parameters, e.g. pointBudget, etc.
 function ViewportCanvas({children, ...props}) {
-    const ContextBridge = useContextBridge(EditorContext, ViewerContext)
+    const ContextBridge = useContextBridge(EditorContext, ViewerContext, SettingsContext, ThemeContext)
     const wrappedChildren = Children.map(children, (child) => (
         <CompositeSuspense>
             {child}

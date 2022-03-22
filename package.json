@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "source": "./src/index.html",
   "scripts": {
-    "start": "vite",
+    "start": "vite --host",
     "build": "vite build",
     "preview": "vite preview",
     "kill-ports": "kill-port --port 5333,5377,5355,5341,5366,4000,4500",

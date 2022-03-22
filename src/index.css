@@ -192,3 +192,10 @@ input[type="color"]::-webkit-color-swatch-wrapper {
 input[type="color"]::-webkit-color-swatch {
 	border: none;
 }
+
+div.firebase-emulator-warning {
+    top: 0;
+    height: 30px;
+    width: 200px !important;
+    overflow: hidden;
+}

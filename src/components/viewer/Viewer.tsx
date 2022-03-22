@@ -5,6 +5,8 @@ import { AudioListener } from "three"
 import { useStatefulDeserialize } from "../editor/ui_elements/EditorIO"
 import Viewport from "./Viewport"
 import { Post } from "../../../api/types/Post"
+import { useContextBridge } from "@react-three/drei"
+import { SettingsContext, ThemeContext } from "../App"
 
 /**
  * Non-visual component that manages the viewer state, including scene configuration and scene children.
@@ -71,7 +73,7 @@ function ViewerUI({post, children, ...props}: ViewerProps) {
             deserialize(post)
         }
     }, [post])
-    return (
+    return (    
         <Viewport {...props}>
             {sceneChildren}
             {children}

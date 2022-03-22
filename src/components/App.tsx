@@ -26,9 +26,10 @@ import { EditPost } from "./admin/EditPost";
 import LoadingScreen from "./utilities/LoadingScreen";
 import { preloadFont } from "troika-three-text";
 import UploadAssetPage from "./development/UploadAssetTest";
+import { LanguageLiteral } from '../../api/types/LanguageLiteral';
 
 export const defaultSettings = {
-    lang: "en"
+    lang: "en" as LanguageLiteral
 }
 
 export const languages = ["en", "zh"]

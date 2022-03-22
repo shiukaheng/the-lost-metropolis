@@ -12,7 +12,7 @@ type LoadingScreenProps = {
 
 export default function LoadingScreen({ready=false, children=null, loadingDivClassname="absolute"}:LoadingScreenProps) {
     const text = useMultilang({
-        en: "Loading...",
+        en: "loading...",
         zh: "載入中..."
     })
     return (
@@ -24,7 +24,7 @@ export default function LoadingScreen({ready=false, children=null, loadingDivCla
                     <div className={twMerge('h-full w-full flex justify-center items-center', loadingDivClassname)}>
                         <MagicDiv>
                             <Fade top cascade>
-                                <div className="text-5xl font-black">
+                                <div className="text-3xl md:text-5xl font-black">
                                     {text}
                                 </div>
                             </Fade>
