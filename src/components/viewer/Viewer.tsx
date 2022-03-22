@@ -9,9 +9,9 @@ import { Post } from "../../../api/types/Post"
 /**
  * Non-visual component that manages the viewer state, including scene configuration and scene children.
  */
-function ViewerManager({children}) {
+function ViewerManager({children, defaultCameraProps}: {children: any, defaultCameraProps?: DefaultCameraPropType}) {
     // Helps to manage Viewer state (camera initial position, post processing, etc), seperated to be reused in Editor and Viewer
-    const [defaultCameraProps, setDefaultCameraProps] = useState<DefaultCameraPropType>({
+    const [_defaultCameraProps, setDefaultCameraProps] = useState<DefaultCameraPropType>(defaultCameraProps || {
         position: [0,0,1],
         rotation: [0,0,0],
         fov: 50
@@ -54,7 +54,7 @@ function ViewerManager({children}) {
     const [potreeOptimisePointBudget, setPotreeOptimisePointBudget] = useState(false)
 
     return (
-        <ViewerContext.Provider value={{defaultCameraProps, setDefaultCameraProps, cameraRef, sceneChildren, setSceneChildren, addSceneChildren, removeSceneChildren, updateSceneChildren, audioListener, potreePointBudget, setPotreePointBudget, potreeOptimisePointBudget, setPotreeOptimisePointBudget}}>
+        <ViewerContext.Provider value={{defaultCameraProps: _defaultCameraProps, setDefaultCameraProps, cameraRef, sceneChildren, setSceneChildren, addSceneChildren, removeSceneChildren, updateSceneChildren, audioListener, potreePointBudget, setPotreePointBudget, potreeOptimisePointBudget, setPotreeOptimisePointBudget}}>
             {children}
         </ViewerContext.Provider>
     );
@@ -81,6 +81,7 @@ function ViewerUI({post, children, ...props}: ViewerProps) {
 
 interface ViewerProps {
     post?: Post
+    defaultCameraProps?: DefaultCameraPropType
     // Allow extra props to be passed to Viewport
     [key: string]: any
 }
@@ -88,10 +89,11 @@ interface ViewerProps {
 /**
  * Composite component that combines ViewerManager and ViewerUI
  */
-function Viewer({post, ...props}: ViewerProps) {
+function Viewer({post, className, style, children, ...props}: ViewerProps) {
+    console.log(props)
     return (
         <ViewerManager {...props}>
-            <ViewerUI post={post} {...props}/>
+            <ViewerUI post={post} {...{className, style, children}}/>
         </ViewerManager>
     )
 }
