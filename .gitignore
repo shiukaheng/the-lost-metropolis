@@ -25,3 +25,4 @@ yarn-error.log*
 
 # development
 /.parcel-cache
+/firebase-debug.log
