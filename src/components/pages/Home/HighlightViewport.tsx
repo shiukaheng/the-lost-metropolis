@@ -22,14 +22,14 @@ function FollowMouse({object, posOffsetIntensity=[1, 1], rotOffsetIntensity=[0, 
     })
 }
 
-function HighlightViewport({children, posOffsetIntensity=[1, 1], rotOffsetIntensity=[0, 0], lambda=2, captureMode="window", ...props}) {
+function HighlightViewport({children, posOffsetIntensity=[1, 1], rotOffsetIntensity=[0, 0], lambda=2, captureMode="window", followMouse=false, ...props}) {
     const rigRef = useRef(null)
     return (
         <div {...props}>
             {/* Todo: Need to replace this with something derived with ViewerManager */}
             <Canvas>
                 <PotreeManager>
-                    <FollowMouse object={rigRef} posOffsetIntensity={posOffsetIntensity} rotOffsetIntensity={rotOffsetIntensity} lambda={lambda} captureMode={captureMode}/>
+                    { followMouse && <FollowMouse object={rigRef} posOffsetIntensity={posOffsetIntensity} rotOffsetIntensity={rotOffsetIntensity} lambda={lambda} captureMode={captureMode}/> }
                     <group ref={rigRef}>
                         {children}
                     </group>

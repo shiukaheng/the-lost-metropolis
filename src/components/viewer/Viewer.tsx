@@ -4,7 +4,6 @@ import { DefaultCameraPropType, ViewerContext } from "./ViewerContext"
 import { AudioListener } from "three"
 import { useStatefulDeserialize } from "../editor/ui_elements/EditorIO"
 import Viewport from "./Viewport"
-import GameControls from "../utilities/GameControls"
 import { Post } from "../../../api/types/Post"
 
 /**
@@ -64,22 +63,24 @@ function ViewerManager({children}) {
 /**
  * Responsible for reading sceneChildren and configuration from ViewerContext, and providing GameControls.
  */
-function ViewerUI({post, ...props}: ViewerProps) {
+function ViewerUI({post, children, ...props}: ViewerProps) {
     const {sceneChildren} = useContext(ViewerContext)
     const deserialize = useStatefulDeserialize()
     useEffect(()=>{
-        deserialize(post)
+        if (post !== null && post !== undefined) {
+            deserialize(post)
+        }
     }, [post])
     return (
         <Viewport {...props}>
-            <GameControls force={10} friction={0.97}/>
             {sceneChildren}
+            {children}
         </Viewport>
     )
 }
 
 interface ViewerProps {
-    post: Post
+    post?: Post
     // Allow extra props to be passed to Viewport
     [key: string]: any
 }
