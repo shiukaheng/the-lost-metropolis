@@ -54,7 +54,7 @@ export function useRefState(initialValue) {
     const ref = useRef(initialValue);
     useEffect(()=>{
         ref.current = value;
-    }, value)
+    }, [value])
     return [ref, value, setValue]
 }
 
