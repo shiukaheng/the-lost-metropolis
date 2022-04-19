@@ -67,7 +67,7 @@ function getTempDir() {
  * @param object
  * @param postRef
  */
-export async function unzipAsset(object: functions.storage.ObjectMetadata, postRef: FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>): Promise<{ unzippedPath: string; metadataFile: AssetMetadataFile; }> {
+export async function unzipAsset(object: functions.storage.ObjectMetadata, postRef: admin.firestore.DocumentReference<admin.firestore.DocumentData>): Promise<{ unzippedPath: string; metadataFile: AssetMetadataFile; }> {
     // Download zip to current directory
     const bucket = admin.storage().bucket();
     if (!(typeof object.name === "string")) {
@@ -132,10 +132,10 @@ async function unzip(zip_destination: string, unzipped_path: string): Promise<vo
 /**
  * Updates asset from post document
  */
-export async function modifyAsset(postRef: FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>, assetID: string, modifier: (x: Asset) => Asset): Promise<void> {
+export async function modifyAsset(postRef: admin.firestore.DocumentReference<admin.firestore.DocumentData>, assetID: string, modifier: (x: Asset) => Asset): Promise<void> {
     const db = admin.firestore();
     try {
-        await db.runTransaction(async (transaction: FirebaseFirestore.Transaction) => {
+        await db.runTransaction(async (transaction: admin.firestore.Transaction) => {
             const postData = (await transaction.get(postRef)).data();
             if (!postDocDataSchema.isValidSync(postData)) {
                 throw new Error("Invalid post document");
@@ -161,7 +161,7 @@ export async function modifyAsset(postRef: FirebaseFirestore.DocumentReference<F
  * @param unzippedPath
  * @param metadataFile
  * @param */
-export async function processAsset(unzippedPath: any, metadataFile: AssetMetadataFile, postRef: FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>, assetID: string) {
+export async function processAsset(unzippedPath: any, metadataFile: AssetMetadataFile, postRef: admin.firestore.DocumentReference<admin.firestore.DocumentData>, assetID: string) {
     const unzippedDataPath = path.resolve(unzippedPath, "data");
     const tempDir = getTempDir();
     const convertedDataPath = path.resolve(tempDir, "converted_data");

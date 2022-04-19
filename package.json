@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "source": "./src/index.html",
   "scripts": {
+    "install": "cd functions && npm install",
     "start": "vite --host",
     "build": "vite build",
     "preview": "vite preview",
