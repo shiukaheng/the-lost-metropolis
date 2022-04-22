@@ -35,6 +35,8 @@ export default function NavigationBar(props) {
             <div className="flex justify-left flex-row md:flex-col">
                 <LoggedInFilter>
                     <MultiLangNavLink text={{"en": "dashboard", "zh": "管理"}} to="/dashboard"/>
+                    <MultiLangNavLink text={{"en": "browse", "zh": "瀏覽"}} to="/browse"/>
+                    <MultiLangNavLink text={{"en": "list", "zh": "列表"}} to="/list"/>
                 </LoggedInFilter>
                 <Condition condition={currentUser===null}>
                     <MultiLangNavLink text={{"en": "home", "zh": "首頁"}} to="/"/>
