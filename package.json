@@ -8,7 +8,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "kill-ports": "kill-port --port 5333,5377,5355,5341,5366,4000,4500",
-    "firebase-emu": "firebase emulators:start --only functions,firestore,storage,auth",
+    "firebase-emu": "firebase emulators:start --import=./data-path --export-on-exit --only functions,firestore,storage,auth",
     "functions-watch": "cd functions && npm run watch",
     "open-browser": "node ./scripts/open_browser.js",
     "dev": "yarn kill-ports && yarn concurrently \"yarn firebase-emu\" \"yarn start\" \"yarn functions-watch\" \"yarn open-browser\""
