@@ -19,7 +19,8 @@ export function naiveExport(post: Post): PostDocData {
         owner: post.owner,
         editors: post.editors,
         viewers: post.viewers,
-        public: post.public
+        public: post.public,
+        theme: post.theme,
     }
 }
 

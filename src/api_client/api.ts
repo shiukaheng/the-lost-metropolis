@@ -176,6 +176,7 @@ export default class VaporAPI {
      * @param cast whether to force cast to {@link PostDocData} or not, otherwise if {@link post} is not well formed it will throw an error
      * @returns a {@link PostDocData} object
      */
+    // TODO: Make exportPost and importPost more dynamic, just replacing the properties with unsupported data types with another.
     static exportPost(post: RecursivePartial<Post>, cast=false): PostDocData { // Always return a full PostDocData, for partial updates, use PostDocData mask
         if (postSchema.isValidSync(post)) {
             return naiveExport(post)
@@ -207,7 +208,8 @@ export default class VaporAPI {
             viewers: docData.viewers,
             public: docData.public,
             createdAt: docData.createdAt.toDate().toISOString(),
-            updatedAt: docData.updatedAt.toDate().toISOString()
+            updatedAt: docData.updatedAt.toDate().toISOString(),
+            theme: docData.theme,
         }
     }
 

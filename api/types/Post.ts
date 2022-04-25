@@ -55,7 +55,7 @@ import { userIDSchema } from "./UserID"
     editors: array(userIDSchema).required().default([]),
     viewers: array(userIDSchema).required().default([]),
     public: boolean().required().default(false),
-    theme: themeSchema,
+    theme: themeSchema.required(),
 })
 
 export type Post = InferType<typeof postSchema>
