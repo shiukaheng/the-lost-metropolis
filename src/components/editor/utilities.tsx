@@ -61,7 +61,8 @@ export function createSelectStyles(theme: Theme) {
             ...provided,
             borderRadius: "999px",
             backgroundColor: formatRGBCSS(theme.foregroundColor),
-            color: formatRGBCSS(theme.foregroundColor)
+            color: formatRGBCSS(theme.foregroundColor),
+            borderColor: formatRGBCSS(theme.foregroundColor),
         }),
         singleValue: (provided, state) => {
             const opacity = state.isDisabled ? 0.5 : 1;
@@ -75,7 +76,7 @@ export function createSelectStyles(theme: Theme) {
             overflow: "clip",
             backgroundColor: formatRGBCSS(theme.foregroundColor),
             color: formatRGBCSS(theme.backgroundColor),
-            // borderColor: formatRGBCSS(theme.backgroundColor),
+            borderColor: formatRGBCSS(theme.foregroundColor),
             borderWidth: "1px"
         })
     };

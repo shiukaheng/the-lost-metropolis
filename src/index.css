@@ -9,7 +9,7 @@
 }
 
 .editor-embedded-widget {
-    @apply border-b border-white py-2;
+    @apply border-b border-current py-2;
 }
 
 .page-margins {
@@ -135,7 +135,7 @@ input[type=number] {
 }
 
 .number-input-field {
-    @apply rounded-3xl w-20 px-2 bg-transparent border
+    @apply rounded-3xl w-20 px-2 bg-transparent border border-current
 }
 
 .string-input-cell {

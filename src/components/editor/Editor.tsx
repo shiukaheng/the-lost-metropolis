@@ -128,7 +128,7 @@ function EditorManager() {
             <KeyPressCallback keyName={"Escape"} onDown={()=>{setSelectedIDs([])}}/>
             <div className="flex flex-row absolute w-full h-full overflow-hidden">
                 <MagicDiv backgroundColorCSSProps={["backgroundColor"]} className="w-[450px] h-full flex flex-col overflow-clip select-none shrink-0 border-r">
-                    <div className="border-b border-white text-2xl font-bold p-8 pb-4">
+                    <div className="border-b border-current text-2xl font-bold p-8 pb-4">
                         <div className="flex flex-row gap-4">
                             <div className='text-3xl'>{heading}</div>
                             <Condition condition={post?.role === "owner" || post?.role === "editor"}>
