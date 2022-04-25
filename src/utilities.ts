@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useLayoutEffect, useContext, useCallback } from "react"
 import { AuthContext } from "./components/admin/AuthProvider";
-import { languages, SettingsContext, ThemeContext, ThemeContextType } from "./components/App";
+import { defaultTheme, languages, SettingsContext, ThemeContext, ThemeContextType } from "./components/App";
 import { ContentContext } from "./components/providers/ContentProvider";
 import { cloneDeep, isEqual, mapValues } from "lodash"
 import { useFrame } from "@react-three/fiber";
@@ -383,15 +383,14 @@ export const useTheme = (targetTheme) => {
     const {theme, setTheme} = useContext(ThemeContext)
     const originalThemeRef = useRef(theme)
     useEffect(()=>{
-        originalThemeRef.current = theme
         return (
             () => {
-                setTheme(originalThemeRef.current)
+                setTheme(defaultTheme)
             }
         )
     }, [])
     useEffect(()=>{
-        const newTheme = mergeTheme(originalThemeRef.current, targetTheme) as Theme
+        const newTheme = mergeTheme(defaultTheme, targetTheme) as Theme
         console.log(newTheme)
         setTheme(newTheme)
     }, [targetTheme])

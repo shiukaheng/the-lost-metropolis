@@ -183,7 +183,7 @@ function OptionalThemeColor({buffer, setBuffer, themePropName}) {
             }
         } } />
         {(buffer.theme[themePropName] !== null) && (
-            <Input className="grow-0" typeName="color" value={buffer.theme[themePropName].map(x => x/255)} setValue={(value) => setBuffer(applyTheme(buffer, { [themePropName]: value.map(x => Math.round(x*255)) }))} />
+            <Input data={{linear: false}} className="grow-0" typeName="color" value={buffer.theme[themePropName].map(x => x/255)} setValue={(value) => setBuffer(applyTheme(buffer, { [themePropName]: value.map(x => Math.round(x*255)) }))} />
         )}
     </div>;
 }
