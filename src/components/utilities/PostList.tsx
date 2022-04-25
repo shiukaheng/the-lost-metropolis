@@ -37,7 +37,7 @@ function PostList({posts, onPostClick=(post)=>{}, columnMakers=[], createButton=
     return (
         <div className="flex flex-col gap-4">
             <div className="flex flex-row gap-4">
-                <input type="text" value={searchTerm} placeholder={placeholder[settings.lang]} onChange={(e) => setSearchTerm(e.target.value)} className="w-full h-12 bg-transparent border rounded-3xl px-5 text-xl font-bold focus:outline-none placeholder-white placeholder-opacity-50"/>
+                <input type="text" value={searchTerm} placeholder={placeholder[settings.lang]} onChange={(e) => setSearchTerm(e.target.value)} className="w-full h-12 bg-transparent border border-current text-current rounded-3xl px-5 text-xl font-bold focus:outline-none placeholder-current placeholder-opacity-50"/>
                 <Condition condition={createButton}>
                     <MagicButton solid languageSpecificChildren={
                     {"en": "+ create post", "zh": "+ 新增文章"}
