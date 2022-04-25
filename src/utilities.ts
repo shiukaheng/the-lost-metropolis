@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useLayoutEffect, useContext, useCallback }
 import { AuthContext } from "./components/admin/AuthProvider";
 import { languages, SettingsContext, ThemeContext, ThemeContextType } from "./components/App";
 import { ContentContext } from "./components/providers/ContentProvider";
-import { cloneDeep, isEqual } from "lodash"
+import { cloneDeep, isEqual, mapValues } from "lodash"
 import { useFrame } from "@react-three/fiber";
 import { Post, postSchema } from "../api/types/Post";
 import VaporAPI from "./api_client/api";
@@ -12,6 +12,7 @@ import { Roled } from "../api/implementation_types/Role";
 import { MultiLangString } from "../api/types/MultiLangString";
 import { auth } from "./firebase-config.js"
 import { signOut } from "firebase/auth";
+import { Theme } from "../api/types/Theme";
 
 export function formatRGBCSS(color: number[]): string {
     return "rgb(" + color[0] + "," + color[1] + "," + color[2] + ")";
@@ -370,18 +371,30 @@ export const createEmptyMultilangString = () => {
     }, {})
 }
 
+function mergeTheme(defaultTheme, newTheme) {
+    // Merge default and new theme objects, with properties in new taking precedence. Although, if a property in new is null, fallback to default
+    return Object.keys(newTheme).reduce((obj, key) => {
+        obj[key] = newTheme[key] === null ? defaultTheme[key] : newTheme[key]
+        return obj
+    }, {})
+}
+
 export const useTheme = (targetTheme) => {
     const {theme, setTheme} = useContext(ThemeContext)
     const originalThemeRef = useRef(theme)
     useEffect(()=>{
         originalThemeRef.current = theme
-        setTheme(targetTheme)
         return (
             () => {
                 setTheme(originalThemeRef.current)
             }
         )
     }, [])
+    useEffect(()=>{
+        const newTheme = mergeTheme(originalThemeRef.current, targetTheme) as Theme
+        console.log(newTheme)
+        setTheme(newTheme)
+    }, [targetTheme])
 }
 
 export function Condition({condition, children}) {

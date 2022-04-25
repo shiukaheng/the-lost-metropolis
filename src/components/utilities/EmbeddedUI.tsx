@@ -64,7 +64,7 @@ export function EmbeddedRow({position="top", embedded=false, children=null, clas
 
 export function RoundedContainer({children=null, className="", direction="vertical"}) {
     return (
-        <div className={twMerge("rounded-3xl w-full h-full overflow-clip flex border place-content-between", (direction==="vertical" ? "flex-col" : direction==="horizontal" ? "flex-row" : ""), className)}>
+        <div className={twMerge("rounded-3xl w-full h-full overflow-clip flex border border-current place-content-between", (direction==="vertical" ? "flex-col" : direction==="horizontal" ? "flex-row" : ""), className)}>
             {children}
         </div>
     )

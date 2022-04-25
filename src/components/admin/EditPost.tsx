@@ -1,5 +1,5 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { Condition, useBufferedPost, useConfirm, useMultilang, usePost } from "../../utilities";
+import { Condition, useBufferedPost, useConfirm, useMultilang, usePost, useTheme } from "../../utilities";
 import GenericPage from "../utilities/GenericPage";
 import { Input } from "../utilities/Input";
 import MagicDiv from "../utilities/MagicDiv";
@@ -12,6 +12,20 @@ import MagicIcon from "../utilities/MagicIcon";
 import { ArrowsExpandIcon } from "@heroicons/react/outline";
 import { EmbeddedButton, EmbeddedRow, EmbeddedTabs, RoundedContainer } from "../utilities/EmbeddedUI";
 import VaporAPI from "../../api_client/api";
+import { Theme } from "../../../api/types/Theme";
+import { Post } from "../../../api/types/Post";
+import { defaultTheme } from "react-select";
+import { defaultTheme as vaporDefaultTheme } from "../App"
+
+function applyTheme(buffer:Partial<Post>, newTheme:Partial<Theme>): Partial<Post> {
+    return {
+        ...buffer,
+        theme: {
+            ...buffer.theme,
+            ...newTheme
+        } as Theme
+    }
+}
  
 export function EditPost() {
     const {id} = useParams()
@@ -59,7 +73,9 @@ function EditorSceneOverlay({hidden, value, setValue}) {
 function EditingForm({className="", editor3dMode=false}) {
     const { id } = useParams();
     const navigate = useNavigate()
-    const [buffer, setBuffer, post, push, pull, changed, overwriteWarning] = useBufferedPost(id, ["title", "description", "public"]);
+    const [buffer, setBuffer, post, push, pull, changed, overwriteWarning] = useBufferedPost(id, ["title", "description", "public", "theme"]);
+    // useTheme()
+    
     const titleLabel = useMultilang({"en": "title", "zh": "標題"});
     const descriptionLabel = useMultilang({"en": "description", "zh": "描述"});
     const publicLabel = useMultilang({"en": "public", "zh": "公開"});
@@ -72,6 +88,22 @@ function EditingForm({className="", editor3dMode=false}) {
         "en": "warning: the post has changed while you were editing. saving will overwrite the changes.",
         "zh": "注意: 您正在編輯的文章已經被修改，若按更新將覆蓋修改。"
     })
+    const enableBgColorLabel = useMultilang({
+        "en": "enable background color",
+        "zh": "啟用背景顏色"
+    })
+    const enableFgColorLabel = useMultilang({
+        "en": "enable foreground color",
+        "zh": "啟用前景顏色"
+    })
+    const bgColorLabel = useMultilang({
+        "en": "background color",
+        "zh": "背景顏色"
+    })
+    const fgColorLabel = useMultilang({
+        "en": "foreground color",
+        "zh": "前景顏色"
+    })
     const pullLabel = useMultilang({"en": "update to latest version", "zh": "獲取最新版本"});
     const [deleteLabel, deleteTrigger] = useConfirm(deleteDefaultLabel, deleteConfirmationLabel, deletePendingLabel, async ()=>{
         // console.log(id)
@@ -81,7 +113,7 @@ function EditingForm({className="", editor3dMode=false}) {
         await VaporAPI.deletePost(id)
         navigate("/dashboard")
     })
-    // console.log(buffer)
+    useTheme(buffer.theme)
     return (
         // Return table with inputs for title, description, and public
         <RoundedContainer className="relative">
@@ -113,6 +145,18 @@ function EditingForm({className="", editor3dMode=false}) {
                                 <Input typeName="boolean" value={buffer.public} setValue={(value) => setBuffer({...buffer, public: value})} />
                             </td>
                         </tr>
+                        <tr>
+                            <td>{bgColorLabel}</td>
+                            <td>
+                                <OptionalThemeColor buffer={buffer} setBuffer={setBuffer} themePropName={"backgroundColor"}/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>{fgColorLabel}</td>
+                            <td>
+                                <OptionalThemeColor buffer={buffer} setBuffer={setBuffer} themePropName={"foregroundColor"}/>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -124,4 +168,22 @@ function EditingForm({className="", editor3dMode=false}) {
             </Condition>
         </RoundedContainer>
     )
+}
+
+function OptionalThemeColor({buffer, setBuffer, themePropName}) {
+    if (!(buffer.theme)) {
+        return null
+    }
+    return <div className="flex flex-row gap-2">
+        <Input className="grow-0" typeName="boolean" value={buffer.theme[themePropName] !== null} setValue={(value) => {
+            if (value) {
+                setBuffer(applyTheme(buffer, { [themePropName]: vaporDefaultTheme[themePropName] }));
+            } else {
+                setBuffer(applyTheme(buffer, { [themePropName]: null }));
+            }
+        } } />
+        {(buffer.theme[themePropName] !== null) && (
+            <Input className="grow-0" typeName="color" value={buffer.theme[themePropName].map(x => x/255)} setValue={(value) => setBuffer(applyTheme(buffer, { [themePropName]: value.map(x => Math.round(x*255)) }))} />
+        )}
+    </div>;
 }

@@ -111,13 +111,13 @@
     border: 6px solid rgba(0, 0, 0, 0);
     background-clip: padding-box;
     border-radius: 9999px;
-    background-color: rgba(255, 255, 255, 0.5);
+    background-color: currentColor;
     transition: background-color 250ms ease-out;
 }
 
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-    background-color: rgba(255, 255, 255, 0.6);
+    background-color: currentColor;
 }
 
 /* Editor CSS */
@@ -139,7 +139,7 @@ input[type=number] {
 }
 
 .string-input-cell {
-    @apply rounded-3xl w-full bg-transparent px-2 border
+    @apply rounded-3xl w-full bg-transparent px-2 border border-current
 }
 
 .matrix-input {
@@ -163,7 +163,7 @@ input[type=number] {
 }
 
 .multiline-string-input-cell {
-    @apply rounded-3xl w-full bg-transparent p-2 border resize-none
+    @apply rounded-3xl w-full bg-transparent p-2 border resize-none border-current
 }
 
 .invalid {

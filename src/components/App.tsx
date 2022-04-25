@@ -27,6 +27,7 @@ import LoadingScreen from "./utilities/LoadingScreen";
 import { preloadFont } from "troika-three-text";
 import UploadAssetPage from "./development/UploadAssetTest";
 import { LanguageLiteral } from '../../api/types/LanguageLiteral';
+import { Theme } from '../../api/types/Theme';
 
 export const defaultSettings = {
     lang: "en" as LanguageLiteral
@@ -39,14 +40,14 @@ const defaultSettingsContext = {
     setSettings: (newSettings) => {},
 }
 
-export type Theme = {
-    backgroundColor: [number, number, number],
-    foregroundColor: [number, number, number],
-    backgroundVideo: string | null,
-    backgroundImage: string | null,
-    backgroundOpacity: number,
-    transitionDuration: number
-}
+// export type Theme = {
+//     backgroundColor: [number, number, number],
+//     foregroundColor: [number, number, number],
+//     backgroundVideo: string | null,
+//     backgroundImage: string | null,
+//     backgroundOpacity: number,
+//     transitionDuration: number
+// }
 
 export const defaultTheme: Theme = {
     backgroundColor: [0, 0, 0],

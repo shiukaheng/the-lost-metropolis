@@ -12,6 +12,7 @@ import { ClientAsset } from '../../api_client/types/ClientAsset';
 import Select from 'react-select';
 import { createSelectStyles } from '../editor/utilities';
 import { ThemedSelect } from './ThemedSelect';
+import { twMerge } from 'tailwind-merge';
 
 // Props for input elements:
 // value is the current value of the property, used to display the current value of the property in the editor
@@ -279,16 +280,17 @@ type InputProps = {
     value: any
     setValue: (value: any) => void
     data?: any
+    className: string
 }
 
-function Input({typeName, value, setValue, data}:InputProps) {
+function Input({typeName, value, setValue, data, className=""}:InputProps) {
     // Props:
     // propName is the display name of the property, used to display the name of the property in the editor
     // value is the current value of the property, used to display the current value of the property in the editor
     // setValue is the function to update the state of the parent component, only call when user input is valid
     // typeName is the type of the property, used to determine which input component to use
     return (
-        <MagicDiv className="flex flex-row gap-2 flex-grow">
+        <MagicDiv className={twMerge("flex flex-row gap-2 flex-grow", className)}>
             {
                 createElement(InputComponentMap[typeName], {value, setValue, data})
             }
