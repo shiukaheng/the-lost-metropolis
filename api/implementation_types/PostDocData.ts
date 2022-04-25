@@ -4,6 +4,7 @@ import { assetSchema } from "../types/Asset"
 import { makeRequiredMultiLangStringSchema } from "../types/MultiLangString"
 import { sceneConfigurationSchema } from '../types/SceneConfiguration';
 import { sceneChildSchema } from '../types/SceneChild';
+import { themeSchema } from '../types/Theme';
 
 
 // export type PostDocData = {
@@ -41,7 +42,8 @@ export const postDocDataSchema = object({
     owner: string().required(),
     editors: array(string()).required(),
     viewers: array(string()).required(),
-    public: boolean().required()
+    public: boolean().required(),
+    theme: themeSchema,
 })
 
 export type PostDocData = InferType<typeof postDocDataSchema>

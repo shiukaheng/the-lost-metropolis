@@ -87,7 +87,7 @@ function EditingForm({className="", editor3dMode=false}) {
         <RoundedContainer className="relative">
             <EditorSceneOverlay value={buffer.data} setValue={(value) => setBuffer({...buffer, data: value})} hidden={!editor3dMode}/>
             <EmbeddedTabs position="top" options={languages} activeOption={activeLanguage} onUpdate={setActiveLanguage} className="h-16"/>
-            <div className="px-8 py-8 flex flex-col gap-4 grow">
+            <div className="px-8 py-8 flex flex-col gap-4 grow overflow-y-scroll">
                 {overwriteWarning ? 
                 <div className="flex flex-row">
                     <div className="font-bold text-yellow-400">{overwriteLabel}</div>

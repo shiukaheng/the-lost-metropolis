@@ -4,6 +4,7 @@ import { makeRequiredMultiLangStringSchema } from "./MultiLangString";
 // import { permissionsSchema } from "./Permissions";
 import { sceneChildSchema } from "./SceneChild";
 import { sceneConfigurationSchema } from "./SceneConfiguration";
+import { themeSchema } from "./Theme";
 import { userIDSchema } from "./UserID"
 
 // TODO: Just unify Post shape with PostDocData shape, but allow different types. Easier to think about.
@@ -53,7 +54,8 @@ import { userIDSchema } from "./UserID"
     owner: userIDSchema.defined().default(""),
     editors: array(userIDSchema).required().default([]),
     viewers: array(userIDSchema).required().default([]),
-    public: boolean().required().default(false)
+    public: boolean().required().default(false),
+    theme: themeSchema,
 })
 
 export type Post = InferType<typeof postSchema>
