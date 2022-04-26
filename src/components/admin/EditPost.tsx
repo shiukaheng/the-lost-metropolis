@@ -113,7 +113,7 @@ function EditingForm({className="", editor3dMode=false}) {
         await VaporAPI.deletePost(id)
         navigate("/dashboard")
     })
-    useTheme(buffer.theme)
+    // useTheme(buffer.theme)
     return (
         // Return table with inputs for title, description, and public
         <RoundedContainer className="relative">

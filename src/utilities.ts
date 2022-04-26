@@ -371,12 +371,12 @@ export const createEmptyMultilangString = () => {
     }, {})
 }
 
-function mergeTheme(defaultTheme, newTheme) {
+export function mergeThemes(defaultTheme: Theme, newTheme): Theme {
     // Merge default and new theme objects, with properties in new taking precedence. Although, if a property in new is null, fallback to default
     return Object.keys(newTheme).reduce((obj, key) => {
         obj[key] = newTheme[key] === null ? defaultTheme[key] : newTheme[key]
         return obj
-    }, {})
+    }, {}) as Theme
 }
 
 export function removeThemeTransition(theme: Theme) {
@@ -398,7 +398,7 @@ export const useTheme = (targetTheme: null | Theme) => {
     }, [])
     useEffect(()=>{
         if (targetTheme !== null) {
-            const newTheme = mergeTheme(defaultTheme, targetTheme) as Theme
+            const newTheme = mergeThemes(defaultTheme, targetTheme) as Theme
             if (changesRef.current <= 1) {
                 setTheme(removeThemeTransition(newTheme))
                 console.log("Initial theme set", newTheme)

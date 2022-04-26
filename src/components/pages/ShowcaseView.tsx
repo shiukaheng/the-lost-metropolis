@@ -5,7 +5,7 @@ import SwipeableViews from 'react-swipeable-views';
 import { useParams } from 'react-router';
 import { useNavigate } from 'react-router-dom';
 import { defaultTheme, ThemeContext } from '../App';
-import { formatRGBCSS, useTheme } from '../../utilities';
+import { formatRGBCSS, mergeThemes, removeThemeTransition, useTheme } from '../../utilities';
 import { ContentContext } from '../providers/ContentProvider';
 import LoadingScreen from '../utilities/LoadingScreen';
 import MagicDiv from '../utilities/MagicDiv';
@@ -27,7 +27,7 @@ function ShowcasePanel() {
     const { theme } = useContext(ThemeContext);
     const { id } = useParams();
     const navigate = useNavigate();
-    const [overrideTheme, setOverrideTheme] = useState(null);
+    const { setTheme, changesRef } = useContext(ThemeContext)
     // If no specified ID, show the first post. If no posts, set activeID and activeIndex to null
     const [activeID, setActiveID] = useState(id || (posts && posts.length > 0 ? posts[0].id : null));
     // If has activeID, find the index of the post with that ID, otherwise set to null
@@ -36,13 +36,27 @@ function ShowcasePanel() {
         setActiveID(posts[index].id);
         navigate(`/browse/${posts[index].id}`);
     }
-    useEffect(()=>{
-        const theme = posts && posts.find(post => post.id === activeID)?.data.theme
-        if (themeSchema.isValidSync(theme)) {
-            setOverrideTheme(theme);
+
+    // Hotfix for applying theme when no id is specified, when url based theme detection doesn't work
+    useEffect(()=>{ // Needs to be put in useEffect because it sets state in the context
+        const postTheme = posts?.find(post => post.id === activeID)?.data?.theme || defaultTheme;
+        const fixedPostTheme = mergeThemes(defaultTheme, postTheme);
+        if (id === undefined) {
+            if (changesRef.current <= 2) {
+                setTheme(removeThemeTransition(fixedPostTheme));
+            } else {
+                setTheme(fixedPostTheme);
+            }
         }
-    }, [activeID])
-    useTheme(overrideTheme);
+    }, [])
+    
+    // useEffect(()=>{
+    //     const theme = posts && posts.find(post => post.id === activeID)?.data.theme
+    //     if (themeSchema.isValidSync(theme)) {
+    //         setOverrideTheme(theme);
+    //     }
+    // }, [activeID])
+    // useTheme(overrideTheme);
     // TODO: Fix the case of potentially null activeIndex
     return (
         <div className="w-full h-full relative">

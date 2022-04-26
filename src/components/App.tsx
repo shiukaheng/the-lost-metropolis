@@ -1,17 +1,17 @@
 import { MainRouter } from './MainRouter';
 
 // import React from "react" // Not sure why this is required but ok
-import { BrowserRouter as Router, Route } from "react-router-dom";
+import { BrowserRouter as Router, Route, useLocation, useParams } from "react-router-dom";
 import NavigationBar from "./utilities/NavigationBar"
 import AppContainer from "./utilities/AppContainer"
 import { useNavigate } from 'react-router-dom';
-import { useState, createContext, useLayoutEffect, useContext, MutableRefObject, useRef } from "react";
+import { useState, createContext, useLayoutEffect, useContext, MutableRefObject, useRef, useEffect } from "react";
 import MagicDiv from "./utilities/MagicDiv";
 import Background from "./utilities/Background";
 import AnimatedSwitch from "./utilities/AnimatedSwitch";
 import { FC } from "react";
 import View from "./pages/View";
-import { formatRGBCSS, KeyPressCallback, useStickyState } from "../utilities";
+import { formatRGBCSS, KeyPressCallback, mergeThemes, removeThemeTransition, useStickyState } from "../utilities";
 import Login from "./admin/Login";
 
 // All pages
@@ -90,19 +90,25 @@ preloadFont(
 
 export function App() {
     // Theme defines the background color and foreground color, as well as the background video. It is not persistent between sessions and is defined by what content the user is viewing.
+    
     const [theme, _setTheme] = useState(defaultTheme)
     const changesRef = useRef(0)
     const setTheme = (newTheme: Theme) => {
         _setTheme(newTheme)
         changesRef.current++
     }
+
     // Settings defines user preferences persistent between sessions.
+
     const [settings, setSettings] = useStickyState(defaultSettings, "settings")
-    // set background color on body element
+
+    // Set background color on body element
+
     useLayoutEffect(() => {
         const body = document.querySelector("body")
         body.style.backgroundColor = formatRGBCSS(theme.backgroundColor)
     }, [theme.backgroundColor])
+
     return (
         <AuthProvider>
             <ContentProvider>
@@ -119,6 +125,7 @@ export function App() {
 function SiteRouter() {
     const posts = useContext(ContentContext)
     return <Router>
+        <ThemeSetter/>
         <LoadingScreen ready={posts !== null}>
             <div className="absolute w-full h-full">
                 <AnimatedSwitch pathPreprocessor={(path) => {
@@ -156,4 +163,34 @@ function SiteRouter() {
             </div>
         </LoadingScreen>
     </Router>;
+}
+
+function ThemeSetter() {
+    const { theme, setTheme, changesRef } = useContext(ThemeContext)
+    const posts = useContext(ContentContext)
+
+    // Detect theme from url (perhaps better than using component logic)
+    // Whenever URL changes or post list changes, update theme
+    // Url rules: /browse/<id> : Get theme with post with id
+    //            /edit/<id> : Get theme with post with id
+    //            /view/<id> : Get theme with post with id
+    //            Anything else: Use default theme
+
+    const location = useLocation()
+    useEffect(()=>{
+        const id = location.pathname.split("/")[2]
+        if (id && posts) {
+            const post = posts.find(p => p.id === id)
+            if (post?.data.theme) {
+                if (changesRef.current <= 1) {
+                    setTheme(removeThemeTransition(mergeThemes(defaultTheme, post.data.theme)))
+                } else {
+                    setTheme(mergeThemes(defaultTheme, post.data.theme))
+                }
+            }
+        } else {
+            setTheme(defaultTheme)
+        }
+    }, [location.pathname, posts])
+    return null
 }

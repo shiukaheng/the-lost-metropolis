@@ -155,11 +155,12 @@ input[type=number] {
 }
 
 .color-input-cell {
-    @apply rounded-3xl overflow-clip cursor-pointer
+    @apply rounded-3xl overflow-clip cursor-pointer outline-1 outline-current outline transition-[outline-color]
 }
 
 .boolean-input-field {
     transform: translate(0px,8px);
+    accent-color: currentColor;
 }
 
 .multiline-string-input-cell {
