@@ -92,7 +92,6 @@ interface ViewerProps {
  * Composite component that combines ViewerManager and ViewerUI
  */
 function Viewer({post, className, style, children, ...props}: ViewerProps) {
-    console.log(props)
     return (
         <ViewerManager {...props}>
             <ViewerUI post={post} {...{className, style, children}}/>

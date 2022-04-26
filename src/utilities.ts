@@ -379,20 +379,36 @@ function mergeTheme(defaultTheme, newTheme) {
     }, {})
 }
 
-export const useTheme = (targetTheme) => {
-    const {theme, setTheme} = useContext(ThemeContext)
-    const originalThemeRef = useRef(theme)
+export function removeThemeTransition(theme: Theme) {
+    return {
+        ...theme,
+        transitionDuration: 0
+    }
+}
+
+export const useTheme = (targetTheme: null | Theme) => {
+    const {theme, setTheme, changesRef} = useContext(ThemeContext)
     useEffect(()=>{
         return (
             () => {
                 setTheme(defaultTheme)
+                console.log("Reverted to default theme", defaultTheme)
             }
         )
     }, [])
     useEffect(()=>{
-        const newTheme = mergeTheme(defaultTheme, targetTheme) as Theme
-        console.log(newTheme)
-        setTheme(newTheme)
+        if (targetTheme !== null) {
+            const newTheme = mergeTheme(defaultTheme, targetTheme) as Theme
+            if (changesRef.current <= 1) {
+                setTheme(removeThemeTransition(newTheme))
+                console.log("Initial theme set", newTheme)
+            } else {
+                setTheme(newTheme)
+                console.log("Theme changed", newTheme)
+            }
+            
+            
+        }
     }, [targetTheme])
 }
 

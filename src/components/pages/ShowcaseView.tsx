@@ -1,5 +1,5 @@
 import ShowcaseContentCard from './ShowcaseView/ShowcaseCard';
-import { useState, useContext, useEffect } from 'react';
+import { useState, useContext, useEffect, useLayoutEffect } from 'react';
 import {ArrowLeftIcon, ArrowRightIcon} from '@heroicons/react/outline';
 import SwipeableViews from 'react-swipeable-views';
 import { useParams } from 'react-router';
@@ -27,8 +27,7 @@ function ShowcasePanel() {
     const { theme } = useContext(ThemeContext);
     const { id } = useParams();
     const navigate = useNavigate();
-    const [overrideTheme, setOverrideTheme] = useState(defaultTheme);
-
+    const [overrideTheme, setOverrideTheme] = useState(null);
     // If no specified ID, show the first post. If no posts, set activeID and activeIndex to null
     const [activeID, setActiveID] = useState(id || (posts && posts.length > 0 ? posts[0].id : null));
     // If has activeID, find the index of the post with that ID, otherwise set to null
@@ -38,8 +37,10 @@ function ShowcasePanel() {
         navigate(`/browse/${posts[index].id}`);
     }
     useEffect(()=>{
-        console.log("Apply theme for", activeID);
-        posts && setOverrideTheme(themeSchema.cast(posts.find(post => post.id === activeID).data.theme));
+        const theme = posts && posts.find(post => post.id === activeID)?.data.theme
+        if (themeSchema.isValidSync(theme)) {
+            setOverrideTheme(theme);
+        }
     }, [activeID])
     useTheme(overrideTheme);
     // TODO: Fix the case of potentially null activeIndex

@@ -5,7 +5,7 @@ import { BrowserRouter as Router, Route } from "react-router-dom";
 import NavigationBar from "./utilities/NavigationBar"
 import AppContainer from "./utilities/AppContainer"
 import { useNavigate } from 'react-router-dom';
-import { useState, createContext, useLayoutEffect, useContext } from "react";
+import { useState, createContext, useLayoutEffect, useContext, MutableRefObject, useRef } from "react";
 import MagicDiv from "./utilities/MagicDiv";
 import Background from "./utilities/Background";
 import AnimatedSwitch from "./utilities/AnimatedSwitch";
@@ -60,12 +60,15 @@ export const defaultTheme: Theme = {
 
 export type ThemeContextType = {
     theme: Theme,
-    setTheme: (newTheme: Theme) => void
+    setTheme: (newTheme: Theme) => void,
+    // changes ref provide reference to a number that tracks how many times the theme has changed
+    changesRef: MutableRefObject<number>,
 }
 
 const defaultThemeContext: ThemeContextType = {
     theme: defaultTheme,
     setTheme: (newTheme: Theme) => {},
+    changesRef: { current: 0 },
 }
 
 export const ThemeContext = createContext<ThemeContextType>(defaultThemeContext)
@@ -85,10 +88,14 @@ preloadFont(
     }
 )
 
-
 export function App() {
     // Theme defines the background color and foreground color, as well as the background video. It is not persistent between sessions and is defined by what content the user is viewing.
-    const [theme, setTheme] = useState(defaultTheme)
+    const [theme, _setTheme] = useState(defaultTheme)
+    const changesRef = useRef(0)
+    const setTheme = (newTheme: Theme) => {
+        _setTheme(newTheme)
+        changesRef.current++
+    }
     // Settings defines user preferences persistent between sessions.
     const [settings, setSettings] = useStickyState(defaultSettings, "settings")
     // set background color on body element
@@ -100,7 +107,7 @@ export function App() {
         <AuthProvider>
             <ContentProvider>
                 <SettingsContext.Provider value={{settings, setSettings}}>
-                    <ThemeContext.Provider value={{theme, setTheme}}>
+                    <ThemeContext.Provider value={{theme, setTheme, changesRef}}>
                         <SiteRouter/>
                     </ThemeContext.Provider>
                 </SettingsContext.Provider>
