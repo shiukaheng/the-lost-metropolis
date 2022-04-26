@@ -167,11 +167,11 @@ export async function processAsset(unzippedPath: any, metadataFile: AssetMetadat
     const convertedDataPath = path.resolve(tempDir, "converted_data");
     const targetType = assetTypes.find(type => type.assetLiteral === metadataFile.targetAssetType);
     if (targetType === undefined) {
-        throw new Error("Unrecognized target type");
+        throw new Error(`Unrecognized target type ${metadataFile.targetAssetType}`);
     }
     const sourceType = assetTypes.find(type => type.assetLiteral === metadataFile.sourceAssetType);
     if (sourceType === undefined) {
-        throw new Error("Unrecognized source type");
+        throw new Error(`Unrecognized source type ${metadataFile.sourceAssetType}`);
     }
     if (metadataFile.sourceAssetType === metadataFile.targetAssetType) {
         sourceType.validate(metadataFile.assetData, unzippedDataPath);

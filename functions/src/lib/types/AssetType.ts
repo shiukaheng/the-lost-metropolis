@@ -1,4 +1,5 @@
 import { AssetLiteral } from "../../../../api/types/AssetLiteral";
+import { Nexus } from "./asset_types/Nexus";
 import { Potree2 } from "./asset_types/Potree2";
 
 export type AssetConverterFunction = (
@@ -26,4 +27,4 @@ export abstract class AssetType {
 
 
 
-export const assetTypes: (typeof AssetType)[] = [Potree2]
+export const assetTypes: (typeof AssetType)[] = [Potree2, Nexus]

@@ -1,4 +1,5 @@
 import { FunctionComponent } from "react"
+import { NexusAssetObject } from "../3d/asset_adapters/NexusAssetObject"
 import { PotreeAssetObject } from "../3d/asset_adapters/PotreeAssetObject"
 import DebugPlane from "../3d/DebugPlane"
 import { DepthKitObject } from "../3d/DepthKitObject"
@@ -40,6 +41,7 @@ export const components = [
     DepthKitObject,
     DebugPlane,
     NexusObject,
+    NexusAssetObject,
 ]
 
 export function getComponentFromTypeName(componentType): VaporComponent {

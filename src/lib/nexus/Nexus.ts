@@ -22,11 +22,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-import corto from './corto.em.js?worker'
-import meco from './meco.js?worker'
+import cortoWorker from './corto.em.js?worker'
+import mecoWorker from './meco.js?worker'
 import {BufferGeometry, BufferAttribute, Mesh, Vector3, Sphere, MeshLambertMaterial, MeshBasicMaterial, DataTexture, RGBFormat, VertexColors, Vector2, Box3, Ray} from "three"
 
-// var work = require('webworkify')
+let corto, meco
 
 let Nexus = function() {
 
@@ -49,6 +49,7 @@ let Nexus = function() {
     }
     
     function loadMeco() {
+        meco = mecoWorker()
         meco.onerror = function(e) { console.log(e); }
         meco.requests = {};
         meco.count = 0;
@@ -76,6 +77,7 @@ let Nexus = function() {
     }
     
     function loadCorto() {
+        corto = cortoWorker()
         corto.requests = {};
         corto.count = 0;
         corto.postRequest = function(node) {
