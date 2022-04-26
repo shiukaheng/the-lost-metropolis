@@ -1,14 +1,15 @@
 import ShowcaseContentCard from './ShowcaseView/ShowcaseCard';
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import {ArrowLeftIcon, ArrowRightIcon} from '@heroicons/react/outline';
 import SwipeableViews from 'react-swipeable-views';
 import { useParams } from 'react-router';
 import { useNavigate } from 'react-router-dom';
-import { ThemeContext } from '../App';
-import { formatRGBCSS } from '../../utilities';
+import { defaultTheme, ThemeContext } from '../App';
+import { formatRGBCSS, useTheme } from '../../utilities';
 import { ContentContext } from '../providers/ContentProvider';
 import LoadingScreen from '../utilities/LoadingScreen';
 import MagicDiv from '../utilities/MagicDiv';
+import { themeSchema } from '../../../api/types/Theme';
 
 function ShowcaseView() {
     const posts = useContext(ContentContext);
@@ -26,6 +27,7 @@ function ShowcasePanel() {
     const { theme } = useContext(ThemeContext);
     const { id } = useParams();
     const navigate = useNavigate();
+    const [overrideTheme, setOverrideTheme] = useState(defaultTheme);
 
     // If no specified ID, show the first post. If no posts, set activeID and activeIndex to null
     const [activeID, setActiveID] = useState(id || (posts && posts.length > 0 ? posts[0].id : null));
@@ -35,6 +37,11 @@ function ShowcasePanel() {
         setActiveID(posts[index].id);
         navigate(`/browse/${posts[index].id}`);
     }
+    useEffect(()=>{
+        console.log("Apply theme for", activeID);
+        posts && setOverrideTheme(themeSchema.cast(posts.find(post => post.id === activeID).data.theme));
+    }, [activeID])
+    useTheme(overrideTheme);
     // TODO: Fix the case of potentially null activeIndex
     return (
         <div className="w-full h-full relative">
