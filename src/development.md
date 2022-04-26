@@ -35,6 +35,15 @@ Asset types (e.g. Potree2) are format specifications for a collection of asset f
 
 VaporComponent types are special 3D components that have extra logic that allows it to be recognized in the Editor and allows prop editing
 
+- To create a new VaporComponent:
+  - Create a new file in /src/components/3d
+  - After the function definition, be sure to add the following extra properties to the function:
+    - displayName: The component type name displayed in the editor
+    - componentType: An identifying string for the component type
+    - inputs: An object describing the inputs to the component, including the type and default values; read by the Editor
+  - Update /api/types/ComponentLiterals.ts to include the new componentType string
+  - Add the component to the "components" export in src/components/viewer/ComponentDeclarations.tsx
+
 # Improvements
 
 - Currently ViewerContext and EditorContext are just one big object with unrelated functionality, and some setValue functions are even passed down, causing some infinite rendering loop issues if setting of one property affects the value of another. Should seperate these into different contexts, but the reason why I initially structured like this is for ease of use. Perhaps find a state management library to improve this? Using useLazyEffect custom hook to get around this but is incredibly hacky. Basically does deep check of dependencyArray to see if the value has actually changed, and only actually call the callback if it did change. Will have impact on performance since these comparisons are not cheap if the dependencies are complex.

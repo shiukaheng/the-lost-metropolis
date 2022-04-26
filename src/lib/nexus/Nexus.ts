@@ -24,10 +24,11 @@ THE SOFTWARE.
 
 import corto from './corto.em.js?worker'
 import meco from './meco.js?worker'
+import {BufferGeometry, BufferAttribute, Mesh, Vector3, Sphere, MeshLambertMaterial, MeshBasicMaterial, DataTexture, RGBFormat, VertexColors, Vector2, Box3, Ray} from "three"
 
 // var work = require('webworkify')
 
-Nexus = function() {
+let Nexus = function() {
 
     /* WORKER INITIALIZED ONCE */
     
@@ -185,7 +186,7 @@ Nexus = function() {
     
     /* PRIORITY QUEUE */
     
-    PriorityQueue = function(max_length) {
+    let PriorityQueue = function(max_length) {
         this.error = new Float32Array(max_length);
         this.data = new Int32Array(max_length);
         this.size = 0;
@@ -288,7 +289,7 @@ Nexus = function() {
     
     /* MESH DEFINITION */
     
-    Mesh = function() {
+    let Mesh = function() {
         var t = this;
         t.onLoad = null;
         t.reqAttempt = 0;
@@ -327,7 +328,7 @@ Nexus = function() {
                 function() { console.log("Open request abort!");}
             );
         },
-    
+        
         httpRequest: function(start, end, load, error, abort, type) {
             if(!type) type = 'arraybuffer';
             var r = new XMLHttpRequest();
@@ -439,7 +440,7 @@ Nexus = function() {
         },
     
         importAttribute: function(view) {
-            var a = {};
+            var a = {} as any;
             a.type = view.getUint8(view.offset++, true);
             a.size = view.getUint8(view.offset++, true);
             a.glType = attrGlMap[a.type];
@@ -504,7 +505,7 @@ Nexus = function() {
         }
     };
     
-    Instance = function(gl) {
+    let Instance = function(gl) {
         this.gl = gl;
         this.onLoad = function() {};
         this.onUpdate = null;
@@ -1343,31 +1344,22 @@ THE SOFTWARE.
 
 function nocenter() { throw "Centering and in general applying matrix to geometry is unsupported."; }
 
-export function NexusObject(url, onLoad, onUpdate, renderer, material=undefined) {
+export function OldNexusObject(url, onLoad, onUpdate, renderer, material=undefined) {
 	if(onload !== null && typeof(onLoad) == 'object')
 		throw "NexusObject constructor has been changed.";
 
 	var gl = renderer.getContext();
-	var geometry = new THREE.BufferGeometry();
+	var geometry = new BufferGeometry();
 
 	geometry.center = nocenter;
 
-/*
-function() { 
-                var s = 1/instance.mesh.sphere.radius;
-                var pos = instance.mesh.sphere.center;
-                mesh.position.set(-pos[0]*s, -pos[1]*s, -pos[2]*s);
-                mesh.scale.set(s, s, s); 
-};
-*/
-
 	var positions = new Float32Array(3);
-	geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+	geometry.setAttribute('position', new BufferAttribute(positions, 3));
 
 	if(!material)
 		this.autoMaterial = true;
 
-	THREE.Mesh.call( this, geometry, material);
+	Mesh.call( this, geometry, material);
 	this.frustumCulled = false;
 
 	var mesh = this;
@@ -1375,55 +1367,48 @@ function() {
 	instance.open(url);
 	instance.onLoad = function() {
 		var c = instance.mesh.sphere.center;
-		var center = new THREE.Vector3(c[0], c[1], c[2]);
+		var center = new Vector3(c[0], c[1], c[2]);
 		var radius = instance.mesh.sphere.radius;
 
-		geometry.boundingSphere = new THREE.Sphere(center, radius);
+		geometry.boundingSphere = new Sphere(center, radius);
 		geometry.boundingBox = mesh.computeBoundingBox();
 
 		if(mesh.autoMaterial)
-			mesh.material = new THREE.MeshLambertMaterial( { color: 0xffffff } );
+			mesh.material = new MeshLambertMaterial( { color: 0xffffff } );
 
 		if(this.mesh.vertex.normal) {
 			var normals = new Float32Array(3);
-			geometry.setAttribute( 'normal', new THREE.BufferAttribute(normals, 3));
+			geometry.setAttribute( 'normal', new BufferAttribute(normals, 3));
 		}
-		let materialType = this.mesh.vertex.normal? THREE.MeshLambertMaterial : THREE.MeshBasicMaterial;
+		let materialType = this.mesh.vertex.normal? MeshLambertMaterial : MeshBasicMaterial;
 
 		if(this.mesh.vertex.color && this.mesh.vertex.texCoord) {
 			var uv = new Float32Array(2);
 			var colors = new Float32Array(4);
-			geometry.setAttribute( 'uv', new THREE.BufferAttribute(uv, 2));
-			geometry.setAttribute( 'color', new THREE.BufferAttribute(colors, 4));
+			geometry.setAttribute( 'uv', new BufferAttribute(uv, 2));
+			geometry.setAttribute( 'color', new BufferAttribute(colors, 4));
 			if(mesh.autoMaterial) {
-				var texture = new THREE.DataTexture( new Uint8Array([1, 1, 1]), 1, 1, THREE.RGBFormat );
+				var texture = new DataTexture( new Uint8Array([1, 1, 1]), 1, 1, RGBFormat );
 				texture.needsUpdate = true;
-				mesh.material = new materialType( { vertexColors: THREE.VertexColors, map: texture } );
+				mesh.material = new materialType( { vertexColors: VertexColors, map: texture } );
 			}
 		}
 		else if(this.mesh.vertex.color) {
 			var colors = new Float32Array(4);
-			geometry.setAttribute( 'color', new THREE.BufferAttribute(colors, 4));
+			geometry.setAttribute( 'color', new BufferAttribute(colors, 4));
 			if(mesh.autoMaterial)
-				mesh.material = new materialType({ vertexColors: THREE.VertexColors });
+				mesh.material = new materialType({ vertexColors: VertexColors });
 		}
 		else if(this.mesh.vertex.texCoord) {
 			var uv = new Float32Array(2);
-			geometry.setAttribute( 'uv', new THREE.BufferAttribute(uv, 2));
+			geometry.setAttribute( 'uv', new BufferAttribute(uv, 2));
 			if(mesh.autoMaterial) {
-				var texture = new THREE.DataTexture( new Uint8Array([1, 1, 1]), 1, 1, THREE.RGBFormat );
+				var texture = new DataTexture( new Uint8Array([1, 1, 1]), 1, 1, RGBFormat );
 				texture.needsUpdate = true;
 				mesh.material = new materialType( { color: 0xffffff, map: texture } );
 			}
 		}
 
-		//this seems not to be needed to setup the attributes and shaders
-/*
-		if(this.mesh.face.index) {
-			var indices = new Uint32Array(3);
-			geometry.setIndex(new THREE.BufferAttribute( indices, 3) );
-		}
-*/
 		if(onLoad) onLoad(mesh);
 	};
 	instance.onUpdate = function() { onUpdate(this) };
@@ -1431,182 +1416,404 @@ function() {
 	this.onAfterRender = onAfterRender;
 }
 
-function onAfterRender(renderer, scene, camera, geometry, material, group) {
-	var gl = renderer.getContext();
-	var instance = geometry.instance;
-	if(!instance || !instance.isReady) return;
-	var s = new THREE.Vector2();
-	renderer.getSize(s);
-	instance.updateView([0, 0, s.width, s.height], 
-	camera.projectionMatrix.elements, 
-	this.modelViewMatrix.elements);
+// Redo of NexusObject for ES6
+export class NexusObject extends Mesh {
+    constructor(url: string, onLoad, onUpdate, renderer, material=undefined) {
+        if (onLoad !== null && typeof(onLoad) == 'object') {
+            throw "NexusObject constructor has been changed."
+        }
+        const gl = renderer.getContext();
+        const geometry = new BufferGeometry();
+        geometry.center = nocenter;
 
-	var program = renderer.getContext().getParameter(gl.CURRENT_PROGRAM);
-	var attr = instance.attributes;
-	attr.position = renderer.getContext().getAttribLocation(program, "position");
-	attr.normal   = renderer.getContext().getAttribLocation(program, "normal");
-	attr.color    = renderer.getContext().getAttribLocation(program, "color");
-	attr.uv       = renderer.getContext().getAttribLocation(program, "uv");
-	attr.size     = renderer.getContext().getUniformLocation(program, "size");
-	attr.scale    = renderer.getContext().getUniformLocation(program, "scale");
+        const positions = new Float32Array(3);
+        geometry.setAttribute('position', new BufferAttribute(positions, 3))
+        
+        super(geometry, material)
+        this.autoMaterial = !!material
+        this.frustumCulled = false
 
-	//hack to detect if threejs using point or triangle shaders
-	instance.mode = attr.size ? "POINT" : "FILL";
-	if(attr.size != -1) 
-		instance.pointsize = material.size;
+        const instance = this.geometry.instance = new Nexus.Instance(gl)
+        instance.open(url)
+        instance.onLoad = () => {
+            const c = instance.mesh.sphere.center
+            const center = new Vector3(c[0], c[1], c[2])
+            const radius = instance.mesh.sphere.radius
+            geometry.boundingSphere = new Sphere(center, radius)
+            geometry.boundingBox = this.computeBoundingBox()
+            if (this.autoMaterial) {
+                this.material = new MeshLambertMaterial({color: 0xffffff})
+            }
+            if (this.mesh.vertex.normal) {
+                const normals = new Float32Array(3)
+                geometry.setAttribute('normal', new BufferAttribute(normals, 3))
+            }
+            let materialType = this.mesh.vertex.normal ? MeshLambertMaterial : MeshBasicMaterial
+            if (this.mesh.vertex.color && this.mesh.vertex.texCoord) {
+                const uv = new Float32Array(2)
+                const color = new Float32Array(4)
+                geometry.setAttribute('uv', new BufferAttribute(uv, 2))
+                geometry.setAttribute('color', new BufferAttribute(colors, 4))
+                if (this.autoMaterial) {
+                    const texture = new DataTexture(new Uint8Array([1,1,1]), 1, 1, RGBFormat)
+                    texture.needsUpdate = true
+                    this.material = new materialType({vertexColors: VertexColors, map: texture})
+                }
+            } else if (this.mesh.vertex.color) {
+                const colors = new Float32Array(4)
+                geometry.setAttribute('color', new BufferAttribute(colors, 4))
+                if (this.autoMaterial) {
+                    this.material = new materialType({vertexColors: VertexColors})
+                }
+            } else if (this.mesh.vertex.texCoord) {
+                var uv = new Float32Array(2)
+                geometry.setAttribute('uv', new BufferAttribute(uv, 2))
+                if (this.autoMaterial) {
+                    const texture = new DataTexture(new Uint8Array([1, 1, 1]), 1, 1, RGBFormat)
+                    texture.needsUpdate = true
+                    this.material = new materialType({color: 0xffffff, map: texture})
+                }
+            }
+            if (onLoad) {
+                onLoad(mesh)
+            }
+        }
+        instance.onUpdate = () => {
+            onUpdate(this)
+        }
+    }
 
-	//can't find docs or code on how material.scale is computed in threejs.
-	if(attr.scale != -1)
-		instance.pointscale = 2.0;
+    onAfterRender(renderer, scene, camera, geometry, material, group) {
+        const gl = renderer.getContext()
+        const instance = geometry.instance
+        if (!instance || !instance.isReady) {
+            return
+        }
+        const s = new Vector2()
+        renderer.getSize(s)
+        instance.updateView([0, 0, s.width, s.height], camera.projectionMatrix.elements, this.modelViewMatrix.elements)
+        const program = renderer.getContext().getParameter(gl.CURRENT_PROGRAM)
+        const attr = instance.attributes
+        attr.position = renderer.getContext().getAttribLocation(program, "position");
+        attr.normal   = renderer.getContext().getAttribLocation(program, "normal");
+        attr.color    = renderer.getContext().getAttribLocation(program, "color");
+        attr.uv       = renderer.getContext().getAttribLocation(program, "uv");
+        attr.size     = renderer.getContext().getUniformLocation(program, "size");
+        attr.scale    = renderer.getContext().getUniformLocation(program, "scale");
+        instance.mode = attr.size ? "POINT" : "FILL";
+        if(attr.size != -1) 
+            instance.pointsize = material.size;
 
-	instance.render();
-	Nexus.updateCache(renderer.getContext());
+        //can't find docs or code on how material.scale is computed in threejs.
+        if(attr.scale != -1)
+            instance.pointscale = 2.0;
+
+        instance.render();
+        Nexus.updateCache(renderer.getContext());
+    }
+
+    dispose() {
+        const instance = this.geometry?.instance
+        const context = instance?.context
+        const mesh = instance?.mesh
+        if (instance) {
+            Nexus.flush(context, mesh)
+            for( var i = 0; i < context.meshes.length; i++) {
+                if ( context.meshes[i] === mesh) {
+                    context.meshes.splice(i, 1); 
+                    break;
+                }
+            }
+        }
+        if (this.geometry) {
+            this.geometry.instance = null;
+            this.geometry.dispose();
+        }
+    }
+
+    georef(url) {
+        const obj = new XMLHttpRequest();
+        obj.overrideMimeType("application/json")
+        obj.open('GET', url, true)
+        obj.onreadystatechange = () => {
+            if (obj.readyState === 4 && obj.status === "200") {
+                this.georef = JSON.parse(obj.responseText)
+                const o = this.georef.origin
+                this.position.set(o[0], o[1], o[2])
+            }
+        }
+        obj.send(null)
+    }
+
+    computeBoundingBox() {
+        const instance = this.geometry.instance
+        const nexus = instance.mesh
+        if (!nexus.sphere) return
+
+        let min = new Vector3(+Infinity, +Infinity, +Infinity);
+        let max = new Vector3(-Infinity, -Infinity, -Infinity);
+
+        const array = new Float32Array(nexus.sink-1)
+        // Check last level of spheres
+        let count = 0;
+
+        for (let i = 0; i < nexus.sink; i++) {
+            const patch = nexus.nfirstpatch[i];
+            if (nexus.patches[patch*3] != nexus.sink)
+                continue;
+            const x = nexus.nspheres[i*5];
+            const y = nexus.nspheres[i*5+1];
+            const z = nexus.nspheres[i*5+2];
+            const r = nexus.nspheres[i*5+4]; //tight radius
+            if (x-r < min.x) min.x = x-r;
+            if (y-r < min.y) min.y = y-r;
+            if (z-r < min.z) min.z = z-r;
+            if (x-r > max.x) max.x = x+r;
+            if (y-r > max.y) max.y = y+r;
+            if (z-r > max.z) max.z = z+r;
+        }
+
+        return new Box3(min, max);
+    }
+
+    raycast(raycaster, intersects) {
+        if(!this.geometry.instance) return;
+
+        const nexus = this.geometry.instance.mesh;
+        if(!nexus.sphere) return;
+    
+        var sp = nexus.sphere;
+        var c = sp.center;
+        var center = new Vector3(c[0], c[1], c[2]);
+        var sphere = new Sphere(center, sp.radius);
+        var m = new Matrix4();
+        m.getInverse(this.matrixWorld);
+        var ray = new Ray();
+        ray.copy(raycaster.ray).applyMatrix4(m);
+    
+        var point = new Vector3(0, 0, 0);
+        var distance = -1.0;
+        var intersect = raycaster.ray.intersectSphere( sphere );
+        if(!intersect)
+            return;
+    
+        if(!nexus.sink || !nexus.basei) {
+            //no mesh loaded, we can still use the sphere.
+            intersect.applyMatrix4(this.matrixWorld);
+            var d = intersect.distanceTo(raycaster.ray.origin);
+            if(d < raycaster.near || d > raycaster.far )  
+                distance = d;
+    
+        } else {
+    
+            var vert = nexus.basev;
+            var face = nexus.basei;
+    
+            for(var j = 0; j < nexus.basei.length; j += 3) {
+                var a = face[j];
+                var b = face[j+1];
+                var c = face[j+2];
+                var A = new Vector3(vert[a*3], vert[a*3+1], vert[a*3+2]);
+                var B = new Vector3(vert[b*3], vert[b*3+1], vert[b*3+2]);
+                var C = new Vector3(vert[c*3], vert[c*3+1], vert[c*3+2]);
+                //TODO use material to determine if using doubleface or not!
+                var hit  = ray.intersectTriangle( C, B, A, false, point ); 
+                if(!hit) continue;
+    
+                //check distances in world space
+                intersect.applyMatrix4(this.matrixWorld);
+                var d = intersect.distanceTo(raycaster.ray.origin);
+                if(d < raycaster.near || d > raycaster.far ) continue;
+                if(distance == -1.0 || d < distance) {
+                    distance = d;
+                    intersect = hit;
+                }
+            }
+        }
+    
+        if(distance == -1.0) return;
+        intersects.push({ distance: distance, point: intersect, object: this} );
+        return;
+    }
+        
 }
 
+// function onAfterRender(renderer, scene, camera, geometry, material, group) {
+// 	var gl = renderer.getContext();
+// 	var instance = geometry.instance;
+// 	if(!instance || !instance.isReady) return;
+// 	var s = new Vector2();
+// 	renderer.getSize(s);
+// 	instance.updateView([0, 0, s.width, s.height], 
+// 	camera.projectionMatrix.elements, 
+// 	this.modelViewMatrix.elements);
 
-NexusObject.prototype = Object.create(THREE.Mesh.prototype);
+// 	var program = renderer.getContext().getParameter(gl.CURRENT_PROGRAM);
+// 	var attr = instance.attributes;
+// 	attr.position = renderer.getContext().getAttribLocation(program, "position");
+// 	attr.normal   = renderer.getContext().getAttribLocation(program, "normal");
+// 	attr.color    = renderer.getContext().getAttribLocation(program, "color");
+// 	attr.uv       = renderer.getContext().getAttribLocation(program, "uv");
+// 	attr.size     = renderer.getContext().getUniformLocation(program, "size");
+// 	attr.scale    = renderer.getContext().getUniformLocation(program, "scale");
 
-NexusObject.prototype.dispose = function() {
-	var instance = this.geometry.instance;
-	var context = instance.context;
-	var mesh = instance.mesh;
-	Nexus.flush(context, mesh);
-	for( var i = 0; i < context.meshes.length; i++) {
-		if ( context.meshes[i] === mesh) {
-			context.meshes.splice(i, 1); 
-			break;
-		}
-	}
-	this.geometry.instance = null;
-	this.geometry.dispose();
-}
+// 	//hack to detect if threejs using point or triangle shaders
+// 	instance.mode = attr.size ? "POINT" : "FILL";
+// 	if(attr.size != -1) 
+// 		instance.pointsize = material.size;
 
-NexusObject.prototype.georef = function(url) {
-	var n = this;
-	var obj = new XMLHttpRequest();
-	obj.overrideMimeType("application/json");
-	obj.open('GET', url, true);
-	obj.onreadystatechange = function () {
-		if (obj.readyState == 4 && obj.status == "200") {
-			this.georef = JSON.parse(obj.responseText);
-			var o = this.georef.origin;
-			n.position.set(o[0], o[1], o[2]);
-		}
-	};
-	obj.send(null);  
-}
+// 	//can't find docs or code on how material.scale is computed in threejs.
+// 	if(attr.scale != -1)
+// 		instance.pointscale = 2.0;
 
-NexusObject.prototype.computeBoundingBox = function() {
-	var instance = this.geometry.instance;
-	var nexus = instance.mesh;
-	if(!nexus.sphere) return;
+// 	instance.render();
+// 	Nexus.updateCache(renderer.getContext());
+// }
 
 
-	var min = new THREE.Vector3( + Infinity, + Infinity, + Infinity );
-	var max = new THREE.Vector3( - Infinity, - Infinity, - Infinity );
+// NexusObject.prototype = Object.create(Mesh.prototype);
 
-	var array = new Float32Array(nexus.sink-1);
-	//check last level of spheres
-	var count = 0;
-	for(var i = 0; i < nexus.sink; i++) {
-		var patch = nexus.nfirstpatch[i];
-		if(nexus.patches[patch*3] != nexus.sink)
-			continue;
-		var x = nexus.nspheres[i*5];
-		var y = nexus.nspheres[i*5+1];
-		var z = nexus.nspheres[i*5+2];
-		var r = nexus.nspheres[i*5+4]; //tight radius
-		if(x-r < min.x) min.x = x-r;
-		if(y-r < min.y) min.y = y-r;
-		if(z-r < min.z) min.z = z-r;
-		if(x-r > max.x) max.x = x+r;
-		if(y-r > max.y) max.y = y+r;
-		if(z-r > max.z) max.z = z+r;
+// NexusObject.prototype.dispose = function() {
+// 	var instance = this.geometry.instance;
+// 	var context = instance.context;
+// 	var mesh = instance.mesh;
+// 	Nexus.flush(context, mesh);
+// 	for( var i = 0; i < context.meshes.length; i++) {
+// 		if ( context.meshes[i] === mesh) {
+// 			context.meshes.splice(i, 1); 
+// 			break;
+// 		}
+// 	}
+// 	this.geometry.instance = null;
+// 	this.geometry.dispose();
+// }
 
-	}
-	return new THREE.Box3(min, max);
-}
+// NexusObject.prototype.georef = function(url) {
+// 	var n = this;
+// 	var obj = new XMLHttpRequest();
+// 	obj.overrideMimeType("application/json");
+// 	obj.open('GET', url, true);
+// 	obj.onreadystatechange = function () {
+// 		if (obj.readyState == 4 && obj.status == "200") {
+// 			this.georef = JSON.parse(obj.responseText);
+// 			var o = this.georef.origin;
+// 			n.position.set(o[0], o[1], o[2]);
+// 		}
+// 	};
+// 	obj.send(null);  
+// }
+
+// NexusObject.prototype.computeBoundingBox = function() {
+// 	var instance = this.geometry.instance;
+// 	var nexus = instance.mesh;
+// 	if(!nexus.sphere) return;
 
 
-NexusObject.prototype.raycast = function(raycaster, intersects) {
-	if(!this.geometry.instance) return;
+// 	var min = new Vector3( + Infinity, + Infinity, + Infinity );
+// 	var max = new Vector3( - Infinity, - Infinity, - Infinity );
 
-	var nexus = this.geometry.instance.mesh;
-	if(!nexus.sphere) return;
+// 	var array = new Float32Array(nexus.sink-1);
+// 	//check last level of spheres
+// 	var count = 0;
+// 	for(var i = 0; i < nexus.sink; i++) {
+// 		var patch = nexus.nfirstpatch[i];
+// 		if(nexus.patches[patch*3] != nexus.sink)
+// 			continue;
+// 		var x = nexus.nspheres[i*5];
+// 		var y = nexus.nspheres[i*5+1];
+// 		var z = nexus.nspheres[i*5+2];
+// 		var r = nexus.nspheres[i*5+4]; //tight radius
+// 		if(x-r < min.x) min.x = x-r;
+// 		if(y-r < min.y) min.y = y-r;
+// 		if(z-r < min.z) min.z = z-r;
+// 		if(x-r > max.x) max.x = x+r;
+// 		if(y-r > max.y) max.y = y+r;
+// 		if(z-r > max.z) max.z = z+r;
 
-	var sp = nexus.sphere;
-	var c = sp.center;
-	var center = new THREE.Vector3(c[0], c[1], c[2]);
-	var sphere = new THREE.Sphere(center, sp.radius);
-	var m = new THREE.Matrix4();
-	m.getInverse(this.matrixWorld);
-	var ray = new THREE.Ray();
-	ray.copy(raycaster.ray).applyMatrix4(m);
+// 	}
+// 	return new Box3(min, max);
+// }
 
-	var point = new THREE.Vector3(0, 0, 0);
-	var distance = -1.0;
-	var intersect = raycaster.ray.intersectSphere( sphere );
-	if(!intersect)
-		return;
 
-	if(!nexus.sink || !nexus.basei) {
-		//no mesh loaded, we can still use the sphere.
-		intersect.applyMatrix4(this.matrixWorld);
-		var d = intersect.distanceTo(raycaster.ray.origin);
-		if(d < raycaster.near || d > raycaster.far )  
-			distance = d;
+// NexusObject.prototype.raycast = function(raycaster, intersects) {
+// 	if(!this.geometry.instance) return;
 
-	} else {
+// 	var nexus = this.geometry.instance.mesh;
+// 	if(!nexus.sphere) return;
 
-		var vert = nexus.basev;
-		var face = nexus.basei;
+// 	var sp = nexus.sphere;
+// 	var c = sp.center;
+// 	var center = new Vector3(c[0], c[1], c[2]);
+// 	var sphere = new Sphere(center, sp.radius);
+// 	var m = new Matrix4();
+// 	m.getInverse(this.matrixWorld);
+// 	var ray = new Ray();
+// 	ray.copy(raycaster.ray).applyMatrix4(m);
 
-		for(var j = 0; j < nexus.basei.length; j += 3) {
-			var a = face[j];
-			var b = face[j+1];
-			var c = face[j+2];
-			var A = new THREE.Vector3(vert[a*3], vert[a*3+1], vert[a*3+2]);
-			var B = new THREE.Vector3(vert[b*3], vert[b*3+1], vert[b*3+2]);
-			var C = new THREE.Vector3(vert[c*3], vert[c*3+1], vert[c*3+2]);
-			//TODO use material to determine if using doubleface or not!
-			var hit  = ray.intersectTriangle( C, B, A, false, point ); 
-			if(!hit) continue;
+// 	var point = new Vector3(0, 0, 0);
+// 	var distance = -1.0;
+// 	var intersect = raycaster.ray.intersectSphere( sphere );
+// 	if(!intersect)
+// 		return;
 
-			//check distances in world space
-			intersect.applyMatrix4(this.matrixWorld);
-			var d = intersect.distanceTo(raycaster.ray.origin);
-			if(d < raycaster.near || d > raycaster.far ) continue;
-			if(distance == -1.0 || d < distance) {
-				distance = d;
-				intersect = hit;
-			}
-		}
-	}
+// 	if(!nexus.sink || !nexus.basei) {
+// 		//no mesh loaded, we can still use the sphere.
+// 		intersect.applyMatrix4(this.matrixWorld);
+// 		var d = intersect.distanceTo(raycaster.ray.origin);
+// 		if(d < raycaster.near || d > raycaster.far )  
+// 			distance = d;
 
-	if(distance == -1.0) return;
-	intersects.push({ distance: distance, point: intersect, object: this} );
-	return;
+// 	} else {
 
-/* Kept for reference, should we want to implement a raycasting on the higher resolution nodes 
+// 		var vert = nexus.basev;
+// 		var face = nexus.basei;
 
-	var distance = -1.0;
-	for(var i = 0; i < nexus.sink; i++) {
-		var patch = nexus.nfirstpatch[i];
-		if(nexus.patches[patch*3] != nexus.sink)
-			continue;
-		var x = nexus.nspheres[i*5];
-		var y = nexus.nspheres[i*5+1];
-		var z = nexus.nspheres[i*5+2];
-		var r = nexus.nspheres[i*5+4]; //tight radius
-		var sphere = new THREE.Sphere(new THREE.Vector3(x, y, z), r);
+// 		for(var j = 0; j < nexus.basei.length; j += 3) {
+// 			var a = face[j];
+// 			var b = face[j+1];
+// 			var c = face[j+2];
+// 			var A = new Vector3(vert[a*3], vert[a*3+1], vert[a*3+2]);
+// 			var B = new Vector3(vert[b*3], vert[b*3+1], vert[b*3+2]);
+// 			var C = new Vector3(vert[c*3], vert[c*3+1], vert[c*3+2]);
+// 			//TODO use material to determine if using doubleface or not!
+// 			var hit  = ray.intersectTriangle( C, B, A, false, point ); 
+// 			if(!hit) continue;
 
-		if (ray.intersectsSphere( sphere ) != false ) {
-			var d = sphere.center.lengthSq();
-			if(distance == -1.0 || d < distance)
-				distance = d;
-		}
-	}
-	if(distance == -1.0) return;
+// 			//check distances in world space
+// 			intersect.applyMatrix4(this.matrixWorld);
+// 			var d = intersect.distanceTo(raycaster.ray.origin);
+// 			if(d < raycaster.near || d > raycaster.far ) continue;
+// 			if(distance == -1.0 || d < distance) {
+// 				distance = d;
+// 				intersect = hit;
+// 			}
+// 		}
+// 	}
 
-	intersects.push({ distance: distance, object: this} ); */
-}
+// 	if(distance == -1.0) return;
+// 	intersects.push({ distance: distance, point: intersect, object: this} );
+// 	return;
+
+// /* Kept for reference, should we want to implement a raycasting on the higher resolution nodes 
+
+// 	var distance = -1.0;
+// 	for(var i = 0; i < nexus.sink; i++) {
+// 		var patch = nexus.nfirstpatch[i];
+// 		if(nexus.patches[patch*3] != nexus.sink)
+// 			continue;
+// 		var x = nexus.nspheres[i*5];
+// 		var y = nexus.nspheres[i*5+1];
+// 		var z = nexus.nspheres[i*5+2];
+// 		var r = nexus.nspheres[i*5+4]; //tight radius
+// 		var sphere = new THREE.Sphere(new THREE.Vector3(x, y, z), r);
+
+// 		if (ray.intersectsSphere( sphere ) != false ) {
+// 			var d = sphere.center.lengthSq();
+// 			if(distance == -1.0 || d < distance)
+// 				distance = d;
+// 		}
+// 	}
+// 	if(distance == -1.0) return;
+
+// 	intersects.push({ distance: distance, object: this} ); */
+// }

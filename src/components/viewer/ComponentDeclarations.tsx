@@ -4,6 +4,7 @@ import DebugPlane from "../3d/DebugPlane"
 import { DepthKitObject } from "../3d/DepthKitObject"
 import InfoObject from "../3d/InfoObject"
 import { LinkObject } from "../3d/LinkObject"
+import { NexusObject } from "../3d/NexusObject"
 import { PotreeObject } from "../3d/PotreeObject"
 import { TestObject } from "../3d/TestObject"
 import { EditorInputType } from "./ArgumentTypes"
@@ -37,7 +38,8 @@ export const components = [
     LinkObject,
     InfoObject,
     DepthKitObject,
-    DebugPlane
+    DebugPlane,
+    NexusObject,
 ]
 
 export function getComponentFromTypeName(componentType): VaporComponent {
