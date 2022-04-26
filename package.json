@@ -38,6 +38,7 @@
     "@react-three/fiber": "^7.0.24",
     "@react-three/xr": "^3.2.0",
     "@types/lodash": "^4.14.179",
+    "@types/three": "^0.139.0",
     "@vitejs/plugin-react": "^1.2.0",
     "concurrently": "^7.0.0",
     "file-saver": "^2.0.5",
