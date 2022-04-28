@@ -17,7 +17,7 @@ export default function MagicIcon({IconComponent, clickable=false, onClick=()=>{
     const classnameList = ["h-5 w-5"]
     const mountedRef = useMounted()
     if (clickable) {
-        classnameList.push("cursor-pointer hover:opacity-50 transition-opacity duration-500");
+        classnameList.push("cursor-pointer hover:opacity-50");
     }
     if (onClickInProgress || disabled) {
         classnameList.push("opacity-50 cursor-not-allowed");
@@ -42,7 +42,7 @@ export default function MagicIcon({IconComponent, clickable=false, onClick=()=>{
             },
             style: {
                 color: formatRGBCSS(theme.foregroundColor),
-                transition: `color ${theme.transitionDuration}s opacity 0.5s`
+                transition: `color ${theme.transitionDuration}s, opacity 0.5s`
             },
             ...props
         })        
