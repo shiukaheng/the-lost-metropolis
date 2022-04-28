@@ -1,4 +1,5 @@
 import { FunctionComponent } from "react"
+import { AmbientLightObject } from "../3d/AmbientLightObject"
 import { NexusAssetObject } from "../3d/asset_adapters/NexusAssetObject"
 import { PotreeAssetObject } from "../3d/asset_adapters/PotreeAssetObject"
 import DebugPlane from "../3d/DebugPlane"
@@ -42,6 +43,7 @@ export const components = [
     DebugPlane,
     NexusObject,
     NexusAssetObject,
+    AmbientLightObject
 ]
 
 export function getComponentFromTypeName(componentType): VaporComponent {
