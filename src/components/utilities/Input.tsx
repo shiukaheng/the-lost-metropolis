@@ -247,7 +247,7 @@ function AssetInput({value, setValue, data}) {
         value: asset
     }))
     useLazyEffect(()=>{
-        if (!(clientAssets.map(a => a.assetID).includes(value.assetID))) {
+        if ((value) !== null && !(clientAssets.map(a => a.assetID).includes(value?.assetID))) {
             // console.warn(`Found unreferenced input ${value}, removing`)
             console.log(clientAssets, value, selectOptions)
             setValue(null)
