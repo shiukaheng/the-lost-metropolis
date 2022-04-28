@@ -25,7 +25,7 @@ function EditorSceneSettings() {
                     if (cameraRef.current) {
                         setDefaultCameraProps({
                             position: cameraRef.current.position.toArray(),
-                            rotation: cameraRef.current.rotation.toArray(),
+                            rotation: cameraRef.current.rotation.toArray().slice(0, 3), // Remove unneeded format info
                             fov: cameraRef.current.fov
                         })
                     }
