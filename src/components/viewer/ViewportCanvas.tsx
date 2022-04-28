@@ -6,6 +6,7 @@ import { EditorContext } from "../editor/EditorContext"
 import { Canvas, useFrame, useThree } from "@react-three/fiber"
 import { ViewerContext } from "../viewer/ViewerContext"
 import { SettingsContext, ThemeContext } from "../App"
+import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing'
 
 function CameraHelper() {
     const {defaultCameraProps, cameraRef, audioListener} = useContext(ViewerContext)
@@ -50,6 +51,10 @@ function ViewportCanvas({children, ...props}) {
     ))
     return (
         <Canvas linear flat {...props}>
+            <EffectComposer>
+                <Bloom luminanceThreshold={0} luminanceSmoothing={0.9} height={160} />
+                <Vignette eskil={false} offset={0.1} darkness={0.5} />
+            </EffectComposer>
             <ContextBridge>
                 <CameraHelper/>
                 <PotreeManager pointBudget={1000000}>

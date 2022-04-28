@@ -36,6 +36,7 @@
     "@pnext/three-loader": "^0.2.5",
     "@react-three/drei": "^8.4.0",
     "@react-three/fiber": "^7.0.24",
+    "@react-three/postprocessing": "^2.3.2",
     "@react-three/xr": "^3.2.0",
     "@types/lodash": "^4.14.179",
     "@types/three": "^0.139.0",

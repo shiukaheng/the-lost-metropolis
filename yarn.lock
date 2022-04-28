@@ -1949,6 +1949,15 @@
     utility-types "^3.10.0"
     zustand "^3.5.1"
 
+"@react-three/postprocessing@^2.3.2":
+  version "2.3.2"
+  resolved "https://registry.yarnpkg.com/@react-three/postprocessing/-/postprocessing-2.3.2.tgz#14ffc56b0153d2cbcb6615ae5a943d6786c5b868"
+  integrity sha512-e1veVao9XR3BP/J6OdvbR7yQq7d3lpOQuKvSQJ9LWLhPziBzHeRazU63cIwf5Dh4qy0TuxswmgWKxRn8Sxp79Q==
+  dependencies:
+    postprocessing "6.26.3"
+    react-merge-refs "^1.1.0"
+    three-stdlib "^2.8.11"
+
 "@react-three/xr@^3.2.0":
   version "3.4.0"
   resolved "https://registry.npmjs.org/@react-three/xr/-/xr-3.4.0.tgz"
@@ -2926,7 +2935,7 @@ chardet@^0.7.0:
   resolved "https://registry.npmjs.org/chardet/-/chardet-0.7.0.tgz"
   integrity sha512-mT8iDcrh03qDGRRmoA2hmBJnxpllMR+0/0qlzjqZES6NdiWDcZkCNAk4rPFZ9Q85r27unkiNNg8ZOiwZXBHwcA==
 
-chevrotain@^10.1.1:
+chevrotain@^10.1.1, chevrotain@^10.1.2:
   version "10.1.2"
   resolved "https://registry.npmjs.org/chevrotain/-/chevrotain-10.1.2.tgz"
   integrity sha512-hvRiQuhhTZxkPMGD/dke+s1EGo8AkKDBU05CcufBO278qgAQSwIC4QyLdHz0CFHVtqVYWjlAS5D1KwvBbaHT+w==
@@ -7003,6 +7012,11 @@ posthtml@^0.16.4, posthtml@^0.16.5:
     posthtml-parser "^0.11.0"
     posthtml-render "^3.0.0"
 
+postprocessing@6.26.3:
+  version "6.26.3"
+  resolved "https://registry.yarnpkg.com/postprocessing/-/postprocessing-6.26.3.tgz#456922499e13e02352b3b6b14881ca8186e8a96a"
+  integrity sha512-f9VMDQSLngrdJByPjza4pNHZWoEnGFdxj6GsgqGd2+RM3PYFTCZapgpX9W/FspRUg6Is38vkUfjvLxWyfBHbhQ==
+
 potpack@^1.0.1:
   version "1.0.2"
   resolved "https://registry.npmjs.org/potpack/-/potpack-1.0.2.tgz"
@@ -8362,6 +8376,22 @@ three-mesh-bvh@^0.5.4:
   version "0.5.5"
   resolved "https://registry.npmjs.org/three-mesh-bvh/-/three-mesh-bvh-0.5.5.tgz"
   integrity sha512-WPsEXLfUh+8n2CcWaDnBm4q3c6PbISPbXOBNYt8VLEOTATXP8UqAfEyEBmQU8B9h5FJSSccdXXlHiexO3hZezg==
+
+three-stdlib@^2.8.11:
+  version "2.10.0"
+  resolved "https://registry.yarnpkg.com/three-stdlib/-/three-stdlib-2.10.0.tgz#4218513bef03b3d2e59c3ba6fdfa4104e75da08d"
+  integrity sha512-vztDAj14T80b+zMU+QKVh7ZXEjw2ACPphJwbse9Lqm0y3BwB3gVWKOHgb5br+PRLZXj91kFjHrjcPPst4m7AKw==
+  dependencies:
+    "@babel/runtime" "^7.16.7"
+    "@webgpu/glslang" "^0.0.15"
+    chevrotain "^10.1.2"
+    draco3d "^1.4.1"
+    fflate "^0.6.9"
+    ktx-parse "^0.2.1"
+    mmd-parser "^1.0.4"
+    opentype.js "^1.3.3"
+    potpack "^1.0.1"
+    zstddec "^0.0.2"
 
 three-stdlib@^2.8.6, three-stdlib@^2.8.7:
   version "2.8.8"
