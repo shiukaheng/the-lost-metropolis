@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef } from "react";
 import { VaporComponent, VaporComponentProps } from "../viewer/ComponentDeclarations";
-import { NexusObject as __NexusObject } from "../../lib/nexus/Nexus"
+import { NexusObject as __NexusObject } from "../../lib/nexus2/nexus_three"
 import { Group, Object3D } from "three";
 import { useThree } from "@react-three/fiber";
 import { genericInputs } from "../viewer/genericInputs";
@@ -29,7 +29,7 @@ const _NexusObject = ({url, ...props}: NexusObjectProps) => {
     useEffect(() => {
         if (group.current && url !== "") {
             dispose()
-            nexusRef.current = new __NexusObject(url, ()=>{}, ()=>{}, gl)
+            nexusRef.current = new __NexusObject(url, ()=>{}, ()=>{}, gl, false)
             group.current.add(
                 nexusRef.current
             )
