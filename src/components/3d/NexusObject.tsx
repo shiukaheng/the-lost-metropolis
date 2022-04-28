@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { VaporComponent, VaporComponentProps } from "../viewer/ComponentDeclarations";
 import { NexusObject as __NexusObject } from "../../lib/nexus/Nexus"
 import { Group, Object3D } from "three";
@@ -12,31 +12,33 @@ type NexusObjectProps = VaporComponentProps & {
     url: string
 }
 
-const _NexusObject = ({url}: NexusObjectProps) => {
+const _NexusObject = ({url, ...props}: NexusObjectProps) => {
     const group = useRef<Group>(null)
     const {gl} = useThree()
     const nexusRef = useRef(null)
-    useEffect(() => {
+    const dispose = useCallback(
+      () => {
         if (group.current && nexusRef.current) {
             group.current.remove(nexusRef.current)
+            console.log("model disposed", nexusRef.current)
             nexusRef.current.dispose()
         }
+      },
+      [],
+    )
+    useEffect(() => {
         if (group.current && url !== "") {
+            dispose()
             nexusRef.current = new __NexusObject(url, ()=>{}, ()=>{}, gl)
-            // console.log(nexusRef.current, group.current)
             group.current.add(
                 nexusRef.current
             )
+            console.log("model added", nexusRef.current)
         }
-        return () => {
-            if (group.current && nexusRef.current) {
-                group.current.remove(nexusRef.current)
-                nexusRef.current.dispose()
-            }
-        }
+        return dispose
     }, [url])
     return (
-        <group ref={group}/>
+        <group ref={group} {...props}/>
     )
 }
 
