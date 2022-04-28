@@ -247,7 +247,9 @@ function AssetInput({value, setValue, data}) {
         value: asset
     }))
     useLazyEffect(()=>{
-        if (!clientAssets.includes(value)) {
+        if (!(clientAssets.map(a => a.assetID).includes(value.assetID))) {
+            // console.warn(`Found unreferenced input ${value}, removing`)
+            console.log(clientAssets, value, selectOptions)
             setValue(null)
         }
     }, [clientAssets])
@@ -256,7 +258,7 @@ function AssetInput({value, setValue, data}) {
     return (
         <ThemedSelect className="flex-grow" options={selectOptions} onChange={(selectedOption, _)=>{
             setValue(selectedOption.value)
-        }} value={selectOptions.find(entry => entry.value === value)}/>
+        }} value={selectOptions.find(entry => entry.value.assetID === value.assetID)}/>
     )
 }
 

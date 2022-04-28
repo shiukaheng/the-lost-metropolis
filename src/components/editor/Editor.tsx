@@ -84,6 +84,7 @@ function EditorManager() {
     }) as [PostScene, (newBuffer: PostScene)=>void, Roled<Post>, ()=>Promise<void>, ()=>void, boolean, boolean]; // Yet another dirty hack!
     // Syncing internal state with buffer
     // Fetch data from buffer during mount
+    // console.log(buffer)
     useEffect(() => {
         if (buffer) {
             deserialize(buffer)
