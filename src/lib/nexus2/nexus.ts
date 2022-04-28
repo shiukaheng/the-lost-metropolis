@@ -299,7 +299,7 @@ export const Nexus = function() {
     var maxBlocked    = 3;
     var maxReqAttempt = 2;
     var maxCacheSize  = 1024*(1<<20); //TODO DEBUG
-    var drawBudget    = 100*(1<<20);
+    var drawBudget    = 10*(1<<20);
     
     
     /* MESH DEFINITION */
