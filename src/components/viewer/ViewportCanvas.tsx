@@ -49,7 +49,7 @@ function ViewportCanvas({children, ...props}) {
         </CompositeSuspense>
     ))
     return (
-        <Canvas {...props}>
+        <Canvas linear flat {...props}>
             <ContextBridge>
                 <CameraHelper/>
                 <PotreeManager pointBudget={1000000}>
