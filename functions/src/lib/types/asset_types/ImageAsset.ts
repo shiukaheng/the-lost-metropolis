@@ -2,7 +2,7 @@ import { AssetLiteral } from "../../../../../api/types/AssetLiteral";
 import { AssetConverterFunction, AssetType } from "../AssetType";
 import * as fs from "fs";
 
-export class Image implements AssetType {
+export class ImageAsset implements AssetType {
     static conversionMap: Map<typeof AssetType, AssetConverterFunction> = new Map();
     static assetLiteral: AssetLiteral = "Image";
     static target: true;
@@ -15,6 +15,6 @@ export class Image implements AssetType {
         // TODO: Implement the proper checks
     }
     static getConverter(targetAssetType: typeof AssetType): AssetConverterFunction | undefined {
-        return Image.conversionMap.get(targetAssetType);
+        return ImageAsset.conversionMap.get(targetAssetType);
     }
 }
