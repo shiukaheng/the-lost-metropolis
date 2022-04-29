@@ -19,8 +19,6 @@ const onNewFile = async (object: functions.storage.ObjectMetadata) => {
     // Check if asset is requested, if not, throw error
     const {postRef, asset} = await checkAssetRequested(object)
     if (object.metadata?.singleFile === "true") {
-        // Process single file
-        // Download file to current directory
         await processSingleFileAsset(object, asset, postRef);
     } else {
         await processZippedAsset(object, postRef, asset);
@@ -78,6 +76,7 @@ export const cullUnreferencedAssets = functions.region("asia-east1").https.onCal
 })
 
 async function processSingleFileAsset(object: functions.storage.ObjectMetadata, asset, postRef: admin.firestore.DocumentReference<admin.firestore.DocumentData>) {
+    // Download file to local directory
     const bucket = admin.storage().bucket();
     if (!(typeof object.name === "string")) {
         throw new Error(`File ${object.name} does not have a valid name`);
@@ -128,13 +127,17 @@ async function processSingleFileAsset(object: functions.storage.ObjectMetadata, 
         return asset;
     });
     // Upload to CDN
+    // Verify object.metadata is valid
+    if (!assetZipMetadataSchema.isValidSync(object.metadata)) {
+        throw new Error("Invalid file metadata")
+    }
     await uploadAssetToCDN(targetPath, object.metadata);
     // Mark asset as ready
     modifyAsset(postRef, asset.id, asset => {
         asset.metadata.status.ready = true;
         return asset;
     });
-    // Cleanup temp directories
+    // Cleanup temp directory
     await cleanupFolders([tempDir]);
 }
 
@@ -147,6 +150,10 @@ async function processZippedAsset(object: functions.storage.ObjectMetadata, post
         // Take metadata and unzipped path as variable and get receiving directory of what to upload to CDN, and update processProgress
         const processedPath = await processAsset(unzippedPath, metadataFile, postRef, asset.id);
         usedPaths.push(processedPath);
+        // Verify object.metadata is valid
+        if (!assetZipMetadataSchema.isValidSync(object.metadata)) {
+            throw new Error("Invalid zip metadata")
+        }
         // Upload to CDN and mark asset as ready
         await uploadAssetToCDN(processedPath, object.metadata);
     } catch (e) {
