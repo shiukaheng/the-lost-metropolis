@@ -76,69 +76,79 @@ export const cullUnreferencedAssets = functions.region("asia-east1").https.onCal
 })
 
 async function processSingleFileAsset(object: functions.storage.ObjectMetadata, asset, postRef: admin.firestore.DocumentReference<admin.firestore.DocumentData>) {
-    // Download file to local directory
-    const bucket = admin.storage().bucket();
-    if (!(typeof object.name === "string")) {
-        throw new Error(`File ${object.name} does not have a valid name`);
+    const usedPaths = []
+    try {
+        // Download file to local directory
+        const bucket = admin.storage().bucket();
+        if (!(typeof object.name === "string")) {
+            throw new Error(`File ${object.name} does not have a valid name`);
+        }
+        const tempDir = getTempDir();
+        usedPaths.push(tempDir)
+        const fileDestination = path.resolve(tempDir, "single-file-asset");
+        console.log("Fetching zip from bucket");
+        await bucket.file(object.name).download({
+            destination: fileDestination
+        });
+        // Delete file from bucket
+        console.log("Deleting file from bucket");
+        await bucket.file(object.name).delete();
+        // Get asset from post
+        // Determine source and target asset types using function that takes in provided info in database and the file itself
+        const { sourceAssetType, targetAssetType } = determineSFAssetAssetTypePair(fileDestination, asset.data);
+        // Change source and target types, and set pending to false
+        await modifyAsset(postRef, asset.id, asset => {
+            asset.metadata.sourceAssetType = sourceAssetType.assetLiteral;
+            asset.metadata.targetAssetType = targetAssetType.assetLiteral;
+            asset.metadata.status.pending = false;
+            return asset;
+        });
+        // Convert asset to target asset type if required
+        var targetPath: string;
+        const sourcePath = path.dirname(fileDestination);
+        if (sourceAssetType !== targetAssetType) {
+            targetPath = path.resolve(tempDir, "converted_data");
+            (sourceAssetType.getConverter(targetAssetType) as AssetConverterFunction)(
+                asset.data.data,
+                sourcePath,
+                targetPath,
+                (progress) => {
+                    // Update process progress
+                    modifyAsset(postRef, asset.id, asset => {
+                        asset.metadata.status.processedProgress = progress;
+                        return asset;
+                    });
+                }
+            );
+        } else {
+            targetPath = fileDestination;
+        }
+        // Mark asset as processed
+        modifyAsset(postRef, asset.id, asset => {
+            asset.metadata.status.processedProgress = 1;
+            asset.metadata.status.processed = true;
+            return asset;
+        });
+        // Upload to CDN
+        // Verify object.metadata is valid
+        if (!assetZipMetadataSchema.isValidSync(object.metadata)) {
+            throw new Error("Invalid file metadata")
+        }
+        await uploadAssetToCDN(targetPath, object.metadata);
+    } catch (e) {
+        await modifyAsset(postRef, asset.id, (asset) => {
+            asset.metadata.status.error = String(e);
+            return asset;
+        });
+        await cleanupFolders(usedPaths);
+        throw e;
     }
-    const tempDir = getTempDir();
-    const fileDestination = path.resolve(tempDir, "single-file-asset");
-    console.log("Fetching zip from bucket");
-    await bucket.file(object.name).download({
-        destination: fileDestination
-    });
-    // Delete file from bucket
-    console.log("Deleting file from bucket");
-    await bucket.file(object.name).delete();
-    // Get asset from post
-    // Determine source and target asset types using function that takes in provided info in database and the file itself
-    const { sourceAssetType, targetAssetType } = determineSFAssetAssetTypePair(fileDestination, asset.data);
-    // Change source and target types, and set pending to false
-    await modifyAsset(postRef, asset.id, asset => {
-        asset.metadata.sourceAssetType = sourceAssetType.assetLiteral;
-        asset.metadata.targetAssetType = targetAssetType.assetLiteral;
-        asset.metadata.status.pending = false;
-        return asset;
-    });
-    // Convert asset to target asset type if required
-    var targetPath: string;
-    const sourcePath = path.dirname(fileDestination);
-    if (sourceAssetType !== targetAssetType) {
-        targetPath = path.resolve(tempDir, "converted_data");
-        (sourceAssetType.getConverter(targetAssetType) as AssetConverterFunction)(
-            asset.data.data,
-            sourcePath,
-            targetPath,
-            (progress) => {
-                // Update process progress
-                modifyAsset(postRef, asset.id, asset => {
-                    asset.metadata.status.processedProgress = progress;
-                    return asset;
-                });
-            }
-        );
-    } else {
-        targetPath = fileDestination;
-    }
-    // Mark asset as processed
-    modifyAsset(postRef, asset.id, asset => {
-        asset.metadata.status.processedProgress = 1;
-        asset.metadata.status.processed = true;
-        return asset;
-    });
-    // Upload to CDN
-    // Verify object.metadata is valid
-    if (!assetZipMetadataSchema.isValidSync(object.metadata)) {
-        throw new Error("Invalid file metadata")
-    }
-    await uploadAssetToCDN(targetPath, object.metadata);
     // Mark asset as ready
     modifyAsset(postRef, asset.id, asset => {
         asset.metadata.status.ready = true;
         return asset;
     });
-    // Cleanup temp directory
-    await cleanupFolders([tempDir]);
+    await cleanupFolders(usedPaths);
 }
 
 async function processZippedAsset(object: functions.storage.ObjectMetadata, postRef: admin.firestore.DocumentReference<admin.firestore.DocumentData>, asset) {
