@@ -18,7 +18,7 @@ Asset types (e.g. Potree2) are format specifications for a collection of files t
 - To create a new asset type:
   - Create a new file in /functions/src/lib/types/asset_types for the cloud function to know how to handle the asset type
   - Include this new class in /function/src/lib/types/AssetType.ts
-  - Update the sourceAssetLiteral / targetAssetLiteral definintions in /api/types/AssetLiterals.ts to include the new asset type
+  - Update the sourceAssetLiteral / targetAssetLiteral definintions in /api/types/AssetLiteral.ts to include the new asset type
   - Update /functions/src/lib/types/AssetType.ts to include the new asset type
 - To use assets as an argument in VaporComponents
   - Create a entry in the input property in the following format:
