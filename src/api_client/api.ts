@@ -1,4 +1,5 @@
 import { Post, postSchema } from '../../api/types/Post';
+import { AssetMetadataFile } from "../../functions/src/lib/types/AssetMetadataFile"
 import { Instance, RecursivePartial } from "../../api/utility_types";
 import { addDoc, collection, deleteDoc, doc, getDoc, updateDoc, arrayUnion, arrayRemove, where } from "firebase/firestore";
 import { PostDocData, postDocDataSchema } from '../../api/implementation_types/PostDocData';
@@ -84,9 +85,9 @@ export default class VaporAPI {
 
     // Asset CRUD - Not really crud though. Only supports upload and delete.
     /**
-     * Uploads an asset to a post
+     * Uploads an asset to a post, file will be a .vaps file which is just a zip archive with a metadata.json and a data folder containing files used by the asset. E.g., Potree and 3D tiles.
      * @param postID the post ID
-     * @param file the file to upload
+     * @param file the .vaps package to upload
      * @param onUploadProgress callback for upload progress
      * @returns Promise of the asset ID
      */
@@ -105,7 +106,50 @@ export default class VaporAPI {
         const fileRef = ref(VaporAPI.storageRef, `${postID}/${assetID}`)
         const uploadFile: Promise<void> = new Promise((resolve, reject) => {
             try {
-                const uploadTask = uploadBytesResumable(fileRef, file, {contentType: "application/zip", customMetadata: {assetID, postID}})
+                const uploadTask = uploadBytesResumable(fileRef, file, {contentType: "application/zip", customMetadata: {assetID, postID, singleFile: "false"}})
+                uploadTask.on("state_changed", (snapshot) => {
+                    const progress = snapshot.bytesTransferred / snapshot.totalBytes;
+                    if (onUploadProgress !== undefined) {
+                        onUploadProgress(progress)
+                    }
+                }, (error) => {
+                    reject(error)
+                }, () => {
+                    resolve()
+                })
+            } catch (error) {
+                reject(error)
+            }
+        })
+        await uploadFile
+        return assetID
+    }
+
+    // TODO: Move AssetMetadataFile out of functions and into the api
+    /**
+     * Convenience method to upload an asset that only uses a single file, like images, sounds, etc. Supplying a metadata file is optional, but recommended as file types can be ambiguous and naming the asset is important.
+     * @param postID the post ID
+     * @param file the file to upload
+     * @param metadata the metadata file to upload
+     * @param onUploadProgress callback for upload progress
+     * @returns Promise of the asset ID
+     */
+    static async uploadSingleFileAsset(postID: string, file: File, metadata: Partial<AssetMetadataFile>, onUploadProgress: (number)=>void): Promise<string> {
+        // Generate a uuidv4 as an id for the asset
+        const assetID = v4()
+        // Generate AssetMetadataFile json with the information we have
+        const asset = generateAsset(metadata);
+        // Wrap the Asset object in an instance with the uuid
+        const assetInstance = instance(asset, assetID)
+        // Get the post document's reference on firebase
+        const postDocRef = doc(VaporAPI.postsRef, postID)
+        // Use arrayUnion and addDoc to add the asset to the assets array
+        await updateDoc(postDocRef, { assets: arrayUnion(assetInstance) })
+        // Use storageRef to upload the file to /<postID>/<assetID>, although the name is not important. Just to avoid collisions.
+        const fileRef = ref(VaporAPI.storageRef, `${postID}/${assetID}`)
+        const uploadFile: Promise<void> = new Promise((resolve, reject) => {
+            try {
+                const uploadTask = uploadBytesResumable(fileRef, file, {contentType: "application/octet-stream", customMetadata: {assetID, postID, singleFile: "true"}})
                 uploadTask.on("state_changed", (snapshot) => {
                     const progress = snapshot.bytesTransferred / snapshot.totalBytes;
                     if (onUploadProgress !== undefined) {
@@ -223,4 +267,21 @@ export default class VaporAPI {
             return `https://static.thelostmetropolis.org/${postID}/${assetID}/`
         }
     }
+}
+
+function generateAsset(metadata: Partial<AssetMetadataFile>) {
+    const asset = assetSchema.getDefault()
+    if (metadata.name !== undefined && metadata.name !== null) {
+        asset.metadata.name = metadata.name
+    }
+    if (metadata.sourceAssetType !== undefined && metadata.sourceAssetType !== null) {
+        asset.metadata.sourceAssetType = metadata.sourceAssetType
+    }
+    if (metadata.targetAssetType !== undefined && metadata.targetAssetType !== null) {
+        asset.metadata.targetAssetType = metadata.targetAssetType
+    }
+    if (metadata.assetData !== undefined && metadata.assetData !== null) {
+        asset.data = metadata.assetData
+    }
+    return asset;
 }
