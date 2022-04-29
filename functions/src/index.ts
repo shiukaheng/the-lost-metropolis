@@ -85,8 +85,10 @@ async function processSingleFileAsset(object: functions.storage.ObjectMetadata, 
         }
         const tempDir = getTempDir();
         usedPaths.push(tempDir)
-        const fileDestination = path.resolve(tempDir, "single-file-asset");
-        console.log("Fetching zip from bucket");
+        // Make a single-file-asset folder
+        
+        const fileDestination = path.resolve(tempDir, "single-file-asset", object.name);
+        console.log("Fetching file from bucket");
         await bucket.file(object.name).download({
             destination: fileDestination
         });

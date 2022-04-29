@@ -145,8 +145,8 @@ export default class VaporAPI {
         const postDocRef = doc(VaporAPI.postsRef, postID)
         // Use arrayUnion and addDoc to add the asset to the assets array
         await updateDoc(postDocRef, { assets: arrayUnion(assetInstance) })
-        // Use storageRef to upload the file to /<postID>/<assetID>, although the name is not important. Just to avoid collisions.
-        const fileRef = ref(VaporAPI.storageRef, `${postID}/${assetID}`)
+        // Use storageRef to upload the file to /<postID>/<assetID>/<file name>, the filename here is important as it is preserved.
+        const fileRef = ref(VaporAPI.storageRef, `${postID}/${assetID}/${file.name}`)
         const uploadFile: Promise<void> = new Promise((resolve, reject) => {
             try {
                 const uploadTask = uploadBytesResumable(fileRef, file, {contentType: "application/octet-stream", customMetadata: {assetID, postID, singleFile: "true"}})
