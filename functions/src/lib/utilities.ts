@@ -8,7 +8,7 @@ import * as fs from "fs";
 import { Instance } from "../../../api/utility_types";
 import { Asset } from "../../../api/types/Asset";
 import { cloneDeep } from "lodash";
-import { assetTypes } from "./types/AssetType";
+import { AssetType, assetTypes } from "./types/AssetType";
 import * as path from "path";
 import { PostDocData, postDocDataSchema } from "../../../api/implementation_types/PostDocData"
 import * as os from "os"
@@ -31,7 +31,7 @@ export async function checkAssetRequested(object: functions.storage.ObjectMetada
         throw new Error(`File ${object.name} does not have valid metadata`);
     }
     const metadata = object.metadata;
-    // Check if post document exists wit id metadata.postID, if not, throw error
+    // Check if post document exists with id metadata.postID, if not, throw error
     const postRef = admin.firestore().collection("posts").doc(metadata.postID);
     const doc = await postRef.get();
     if (!doc.exists) {
@@ -54,7 +54,7 @@ export async function checkAssetRequested(object: functions.storage.ObjectMetada
     return { postRef, postSnap, asset };
 }
 
-function getTempDir() {
+export function getTempDir() {
     if ( process.env.FUNCTIONS_EMULATOR ) {
         return os.tmpdir();
     } else {
@@ -218,5 +218,14 @@ export async function cleanupFolders(paths: string[]) {
         if (fs.existsSync(path)) {
             await fsAsync.rm(path, { recursive: true });
         }
+    }
+}
+
+export function getAssetType(assetLiteral: string): typeof AssetType {
+    const assetType = assetTypes.find(type => type.assetLiteral === assetLiteral);
+    if (assetType !== undefined) {
+        return assetType
+    } else {
+        throw new Error(`Unrecognized asset type ${assetLiteral}`);
     }
 }

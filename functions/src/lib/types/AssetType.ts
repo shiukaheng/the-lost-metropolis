@@ -25,6 +25,4 @@ export abstract class AssetType {
     }
 }
 
-
-
 export const assetTypes: (typeof AssetType)[] = [Potree2, Nexus]

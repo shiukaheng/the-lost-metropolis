@@ -3,8 +3,12 @@ import * as admin from "firebase-admin"
 import { EventContext } from "firebase-functions";
 import { QueryDocumentSnapshot } from "firebase-functions/v1/firestore";
 import { assetZipMetadataSchema } from "./lib/types/AssetZipMetadata";
-import { checkAssetRequested, unzipAsset, processAsset, uploadAssetToCDN, modifyAsset, cleanupFolders, generatePostFolderPath, generateAssetFolderPath } from "./lib/utilities";
+import { checkAssetRequested, unzipAsset, processAsset, uploadAssetToCDN, modifyAsset, cleanupFolders, generatePostFolderPath, generateAssetFolderPath, getTempDir, getAssetType } from "./lib/utilities";
 import { postDocDataSchema } from "../../api/implementation_types/PostDocData";
+import * as path from "path";
+import { SourceAssetLiteral, TargetAssetLiteral } from "../../api/types/AssetLiteral";
+import { Asset } from "../../api/types/Asset";
+import { AssetConverterFunction, AssetType, assetTypes } from "./lib/types/AssetType";
 
 admin.initializeApp();
 
@@ -14,31 +18,13 @@ const onNewFile = async (object: functions.storage.ObjectMetadata) => {
     }
     // Check if asset is requested, if not, throw error
     const {postRef, asset} = await checkAssetRequested(object)
-    const usedPaths: string[] = []
-    try {
-        // Unzip asset to local temp folder, and parse metadata.json to a variable and updating post doc too
-        const {unzippedPath, metadataFile} = await unzipAsset(object, postRef)
-        usedPaths.push(unzippedPath)
-        // Take metadata and unzipped path as variable and get receiving directory of what to upload to CDN, and update processProgress
-        const processedPath = await processAsset(unzippedPath, metadataFile, postRef, asset.id)
-        usedPaths.push(processedPath)
-        // Upload to CDN and mark asset as ready
-        await uploadAssetToCDN(processedPath, object.metadata)
-    } catch (e) {
-        await modifyAsset(postRef, asset.id, (asset) => {
-            asset.metadata.status.error = String(e)
-            return asset
-        })
-        await cleanupFolders(usedPaths)
-        throw e
+    if (object.metadata?.singleFile === "true") {
+        // Process single file
+        // Download file to current directory
+        await processSingleFileAsset(object, asset, postRef);
+    } else {
+        await processZippedAsset(object, postRef, asset);
     }
-    // Mark asset as ready
-    await modifyAsset(postRef, asset.id, asset => {
-        asset.metadata.status.ready = true
-        return asset
-    })
-    // Cleanup temp directories
-    await cleanupFolders(usedPaths)
 }
 
 const onPostDocumentDelete = async (snapshot: QueryDocumentSnapshot, context: EventContext) => {
@@ -91,3 +77,157 @@ export const cullUnreferencedAssets = functions.region("asia-east1").https.onCal
     return {}
 })
 
+async function processSingleFileAsset(object: functions.storage.ObjectMetadata, asset, postRef: admin.firestore.DocumentReference<admin.firestore.DocumentData>) {
+    const bucket = admin.storage().bucket();
+    if (!(typeof object.name === "string")) {
+        throw new Error(`File ${object.name} does not have a valid name`);
+    }
+    const tempDir = getTempDir();
+    const fileDestination = path.resolve(tempDir, "single-file-asset");
+    console.log("Fetching zip from bucket");
+    await bucket.file(object.name).download({
+        destination: fileDestination
+    });
+    // Delete file from bucket
+    console.log("Deleting file from bucket");
+    await bucket.file(object.name).delete();
+    // Get asset from post
+    // Determine source and target asset types using function that takes in provided info in database and the file itself
+    const { sourceAssetType, targetAssetType } = determineSFAssetAssetTypePair(fileDestination, asset.data);
+    // Change source and target types, and set pending to false
+    await modifyAsset(postRef, asset.id, asset => {
+        asset.metadata.sourceAssetType = sourceAssetType.assetLiteral;
+        asset.metadata.targetAssetType = targetAssetType.assetLiteral;
+        asset.metadata.status.pending = false;
+        return asset;
+    });
+    // Convert asset to target asset type if required
+    var targetPath: string;
+    const sourcePath = path.dirname(fileDestination);
+    if (sourceAssetType !== targetAssetType) {
+        targetPath = path.resolve(tempDir, "converted_data");
+        (sourceAssetType.getConverter(targetAssetType) as AssetConverterFunction)(
+            asset.data.data,
+            sourcePath,
+            targetPath,
+            (progress) => {
+                // Update process progress
+                modifyAsset(postRef, asset.id, asset => {
+                    asset.metadata.status.processedProgress = progress;
+                    return asset;
+                });
+            }
+        );
+    } else {
+        targetPath = fileDestination;
+    }
+    // Mark asset as processed
+    modifyAsset(postRef, asset.id, asset => {
+        asset.metadata.status.processedProgress = 1;
+        asset.metadata.status.processed = true;
+        return asset;
+    });
+    // Upload to CDN
+    await uploadAssetToCDN(targetPath, object.metadata);
+    // Mark asset as ready
+    modifyAsset(postRef, asset.id, asset => {
+        asset.metadata.status.ready = true;
+        return asset;
+    });
+    // Cleanup temp directories
+    await cleanupFolders([tempDir]);
+}
+
+async function processZippedAsset(object: functions.storage.ObjectMetadata, postRef: admin.firestore.DocumentReference<admin.firestore.DocumentData>, asset) {
+    const usedPaths: string[] = [];
+    try {
+        // Unzip asset to local temp folder, and parse metadata.json to a variable and updating post doc too
+        const { unzippedPath, metadataFile } = await unzipAsset(object, postRef);
+        usedPaths.push(unzippedPath);
+        // Take metadata and unzipped path as variable and get receiving directory of what to upload to CDN, and update processProgress
+        const processedPath = await processAsset(unzippedPath, metadataFile, postRef, asset.id);
+        usedPaths.push(processedPath);
+        // Upload to CDN and mark asset as ready
+        await uploadAssetToCDN(processedPath, object.metadata);
+    } catch (e) {
+        await modifyAsset(postRef, asset.id, (asset) => {
+            asset.metadata.status.error = String(e);
+            return asset;
+        });
+        await cleanupFolders(usedPaths);
+        throw e;
+    }
+    // Mark asset as ready
+    await modifyAsset(postRef, asset.id, asset => {
+        asset.metadata.status.ready = true;
+        return asset;
+    });
+    // Cleanup temp directories
+    await cleanupFolders(usedPaths);
+}
+
+/**
+ * Determines the source and target asset types of a single file asset
+ * @param fileDestination The path to the file that was downloaded
+ * @param asset The asset object in the database
+ */
+function determineSFAssetAssetTypePair(fileDestination: string, asset: Asset): { sourceAssetType: typeof AssetType; targetAssetType: typeof AssetType; } {
+    var sourceType: typeof AssetType = null;
+    var targetType: typeof AssetType = null;
+    var sourceTypeVerified = false;
+    const assetFolder = path.dirname(fileDestination);
+    // Check if sourceAssetType and targetAssetType are provided in metadata
+    // Conditional: If both sourceAssetType and targetAssetType is provided, 
+    if (asset.metadata.sourceAssetType && asset.metadata.targetAssetType) {
+        // If yes, check if it is a valid source-target pair
+        const proposedSourceAssetType = getAssetType(asset.metadata.sourceAssetType);
+        const proposedTargetAssetType = getAssetType(asset.metadata.targetAssetType);
+        if (proposedSourceAssetType.conversionMap.has(proposedTargetAssetType)) {
+            // If yes: set sourceAssetType and targetAssetType to the provided values
+            sourceType = proposedSourceAssetType;
+            targetType = proposedTargetAssetType;
+        } else {
+            // If not, throw error: Invalid source-target pair
+            throw new Error("Invalid source-target pair specified");
+        }
+    } else {
+        // If no: try detect sourceAssetType
+        const detectedTypes = detectAssetTypes(asset.data, assetFolder)
+        const sourceTypes = detectedTypes.filter(type => type.source)
+        if (sourceTypes.length === 1) {
+            // If a single sourceType is found, see if it is also a targetAssetType
+            sourceType = sourceTypes[0];
+            sourceTypeVerified = true;
+            if (sourceType.target) {
+                // If yes: Set targetAssetType to the sourceAssetType
+                targetType = sourceType;
+            } else {
+                // If no: Throw error: Given file is a sourceAssetType but not a targetAssetType, please provide targetAssetType
+                throw new Error("Given file is a sourceAssetType but not a targetAssetType, please provide targetAssetType");
+            }
+        } else if (sourceTypes.length > 1) {
+            // If multiple sourceTypes are found, throw error: Given file is ambiguous, please provide sourceAssetType and targetAssetType
+            throw new Error("Given file is ambiguous, please provide sourceAssetType and targetAssetType");
+        } else {
+            throw new Error("Given file is not a valid asset, please provide sourceAssetType and targetAssetType");
+        }   
+    }
+    // Check sourceType validity if it was not verified before
+    if (!sourceTypeVerified) {
+        sourceType.validate(asset.data, assetFolder);
+    }
+    return { sourceAssetType: sourceType, targetAssetType: targetType };
+}
+
+function detectAssetTypes(assetData: any, rootPath: string): (typeof AssetType)[] {
+    const possibleTypes = [];
+    for (const assetType of assetTypes) {
+        try {
+            assetType.validate(assetData, rootPath)
+            possibleTypes.push(assetType);
+        } catch {
+            // Do nothing
+        }
+    }
+    return possibleTypes;
+}
