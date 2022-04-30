@@ -46,7 +46,10 @@ export const postDocDataSchema = object({
     public: boolean().required(),
     theme: themeSchema.required(),
     tags: array(string().required()).required(),
-    sponsors: array(sponsorSchema.required()).required().default([]),
+    sponsors: array(object({
+        id: string().required(),
+        data: sponsorSchema.required(),
+    })).required().default([]),
 })
 
 export type PostDocData = InferType<typeof postDocDataSchema>

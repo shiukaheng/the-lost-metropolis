@@ -37,7 +37,10 @@ import { userIDSchema } from "./UserID"
     public: boolean().required().default(false),
     theme: themeSchema.required(),
     tags: array(string().required()).required().default([]),
-    sponsors: array(sponsorSchema.required()).required().default([]),
+    sponsors: array(object({
+        id: string().required(),
+        data: sponsorSchema.required(),
+    })).required().default([]),
 })
 
 export type Post = InferType<typeof postSchema>
