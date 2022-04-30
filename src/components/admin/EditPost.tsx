@@ -107,6 +107,10 @@ function EditingForm({className="", editor3dMode=false}) {
         "en": "background image",
         "zh": "背景圖片"
     })
+    const sponsorsLabel = useMultilang({
+        "en": "sponsors",
+        "zh": "贊助商"
+    })
     const pullLabel = useMultilang({"en": "update to latest version", "zh": "獲取最新版本"});
     const [deleteLabel, deleteTrigger] = useConfirm(deleteDefaultLabel, deleteConfirmationLabel, deletePendingLabel, async ()=>{
         // console.log(id)
@@ -190,6 +194,12 @@ function EditingForm({className="", editor3dMode=false}) {
                                             }} postID={id}/>
                                         }
                                         />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>{sponsorsLabel}</td>
+                                    <td>
+                                        
                                     </td>
                                 </tr>
                             </tbody>
