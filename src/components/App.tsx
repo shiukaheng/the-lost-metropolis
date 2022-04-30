@@ -28,6 +28,7 @@ import { preloadFont } from "troika-three-text";
 import UploadAssetPage from "./development/UploadAssetTest";
 import { LanguageLiteral } from '../../api/types/LanguageLiteral';
 import { Theme } from '../../api/types/Theme';
+import { PointCloudOctreeGeometryNode } from '@pnext/three-loader';
 
 export const defaultSettings = {
     lang: "en" as LanguageLiteral
@@ -177,8 +178,9 @@ function ThemeSetter() {
     //            Anything else: Use default theme
 
     const location = useLocation()
+    const splitPath = location.pathname.split("/")
     useEffect(()=>{
-        const id = location.pathname.split("/")[2]
+        const id = splitPath[2]
         if (id && posts) {
             const post = posts.find(p => p.id === id)
             if (post?.data.theme) {
@@ -188,6 +190,8 @@ function ThemeSetter() {
                     setTheme(mergeThemes(defaultTheme, post.data.theme))
                 }
             }
+        } else if (splitPath[1] === "browse" && splitPath[2] === undefined && posts && posts.length > 0) {
+            setTheme(posts[0].data.theme)
         } else {
             setTheme(defaultTheme)
         }

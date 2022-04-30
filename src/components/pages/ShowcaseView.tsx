@@ -28,7 +28,7 @@ function ShowcasePanel() {
     const { theme } = useContext(ThemeContext);
     const { id } = useParams();
     const navigate = useNavigate();
-    const { setTheme, changesRef } = useContext(ThemeContext)
+    // const { setTheme, changesRef } = useContext(ThemeContext)
     // If no specified ID, show the first post. If no posts, set activeID and activeIndex to null
     const [activeID, setActiveID] = useState(id || (posts && posts.length > 0 ? posts[0].id : null));
     // If has activeID, find the index of the post with that ID, otherwise set to null
@@ -37,19 +37,6 @@ function ShowcasePanel() {
         setActiveID(posts[index].id);
         navigate(`/browse/${posts[index].id}`);
     }
-
-    // Hotfix for applying theme when no id is specified, when url based theme detection doesn't work
-    useEffect(()=>{ // Needs to be put in useEffect because it sets state in the context
-        const postTheme = posts?.find(post => post.id === activeID)?.data?.theme || defaultTheme;
-        const fixedPostTheme = mergeThemes(defaultTheme, postTheme);
-        if (id === undefined) {
-            if (changesRef.current <= 2) {
-                setTheme(removeThemeTransition(fixedPostTheme));
-            } else {
-                setTheme(fixedPostTheme);
-            }
-        }
-    }, [])
     
     // useEffect(()=>{
     //     const theme = posts && posts.find(post => post.id === activeID)?.data.theme
