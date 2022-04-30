@@ -8,6 +8,23 @@ import { components } from "../../viewer/ComponentDeclarations";
 import { ViewerContext } from "../../viewer/ViewerContext";
 import MagicDiv from "../../utilities/MagicDiv";
 import { useMultilang } from "../../../utilities";
+import { EditorInputType } from "../../viewer/ArgumentTypes";
+
+/**
+ * Processes input data property before passing it to the Input component, created so that in the 3D editor, it only shows assets that are tagged with "editor-3d"
+ * @param propType The property to process
+ */
+function processPropData(propType) {
+    // If prop is of type "Asset", we add "3d-editor" to the data.tags property
+    if (propType.typeName === "asset") {
+        return {
+            ...propType.data,
+            tags: [...(propType.data.tags || []), "3d-editor"]
+        }
+    } else {
+        return propType.data
+    }
+}
 
 export default function EditorComponentProperties() {
     const { sceneChildren, setSceneChildren } = useContext(ViewerContext)
@@ -28,7 +45,7 @@ export default function EditorComponentProperties() {
                             }
                             const propsDescription = child.type.inputs
                             const inputs = Object.entries(propsDescription).map(([propName, propDescription], i) => (
-                                <EditorInput key={selectedIDs[0]+i.toString()} data={propDescription.type.data} propName={propName} typeName={propDescription.type.typeName} value={child.props[propName]} setValue={(value)=>{
+                                <EditorInput key={selectedIDs[0]+i.toString()} data={processPropData(propDescription.type)} propName={propName} typeName={propDescription.type.typeName} value={child.props[propName]} setValue={(value)=>{
                                     setSceneChildren(sceneChildren.map(child => {
                                         if (child.props.objectID === selectedIDs[0]) {
                                             return cloneElement(child, {
