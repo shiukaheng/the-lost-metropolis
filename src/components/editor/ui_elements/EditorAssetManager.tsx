@@ -53,7 +53,7 @@ export default function EditorAssetManager({postID, assets}: {postID?: string, a
                 }%`}</MagicButton>
             </div>
             {
-                (assets !== undefined) && assets.map((asset, index) => {
+                (assets !== undefined) && assets.filter(asset => asset.data.metadata.tags.includes("3d-editor")).map((asset, index) => {
                     return (
                         <AssetEntry key={index} asset={asset} postID={postID}/>
                     )
