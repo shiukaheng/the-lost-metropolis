@@ -169,7 +169,7 @@ function SiteRouter() {
     </Router>;
 }
 
-function detectBackgroundUrls(postInstance: Instance<Post>) {
+function inferTheme(postInstance: Instance<Post>) {
     // First, we determine the URLs for possible background images / videos
     var backgroundImage: string | null = null;
     var backgroundVideo: string | null = null;
@@ -199,7 +199,11 @@ function detectBackgroundUrls(postInstance: Instance<Post>) {
             }
         }
     }
-    return { backgroundImage, backgroundVideo }
+    return {
+        ...mergeThemes(defaultTheme, postInstance.data.theme),
+        backgroundImage,
+        backgroundVideo
+    }
 }
 
 function ThemeSetter() {
@@ -218,17 +222,20 @@ function ThemeSetter() {
     useEffect(()=>{
         const id = splitPath[2]
         if (id && posts) {
+            // If a post is detected in the url, use that post's theme
             const post = posts.find(p => p.id === id)
             if (post?.data.theme) {
                 if (changesRef.current <= 1) {
-                    setTheme(removeThemeTransition(mergeThemes(defaultTheme, post.data.theme)))
+                    setTheme(removeThemeTransition(inferTheme(post)))
                 } else {
-                    setTheme(mergeThemes(defaultTheme, post.data.theme))
+                    setTheme(inferTheme(post))
                 }
             }
         } else if (splitPath[1] === "browse" && splitPath[2] === undefined && posts && posts.length > 0) {
-            setTheme(posts[0].data.theme)
+            // If we are in the browse directory without an id, use the first post's theme
+            setTheme(inferTheme(posts[0]))
         } else {
+            // Otherwise, use the default theme
             setTheme(defaultTheme)
         }
     }, [location.pathname, posts])

@@ -416,6 +416,10 @@ export function Condition({condition, children}) {
     return condition ? children : null
 }
 
+export function Switcher({condition, trueChild, falseChild}) {
+    return condition ? trueChild : falseChild
+}
+
 export function useChooseFile(validifier?: (file: File)=>boolean, accept?:string): [createPrompt:()=>void, file:File | null, valid:boolean | null, clearFiles:()=>void] {
     // Returns createPrompt function and file object
     const [file, setFile] = useState<File|null>(null)

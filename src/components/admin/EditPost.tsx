@@ -1,5 +1,5 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { Condition, useBufferedPost, useChooseFile, useConfirm, useMultilang, usePost, useTheme } from "../../utilities";
+import { Condition, Switcher, useBufferedPost, useChooseFile, useConfirm, useMultilang, usePost, useTheme } from "../../utilities";
 import GenericPage from "../utilities/GenericPage";
 import { Input } from "../utilities/Input";
 import MagicDiv from "../utilities/MagicDiv";
@@ -103,6 +103,10 @@ function EditingForm({className="", editor3dMode=false}) {
         "en": "foreground color",
         "zh": "前景顏色"
     })
+    const bgImageLabel = useMultilang({
+        "en": "background image",
+        "zh": "背景圖片"
+    })
     const pullLabel = useMultilang({"en": "update to latest version", "zh": "獲取最新版本"});
     const [deleteLabel, deleteTrigger] = useConfirm(deleteDefaultLabel, deleteConfirmationLabel, deletePendingLabel, async ()=>{
         // console.log(id)
@@ -112,6 +116,7 @@ function EditingForm({className="", editor3dMode=false}) {
         await VaporAPI.deletePost(id)
         navigate("/dashboard")
     })
+    const backgroundImageAsset = post?.assets?.find(asset => (asset.data.metadata.tags.includes("background-image")))
     // useTheme(buffer.theme)
     return (
         // Return table with inputs for title, description, and public
@@ -159,18 +164,32 @@ function EditingForm({className="", editor3dMode=false}) {
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td>upload image</td>
+                                    <td>{bgImageLabel}</td>
                                     <td>
-                                        <SingleFileAssetUploader extensions={["jpg", "jpeg", "png", "webp"]} tags={["showcase-pictures"]} metadata={(file: File) => {
-                                            return {
-                                                sourceAssetType: "Image",
-                                                targetAssetType: "Image",
-                                                name: file.name.split(".")[0],
-                                                assetData: {
-                                                    fileName: file.name,
+                                        <Switcher condition={backgroundImageAsset !== undefined}
+                                        trueChild={
+                                            <MagicButton languageSpecificChildren={{
+                                                "en": "remove background image",
+                                                "zh": "移除背景圖片"
+                                            }} onClick={()=>{
+                                                if (backgroundImageAsset !== undefined) {
+                                                    VaporAPI.deleteAsset(id, backgroundImageAsset.id)
                                                 }
-                                            }
-                                        }} postID={id}/>
+                                            }}/>
+                                        }
+                                        falseChild={
+                                            <SingleFileAssetUploader extensions={["jpg", "jpeg", "png", "webp"]} tags={["background-image"]} metadata={(file: File) => {
+                                                return {
+                                                    sourceAssetType: "Image",
+                                                    targetAssetType: "Image",
+                                                    name: file.name.split(".")[0],
+                                                    assetData: {
+                                                        fileName: file.name,
+                                                    }
+                                                }
+                                            }} postID={id}/>
+                                        }
+                                        />
                                     </td>
                                 </tr>
                             </tbody>
