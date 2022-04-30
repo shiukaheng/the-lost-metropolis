@@ -83,7 +83,7 @@ export default class VaporAPI {
         await deleteDoc(doc(VaporAPI.postsRef, id))
     }
 
-    // Asset CRUD - Not really crud though. Only supports upload and delete.
+    // Asset CRUD, a bit more managed than the post CRUD
     /**
      * Uploads an asset to a post, file will be a .vaps file which is just a zip archive with a metadata.json and a data folder containing files used by the asset. E.g., Potree and 3D tiles.
      * @param postID the post ID
@@ -135,12 +135,12 @@ export default class VaporAPI {
      * Convenience method to upload an asset that only uses a single file, like images, sounds, etc. Supplying a metadata file is optional, but recommended as file types can be ambiguous and naming the asset is important.
      * @param postID the post ID
      * @param file the file to upload
-     * @param metadata the metadata file to upload
+     * @param metadata optional metadata to attach to asset
      * @param onUploadProgress callback for upload progress
      * @param tags optional tags to add to the asset
      * @returns Promise of the asset ID
      */
-    static async uploadSingleFileAsset(postID: string, file: File, metadata: Partial<AssetMetadataFile>, onUploadProgress: (number)=>void, tags?: string[]): Promise<string> {
+    static async uploadSingleFileAsset(postID: string, file: File, metadata: Partial<AssetMetadataFile>={}, onUploadProgress: (number)=>void, tags?: string[]): Promise<string> {
         // Generate a uuidv4 as an id for the asset
         const assetID = v4()
         // Generate AssetMetadataFile json with the information we have
@@ -236,8 +236,6 @@ export default class VaporAPI {
         // Delete the asset from the post
         await updateDoc(postDocRef, { assets: arrayRemove(assetInstance) })
         // Note: Could be optimized to use an existing assetInstance that could be supplied as a parameter
-        // Note: Could use modifyAsset for this
-        // TODO: Delete the asset from the storage, use a called function to delete unmatched assets on static storage
         const culler = httpsCallable(functions, "cullUnreferencedAssets");
         await culler({postID})
     }
