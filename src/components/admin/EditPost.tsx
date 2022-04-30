@@ -16,7 +16,7 @@ import { Theme } from "../../../api/types/Theme";
 import { Post } from "../../../api/types/Post";
 import { defaultTheme } from "react-select";
 import { defaultTheme as vaporDefaultTheme } from "../App"
-import { SingleFileAssetUploader } from "../editor/ui_elements/SingleFileAssetUploader";
+import { SingleFileAssetUploader } from "./editPost/SingleFileAssetUploader";
 
 function applyTheme(buffer:Partial<Post>, newTheme:Partial<Theme>): Partial<Post> {
     return {
