@@ -5,8 +5,8 @@ import * as fs from "fs";
 export class ImageAsset implements AssetType {
     static conversionMap: Map<typeof AssetType, AssetConverterFunction> = new Map();
     static assetLiteral: AssetLiteral = "Image";
-    static target: true;
-    static source: true;
+    static target = true;
+    static source = true;
     static validate(assetData: object, rootPath: string): void {
         // Check that rootPath is actually a directory
         if (!fs.lstatSync(rootPath).isDirectory()) {

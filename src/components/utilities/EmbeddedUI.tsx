@@ -1,4 +1,4 @@
-import { Children, cloneElement, useContext } from "react"
+import { Children, cloneElement, ReactChildren, ReactElement, useContext } from "react"
 import { twMerge } from "tailwind-merge"
 import { formatRGBCSS } from "../../utilities"
 import { ThemeContext } from "../App"
@@ -41,7 +41,13 @@ export function EmbeddedCell({position="top", embedded=false, children=null, cla
     )
 }
 
-export function EmbeddedRow({position="top", embedded=false, children=null, className="", ...props}) {
+export function EmbeddedRow({position="top", embedded=false, children=null, className="", ...props}: {
+    position?: "top" | "bottom",
+    embedded?: boolean,
+    children?: ReactElement[] | null,
+    className?: string,
+    [key: string]: any
+}) {
     // If position is top or bottom, add border-l to all children except the first; If position is left or right, add border-t to all children except the first
     const wrappedChildren = Children.toArray(children).map((child, index) => {
         const borderClassName = (
@@ -62,7 +68,11 @@ export function EmbeddedRow({position="top", embedded=false, children=null, clas
     )
 }
 
-export function RoundedContainer({children=null, className="", direction="vertical"}) {
+export function RoundedContainer({children=null, className="", direction="vertical"}: {
+    children?: React.ReactNode;
+    className?: string;
+    direction?: "vertical" | "horizontal";
+}) {
     return (
         <div className={twMerge("rounded-3xl w-full h-full overflow-clip flex border border-current place-content-between", (direction==="vertical" ? "flex-col" : direction==="horizontal" ? "flex-row" : ""), className)}>
             {children}
@@ -102,11 +112,18 @@ export function EmbeddedTab({position="top", embedded=false, highlight=false, on
     )
 }
 
-export function EmbeddedTabs({position="top", embedded=false, options=[], activeOption="", onUpdate=(option)=>{}, className=""}) {
+export function EmbeddedTabs({position="top", embedded=false, options=[], activeOption="", onUpdate=(option)=>{}, className=""}: {
+    position?: "top" | "bottom" | "left" | "right";
+    embedded?: boolean;
+    options?: string[];
+    activeOption?: string;
+    onUpdate?: (option: string) => void;
+    className?: string;
+}) {
     return (
         <EmbeddedRow position={position} embedded={embedded} className={className}>
             {
-                options.map((option, index)=>(
+                options.map((option: string, index: number)=>(
                     <EmbeddedTab key={index} onClick={()=>{onUpdate(option)}} highlight={activeOption===option}>{option}</EmbeddedTab>
                 ))
             }

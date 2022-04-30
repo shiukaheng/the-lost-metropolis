@@ -213,6 +213,7 @@ export async function uploadAssetToCDN(processedPath: any, metadata: AssetZipMet
     }
 }
 export async function cleanupFolders(paths: string[]) {
+    console.log("Cleaning up folders", paths);
     for (const path of paths) {
         // Check if path exists
         if (fs.existsSync(path)) {

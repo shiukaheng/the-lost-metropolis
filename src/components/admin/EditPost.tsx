@@ -1,5 +1,5 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { Condition, useBufferedPost, useConfirm, useMultilang, usePost, useTheme } from "../../utilities";
+import { Condition, useBufferedPost, useChooseFile, useConfirm, useMultilang, usePost, useTheme } from "../../utilities";
 import GenericPage from "../utilities/GenericPage";
 import { Input } from "../utilities/Input";
 import MagicDiv from "../utilities/MagicDiv";
@@ -16,6 +16,7 @@ import { Theme } from "../../../api/types/Theme";
 import { Post } from "../../../api/types/Post";
 import { defaultTheme } from "react-select";
 import { defaultTheme as vaporDefaultTheme } from "../App"
+import { SingleFileAssetUploader } from "../editor/ui_elements/UploaderButton";
 
 function applyTheme(buffer:Partial<Post>, newTheme:Partial<Theme>): Partial<Post> {
     return {
@@ -74,8 +75,6 @@ function EditingForm({className="", editor3dMode=false}) {
     const { id } = useParams();
     const navigate = useNavigate()
     const [buffer, setBuffer, post, push, pull, changed, overwriteWarning] = useBufferedPost(id, ["title", "description", "public", "theme"]);
-    // useTheme()
-    
     const titleLabel = useMultilang({"en": "title", "zh": "標題"});
     const descriptionLabel = useMultilang({"en": "description", "zh": "描述"});
     const publicLabel = useMultilang({"en": "public", "zh": "公開"});
@@ -116,57 +115,70 @@ function EditingForm({className="", editor3dMode=false}) {
     // useTheme(buffer.theme)
     return (
         // Return table with inputs for title, description, and public
-        <RoundedContainer className="relative">
-            <EditorSceneOverlay value={buffer.data} setValue={(value) => setBuffer({...buffer, data: value})} hidden={!editor3dMode}/>
-            <EmbeddedTabs position="top" options={languages} activeOption={activeLanguage} onUpdate={setActiveLanguage} className="h-16"/>
-            <div className="px-8 py-8 flex flex-col gap-4 grow overflow-y-scroll">
-                {overwriteWarning ? 
-                <div className="flex flex-row">
-                    <div className="font-bold text-yellow-400">{overwriteLabel}</div>
-                    <MagicButton solid className="ml-auto" onClick={()=>{pull()}}>{pullLabel}</MagicButton>
-                </div> : null}
-                <table className="w-full">
-                    <tbody className="post-editor">
-                        <tr>
-                            <td>{titleLabel}</td>
-                            <td>
-                                <Input typeName="string" value={buffer.title[activeLanguage]} setValue={(value) => setBuffer({...buffer, title: {...buffer.title, [activeLanguage]: value}})} />
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>{descriptionLabel}</td>
-                            <td>
-                                <Input typeName="multiline-string" value={buffer.description[activeLanguage]} setValue={(value) => setBuffer({...buffer, description: {...buffer.description, [activeLanguage]: value}})} />
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>{publicLabel}</td>
-                            <td>
-                                <Input typeName="boolean" value={buffer.public} setValue={(value) => setBuffer({...buffer, public: value})} />
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>{bgColorLabel}</td>
-                            <td>
-                                <OptionalThemeColor buffer={buffer} setBuffer={setBuffer} themePropName={"backgroundColor"}/>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>{fgColorLabel}</td>
-                            <td>
-                                <OptionalThemeColor buffer={buffer} setBuffer={setBuffer} themePropName={"foregroundColor"}/>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <Condition condition={post?.role === "editor" || post?.role === "owner"}>
-                <EmbeddedRow position="bottom" className="h-16">
-                    <EmbeddedButton className="basis-3/4" onClick={push} disabled={!changed}>{saveLabel}</EmbeddedButton>
-                    <EmbeddedButton className="basis-1/4 border-l" backgroundColor={[209, 54, 70]} onClick={deleteTrigger}>{deleteLabel}</EmbeddedButton>
-                </EmbeddedRow>
-            </Condition>
-        </RoundedContainer>
+        <Condition condition={id && buffer}>
+            <RoundedContainer className="relative">
+                <EditorSceneOverlay value={buffer.data} setValue={(value) => setBuffer({...buffer, data: value})} hidden={!editor3dMode}/>
+                <EmbeddedTabs position="top" options={languages} activeOption={activeLanguage} onUpdate={setActiveLanguage} className="h-16"/>
+                <div className="overflow-y-scroll flex flex-col grow">
+                    <div className="px-8 py-8 flex flex-col gap-4">
+                        {overwriteWarning ? 
+                        <div className="flex flex-row">
+                            <div className="font-bold text-yellow-400">{overwriteLabel}</div>
+                            <MagicButton solid className="ml-auto" onClick={()=>{pull()}}>{pullLabel}</MagicButton>
+                        </div> : null}
+                        <table className="w-full">
+                            <tbody className="post-editor">
+                                <tr>
+                                    <td>{titleLabel}</td>
+                                    <td>
+                                        <Input typeName="string" value={buffer.title[activeLanguage]} setValue={(value) => setBuffer({...buffer, title: {...buffer.title, [activeLanguage]: value}})} />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>{descriptionLabel}</td>
+                                    <td>
+                                        <Input typeName="multiline-string" value={buffer.description[activeLanguage]} setValue={(value) => setBuffer({...buffer, description: {...buffer.description, [activeLanguage]: value}})} />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>{publicLabel}</td>
+                                    <td>
+                                        <Input typeName="boolean" value={buffer.public} setValue={(value) => setBuffer({...buffer, public: value})} />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>{bgColorLabel}</td>
+                                    <td>
+                                        <OptionalThemeColor buffer={buffer} setBuffer={setBuffer} themePropName={"backgroundColor"}/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>{fgColorLabel}</td>
+                                    <td>
+                                        <OptionalThemeColor buffer={buffer} setBuffer={setBuffer} themePropName={"foregroundColor"}/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>upload image</td>
+                                    <td>
+                                        <SingleFileAssetUploader extensions={["jpg", "jpeg", "png", "webp"]} tags={["showcase-pictures"]} metadata={{
+                                            sourceAssetType: "Image",
+                                            targetAssetType: "Image"
+                                        }} postID={id}/>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <Condition condition={post?.role === "editor" || post?.role === "owner"}>
+                    <EmbeddedRow position="bottom" className="h-16">
+                        <EmbeddedButton className="basis-3/4" onClick={push} disabled={!changed}>{saveLabel}</EmbeddedButton>
+                        <EmbeddedButton className="basis-1/4 border-l" backgroundColor={[209, 54, 70]} onClick={deleteTrigger}>{deleteLabel}</EmbeddedButton>
+                    </EmbeddedRow>
+                </Condition>
+            </RoundedContainer>
+        </Condition>
     )
 }
 

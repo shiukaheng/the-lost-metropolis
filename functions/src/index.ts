@@ -9,6 +9,7 @@ import * as path from "path";
 import { SourceAssetLiteral, TargetAssetLiteral } from "../../api/types/AssetLiteral";
 import { Asset } from "../../api/types/Asset";
 import { AssetConverterFunction, AssetType, assetTypes } from "./lib/types/AssetType";
+import * as fs from "fs";
 
 admin.initializeApp();
 
@@ -79,26 +80,31 @@ async function processSingleFileAsset(object: functions.storage.ObjectMetadata, 
     const usedPaths = []
     try {
         // Download file to local directory
+        console.log("Downloading file to local directory")
         const bucket = admin.storage().bucket();
         if (!(typeof object.name === "string")) {
             throw new Error(`File ${object.name} does not have a valid name`);
         }
         const tempDir = getTempDir();
-        usedPaths.push(tempDir)
         // Make a single-file-asset folder
-        
+        console.log("Making single-file-asset folder")
         const fileDestination = path.resolve(tempDir, "single-file-asset", object.name);
-        console.log("Fetching file from bucket");
+        const downloadFolder = path.dirname(fileDestination)
+        usedPaths.push(downloadFolder)
+        fs.mkdirSync(downloadFolder, { recursive: true });
+        console.log("Fetching file from temp bucket");
         await bucket.file(object.name).download({
             destination: fileDestination
         });
         // Delete file from bucket
-        console.log("Deleting file from bucket");
+        console.log("Deleting file from temp bucket");
         await bucket.file(object.name).delete();
         // Get asset from post
+        console.log("Determining asset types")
         // Determine source and target asset types using function that takes in provided info in database and the file itself
         const { sourceAssetType, targetAssetType } = determineSFAssetAssetTypePair(fileDestination, asset.data);
         // Change source and target types, and set pending to false
+        console.log("Updating asset source, target types:", sourceAssetType.assetLiteral, targetAssetType.assetLiteral)
         await modifyAsset(postRef, asset.id, asset => {
             asset.metadata.sourceAssetType = sourceAssetType.assetLiteral;
             asset.metadata.targetAssetType = targetAssetType.assetLiteral;
@@ -109,7 +115,10 @@ async function processSingleFileAsset(object: functions.storage.ObjectMetadata, 
         var targetPath: string;
         const sourcePath = path.dirname(fileDestination);
         if (sourceAssetType !== targetAssetType) {
+            console.log("Converting asset to target asset type")
             targetPath = path.resolve(tempDir, "converted_data");
+            usedPaths.push(targetPath)
+            fs.mkdirSync(targetPath, { recursive: true });
             (sourceAssetType.getConverter(targetAssetType) as AssetConverterFunction)(
                 asset.data.data,
                 sourcePath,
@@ -123,15 +132,18 @@ async function processSingleFileAsset(object: functions.storage.ObjectMetadata, 
                 }
             );
         } else {
-            targetPath = fileDestination;
+            console.log("No conversion required")
+            targetPath = sourcePath;
         }
         // Mark asset as processed
+        console.log("Marking asset as processed")
         modifyAsset(postRef, asset.id, asset => {
             asset.metadata.status.processedProgress = 1;
             asset.metadata.status.processed = true;
             return asset;
         });
         // Upload to CDN
+        console.log("Uploading to CDN")
         // Verify object.metadata is valid
         if (!assetZipMetadataSchema.isValidSync(object.metadata)) {
             throw new Error("Invalid file metadata")
@@ -151,6 +163,7 @@ async function processSingleFileAsset(object: functions.storage.ObjectMetadata, 
         return asset;
     });
     await cleanupFolders(usedPaths);
+    console.log("Done creating asset")
 }
 
 async function processZippedAsset(object: functions.storage.ObjectMetadata, postRef: admin.firestore.DocumentReference<admin.firestore.DocumentData>, asset) {
@@ -191,25 +204,35 @@ async function processZippedAsset(object: functions.storage.ObjectMetadata, post
  * @param asset The asset object in the database
  */
 function determineSFAssetAssetTypePair(fileDestination: string, asset: Asset): { sourceAssetType: typeof AssetType; targetAssetType: typeof AssetType; } {
+    console.log("Asset detection with params:", fileDestination, asset)
     var sourceType: typeof AssetType = null;
     var targetType: typeof AssetType = null;
     var sourceTypeVerified = false;
+    console.log("Getting asset folder")
     const assetFolder = path.dirname(fileDestination);
     // Check if sourceAssetType and targetAssetType are provided in metadata
     // Conditional: If both sourceAssetType and targetAssetType is provided, 
     if (asset.metadata.sourceAssetType && asset.metadata.targetAssetType) {
+        console.log("Source and target asset types provided in metadata, checking if they are a valid pair")
         // If yes, check if it is a valid source-target pair
         const proposedSourceAssetType = getAssetType(asset.metadata.sourceAssetType);
         const proposedTargetAssetType = getAssetType(asset.metadata.targetAssetType);
-        if (proposedSourceAssetType.conversionMap.has(proposedTargetAssetType)) {
+        console.log("Proposed source and target asset types:", proposedSourceAssetType, proposedTargetAssetType)
+        console.log((proposedSourceAssetType.assetLiteral === proposedTargetAssetType.assetLiteral), (proposedTargetAssetType.target), (proposedTargetAssetType.source))
+        if (proposedSourceAssetType.conversionMap.has(proposedTargetAssetType) || 
+        ((proposedSourceAssetType.assetLiteral === proposedTargetAssetType.assetLiteral) && (proposedTargetAssetType.target) && (proposedTargetAssetType.source))) {
             // If yes: set sourceAssetType and targetAssetType to the provided values
+            console.log("Valid source-target pair, setting source and target asset types")
             sourceType = proposedSourceAssetType;
             targetType = proposedTargetAssetType;
         } else {
             // If not, throw error: Invalid source-target pair
+            console.error("Invalid source-target pair, throwing error")
             throw new Error("Invalid source-target pair specified");
         }
+        console.log("Source and target asset types verified")
     } else {
+        console.log("No source or target asset types provided in metadata, checking if file belongs to a known asset type")
         // If no: try detect sourceAssetType
         const detectedTypes = detectAssetTypes(asset.data, assetFolder)
         const sourceTypes = detectedTypes.filter(type => type.source)
@@ -232,6 +255,7 @@ function determineSFAssetAssetTypePair(fileDestination: string, asset: Asset): {
         }   
     }
     // Check sourceType validity if it was not verified before
+    console.log("Validating proposed types:", sourceType, targetType)
     if (!sourceTypeVerified) {
         sourceType.validate(asset.data, assetFolder);
     }

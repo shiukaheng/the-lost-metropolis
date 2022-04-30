@@ -190,7 +190,7 @@ export function useFollowMouse(onMouseMove:Function|null=null) {
 //     return posts;
 // }
 
-export const useMultilang = (content?: MultiLangString) => {
+export const useMultilang = (content: MultiLangString) => {
     const {settings} = useContext(SettingsContext)
     if (content === undefined || content === null) {
         return ""
@@ -416,7 +416,7 @@ export function Condition({condition, children}) {
     return condition ? children : null
 }
 
-export function useChooseFile(validifier?: (file: File)=>boolean): [createPrompt:()=>void, file:File | null, valid:boolean | null, clearFiles:()=>void] {
+export function useChooseFile(validifier?: (file: File)=>boolean, accept?:string): [createPrompt:()=>void, file:File | null, valid:boolean | null, clearFiles:()=>void] {
     // Returns createPrompt function and file object
     const [file, setFile] = useState<File|null>(null)
     const [valid, setValid] = useState<boolean|null>(null)
@@ -426,6 +426,7 @@ export function useChooseFile(validifier?: (file: File)=>boolean): [createPrompt
         inputRef.current = document.createElement("input")
         inputRef.current.type = "file"
         inputRef.current.style.display = "none"
+        inputRef.current.accept = accept || "*"
         inputRef.current.addEventListener("change", (e) => {
             if (e.target === null) { // If the event is not triggered by the input element
                 return
@@ -448,6 +449,9 @@ export function useChooseFile(validifier?: (file: File)=>boolean): [createPrompt
         inputRef.current && inputRef.current.click()
     }
     const clearFiles = () => {
+        if (inputRef.current) {
+            inputRef.current.value = null
+        }
         setFile(null)
         setValid(null)
     }

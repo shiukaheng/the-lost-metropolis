@@ -2,9 +2,21 @@ import { SettingsContext, ThemeContext } from "../App"
 import { Fragment, useContext, useLayoutEffect, useRef, useState } from "react"
 import { formatRGBCSS, useMounted } from "../../utilities"
 import { twMerge } from 'tailwind-merge'
+import { MultiLangString } from "../../../api/types/MultiLangString"
 
 // Dynamically color div css attributes based on theme, but note that its not compatible with external transitions due to use of element css which overrides classes
-function MagicButton({ languageSpecificChildren=null, style={}, solid=false, children=undefined, className="", mergeTransitions=true, autoColor=true, disabled=false, onClick=(e)=>{}, ...props }) {
+function MagicButton({ languageSpecificChildren=null, style={}, solid=false, children=undefined, className="", mergeTransitions=true, autoColor=true, disabled=false, onClick=(e)=>{}, ...props }: {
+    languageSpecificChildren?: MultiLangString | null,
+    style?: React.CSSProperties,
+    solid?: boolean,
+    children?: React.ReactNode,
+    className?: string,
+    mergeTransitions?: boolean,
+    autoColor?: boolean,
+    disabled?: boolean,
+    onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void,
+    [key: string]: any
+}) {
     const {settings} = useContext(SettingsContext)
     const {theme} = useContext(ThemeContext)
     const testDiv = useRef(null)
