@@ -52,7 +52,7 @@ function ViewportCanvas({children, ...props}) {
     return (
         <Canvas linear flat {...props}>
             <EffectComposer>
-                <Bloom luminanceThreshold={0} luminanceSmoothing={0.9} height={160} />
+                {/* <Bloom luminanceThreshold={0} luminanceSmoothing={0.9} height={160} /> */}
                 <Vignette eskil={false} offset={0.1} darkness={0.5} />
             </EffectComposer>
             <ContextBridge>

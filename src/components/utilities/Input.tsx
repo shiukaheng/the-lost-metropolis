@@ -258,7 +258,7 @@ function AssetInput({value, setValue, data}) {
     return (
         <ThemedSelect className="flex-grow" options={selectOptions} onChange={(selectedOption, _)=>{
             setValue(selectedOption.value)
-        }} value={selectOptions.find(entry => entry.value.assetID === value.assetID)}/>
+        }} value={selectOptions.find(entry => entry.value.assetID === value?.assetID)}/>
     )
 }
 
