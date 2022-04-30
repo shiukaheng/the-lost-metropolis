@@ -1,5 +1,5 @@
 import { sourceAssetLiteralSchema, targetAssetLiteralSchema } from './AssetLiteral';
-import { boolean, InferType, number, object, string } from "yup";
+import { array, boolean, InferType, number, object, string } from "yup";
 
 export const assetSchema = object({
     data: object().nullable().defined().default(null),
@@ -15,7 +15,8 @@ export const assetSchema = object({
             ready: boolean().required().default(false),
             pending: boolean().required().default(true),
             error: string().nullable().default(null)
-        }).required()
+        }).required(),
+        tags: array(string()).required().default([]),
     }).required()
 })
 

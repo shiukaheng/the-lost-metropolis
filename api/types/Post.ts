@@ -9,27 +9,6 @@ import { userIDSchema } from "./UserID"
 
 // TODO: Just unify Post shape with PostDocData shape, but allow different types. Easier to think about.
 
-// export const postSchema = object({
-//     data: object({
-//         title: makeRequiredMultiLangStringSchema({
-//             "en": "Untitled post",
-//             "zh": "無標題"
-//         }),
-//         description: makeRequiredMultiLangStringSchema(),
-//         configuration: sceneConfigurationSchema.required(),
-//         sceneChildren: array(sceneChildSchema).required().default([]),
-//         assets: array(object({
-//             id: string().required(),
-//             data: assetSchema.required()
-//         }).required()).required().default([])
-//     }),
-//     metadata: object({
-//         createdAt: string().required().default(()=>new Date().toISOString()),
-//         updatedAt: string().required().default(()=>new Date().toISOString()),
-//         permissions: permissionsSchema.required()
-//     })
-// })
-
 /**
  * The schema for the DocumentData that will be retrieved from firebase
  */
@@ -56,6 +35,7 @@ import { userIDSchema } from "./UserID"
     viewers: array(userIDSchema).required().default([]),
     public: boolean().required().default(false),
     theme: themeSchema.required(),
+    tags: array(string()).required().default([]),
 })
 
 export type Post = InferType<typeof postSchema>

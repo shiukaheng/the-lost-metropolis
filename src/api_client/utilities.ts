@@ -21,6 +21,7 @@ export function naiveExport(post: Post): PostDocData {
         viewers: post.viewers,
         public: post.public,
         theme: post.theme,
+        tags: post.tags,
     }
 }
 

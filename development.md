@@ -53,6 +53,10 @@ VaporComponent types are special 3D components that have extra logic that allows
   - For single file uploads, since no metadata.json can be provided, you need to either supply it as an object for as a function argument, or if no argument was given, the cloud function will try and infer it.
 - A cloud function will then be triggered when the file is uploaded (which will mark the asset's pending property as false), and convert the asset if needed (during conversion, updates the asset processProgress property, and when finished, updates the asset processed property to true), and finally upload it to the static server (and marks the asset ready property as true).
 
+# Updating post schema
+- Remember to update both Post and PostDocData schemas
+- Also, update importPost and exportPost in the api
+
 # Improvements
 
 - Currently ViewerContext and EditorContext are just one big object with unrelated functionality, and some setValue functions are even passed down, causing some infinite rendering loop issues if setting of one property affects the value of another. Should seperate these into different contexts, but the reason why I initially structured like this is for ease of use. Perhaps find a state management library to improve this? Using useLazyEffect custom hook to get around this but is incredibly hacky. Basically does deep check of dependencyArray to see if the value has actually changed, and only actually call the callback if it did change. Will have impact on performance since these comparisons are not cheap if the dependencies are complex.
