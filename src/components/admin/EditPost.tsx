@@ -161,9 +161,15 @@ function EditingForm({className="", editor3dMode=false}) {
                                 <tr>
                                     <td>upload image</td>
                                     <td>
-                                        <SingleFileAssetUploader extensions={["jpg", "jpeg", "png", "webp"]} tags={["showcase-pictures"]} metadata={{
-                                            sourceAssetType: "Image",
-                                            targetAssetType: "Image"
+                                        <SingleFileAssetUploader extensions={["jpg", "jpeg", "png", "webp"]} tags={["showcase-pictures"]} metadata={(file: File) => {
+                                            return {
+                                                sourceAssetType: "Image",
+                                                targetAssetType: "Image",
+                                                name: file.name.split(".")[0],
+                                                assetData: {
+                                                    fileName: file.name,
+                                                }
+                                            }
                                         }} postID={id}/>
                                     </td>
                                 </tr>
