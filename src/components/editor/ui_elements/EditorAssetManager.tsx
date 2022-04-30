@@ -39,7 +39,7 @@ export default function EditorAssetManager({postID, assets}: {postID?: string, a
                         try {
                             await VaporAPI.uploadAsset(postID as string, file, (progress: number)=>{
                                 setUploadProgress(progress)
-                            })
+                            }, ["3d-editor"])
                         } catch (e) {
                             console.warn("Error uploading asset...")
                             if (window.location.hostname !== "localhost") {
