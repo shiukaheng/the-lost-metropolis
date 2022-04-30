@@ -5,7 +5,7 @@ import {
 import { range } from "lodash"
 import { createElement } from "react";
 import MagicDiv from '../utilities/MagicDiv';
-import { LinearToSRGB, SRGBToLinear, useLazyEffect } from '../../utilities';
+import { LinearToSRGB, SRGBToLinear, unionMatch, useLazyEffect } from '../../utilities';
 import { targetAssetLiteralSchema } from '../../../api/types/AssetLiteral';
 import { EditorContext } from '../editor/EditorContext';
 import { ClientAsset } from '../../api_client/types/ClientAsset';
@@ -13,6 +13,7 @@ import Select from 'react-select';
 import { createSelectStyles } from '../editor/utilities';
 import { ThemedSelect } from './ThemedSelect';
 import { twMerge } from 'tailwind-merge';
+import { array, InferType, object, string } from 'yup';
 
 // Props for input elements:
 // value is the current value of the property, used to display the current value of the property in the editor
@@ -224,23 +225,29 @@ const QuaternionInput = ({value, setValue}) => VectorInput({length: 4, value, se
 const Matrix3Input = ({value, setValue}) => MatrixInput({rows: 3, columns: 3, value: unflattenMatrix(value, 3, 3), setValue: (value) => setValue(flattenMatrix(value))});
 const Matrix4Input = ({value, setValue}) => MatrixInput({rows: 4, columns: 4, value: unflattenMatrix(value, 4, 4), setValue: (value) => setValue(flattenMatrix(value))});
 
+export const assetInputDataSchema = object({
+    "assetTypes": array(targetAssetLiteralSchema),
+    "tags": array(string())
+})
+
+export type AssetInputData = InferType<typeof assetInputDataSchema>
+
 function AssetInput({value, setValue, data}) {
-    // Check that data is an array of valid assetLiterals (use assetLiteralSchema)
     const { clientAssets } = useContext(EditorContext)
-    if (Array.isArray(data)) {
-        for (const type of data) {
-            if (!targetAssetLiteralSchema.isValidSync(type)) {
-                console.error("Invalid asset literal", type);
-                return null;
-            }
-        }
-    } else {
-        console.error("Invalid data value", data)
-        throw new Error("AssetInput data must be an array of asset literals");
+    // Check if data is valid
+    if (!assetInputDataSchema.isValidSync(data)) {
+        console.warn("Invalid asset input data", data);
     }
     let availableAssets: ClientAsset[] = []
     if (clientAssets !== null) {
-        availableAssets = clientAssets.filter(asset => data.includes(asset.type)) 
+        availableAssets = [...clientAssets]; // clone
+        // availableAssets = clientAssets.filter(asset => data.includes(asset.type))
+        if (data.assetTypes) {
+            availableAssets = availableAssets.filter(asset => data.assetTypes.includes(asset.type))
+        }
+        if (data.tags) {
+            availableAssets = availableAssets.filter(asset => unionMatch(data.tags, asset.tags))
+        }
     }
     const selectOptions = availableAssets.map(asset => ({
         label: asset.name,

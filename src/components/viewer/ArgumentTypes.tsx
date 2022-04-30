@@ -90,11 +90,14 @@ export const MultilineStringType: EditorInputType = {
 //     typeCheck: (value) => resolvedAssetSchema.isValidSync(value)
 // }
 
-export function createAssetType(acceptedAssetTypes: string[]): EditorInputType {
+export function createAssetType(acceptedAssetTypes?: string[], acceptedTags?: string[]): EditorInputType {
     return {
         typeName: "asset",
         typeCheck: (value) => (value === null) || (clientAssetSchema.isValidSync(value) && acceptedAssetTypes.includes(value.type)), // Input needs to be able to deal with null, since assets can't have some generic default type
-        data: acceptedAssetTypes
+        data: {
+            "assetTypes": acceptedAssetTypes,
+            "tags": acceptedTags
+        }
     }
 }
 

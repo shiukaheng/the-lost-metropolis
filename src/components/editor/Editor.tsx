@@ -116,7 +116,8 @@ function EditorManager() {
                     assetID: asset.id,
                     type: type,
                     assetData: asset.data.data,
-                    name: asset.data.metadata.name
+                    name: asset.data.metadata.name,
+                    tags: asset.data.metadata.tags,
                 })
             }
         }

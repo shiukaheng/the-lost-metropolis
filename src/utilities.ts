@@ -484,3 +484,8 @@ export function useLazyEffect(callback, dependencyArray) { // Hacky workaround f
         numUpdatesRef.current++
     }, dependencyArray)
 }
+
+export function unionMatch(listA, listsB) {
+    // Returns true if any of the elements in listA is in listB
+    return listA.some(x => listsB.includes(x))
+}
