@@ -89,13 +89,18 @@ export default class VaporAPI {
      * @param postID the post ID
      * @param file the .vaps package to upload
      * @param onUploadProgress callback for upload progress
+     * @param tags optional tags to add to the asset
      * @returns Promise of the asset ID
      */
-    static async uploadAsset(postID: string, file: File, onUploadProgress: (number)=>void): Promise<string> {
+    static async uploadAsset(postID: string, file: File, onUploadProgress: (number)=>void, tags?: string[]): Promise<string> {
         // Generate a uuidv4 as an id for the asset
         const assetID = v4()
         // Create an empty Asset object using the assetSchema
         const asset: Asset = assetSchema.getDefault()
+        // Concatenate tags to the asset, not just setting it
+        if (tags) {
+            asset.metadata.tags.push(...tags)
+        }
         // Wrap the Asset object in an instance with the uuid
         const assetInstance = instance(asset, assetID)
         // Get the post document's reference on firebase
@@ -134,11 +139,15 @@ export default class VaporAPI {
      * @param onUploadProgress callback for upload progress
      * @returns Promise of the asset ID
      */
-    static async uploadSingleFileAsset(postID: string, file: File, metadata: Partial<AssetMetadataFile>, onUploadProgress: (number)=>void): Promise<string> {
+    static async uploadSingleFileAsset(postID: string, file: File, metadata: Partial<AssetMetadataFile>, onUploadProgress: (number)=>void, tags?: string[]): Promise<string> {
         // Generate a uuidv4 as an id for the asset
         const assetID = v4()
         // Generate AssetMetadataFile json with the information we have
         const asset = generateAsset(metadata);
+        // Add tags to the asset
+        if (tags) {
+            asset.metadata.tags.push(...tags)
+        }
         // Wrap the Asset object in an instance with the uuid
         const assetInstance = instance(asset, assetID)
         // Get the post document's reference on firebase
@@ -254,6 +263,7 @@ export default class VaporAPI {
             createdAt: docData.createdAt.toDate().toISOString(),
             updatedAt: docData.updatedAt.toDate().toISOString(),
             theme: docData.theme,
+            tags: docData.tags,
         }
     }
 
