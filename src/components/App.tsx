@@ -29,6 +29,9 @@ import UploadAssetPage from "./development/UploadAssetTest";
 import { LanguageLiteral } from '../../api/types/LanguageLiteral';
 import { Theme } from '../../api/types/Theme';
 import { PointCloudOctreeGeometryNode } from '@pnext/three-loader';
+import { Post } from '../../api/types/Post';
+import VaporAPI from '../api_client/api';
+import { Instance } from '../../api/utility_types';
 
 export const defaultSettings = {
     lang: "en" as LanguageLiteral
@@ -164,6 +167,39 @@ function SiteRouter() {
             </div>
         </LoadingScreen>
     </Router>;
+}
+
+function detectBackgroundUrls(postInstance: Instance<Post>) {
+    // First, we determine the URLs for possible background images / videos
+    var backgroundImage: string | null = null;
+    var backgroundVideo: string | null = null;
+    // If there is a background image url specified in the theme object, use that; otherwise, find the first asset that is a image, and marked with a "background-image" tag.
+    if (postInstance.data.theme.backgroundImage) {
+        backgroundImage = postInstance.data.theme.backgroundImage;
+    } else {
+        const asset = postInstance.data.assets.find((asset) => asset.data.metadata.tags.includes("background-image") && asset.data.metadata.targetAssetType === "Image");
+        if (asset) {
+            if (asset?.data?.data?.fileName === undefined || asset?.data?.data?.fileName === null) {
+                console.warn("Unreadable Image asset", asset);
+            } else {
+                backgroundImage = VaporAPI.resolveAsset(postInstance.id, asset.id)+asset.data.data.fileName;
+            }
+        }
+    }
+    // Same principle for background video.
+    if (postInstance.data.theme.backgroundVideo) {
+        backgroundVideo = postInstance.data.theme.backgroundVideo;
+    } else {
+        const asset = postInstance.data.assets.find((asset) => asset.data.metadata.tags.includes("background-video") && asset.data.metadata.targetAssetType === "Video"); // TODO: Create video asset
+        if (asset) {
+            if (asset?.data?.data?.fileName === undefined || asset?.data?.data?.fileName === null) {
+                console.warn("Unreadable Video asset", asset);
+            } else {
+                backgroundVideo = VaporAPI.resolveAsset(postInstance.id, asset.id)+asset.data.data.fileName;
+            }
+        }
+    }
+    return { backgroundImage, backgroundVideo }
 }
 
 function ThemeSetter() {
