@@ -5,6 +5,7 @@ import { makeRequiredMultiLangStringSchema } from "../types/MultiLangString"
 import { sceneConfigurationSchema } from '../types/SceneConfiguration';
 import { sceneChildSchema } from '../types/SceneChild';
 import { themeSchema } from '../types/Theme';
+import { sponsorSchema } from '../types/Sponsor';
 
 
 // export type PostDocData = {
@@ -44,7 +45,8 @@ export const postDocDataSchema = object({
     viewers: array(string()).required(),
     public: boolean().required(),
     theme: themeSchema.required(),
-    tags: array(string()).required(),
+    tags: array(string().required()).required(),
+    sponsors: array(sponsorSchema.required()).required().default([]),
 })
 
 export type PostDocData = InferType<typeof postDocDataSchema>

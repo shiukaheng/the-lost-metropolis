@@ -305,6 +305,7 @@ export default class VaporAPI {
             updatedAt: docData.updatedAt.toDate().toISOString(),
             theme: docData.theme,
             tags: docData.tags,
+            sponsors: docData.sponsors,
         }
     }
 

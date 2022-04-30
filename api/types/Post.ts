@@ -4,6 +4,7 @@ import { makeRequiredMultiLangStringSchema } from "./MultiLangString";
 // import { permissionsSchema } from "./Permissions";
 import { sceneChildSchema } from "./SceneChild";
 import { sceneConfigurationSchema } from "./SceneConfiguration";
+import { sponsorSchema } from "./Sponsor";
 import { themeSchema } from "./Theme";
 import { userIDSchema } from "./UserID"
 
@@ -35,7 +36,8 @@ import { userIDSchema } from "./UserID"
     viewers: array(userIDSchema).required().default([]),
     public: boolean().required().default(false),
     theme: themeSchema.required(),
-    tags: array(string()).required().default([]),
+    tags: array(string().required()).required().default([]),
+    sponsors: array(sponsorSchema.required()).required().default([]),
 })
 
 export type Post = InferType<typeof postSchema>

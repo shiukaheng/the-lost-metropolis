@@ -1,4 +1,4 @@
-import { object, string } from "yup";
+import { InferType, object, string } from "yup";
 import { makeRequiredMultiLangStringSchema } from "./MultiLangString";
 
 export const sponsorSchema = object({
@@ -8,3 +8,5 @@ export const sponsorSchema = object({
     title: makeRequiredMultiLangStringSchema(), // The title of the sponsor to display on the website
     description: makeRequiredMultiLangStringSchema().nullable().default(null), // The description of the sponsor, if provided, will be displayed on the website
 })
+
+export type Sponsor = InferType<typeof sponsorSchema>

@@ -22,6 +22,7 @@ export function naiveExport(post: Post): PostDocData {
         public: post.public,
         theme: post.theme,
         tags: post.tags,
+        sponsors: post.sponsors,
     }
 }
 
