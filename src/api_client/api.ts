@@ -1,12 +1,12 @@
 import { Post, postSchema } from '../../api/types/Post';
 import { AssetMetadataFile } from "../../functions/src/lib/types/AssetMetadataFile"
 import { Instance, RecursivePartial } from "../../api/utility_types";
-import { addDoc, collection, deleteDoc, doc, getDoc, updateDoc, arrayUnion, arrayRemove, where } from "firebase/firestore";
+import { addDoc, collection, deleteDoc, doc, getDoc, updateDoc, arrayUnion, arrayRemove, where, runTransaction, Transaction } from "firebase/firestore";
 import { PostDocData, postDocDataSchema } from '../../api/implementation_types/PostDocData';
 import { naiveExport, subToRefWithRoleAuthSensitive } from './utilities';
 import { db, storage, functions } from '../firebase-config'
 import { instance, uninstance } from '../../api/utilities';
-import { omit, pick } from "lodash"
+import { cloneDeep, omit, pick } from "lodash"
 import { v4 } from "uuid";
 import { Asset, assetSchema } from '../../api/types/Asset';
 import { ref, uploadBytesResumable } from 'firebase/storage';
@@ -137,6 +137,7 @@ export default class VaporAPI {
      * @param file the file to upload
      * @param metadata the metadata file to upload
      * @param onUploadProgress callback for upload progress
+     * @param tags optional tags to add to the asset
      * @returns Promise of the asset ID
      */
     static async uploadSingleFileAsset(postID: string, file: File, metadata: Partial<AssetMetadataFile>, onUploadProgress: (number)=>void, tags?: string[]): Promise<string> {
@@ -175,6 +176,48 @@ export default class VaporAPI {
         })
         await uploadFile
         return assetID
+    }
+
+    /**
+     * Updates the asset object in database, but does not update the asset file.
+     * @param postID the ID of the post the asset belongs to
+     * @param assetID the asset ID to be updated
+     * @param newAsset, either a new asset object, or a function that takes in the asset object and returns the updated asset object
+     */
+    static async updateAsset(postID: string, assetID: string, newAsset: Asset | ((Asset) => Asset)): Promise<void> {
+        // Determine update type
+        try {
+            await runTransaction(db, async(transaction: Transaction) => {
+                const postRef = doc(VaporAPI.postsRef, postID)
+                const postData = (await transaction.get(postRef)).data();
+                if (!postDocDataSchema.isValidSync(postData)) {
+                    throw new Error("Invalid post document");
+                }
+                const assets: Instance<Asset>[] = postData.assets;
+                const oldAsset = postData.assets.find(asset => asset.id === assetID);
+                if (oldAsset === undefined) {
+                    throw new Error("Asset not found");
+                }
+                var updatedAsset: Asset;
+                if (typeof newAsset === "function") {
+                    updatedAsset = newAsset(cloneDeep(oldAsset.data));
+                } else {
+                    updatedAsset = newAsset;
+                }
+                // Check newAsset schema
+                if (!assetSchema.isValidSync(updatedAsset)) {
+                    throw new Error("Invalid asset object");
+                }
+                
+                const newAssets: Instance<Asset>[] = assets.map(asset => (asset.id === assetID) ? { id: assetID, data: updatedAsset } : asset);
+                transaction.update(postRef, {
+                    assets: newAssets
+                });
+            }) 
+        } catch (e) {
+            console.error(e)
+            throw new Error("Transaction failure");
+        }
     }
 
     /**
