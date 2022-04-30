@@ -57,7 +57,7 @@ export function EditPost() {
     )
 }
 
-function EditorSceneOverlay({hidden, value, setValue}) {
+function EditorSceneOverlay({hidden}) {
     const handle = useFullScreenHandle();
     return (
         <div className={`absolute w-full h-full z-10 ${hidden ? "hidden" : ""}`}>
@@ -117,7 +117,7 @@ function EditingForm({className="", editor3dMode=false}) {
         // Return table with inputs for title, description, and public
         <Condition condition={id && buffer}>
             <RoundedContainer className="relative">
-                <EditorSceneOverlay value={buffer.data} setValue={(value) => setBuffer({...buffer, data: value})} hidden={!editor3dMode}/>
+                <EditorSceneOverlay hidden={!editor3dMode}/>
                 <EmbeddedTabs position="top" options={languages} activeOption={activeLanguage} onUpdate={setActiveLanguage} className="h-16"/>
                 <div className="overflow-y-scroll flex flex-col grow">
                     <div className="px-8 py-8 flex flex-col gap-4">
