@@ -1,7 +1,7 @@
 import { SwitchTransition, CSSTransition } from 'react-transition-group';
 import { Fade } from 'react-reveal';
 import MagicDiv from './MagicDiv';
-import { useMultilang } from '../../utilities';
+import { useMultiLang } from '../../utilities';
 import { twMerge } from 'tailwind-merge'
 
 type LoadingScreenProps = {
@@ -11,7 +11,7 @@ type LoadingScreenProps = {
 }
 
 export default function LoadingScreen({ready=false, children=null, loadingDivClassname="absolute"}:LoadingScreenProps) {
-    const text = useMultilang({
+    const text = useMultiLang({
         en: "loading...",
         zh: "載入中..."
     })

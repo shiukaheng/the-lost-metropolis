@@ -191,7 +191,7 @@ export function useFollowMouse(onMouseMove:Function|null=null) {
 //     return posts;
 // }
 
-export const useMultilang = (content: MultiLangString) => {
+export const useMultiLang = (content: MultiLangString) => {
     const {settings} = useContext(SettingsContext)
     if (content === undefined || content === null) {
         return ""

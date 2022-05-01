@@ -1,6 +1,6 @@
 import { applyProps } from "@react-three/fiber";
 import { useContext } from "react";
-import { useMultilang } from "../../../utilities";
+import { useMultiLang } from "../../../utilities";
 import { ViewerContext } from "../../viewer/ViewerContext";
 import EditorButton from "./EditorButton";
 import EditorEmbeddedWidget from "./EditorEmbeddedWidget";
@@ -8,12 +8,12 @@ import EditorInput from "./EditorInput";
 
 function EditorSceneSettings() {    
     const {defaultCameraProps, setDefaultCameraProps, cameraRef, potreePointBudget, setPotreePointBudget} = useContext(ViewerContext);
-    const heading = useMultilang({"en": "scene Settings", "zh":"場景設定"});
-    const pointBudgetLabel = useMultilang({"en": "point budget", "zh": "點限制"});
-    const defaultCameraPosLabel = useMultilang({"en": "default camera position", "zh": "預設攝影機位置"});
-    const defaultCameraRotLabel = useMultilang({"en": "default camera rotation", "zh": "預設攝影機旋轉"});
-    const defaultCameraFOVLabel = useMultilang({"en": "default camera FOV", "zh": "預設攝影機 FOV"});
-    const setToCurrentPoseLabel = useMultilang({"en": "set to current pose", "zh": "設定為當前姿態"});
+    const heading = useMultiLang({"en": "scene Settings", "zh":"場景設定"});
+    const pointBudgetLabel = useMultiLang({"en": "point budget", "zh": "點限制"});
+    const defaultCameraPosLabel = useMultiLang({"en": "default camera position", "zh": "預設攝影機位置"});
+    const defaultCameraRotLabel = useMultiLang({"en": "default camera rotation", "zh": "預設攝影機旋轉"});
+    const defaultCameraFOVLabel = useMultiLang({"en": "default camera FOV", "zh": "預設攝影機 FOV"});
+    const setToCurrentPoseLabel = useMultiLang({"en": "set to current pose", "zh": "設定為當前姿態"});
     return (
         <EditorEmbeddedWidget title={heading} stickyKey="sceneSettingsExpanded">
             <div className="flex flex-col gap-2">

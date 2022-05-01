@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { AssetMetadataFile } from "../../../../functions/src/lib/types/AssetMetadataFile"
 import VaporAPI from "../../../api_client/api"
-import { useChooseFile, useMultilang } from "../../../utilities"
+import { useChooseFile, useMultiLang } from "../../../utilities"
 import MagicButton from "../../utilities/MagicButton"
 
 interface UploaderProps {
@@ -35,15 +35,15 @@ export function SingleFileAssetUploader({extensions, postID, tags, metadata}: Up
         acceptFileString = "*"
     }
     const [createPrompt, file, valid, clearFiles] = useChooseFile((file) => extensions.some(extension => file.name.endsWith(`.${extension}`)), acceptFileString)
-    const chooseFile = useMultilang({
+    const chooseFile = useMultiLang({
         en: `choose a file (${acceptFileString})`,
         zh: `選擇檔案 (${acceptFileString})`,
     })
-    const invalidFile = useMultilang({
+    const invalidFile = useMultiLang({
         en: "invalid file format",
         zh: "無效檔案格式",
     })
-    const uploadButtonText = useMultilang({
+    const uploadButtonText = useMultiLang({
         en: "upload",
         zh: "上傳",
     })

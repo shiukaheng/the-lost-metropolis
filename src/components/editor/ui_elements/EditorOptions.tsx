@@ -2,7 +2,7 @@ import { ReactComponent as Translate } from "../svgs/translate.svg"
 import { ReactComponent as Rotate } from "../svgs/rotate.svg"
 import { ReactComponent as Scale } from "../svgs/scale.svg"
 import { ThemeContext } from "../../App"
-import { formatRGBCSS, useMultilang } from "../../../utilities";
+import { formatRGBCSS, useMultiLang } from "../../../utilities";
 import MagicDiv from "../../utilities/MagicDiv"
 import { useContext, useState } from "react";
 import EditorEmbeddedWidget from "./EditorEmbeddedWidget";
@@ -54,9 +54,9 @@ function TransformModeSetter({transformMode, setTransformMode, transformSpace, s
 
 export default function EditorOptions() {
     const { transformMode, setTransformMode, transformSpace, setTransformSpace, setOverrideInteractions, overrideInteractions } = useContext(EditorContext)
-    const heading = useMultilang({"en": "editor options", "zh": "編輯器選項"})
-    const transformationLabel = useMultilang({"en": "transformation", "zh": "變換"})
-    const bypassLabel = useMultilang({"en": "bypass editor interactions", "zh": "跳過編輯器互動"})
+    const heading = useMultiLang({"en": "editor options", "zh": "編輯器選項"})
+    const transformationLabel = useMultiLang({"en": "transformation", "zh": "變換"})
+    const bypassLabel = useMultiLang({"en": "bypass editor interactions", "zh": "跳過編輯器互動"})
     return (
         <EditorEmbeddedWidget title={heading} stickyKey="editorOptionsExpanded">
             <div className="flex flex-row gap-2">

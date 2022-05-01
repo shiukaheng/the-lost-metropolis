@@ -3,7 +3,7 @@ import { twMerge } from "tailwind-merge";
 import { Asset } from "../../../../api/types/Asset";
 import { Instance } from "../../../../api/utility_types";
 import VaporAPI from "../../../api_client/api";
-import { useChooseFile, useMultilang } from "../../../utilities";
+import { useChooseFile, useMultiLang } from "../../../utilities";
 import MagicButton from "../../utilities/MagicButton";
 import MagicDiv from "../../utilities/MagicDiv";
 import EditorEmbeddedWidget from "./EditorEmbeddedWidget";
@@ -13,19 +13,19 @@ import MagicIcon from "../../utilities/MagicIcon";
 export default function EditorAssetManager({postID, assets}: {postID?: string, assets?: (Instance<Asset>)[]}) {
     const [createPrompt, file, valid, clearFiles] = useChooseFile((file) => file.name.endsWith(".vaps"))
     const [uploadProgress, setUploadProgress] = useState<null|number>(null)
-    const title = useMultilang({
+    const title = useMultiLang({
         en: "asset manager",
         zh: "資源管理器",
     })
-    const chooseFile = useMultilang({
+    const chooseFile = useMultiLang({
         en: "choose asset file (.vaps)",
         zh: "選擇資源檔 (.vaps)",
     })
-    const invalidFile = useMultilang({
+    const invalidFile = useMultiLang({
         en: "invalid file format",
         zh: "無效檔案格式",
     })
-    const uploadButtonText = useMultilang({
+    const uploadButtonText = useMultiLang({
         en: "upload",
         zh: "上傳",
     })
@@ -64,27 +64,27 @@ export default function EditorAssetManager({postID, assets}: {postID?: string, a
 }
 
 function AssetEntry({asset, postID}: {asset: Instance<Asset>, postID: string}) {
-    const assetLoading = useMultilang({
+    const assetLoading = useMultiLang({
         en: "unknown",
         zh: "未知",
     })
-    const assetUntitled = useMultilang({
+    const assetUntitled = useMultiLang({
         en: "untitled",
         zh: "未命名",
     })
-    const unknownAssetType = useMultilang({
+    const unknownAssetType = useMultiLang({
         en: "unknown",
         zh: "未知",
     })
-    const pending = useMultilang({
+    const pending = useMultiLang({
         en: "pending",
         zh: "等待中",
     })
-    const ready = useMultilang({
+    const ready = useMultiLang({
         en: "ready",
         zh: "就緒",
     })
-    const error = useMultilang({
+    const error = useMultiLang({
         en: "error",
         zh: "錯誤",
     })

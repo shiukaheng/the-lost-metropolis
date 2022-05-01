@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
-import { useMultilang, usePost } from '../../utilities';
+import { useMultiLang, usePost } from '../../utilities';
 import MagicButton from '../utilities/MagicButton';
 import MagicDiv from '../utilities/MagicDiv';
 import { Viewer } from '../viewer/Viewer';
@@ -11,7 +11,7 @@ function View({ ...props}) {
     const { id } = useParams();
     const [post, _] = usePost(id || null)
     const navigate = useNavigate();
-    const title = useMultilang(post?.title)
+    const title = useMultiLang(post?.title)
     if (post === null) {
         navigate("/")
         return null

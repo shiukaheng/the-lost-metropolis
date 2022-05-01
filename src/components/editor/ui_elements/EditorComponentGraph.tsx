@@ -3,7 +3,7 @@ import Select from 'react-select';
 import MagicDiv from "../../utilities/MagicDiv";
 import { createElement, useState, useContext } from "react";
 import { v4 as uuidv4 } from 'uuid';
-import { KeyPressCallback, formatRGBCSS, useMultilang } from "../../../utilities";
+import { KeyPressCallback, formatRGBCSS, useMultiLang } from "../../../utilities";
 import { Theme, ThemeContext } from "../../App"
 import { EditorContext } from "../EditorContext";
 import { ViewerContext } from "../../viewer/ViewerContext";
@@ -44,7 +44,7 @@ export default function EditorComponentGraph() {
     const {sceneChildren} = useContext(ViewerContext)
     const {selectedIDs, setSelectedIDs, addSelectedIDs, removeSelectedIDs, shiftPressed, setSceneChildren} = useContext(EditorContext)
     const [addChildrenType, setAddChildrenType] = useState<null|VaporComponent>(null)
-    const heading = useMultilang({"en": "components", "zh": "組件"})
+    const heading = useMultiLang({"en": "components", "zh": "組件"})
     const componentOptions = components.map(component => ({
         label: component.displayName,
         value: component

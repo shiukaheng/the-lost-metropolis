@@ -12,7 +12,7 @@ import { ContentContext } from '../providers/ContentProvider';
 import { AuthContext } from '../admin/AuthProvider';
 import MagicIcon from '../utilities/MagicIcon';
 import { EyeIcon, EyeOffIcon } from '@heroicons/react/outline';
-import { useMultilang } from '../../utilities';
+import { useMultiLang } from '../../utilities';
 
 const StyledRow = tw.tr`border-b border-t border-current md:hover:opacity-50 transition-opacity duration-500 cursor-pointer table-row`
 const StyledCell = tw.td`text-left font-serif md:text-lg font-semibold pt-2 pb-6 table-cell`
@@ -23,9 +23,9 @@ function ListView() {
     const {settings} = useContext(SettingsContext)
     const {currentUser} = useContext(AuthContext)
     const roleDisplay = {
-        "owner": useMultilang({"en": "owner", "zh": "擁有者"}),
-        "editor": useMultilang({"en": "editor", "zh": "編輯者"}),
-        "viewer": useMultilang({"en": "viewer", "zh": "閱讀者"}),
+        "owner": useMultiLang({"en": "owner", "zh": "擁有者"}),
+        "editor": useMultiLang({"en": "editor", "zh": "編輯者"}),
+        "viewer": useMultiLang({"en": "viewer", "zh": "閱讀者"}),
         "public": ""
     }
     const columnMakers: ColumnMaker[] = [

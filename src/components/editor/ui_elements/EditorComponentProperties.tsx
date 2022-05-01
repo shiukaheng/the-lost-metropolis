@@ -7,7 +7,7 @@ import { EditorContext } from "./../EditorContext";
 import { components } from "../../viewer/ComponentDeclarations";
 import { ViewerContext } from "../../viewer/ViewerContext";
 import MagicDiv from "../../utilities/MagicDiv";
-import { useMultilang } from "../../../utilities";
+import { useMultiLang } from "../../../utilities";
 import { EditorInputType } from "../../viewer/ArgumentTypes";
 
 /**
@@ -29,7 +29,7 @@ function processPropData(propType) {
 export default function EditorComponentProperties() {
     const { sceneChildren, setSceneChildren } = useContext(ViewerContext)
     const { selectedIDs } = useContext(EditorContext);
-    const heading = useMultilang({"en": "component properties", "zh": "組件屬性"})
+    const heading = useMultiLang({"en": "component properties", "zh": "組件屬性"})
     return (
         <EditorEmbeddedWidget title={heading} stickyKey="compPropExpanded">
             <div className="flex flex-col">

@@ -6,7 +6,7 @@ import FileSaver from "file-saver"
 import { ViewerContext } from "../../viewer/ViewerContext";
 import { v4 as uuidv4 } from 'uuid';
 import MagicButton from "../../utilities/MagicButton";
-import { useMultilang } from "../../../utilities";
+import { useMultiLang } from "../../../utilities";
 import { Post } from "../../../../api/types/Post";
 import { SceneChild, sceneChildSchema } from "../../../../api/types/SceneChild";
 import { CameraProps } from "../../../../api/types/CameraProps";

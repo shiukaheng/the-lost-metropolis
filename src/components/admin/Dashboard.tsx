@@ -11,7 +11,7 @@ import { ContentContext } from '../providers/ContentProvider';
 import { AuthContext } from '../admin/AuthProvider';
 import MagicIcon from '../utilities/MagicIcon';
 import { EyeIcon, EyeOffIcon } from '@heroicons/react/outline';
-import { useMultilang } from '../../utilities';
+import { useMultiLang } from '../../utilities';
 
 function Dashboard() {
     const navigate = useNavigate();
@@ -19,9 +19,9 @@ function Dashboard() {
     const {settings} = useContext(SettingsContext)
     const {currentUser} = useContext(AuthContext)
     const roleDisplay = {
-        "owner": useMultilang({"en": "owner", "zh": "擁有者"}),
-        "editor": useMultilang({"en": "editor", "zh": "編輯者"}),
-        "viewer": useMultilang({"en": "viewer", "zh": "閱讀者"}),
+        "owner": useMultiLang({"en": "owner", "zh": "擁有者"}),
+        "editor": useMultiLang({"en": "editor", "zh": "編輯者"}),
+        "viewer": useMultiLang({"en": "viewer", "zh": "閱讀者"}),
         "public": ""
     }
     const columnMakers: ColumnMaker[] = currentUser ?

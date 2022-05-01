@@ -1,5 +1,5 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { Condition, Switcher, useBufferedPost, useChooseFile, useConfirm, useMultilang, usePost, useTheme } from "../../utilities";
+import { Condition, Switcher, useBufferedPost, useChooseFile, useConfirm, useMultiLang, usePost, useTheme } from "../../utilities";
 import GenericPage from "../utilities/GenericPage";
 import { Input } from "../utilities/Input";
 import MagicDiv from "../utilities/MagicDiv";
@@ -75,43 +75,43 @@ function EditingForm({className="", editor3dMode=false}) {
     const { id } = useParams();
     const navigate = useNavigate()
     const [buffer, setBuffer, post, push, pull, changed, overwriteWarning] = useBufferedPost(id, ["title", "description", "public", "theme"]);
-    const titleLabel = useMultilang({"en": "title", "zh": "標題"});
-    const descriptionLabel = useMultilang({"en": "description", "zh": "描述"});
-    const publicLabel = useMultilang({"en": "public", "zh": "公開"});
-    const saveLabel = useMultilang({"en": "update", "zh": "更新"});
+    const titleLabel = useMultiLang({"en": "title", "zh": "標題"});
+    const descriptionLabel = useMultiLang({"en": "description", "zh": "描述"});
+    const publicLabel = useMultiLang({"en": "public", "zh": "公開"});
+    const saveLabel = useMultiLang({"en": "update", "zh": "更新"});
     const [activeLanguage, setActiveLanguage] = useState(languages[0]);
-    const deleteDefaultLabel = useMultilang({"en": "delete", "zh": "刪除"});
-    const deleteConfirmationLabel = useMultilang({"en": "click to confirm", "zh": "點擊確認"});
-    const deletePendingLabel = useMultilang({"en": "deleting...", "zh": "刪除中..."});
-    const overwriteLabel = useMultilang({
+    const deleteDefaultLabel = useMultiLang({"en": "delete", "zh": "刪除"});
+    const deleteConfirmationLabel = useMultiLang({"en": "click to confirm", "zh": "點擊確認"});
+    const deletePendingLabel = useMultiLang({"en": "deleting...", "zh": "刪除中..."});
+    const overwriteLabel = useMultiLang({
         "en": "warning: the post has changed while you were editing. saving will overwrite the changes.",
         "zh": "注意: 您正在編輯的文章已經被修改，若按更新將覆蓋修改。"
     })
-    const enableBgColorLabel = useMultilang({
+    const enableBgColorLabel = useMultiLang({
         "en": "enable background color",
         "zh": "啟用背景顏色"
     })
-    const enableFgColorLabel = useMultilang({
+    const enableFgColorLabel = useMultiLang({
         "en": "enable foreground color",
         "zh": "啟用前景顏色"
     })
-    const bgColorLabel = useMultilang({
+    const bgColorLabel = useMultiLang({
         "en": "background color",
         "zh": "背景顏色"
     })
-    const fgColorLabel = useMultilang({
+    const fgColorLabel = useMultiLang({
         "en": "foreground color",
         "zh": "前景顏色"
     })
-    const bgImageLabel = useMultilang({
+    const bgImageLabel = useMultiLang({
         "en": "background image",
         "zh": "背景圖片"
     })
-    const sponsorsLabel = useMultilang({
+    const sponsorsLabel = useMultiLang({
         "en": "sponsors",
         "zh": "贊助商"
     })
-    const pullLabel = useMultilang({"en": "update to latest version", "zh": "獲取最新版本"});
+    const pullLabel = useMultiLang({"en": "update to latest version", "zh": "獲取最新版本"});
     const [deleteLabel, deleteTrigger] = useConfirm(deleteDefaultLabel, deleteConfirmationLabel, deletePendingLabel, async ()=>{
         // console.log(id)
         if (id === undefined) {

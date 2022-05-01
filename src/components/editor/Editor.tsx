@@ -8,7 +8,7 @@ import MagicDiv from '../utilities/MagicDiv';
 import EditorTransformControls from './ui_elements/EditorTransformControls';
 import EditorOptions from './ui_elements/EditorOptions';
 import { deserializeChildren, exportChildren, PostScene, useStatefulDeserialize, useStatefulSerialize } from './ui_elements/EditorIO';
-import { Condition, KeyPressCallback, useBufferedPost, useKeyPress, useMultilang } from '../../utilities';
+import { Condition, KeyPressCallback, useBufferedPost, useKeyPress, useMultiLang } from '../../utilities';
 import EditorSceneSettings from './ui_elements/EditorSceneSettings';
 import { EditorContext } from './EditorContext';
 import { ViewerManager } from '../viewer/Viewer';
@@ -98,13 +98,13 @@ function EditorManager() {
         setBuffer(newBuffer)
     }, [sceneChildren, defaultCameraProps, potreePointBudget])
     // Update internal state when buffer changes, which only happens if we change sceneChildren (handled), and pull
-    const updateLabel = useMultilang({"en": "update", "zh": "更新"})
-    const overwriteLabel = useMultilang({
+    const updateLabel = useMultiLang({"en": "update", "zh": "更新"})
+    const overwriteLabel = useMultiLang({
         "en": "warning: the post has changed while you were editing. saving will overwrite the changes.",
         "zh": "注意: 您正在編輯的文章已經被修改，若按更新將覆蓋修改。"
     })
-    const pullLabel = useMultilang({"en": "update to latest version", "zh": "獲取最新版本"});
-    const heading = useMultilang({"en": "editor", "zh": "編輯器"})
+    const pullLabel = useMultiLang({"en": "update to latest version", "zh": "獲取最新版本"});
+    const heading = useMultiLang({"en": "editor", "zh": "編輯器"})
     let clientAssets: ClientAsset[] = []
     if (id) {
         for (const asset of post.assets) { // TODO: This is unnecesarily complex. Should probably unify Asset and ClientAsset under ths same format but mutated with a WithPostID generic type
