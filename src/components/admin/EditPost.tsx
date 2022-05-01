@@ -4,7 +4,7 @@ import GenericPage from "../utilities/GenericPage";
 import { Input } from "../utilities/Input";
 import MagicDiv from "../utilities/MagicDiv";
 import { languages } from "../App"
-import { useState,  useCallback } from "react";
+import { useState,  useCallback, useEffect } from "react";
 import MagicButton from "../utilities/MagicButton";
 import { Editor } from "../editor/Editor";
 import { FullScreen, useFullScreenHandle } from "react-full-screen";
@@ -123,10 +123,27 @@ function EditingForm({className="", editor3dMode=false}) {
         navigate("/dashboard")
     })
     const backgroundImageAsset = post?.assets?.find(asset => (asset.data.metadata.tags.includes("background-image")))
-
-    // if (post === undefined || post === null) { // Post not found, redirect to dashboard
-    //     navigate("/dashboard")
-    // }
+    // Do cleanup of unreferenced assets
+    // TODO (URGENT!): This is a hacky way to do this, if users added some assets but closed the browser, the assets would still be there. Perhaps could use a server side cleanup. 
+    useEffect(()=>{
+        return ()=>{
+            if (id !== undefined && id !== null && post !== undefined && post !== null) {
+                // Sponsors, since they may have sponsor images as assets
+                // Build list of referenced sponsor image assets
+                const referencedSponsorImages = post?.sponsors?.map(sponsor => sponsor.data.imageAssetID).filter(id => id !== null) as string[] // Should be guaranteed to be non-null, as if the post is null then its filtered by the Edit component already
+                console.log(referencedSponsorImages)
+                // List all sponsor image assets
+                const allSponsorImages = post?.assets?.filter(asset => asset.data.metadata.tags.includes("sponsor-image")).map(asset => asset.id) as string[]
+                // Remove all sponsor image assets that are not referenced
+                allSponsorImages.forEach(assetID => {
+                    if (!referencedSponsorImages.includes(assetID)) {
+                        console.log("Removing unreferenced sponsor image asset", assetID)
+                        VaporAPI.deleteAsset(id, assetID)
+                    }
+                })
+            }
+        }
+    }, [])
     return (
         // Return table with inputs for title, description, and public
         <Condition condition={id && buffer && post}>
