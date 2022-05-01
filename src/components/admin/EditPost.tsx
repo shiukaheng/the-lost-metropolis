@@ -17,6 +17,8 @@ import { Post } from "../../../api/types/Post";
 import { defaultTheme } from "react-select";
 import { defaultTheme as vaporDefaultTheme } from "../App"
 import { SingleFileAssetUploader } from "./editPost/SingleFileAssetUploader";
+import { SponsorsEditor } from "./editPost/Sponsors";
+import { instance } from "../../../api/utilities";
 
 function applyTheme(buffer:Partial<Post>, newTheme:Partial<Theme>): Partial<Post> {
     return {
@@ -74,7 +76,7 @@ function EditorSceneOverlay({hidden}) {
 function EditingForm({className="", editor3dMode=false}) {
     const { id } = useParams();
     const navigate = useNavigate()
-    const [buffer, setBuffer, post, push, pull, changed, overwriteWarning] = useBufferedPost(id, ["title", "description", "public", "theme"]);
+    const [buffer, setBuffer, post, push, pull, changed, overwriteWarning] = useBufferedPost(id, ["title", "description", "public", "theme", "sponsors"]);
     const titleLabel = useMultiLang({"en": "title", "zh": "標題"});
     const descriptionLabel = useMultiLang({"en": "description", "zh": "描述"});
     const publicLabel = useMultiLang({"en": "public", "zh": "公開"});
@@ -121,10 +123,13 @@ function EditingForm({className="", editor3dMode=false}) {
         navigate("/dashboard")
     })
     const backgroundImageAsset = post?.assets?.find(asset => (asset.data.metadata.tags.includes("background-image")))
-    // useTheme(buffer.theme)
+
+    // if (post === undefined || post === null) { // Post not found, redirect to dashboard
+    //     navigate("/dashboard")
+    // }
     return (
         // Return table with inputs for title, description, and public
-        <Condition condition={id && buffer}>
+        <Condition condition={id && buffer && post}>
             <RoundedContainer className="relative">
                 <EditorSceneOverlay hidden={!editor3dMode}/>
                 <EmbeddedTabs position="top" options={languages} activeOption={activeLanguage} onUpdate={setActiveLanguage} className="h-16"/>
@@ -199,7 +204,7 @@ function EditingForm({className="", editor3dMode=false}) {
                                 <tr>
                                     <td>{sponsorsLabel}</td>
                                     <td>
-                                        
+                                        <SponsorsEditor buffer={buffer} setBuffer={setBuffer} post={post} activeLanguage={activeLanguage} postInstance={instance(post, id as string)}/>
                                     </td>
                                 </tr>
                             </tbody>

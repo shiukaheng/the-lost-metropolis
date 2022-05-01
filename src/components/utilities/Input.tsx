@@ -291,7 +291,7 @@ type InputProps = {
     value: any
     setValue: (value: any) => void
     data?: any
-    className: string
+    className?: string
 }
 
 function Input({typeName, value, setValue, data, className=""}:InputProps) {

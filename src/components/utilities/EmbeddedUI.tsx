@@ -82,7 +82,7 @@ export function RoundedContainer({children=null, className="", direction="vertic
 
 export function EmbeddedButton({position="top", embedded=false, children, onClick=(e)=>{}, disabled=false, className="", backgroundColor=null}) {
     return (
-        <EmbeddedCell position={position} embedded={embedded} className={twMerge(disabled ? "cursor-not-allowed" : "cursor-pointer", "select-none", className)} onClick={onClick}
+        <EmbeddedCell position={position} embedded={embedded} className={twMerge(disabled ? "cursor-not-allowed" : "cursor-pointer", "select-none", className)} onClick={disabled ? ()=>{} : onClick}
         backgroundProps={{
             mergeTransitions: true,
             foregroundColorCSSProps: backgroundColor ? [] : ["color"],

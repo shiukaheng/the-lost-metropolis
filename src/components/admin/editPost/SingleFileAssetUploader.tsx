@@ -8,7 +8,8 @@ interface UploaderProps {
     extensions: string[]
     postID: string
     tags?: string[]
-    metadata?: Partial<AssetMetadataFile> | ((file: File) => Partial<AssetMetadataFile>) // If a function is passed, it will be called with the file and the result will be used as the metadata
+    metadata?: Partial<AssetMetadataFile> | ((file: File) => Partial<AssetMetadataFile>), // If a function is passed, it will be called with the file and the result will be used as the metadata
+    onUploaded?: (assetID: string) => void
 }
 
 function generateMetadata(metadataProp: Partial<AssetMetadataFile> | ((file: File) => Partial<AssetMetadataFile>) | undefined, file: File): Partial<AssetMetadataFile> {
@@ -24,7 +25,7 @@ function generateMetadata(metadataProp: Partial<AssetMetadataFile> | ((file: Fil
 /**
  * Uploader component for single file assets, metadata should be provided to indicate the asset type (auto-detection is possible, but not stable)
  */
-export function SingleFileAssetUploader({extensions, postID, tags, metadata}: UploaderProps) {
+export function SingleFileAssetUploader({extensions, postID, tags, metadata, onUploaded}: UploaderProps) {
     const [uploadProgress, setUploadProgress] = useState<null|number>(null)
     var acceptFileString = ""
     if (extensions.length > 1) {
@@ -53,18 +54,13 @@ export function SingleFileAssetUploader({extensions, postID, tags, metadata}: Up
             <MagicButton className="h-9 md:h-9" onClick={async ()=>{
                 if((file !== null) && (uploadProgress === null)) {
                     setUploadProgress(0)
-                    try {
-                        await VaporAPI.uploadSingleFileAsset(postID as string, file, generateMetadata(metadata, file), (progress: number)=>{
+                    var id
+                        id = await VaporAPI.uploadSingleFileAsset(postID as string, file, generateMetadata(metadata, file), (progress: number)=>{
                             setUploadProgress(progress)
                         }, tags)
-                    } catch (e) {
-                        console.warn("Error uploading asset...")
-                        if (window.location.hostname !== "localhost") {
-                            throw e
-                        } 
-                    }
                     setUploadProgress(null)
                     clearFiles()
+                    onUploaded && onUploaded(id)
                 }
             }} disabled={(file === null) || (uploadProgress !== null)}>{(uploadProgress === null) ? uploadButtonText : `${Math.round(uploadProgress*100)
             }%`}</MagicButton>

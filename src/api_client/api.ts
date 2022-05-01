@@ -174,7 +174,16 @@ export default class VaporAPI {
                 reject(error)
             }
         })
-        await uploadFile
+        try {
+            await uploadFile
+        } catch (e) {
+            if (window.location.hostname !== "localhost") {
+                throw e
+            } else {
+                console.warn("Error uploading asset, but most likely due to firebase-emu bug", e)
+            }
+        }
+        
         return assetID
     }
 

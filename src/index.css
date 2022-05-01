@@ -96,6 +96,19 @@
     @apply w-full pr-0
 }
 
+.sponsor-table {
+    /* width: auto; */
+}
+
+.sponsor-table * td {
+    white-space: nowrap;
+}
+
+.sponsor-table * td:last-child {
+    @apply w-full pr-0
+}
+
+
 /* width */
 ::-webkit-scrollbar {
     width: 15px;
