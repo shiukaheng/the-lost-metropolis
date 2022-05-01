@@ -14,6 +14,9 @@ import { MultiLangObject } from "../api/types/MultiLangObject";
 import { auth } from "./firebase-config.js"
 import { signOut } from "firebase/auth";
 import { Theme } from "../api/types/Theme";
+import { Instance, Instance } from "../api/utility_types";
+import { Sponsor } from "../api/types/Sponsor";
+import { Asset } from "../api/types/Asset";
 
 export function formatRGBCSS(color: number[]): string {
     return "rgb(" + color[0] + "," + color[1] + "," + color[2] + ")";
@@ -505,4 +508,28 @@ export function useLazyEffect(callback, dependencyArray) { // Hacky workaround f
 export function unionMatch(listA, listsB) {
     // Returns true if any of the elements in listA is in listB
     return listA.some(x => listsB.includes(x))
+}
+
+export function findAsset(post: Post, assetID: string): Asset | null {
+    // Returns the asset with the given ID
+    return post?.assets?.find(x => x.id === assetID)?.data || null
+}
+
+/**
+ * Returns an image url or null for a given sponsor
+ * @param postInstance 
+ * @param sponsorInstance 
+ * @returns 
+ */
+export function getSponsorImageURL(postInstance: Instance<Post>, sponsorInstance: Instance<Sponsor>): string | null {
+    if (sponsorInstance.data.imageAssetID) {
+        // console.log(findAsset(postInstance.data, sponsorInstance.data.imageAssetID))
+        const url = VaporAPI.resolveAsset(postInstance.id, sponsorInstance.data.imageAssetID)+findAsset(postInstance.data, sponsorInstance.data.imageAssetID)?.data?.fileName
+        if (url === null || url === undefined || url === "") {
+            console.warn("Invalid sponsor image URL", url)
+        }
+        return url
+    } else {
+        return null
+    }
 }

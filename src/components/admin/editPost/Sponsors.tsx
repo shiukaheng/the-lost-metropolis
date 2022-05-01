@@ -3,7 +3,7 @@ import { boolean } from "yup";
 import { Post } from "../../../../api/types/Post";
 import { Sponsor, sponsorSchema } from "../../../../api/types/Sponsor";
 import { Instance } from "../../../../api/utility_types";
-import { createEmptyMultilangString, Switcher, useMultiLang, useMultiLangObject } from "../../../utilities";
+import { createEmptyMultilangString, getSponsorImageURL, Switcher, useMultiLang, useMultiLangObject } from "../../../utilities";
 import {ArrowUpIcon, ArrowDownIcon, PencilIcon, EyeIcon, TrashIcon} from '@heroicons/react/outline';
 import MagicIcon from "../../utilities/MagicIcon";
 import MagicButton from "../../utilities/MagicButton";
@@ -65,7 +65,11 @@ function SponsorComponent({sponsorInstance, buffer, setBuffer, startWithEditMode
     })
     const clearAllAssociatedAssets = useCallback(async () => {
         if (sponsorInstance.data.imageAssetID) {
-            await VaporAPI.deleteAsset(postInstance.id, sponsorInstance.data.imageAssetID)
+            try {
+                await VaporAPI.deleteAsset(postInstance.id, sponsorInstance.data.imageAssetID)
+            } catch (e) {
+                console.warn("Unable to delete asset", postInstance, sponsorInstance)
+            }
         }
     }, [sponsorInstance.data.imageAssetID, postInstance.id])
     // TODO: Use useEffect to clear unreferenced assets
@@ -117,7 +121,7 @@ function SponsorComponent({sponsorInstance, buffer, setBuffer, startWithEditMode
                 <SponsorComponentEdit buffer={buffer} setBuffer={setBuffer} sponsorInstance={sponsorInstance} setEditMode={setEditMode} activeLanguage={activeLanguage} postInstance={postInstance}/>
             }
             falseChild={
-                <SponsorComponentView buffer={buffer} setBuffer={setBuffer} sponsorInstance={sponsorInstance} setEditMode={setEditMode}/>
+                <SponsorComponentView buffer={buffer} setBuffer={setBuffer} sponsorInstance={sponsorInstance} setEditMode={setEditMode} postInstance={postInstance}/>
             }/>
         </div>
     )
@@ -289,10 +293,20 @@ function SponsorComponentEdit({sponsorInstance, buffer, setBuffer, setEditMode, 
     )
 }
 
-function SponsorComponentView({sponsorInstance, buffer, setBuffer, setEditMode}) { // TODO: Finish!
-    // throw new Error("Not implemented!")
-    return (
-        // Horizontal div entry of sponsor.data.name, then a up button, a down button, and then a edit button that will toggle edit mode.
-        null
-    )
+function SponsorComponentView({sponsorInstance, buffer, setBuffer, setEditMode, postInstance}: {
+    sponsorInstance: Instance<Sponsor>,
+    buffer: Buffer,
+    setBuffer: (newBuffer: Buffer) => void,
+    setEditMode: (newEditMode: boolean) => void,
+    postInstance: Instance<Post>
+}) {
+    if (sponsorInstance.data.imageAssetID !== null) {
+        return (
+            <div>
+                <img className="h-12 min-w-fit" src={getSponsorImageURL(postInstance, sponsorInstance) as string}/>
+            </div>
+        )
+    } else {
+        return null
+    }
 }

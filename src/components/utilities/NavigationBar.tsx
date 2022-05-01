@@ -33,17 +33,12 @@ export default function NavigationBar(props) {
             <Logo />
             {/* <div className="flex justify-center flex-col"> DESKTOP*/} 
             <div className="flex justify-left flex-row md:flex-col">
+                <MultiLangNavLink text={{"en": "home", "zh": "首頁"}} to="/"/>
                 <LoggedInFilter>
                     <MultiLangNavLink text={{"en": "dashboard", "zh": "管理"}} to="/dashboard"/>
                     <MultiLangNavLink text={{"en": "browse", "zh": "瀏覽"}} to="/browse"/>
                     <MultiLangNavLink text={{"en": "list", "zh": "列表"}} to="/list"/>
                 </LoggedInFilter>
-                <Condition condition={currentUser===null}>
-                    <MultiLangNavLink text={{"en": "home", "zh": "首頁"}} to="/"/>
-                    {/* <MultiLangNavLink text={{"en": "browse", "zh": "瀏覽"}} to="/browse"/> */}
-                    {/* <MultiLangNavLink text={{"en": "list", "zh": "列表"}} to="/list"/> */}
-                    {/* <MultiLangNavLink text={{"en": "about", "zh": "關於"}} to="/about"/> */}
-                </Condition>
                 <LoggedInFilter>
                     <MagicDiv mergeTransitions={true} className="nav-button" onClick={()=>{
                         logOut()
