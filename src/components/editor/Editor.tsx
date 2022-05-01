@@ -14,7 +14,7 @@ import { EditorContext } from './EditorContext';
 import { ViewerManager } from '../viewer/Viewer';
 import { ViewerContext } from '../viewer/ViewerContext';
 import MagicButton from '../utilities/MagicButton';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import EditorAssetManager from './ui_elements/EditorAssetManager';
 import { Roled } from '../../../api/implementation_types/Role';
 import { Post } from '../../../api/types/Post';
@@ -97,6 +97,7 @@ function EditorManager() {
         const newBuffer = serialize()
         setBuffer(newBuffer)
     }, [sceneChildren, defaultCameraProps, potreePointBudget])
+
     // Update internal state when buffer changes, which only happens if we change sceneChildren (handled), and pull
     const updateLabel = useMultiLang({"en": "update", "zh": "更新"})
     const overwriteLabel = useMultiLang({
@@ -106,7 +107,7 @@ function EditorManager() {
     const pullLabel = useMultiLang({"en": "update to latest version", "zh": "獲取最新版本"});
     const heading = useMultiLang({"en": "editor", "zh": "編輯器"})
     let clientAssets: ClientAsset[] = []
-    if (id) {
+    if (id && post !== null) {
         for (const asset of post.assets) { // TODO: This is unnecesarily complex. Should probably unify Asset and ClientAsset under ths same format but mutated with a WithPostID generic type
             const type = asset.data.metadata.targetAssetType
             const ready = asset.data.metadata.status.ready
