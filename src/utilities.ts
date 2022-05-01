@@ -10,6 +10,7 @@ import { uninstance, instance } from "../api/utilities";
 import { PostDocData } from "../api/implementation_types/PostDocData";
 import { Roled } from "../api/implementation_types/Role";
 import { MultiLangString } from "../api/types/MultiLangString";
+import { MultiLangObject } from "../api/types/MultiLangObject";
 import { auth } from "./firebase-config.js"
 import { signOut } from "firebase/auth";
 import { Theme } from "../api/types/Theme";
@@ -196,6 +197,14 @@ export const useMultilang = (content: MultiLangString) => {
         return ""
     }
     return content[settings.lang]
+}
+
+export function useMultiLangObject(content: MultiLangObject): {[key:string]:string} {
+    const {settings} = useContext(SettingsContext)
+    if (content === undefined || content === null) {
+        return {}
+    }
+    return mapValues(content, (value) => value[settings.lang])
 }
 
 /**
