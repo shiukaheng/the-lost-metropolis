@@ -1,12 +1,12 @@
 import { useContext, useEffect, useState } from 'react';
 import {
-    NumberType, Vector3Type, Vector4Type, Vector2Type, ColorType, QuaternionType, EulerType, Matrix3Type, Matrix4Type, StringType, URLType, MatrixType, VectorType, EditorInputType, BooleanType
+    NumberType, Vector3Type, Vector4Type, Vector2Type, ColorType, QuaternionType, EulerType, Matrix3Type, Matrix4Type, StringType, URLType, MatrixType, VectorType, EditorInputType, BooleanType, ArgumentLiteral
 } from "../viewer/ArgumentTypes"
 import { range } from "lodash"
 import { createElement } from "react";
 import MagicDiv from '../utilities/MagicDiv';
-import { LinearToSRGB, SRGBToLinear, unionMatch, useLazyEffect } from '../../utilities';
-import { targetAssetLiteralSchema } from '../../../api/types/AssetLiteral';
+import { createEmptyMultilangString, LinearToSRGB, SRGBToLinear, unionMatch, useLazyEffect, useMultiLang } from '../../utilities';
+import { AssetLiteral, targetAssetLiteralSchema } from '../../../api/types/AssetLiteral';
 import { EditorContext } from '../editor/EditorContext';
 import { ClientAsset } from '../../api_client/types/ClientAsset';
 import Select from 'react-select';
@@ -16,10 +16,19 @@ import { twMerge } from 'tailwind-merge';
 import { array, InferType, object, string } from 'yup';
 import { MultiLangString } from '../../../api/types/MultiLangString';
 import { languageLiteral, LanguageLiteral } from '../../../api/types/LanguageLiteral';
+import { MagicString } from '../../../api/types/MagicString';
 
 // Props for input elements:
 // value is the current value of the property, used to display the current value of the property in the editor
 // setValue is the function to update the state of the parent component, only call when user input is checked to be valid using type's typeCheck function
+
+type InputComponentProps = {
+    value: any,
+    setValue: (newValue: any) => void,
+    data?: any,
+}
+
+type InputComponent = React.FC<InputComponentProps>;
 
 // Component for inputting numbers
 function NumberInput({value, setValue}) {
@@ -53,9 +62,15 @@ function NumberInput({value, setValue}) {
 }
 
 // Component for inputting boolean
-function BooleanInput({value, setValue}) {
+function BooleanInput({value, setValue, data}: {
+    value: boolean,
+    setValue: (newValue: boolean) => void,
+    data?: {
+        tooltip?: string,
+    }
+}) {
     return (
-        <input className="boolean-input-field" type="checkbox" checked={value} onChange={(e) => setValue(e.target.checked)}/>
+        <input data-tip={data?.tooltip} title={data?.tooltip} className="boolean-input-field" type="checkbox" checked={value} onChange={(e) => setValue(e.target.checked)}/>
     );
 }
 
@@ -271,24 +286,64 @@ function AssetInput({value, setValue, data}) {
     )
 }
 
-function MultiLangStringInput({value, setValue, data={activeLanguage: languageLiteral[0]}}: {
+function MultiLangStringInput({value, setValue, data}: {
     value: MultiLangString,
     setValue: (value: MultiLangString) => void,
     data?: {
         activeLanguage: LanguageLiteral
     }
 }) {
+    const {activeLanguage} = useContext(EditorContext)
+    const lang = data?.activeLanguage || activeLanguage;
     // Accept optional data object to hint the activeLanguage (language currently being edited)
     // TODO: It is more logical to pass this data in the EditorContext, so that's why the data object is optional. But this feature is to be developed. For now, fall back to the first language specified if none supplied by the data object.
     return (
-        <StringInput value={value[data.activeLanguage]} setValue={(newLangValue) => {setValue({...value, [data.activeLanguage]: newLangValue})}}/>
+        <StringInput value={value[lang]} setValue={(newLangValue) => {setValue({...value, [lang]: newLangValue})}}/>
+    )
+}
+
+function MagicStringInput({value, setValue, data}: {
+    value: MagicString,
+    setValue: (value: MagicString) => void,
+    data?: {
+        activeLanguage: LanguageLiteral
+    }
+}) {
+    const tooltip = useMultiLang({
+        "en": "enable multilanguage",
+        "zh": "使用多語言"
+    })
+    // MagicString allows value to either be a string or a MultiLangString
+    // Create a flex-row div to contain a checkbox for enabling multilanguage, and a input field for the string or string of the active language. The input field should grow.
+    // No need to have state for whether multilanguage is enabled, as it could be inferred from the value type.
+    return (
+        <div className="flex flex-col gap-2">
+            {
+                typeof value === "string" ?
+                <StringInput value={value} setValue={setValue}/> :
+                <MultiLangStringInput value={value} setValue={setValue} data={data}/>
+            }
+            <div className='flex flex-row gap-2'>
+                <div>
+                    {tooltip}
+                </div>
+                <BooleanInput value={typeof value !== "string"} setValue={(newValue) => {
+                    if (newValue) {
+                        setValue(createEmptyMultilangString())
+                    } else {
+                        setValue("")
+                    }
+                }}/>
+            </div>
+            
+        </div>
     )
 }
 
 // There are still some thoughts on whether to create a new Input component, or supply stuff in the data property to modify input component behavior if the input type is a particular subset of one of the existing input types, e.g., StringInput vs URLInput.
 // Perhaps a good way to think about this is if the number of potential subsets are small, it's better to create a new component, but if the number of potential subsets is large, it's better to pass info in the data property to modify the behavior of one input component. 
 
-const InputComponentMap = {
+const InputComponentMap: Partial<{[key in ArgumentLiteral]: InputComponent}> = {
     "number": NumberInput,
     "string": StringInput,
     "url": URLInput,
@@ -303,7 +358,8 @@ const InputComponentMap = {
     "boolean": BooleanInput,
     "multiline-string": MultilineStringInput,
     "multilang-string": MultiLangStringInput,
-    "asset": AssetInput
+    "magic-string": MagicStringInput,
+    "asset": AssetInput,
 }
 
 type InputProps = {

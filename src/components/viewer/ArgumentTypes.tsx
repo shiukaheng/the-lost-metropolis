@@ -1,4 +1,5 @@
 import {ReactNode} from 'react';
+import { magicStringSchema } from '../../../api/types/MagicString';
 import { multiLangStringSchema } from '../../../api/types/MultiLangString';
 import { clientAssetSchema } from '../../api_client/types/ClientAsset';
 
@@ -91,6 +92,11 @@ export const MultiLangStringType: EditorInputType = {
     typeCheck: (value) => multiLangStringSchema.isValidSync(value),
 }
 
+export const MagicStringType: EditorInputType = {
+    typeName: "magic-string",
+    typeCheck: (value) => magicStringSchema.isValidSync(value),
+}
+
 // export const AssetType: EditorInputType = {
 //     typeName: "asset",
 //     typeCheck: (value) => resolvedAssetSchema.isValidSync(value)
@@ -107,4 +113,4 @@ export function createAssetType(acceptedAssetTypes?: string[], acceptedTags?: st
     }
 }
 
-export type ArgumentLiteral = "number" | "string" | "url" | "vector" | "vector3" | "vector4" | "vector2" | "color" | "quaternion" | "euler" | "matrix3" | "matrix4" | "matrix" | "boolean" | "multiline-string" | "asset" | "multilang-string"
+export type ArgumentLiteral = "number" | "string" | "url" | "vector" | "vector3" | "vector4" | "vector2" | "color" | "quaternion" | "euler" | "matrix3" | "matrix4" | "matrix" | "boolean" | "multiline-string" | "asset" | "multilang-string" | "magic-string"

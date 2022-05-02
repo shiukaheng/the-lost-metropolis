@@ -21,6 +21,7 @@ import { Post } from '../../../api/types/Post';
 import { Asset } from '../../../api/types/Asset';
 import { ClientAsset } from '../../api_client/types/ClientAsset';
 import { targetAssetLiteralSchema } from '../../../api/types/AssetLiteral';
+import { languageLiteral, LanguageLiteral } from '../../../api/types/LanguageLiteral';
 
 function Editor() {
     return (
@@ -39,6 +40,7 @@ function EditorManager() {
     const [transformMode, setTransformMode] = useState("translate")
     const [transformSpace, setTransformSpace] = useState("world")
     const [overrideInteractions, setOverrideInteractions] = useState(true)
+    const [activeLanguage, setActiveLanguage] = useState<LanguageLiteral>(languageLiteral[0])
     const shiftPressed = useKeyPress("Shift")
     // Create convenience functions for adding and removing selectedIDs
     const addSelectedIDs = (newIDs) => {
@@ -126,7 +128,7 @@ function EditorManager() {
     
     return (
         <EditorContext.Provider value={
-            {selectedIDs, setSelectedIDs, addSelectedIDs, removeSelectedIDs, transformMode, setTransformMode, transformSpace, setTransformSpace, overrideInteractions, setOverrideInteractions, shiftPressed, setSceneChildren, removeSceneChildren, clientAssets}
+            {selectedIDs, setSelectedIDs, addSelectedIDs, removeSelectedIDs, transformMode, setTransformMode, transformSpace, setTransformSpace, overrideInteractions, setOverrideInteractions, shiftPressed, setSceneChildren, removeSceneChildren, clientAssets, activeLanguage, setActiveLanguage}
         }>
             <KeyPressCallback keyName={"Escape"} onDown={()=>{setSelectedIDs([])}}/>
             <div className="flex flex-row absolute w-full h-full overflow-hidden">
@@ -145,11 +147,11 @@ function EditorManager() {
                     {
                         editorExpanded ?
                         <div className='overflow-auto p-8 pt-0'>
+                            <EditorOptions/>
                             <EditorComponentGraph/>
                             {/* Post ID and assets are passed in as props because they are not part of Post */}
                             <EditorAssetManager postID={id} assets={post?.assets}/>
                             <EditorComponentProperties/>
-                            <EditorOptions/>
                             <EditorSceneSettings/>
                         </div>
                         : null

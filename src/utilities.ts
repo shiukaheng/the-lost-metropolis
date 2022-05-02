@@ -17,6 +17,7 @@ import { Theme } from "../api/types/Theme";
 import { Instance, Instance } from "../api/utility_types";
 import { Sponsor } from "../api/types/Sponsor";
 import { Asset } from "../api/types/Asset";
+import { MagicString } from "../api/types/MagicString";
 
 export function formatRGBCSS(color: number[]): string {
     return "rgb(" + color[0] + "," + color[1] + "," + color[2] + ")";
@@ -531,5 +532,14 @@ export function getSponsorImageURL(postInstance: Instance<Post>, sponsorInstance
         return url
     } else {
         return null
+    }
+}
+
+export function useMagicString(value: MagicString) {
+    const {settings} = useContext(SettingsContext)
+    if (typeof value === "string") {
+        return value
+    } else {
+        return value[settings.lang]
     }
 }
