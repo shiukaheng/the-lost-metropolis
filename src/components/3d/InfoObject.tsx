@@ -9,6 +9,7 @@ import { genericInputs } from "../viewer/genericInputs"
 import { BooleanType, MagicStringType, NumberType, StringType } from "../viewer/ArgumentTypes"
 import { createEmptyMultilangString, useMagicString } from "../../utilities"
 import { MagicString } from "../../../api/types/MagicString"
+import infoIconURL from "../../../static/viewport/info-icon.png"
 
 type InfoObjectProps = VaporComponentProps & {
     text?: MagicString
@@ -35,7 +36,7 @@ export const InfoObject: VaporComponent = ({text=createEmptyMultilangString(), i
             ({opacity, scale}, item) => (
                 item 
                 ?
-                <AnimatedLabelIcon iconUrl="/static/viewport/info-icon.png" onClick={()=>{setExpanded(!expanded)}} iconScale={scale} iconOpacity={opacity} skirtHidden={!expanded} scale={iconSize} objectID={props.objectID} position={props.position}/>
+                <AnimatedLabelIcon iconUrl={infoIconURL} onClick={()=>{setExpanded(!expanded)}} iconScale={scale} iconOpacity={opacity} skirtHidden={!expanded} scale={iconSize} objectID={props.objectID} position={props.position}/>
                 :
                 <UnifiedInteractive {...props} onClick={()=>{setExpanded(!expanded)}} parentObjectID={props.objectID}>
                     <AnimatedText scale={scale} gpuAccelerateSDF={true} fillOpacity={opacity} text={displayText} maxWidth={wrapText ? textMaxWidth : Infinity} fontSize={fontSize} renderOrder={1} font="https://fonts.gstatic.com/s/notoseriftc/v20/XLYgIZb5bJNDGYxLBibeHZ0BhnQ.woff"/>
