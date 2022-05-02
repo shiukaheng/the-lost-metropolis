@@ -12,6 +12,8 @@ type NexusObjectProps = VaporComponentProps & {
     url: string
 }
 
+// TODO: Make Nexus engine parameters editable in the UI
+
 const _NexusObject = ({url, ...props}: NexusObjectProps) => {
     const group = useRef<Group>(null)
     const {gl} = useThree()
