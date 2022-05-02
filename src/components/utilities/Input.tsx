@@ -14,6 +14,8 @@ import { createSelectStyles } from '../editor/utilities';
 import { ThemedSelect } from './ThemedSelect';
 import { twMerge } from 'tailwind-merge';
 import { array, InferType, object, string } from 'yup';
+import { MultiLangString } from '../../../api/types/MultiLangString';
+import { languageLiteral, LanguageLiteral } from '../../../api/types/LanguageLiteral';
 
 // Props for input elements:
 // value is the current value of the property, used to display the current value of the property in the editor
@@ -269,6 +271,23 @@ function AssetInput({value, setValue, data}) {
     )
 }
 
+function MultiLangStringInput({value, setValue, data={activeLanguage: languageLiteral[0]}}: {
+    value: MultiLangString,
+    setValue: (value: MultiLangString) => void,
+    data?: {
+        activeLanguage: LanguageLiteral
+    }
+}) {
+    // Accept optional data object to hint the activeLanguage (language currently being edited)
+    // TODO: It is more logical to pass this data in the EditorContext, so that's why the data object is optional. But this feature is to be developed. For now, fall back to the first language specified if none supplied by the data object.
+    return (
+        <StringInput value={value[data.activeLanguage]} setValue={(newLangValue) => {setValue({...value, [data.activeLanguage]: newLangValue})}}/>
+    )
+}
+
+// There are still some thoughts on whether to create a new Input component, or supply stuff in the data property to modify input component behavior if the input type is a particular subset of one of the existing input types, e.g., StringInput vs URLInput.
+// Perhaps a good way to think about this is if the number of potential subsets are small, it's better to create a new component, but if the number of potential subsets is large, it's better to pass info in the data property to modify the behavior of one input component. 
+
 const InputComponentMap = {
     "number": NumberInput,
     "string": StringInput,
@@ -283,6 +302,7 @@ const InputComponentMap = {
     "matrix4": Matrix4Input,
     "boolean": BooleanInput,
     "multiline-string": MultilineStringInput,
+    "multilang-string": MultiLangStringInput,
     "asset": AssetInput
 }
 

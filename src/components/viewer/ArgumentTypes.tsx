@@ -1,8 +1,9 @@
 import {ReactNode} from 'react';
+import { multiLangStringSchema } from '../../../api/types/MultiLangString';
 import { clientAssetSchema } from '../../api_client/types/ClientAsset';
 
 export type EditorInputType = {
-    typeName: string
+    typeName: ArgumentLiteral
     typeCheck: (value: any) => boolean
     data?: any
 }
@@ -80,9 +81,14 @@ export const BooleanType: EditorInputType = {
     typeCheck: (value) => typeof value === "boolean"
 }
 
-export const MultilineStringType: EditorInputType = {
+export const MultilineStringType: EditorInputType = { // TODO: Unify with StringType (?) as they should both output valid strings, instead return different UI based on the data given
     typeName: "multiline-string",
     typeCheck: (value) => typeof value === "string" && (value !== undefined)
+}
+
+export const MultiLangStringType: EditorInputType = {
+    typeName: "multilang-string",
+    typeCheck: (value) => multiLangStringSchema.isValidSync(value),
 }
 
 // export const AssetType: EditorInputType = {
@@ -101,4 +107,4 @@ export function createAssetType(acceptedAssetTypes?: string[], acceptedTags?: st
     }
 }
 
-export type ArgumentLiteral = "number" | "string" | "url" | "vector" | "vector3" | "vector4" | "vector2" | "color" | "quaternion" | "euler" | "matrix3" | "matrix4" | "matrix" | "boolean" | "multiline-string" | "asset"
+export type ArgumentLiteral = "number" | "string" | "url" | "vector" | "vector3" | "vector4" | "vector2" | "color" | "quaternion" | "euler" | "matrix3" | "matrix4" | "matrix" | "boolean" | "multiline-string" | "asset" | "multilang-string"
