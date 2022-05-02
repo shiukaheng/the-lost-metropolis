@@ -131,7 +131,7 @@ function EditingForm({className="", editor3dMode=false}) {
                 // Sponsors, since they may have sponsor images as assets
                 // Build list of referenced sponsor image assets
                 const referencedSponsorImages = post?.sponsors?.map(sponsor => sponsor.data.imageAssetID).filter(id => id !== null) as string[] // Should be guaranteed to be non-null, as if the post is null then its filtered by the Edit component already
-                console.log(referencedSponsorImages)
+                // console.log(referencedSponsorImages)
                 // List all sponsor image assets
                 const allSponsorImages = post?.assets?.filter(asset => asset.data.metadata.tags.includes("sponsor-image")).map(asset => asset.id) as string[]
                 // Remove all sponsor image assets that are not referenced

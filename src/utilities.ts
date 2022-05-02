@@ -375,12 +375,12 @@ export const useConfirm = (defaultText="default", confirmText="confirm", pending
     return [text, trigger]
 }
 
-export const createEmptyMultilangString = () => {
+export function createEmptyMultilangString(): MultiLangString {
     // Transform languages array to an object with each language as key and empty string as value; languages is already imported
     return languages.reduce((obj, lang) => {
         obj[lang] = ""
         return obj
-    }, {})
+    }, {}) as MultiLangString
 }
 
 export function mergeThemes(defaultTheme: Theme, newTheme): Theme {
