@@ -46,7 +46,7 @@ function Home() {
     const {settings} = useContext(SettingsContext) // Somehow the settings context is not being passed down to the children if its inside of Scroll
     return (
         <GenericPage className="relative w-full h-full">
-            {/* <Viewer className="absolute w-full h-full overflow-hidden flex-grow rounded-3xl" defaultCameraProps={{
+            <Viewer className="absolute w-full h-full overflow-hidden flex-grow rounded-3xl" defaultCameraProps={{
                 position: [0,0,5],
                 rotation: [0,0,0],
                 fov: 90
@@ -55,7 +55,7 @@ function Home() {
                     <Scroll>
                     <PotreeObject objectID="homepageShowcase" pointShape={0} pointSize={1} pointSizeType={0} scale={[0.9, 0.9, 0.9]} rotation={[0, 0, 0]} position={[-10, -3 , 12]} baseUrl={"https://static.thelostmetropolis.org/BigShotCleanV2/"} cloudName="metadata.json"/>   
                     </Scroll>
-                    <Scroll html className="w-full">
+                    {/* <Scroll html className="w-full">
                         <div className="w-full h-full fixed bg-black"></div>
                         <div className="flex flex-col w-full">
                             <div className="h-8"></div>
@@ -78,17 +78,13 @@ function Home() {
                                 }} languageOverride={settings.lang}/>
                             </RevealDiv>
                         </div>
-                    </Scroll>
+                    </Scroll> */}
                 </ScrollControls>
-            </Viewer> */}
+            </Viewer>
             {/* <MagicDiv languageSpecificChildren={{
                 en: "page under construction",
                 zh: "頁面正在建設中"
             }} className=""/> */}
-            <MagicDiv languageSpecificChildren={{
-                "en": "page under construction",
-                "zh": "頁面正在建設中"
-            }} className="font-bold text-5xl"/>
         </GenericPage>
         // 3D model of the city with hover effect to shine light on buildings
     )

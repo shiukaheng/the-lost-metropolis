@@ -27,7 +27,7 @@ export const PotreeAssetObject: VaporComponent = ({potreeAsset, ...props}: Potre
     }
 }
 
-PotreeAssetObject.displayName = "Potree Object"
+PotreeAssetObject.displayName = "Potree asset object"
 PotreeAssetObject.componentType = "PotreeAssetObject"
 PotreeAssetObject.inputs = {
     ...genericInputs,

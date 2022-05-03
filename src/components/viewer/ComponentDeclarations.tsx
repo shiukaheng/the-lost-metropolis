@@ -43,7 +43,8 @@ export const components = [
     DebugPlane,
     NexusObject,
     NexusAssetObject,
-    AmbientLightObject
+    AmbientLightObject,
+    PotreeObject
 ]
 
 export function getComponentFromTypeName(componentType): VaporComponent {

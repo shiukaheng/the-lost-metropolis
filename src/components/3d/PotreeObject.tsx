@@ -23,6 +23,7 @@ export const PotreeObject: VaporComponent = ({cloudName="cloud.js", baseUrl, poi
     const defaultGetUrl = (relativeUrl) => {
         return `${baseUrl}${relativeUrl}`
     }
+    console.log(potree)
 
     // Use useEffect to update pointCloud variable on cloudName, baseUrl changes
     useEffect(()=>{
