@@ -24,7 +24,7 @@ function Login() {
     return (
         <GenericPage>
             <KeyPressCallback keyName={"Enter"} onDown={submit}/>
-            <RoundedContainer className="w-[32rem]">
+            <RoundedContainer className="w-full md:w-[32rem]">
                 <MagicDiv className={"text-5xl font-black pt-8 px-8"} languageSpecificChildren={{"en": "member login", "zh": "會員登錄"}}/>
                 {/* Login form */}
                 <form className="flex flex-col gap-2 w-full px-8 py-8">
