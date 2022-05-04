@@ -1,5 +1,4 @@
 import MagicDiv from '../utilities/MagicDiv'
-import HighlightViewport from './Home/HighlightViewport'
 import GenericPage from '../utilities/GenericPage'
 import { PotreeObject } from '../3d/PotreeObject'
 import { useRefState, useTheme } from '../../utilities'
@@ -12,6 +11,7 @@ import { SettingsContext } from '../App'
 import { PotreeContext } from '../3d/managers/PotreeManager'
 import { EditorContext } from '../editor/EditorContext'
 import { ViewerContext } from '../viewer/ViewerContext'
+import { FollowMouseGroup } from './Home/HighlightViewport'
 
 function PointCloud() {
     const ref = useRef()
@@ -79,7 +79,9 @@ function Home() {
             }}>
                 <ScrollControls pages={5} >
                     <Scroll>
-                    <PotreeObject objectID="homepageShowcase" pointShape={0} pointSize={1} pointSizeType={0} scale={[0.9, 0.9, 0.9]} rotation={[-.5, 0.3, 0.088]} position={[-10, -3 , 12]} baseUrl={"https://static.thelostmetropolis.org/BigShotCleanV2/"} cloudName="metadata.json"/>   
+                        <FollowMouseGroup>
+                            <PotreeObject objectID="homepageShowcase" pointShape={0} pointSize={1} pointSizeType={0} scale={[0.9, 0.9, 0.9]} rotation={[-.5, 0.3, 0.088]} position={[-10, -3 , 12]} baseUrl={"https://static.thelostmetropolis.org/BigShotCleanV2/"} cloudName="metadata.json"/>   
+                        </FollowMouseGroup>
                     </Scroll>
                     <Scroll html className="w-full h-full">
                         <div className='w-full h-full relative flex flex-col justify-center md:justify-start'>

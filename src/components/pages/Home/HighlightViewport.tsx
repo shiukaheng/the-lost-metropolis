@@ -1,5 +1,5 @@
 import { Canvas, useFrame } from "@react-three/fiber"
-import { useRef, useContext, useEffect, useLayoutEffect } from "react"
+import { useRef, useContext, useEffect, useLayoutEffect, Fragment } from "react"
 import * as THREE from 'three'
 import { PotreeManager } from "../../3d/managers/PotreeManager"
 import { useContextBridge } from "@react-three/drei"
@@ -22,21 +22,14 @@ function FollowMouse({object, posOffsetIntensity=[1, 1], rotOffsetIntensity=[0, 
     })
 }
 
-function HighlightViewport({children, posOffsetIntensity=[1, 1], rotOffsetIntensity=[0, 0], lambda=2, captureMode="window", followMouse=false, ...props}) {
+export function FollowMouseGroup({children, posOffsetIntensity=[1, 1], rotOffsetIntensity=[0, 0], lambda=2, captureMode="window"}) {
     const rigRef = useRef(null)
     return (
-        <div {...props}>
-            {/* Todo: Need to replace this with something derived with ViewerManager */}
-            <Canvas>
-                <PotreeManager>
-                    { followMouse && <FollowMouse object={rigRef} posOffsetIntensity={posOffsetIntensity} rotOffsetIntensity={rotOffsetIntensity} lambda={lambda} captureMode={captureMode}/> }
-                    <group ref={rigRef}>
-                        {children}
-                    </group>
-                </PotreeManager>
-            </Canvas>
-        </div>
+        <Fragment>
+            <FollowMouse object={rigRef} posOffsetIntensity={posOffsetIntensity} rotOffsetIntensity={rotOffsetIntensity} lambda={lambda} captureMode={captureMode}/>
+            <group ref={rigRef}>
+                {children}
+            </group>
+        </Fragment>
     );
 }
-
-export default HighlightViewport;
