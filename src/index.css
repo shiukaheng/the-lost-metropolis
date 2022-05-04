@@ -213,3 +213,10 @@ div.firebase-emulator-warning {
     width: 200px !important;
     overflow: hidden;
 }
+
+.homepage * {
+    -ms-overflow-style: none;
+}
+.homepage * ::-webkit-scrollbar {
+    width: 0px;
+}
