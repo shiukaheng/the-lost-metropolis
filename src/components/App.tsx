@@ -34,7 +34,7 @@ import VaporAPI from '../api_client/api';
 import { Instance } from '../../api/utility_types';
 
 export const defaultSettings = {
-    lang: "en" as LanguageLiteral
+    lang: "zh" as LanguageLiteral
 }
 
 export const languages = ["en", "zh"]

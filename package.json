@@ -6,7 +6,7 @@
     "install": "cd functions && npm install",
     "start": "vite --host",
     "build": "vite build",
-    "deploy": "yarn build && firebase deploy",
+    "deploy-hosting": "yarn build && firebase deploy --only hosting",
     "preview": "vite preview",
     "kill-ports": "kill-port --port 5333,5377,5355,5341,5366,4000,4500",
     "firebase-emu": "firebase emulators:start --only functions,firestore,storage,auth",
