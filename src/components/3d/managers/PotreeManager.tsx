@@ -43,7 +43,6 @@ function PotreeManager({children}:PotreeManagerProps) {
             potree.pointBudget -= 100
         }
     })
-    console.log(pointClouds)
     return (
         <PotreeContext.Provider value={{potree, pointClouds, setPointClouds, setPointCloud}}>
             {children}

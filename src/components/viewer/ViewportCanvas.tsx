@@ -42,7 +42,7 @@ function CameraHelper() {
 
 // Convenience component to provide common contexts to viewport children, in the future may include 3DTilesManager, NexusManager, etc which serves to manage 3DTilesObject and NexusObject on each render.
 // TODO: Provide a way to change the child manager's parameters, e.g. pointBudget, etc.
-function ViewportCanvas({children, ...props}) {
+function ViewportCanvas({children, paused, ...props}) {
     const ContextBridge = useContextBridge(EditorContext, ViewerContext, SettingsContext, ThemeContext)
     const wrappedChildren = Children.map(children, (child) => (
         <CompositeSuspense>
@@ -50,7 +50,7 @@ function ViewportCanvas({children, ...props}) {
         </CompositeSuspense>
     ))
     return (
-        <Canvas linear flat {...props}>
+        <Canvas linear flat invalidateFrameloop={paused} {...props}>
             <ContextBridge>
                 <CameraHelper/>
                 <PotreeManager pointBudget={1000000}>
