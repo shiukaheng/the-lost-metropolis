@@ -25,7 +25,6 @@
         "firestore-debug.log": true,
         "postcss.config.js": true,
         "storage.rules": true,
-        "tailwind.config.js": true,
         "firestore.rules": true
     },
     "hide-files.files": [
@@ -48,7 +47,6 @@
         "firestore-debug.log",
         "postcss.config.js",
         "storage.rules",
-        "tailwind.config.js",
         "firestore.rules"
     ]
 }

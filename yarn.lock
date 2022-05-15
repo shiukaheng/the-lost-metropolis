@@ -7352,6 +7352,11 @@ react-full-screen@^1.1.0:
   dependencies:
     fscreen "^1.0.2"
 
+react-hook-media-query@^1.0.5:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/react-hook-media-query/-/react-hook-media-query-1.0.5.tgz#e5d8282c5cd5b54f7b72923f6b05c92ab3e74ba8"
+  integrity sha512-3Sj6ChZQC/13/8w3Endyp+4erVnVgFWRnA8J8COKrx1JBC0/T2Uwt6c5Bo5lGFGQGSicTXwSxOKEy7+vKjLqFw==
+
 react-intersection-observer@^8.32.0:
   version "8.34.0"
   resolved "https://registry.yarnpkg.com/react-intersection-observer/-/react-intersection-observer-8.34.0.tgz#6f6e67831c52e6233f6b6cc7eb55814820137c42"
