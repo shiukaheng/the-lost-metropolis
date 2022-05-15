@@ -89,8 +89,8 @@ function Home() {
             "en": "scroll to explore ↓"
         },
         "subtitle": {
-            "zh": "挽救日常中的社區歷史",
-            "en": "x number of heritage sites have been demolished in the past decade" 
+            "zh": "重構身邊往往被遺忘的故事",
+            "en": ""
         },
         "p1": {
             "zh": "偶然發現某些定格於幾十年前的建築物與老店，彷彿能管窺時代的變遷。儘管我這代年輕人並沒有在老一輩的香港活過，喜愛舊日文化的年輕人為數亦不少。我有幸生於這個時代仍能見證這地方的舊文化，但每當想起在不久的將來它將被重建清拆，便會發現社會上「新」與「舊」的二元對立日趨嚴重。",
