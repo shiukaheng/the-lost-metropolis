@@ -1,8 +1,8 @@
 import MagicDiv from '../../utilities/MagicDiv';
 import { useRefState } from '../../../utilities';
 import { Fade } from "react-reveal";
-import { useScroll, ScrollControlsState } from "@react-three/drei";
-import { Fragment, useContext, useEffect, useRef } from 'react';
+import { useScroll, ScrollControlsState, Plane } from "@react-three/drei";
+import { Children, cloneElement, Fragment, useContext, useEffect, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { ViewerContext } from '../../viewer/ViewerContext';
 import useMediaQuery from 'react-hook-media-query';
@@ -11,6 +11,8 @@ import { ReactComponent as InstagramIcon } from "./svgs/instagram.svg";
 import MagicButton from '../../utilities/MagicButton';
 import { useNavigate } from 'react-router-dom';
 import { MultiLangObject } from '../../../../api/types/MultiLangObject';
+import { twMerge } from 'tailwind-merge';
+import { Group, MathUtils, MeshBasicMaterial } from 'three';
 
 function RevealDiv({ predicate, children }: { predicate: (data: ScrollControlsState) => boolean; children: React.ReactNode; }) {
     const data = useScroll();
@@ -72,6 +74,105 @@ export function FadeFilter({ pages = 1, threshold = 1.2, children, onFullyOpaque
     );
 }
 
+export function useFadeOpacity3D(page, matRef) {
+    const data = useScroll();
+    useFrame(()=>{
+        if (matRef.current !== null) {
+            matRef.current.opacity = Math.min((data.offset * data.pages) / page, 1);
+        }
+    })
+}
+
+export function useHide3D(page) {
+    const data = useScroll();
+    // Similar to useFadeOpacity3D, but returns true or false instead of setting opacity
+    const [hiddenRef, hidden, setHidden] = useRefState(false);
+    // Don't update state if no change
+    useFrame(()=>{
+        const newHidden = Math.min((data.offset * data.pages) / page, 1) >= 1;
+        if (newHidden !== hiddenRef.current) {
+            setHidden(newHidden);
+        }
+    })
+    return hidden;
+}
+
+export function FadeFilter3D({cameraOffset=20.5, planeScale=20, page=0.5, visible=true}) {
+    const matRef = useRef<MeshBasicMaterial>(null);
+    useFadeOpacity3D(page, matRef);
+    return (
+        <CameraStartGroup visible={visible}>
+            <Plane scale={planeScale} rotation={[0,0,Math.PI/2]} position={[0, 0, -cameraOffset]}>
+                <meshBasicMaterial ref={matRef} attach="material" color="black" opacity={1} transparent={true} />
+            </Plane>
+        </CameraStartGroup>
+    )
+}
+
+export function PopGroup({factor=100, lambda=5, deltaPosition=[0,0,1], deltaRotation=[0,0,0], children, ...props}: {
+    factor?: number,
+    lambda?: number,
+    deltaPosition?: [number, number, number],
+    deltaRotation?: [number, number, number],
+    children?: React.ReactNode,
+    [key: string]: any
+}) {
+    const data = useScroll();
+    const groupRef = useRef<Group>(null);
+    useFrame((state, dt)=>{
+        if (groupRef.current) {
+            groupRef.current.position.x = MathUtils.damp(groupRef.current.position.x, data.delta * factor * deltaPosition[0], lambda, dt);
+            groupRef.current.position.y = MathUtils.damp(groupRef.current.position.y, data.delta * factor * deltaPosition[1], lambda, dt);
+            groupRef.current.position.z = MathUtils.damp(groupRef.current.position.z, data.delta * factor * deltaPosition[2], lambda, dt);
+            groupRef.current.rotation.x = MathUtils.damp(groupRef.current.rotation.x, data.delta * factor * deltaRotation[0], lambda, dt);
+            groupRef.current.rotation.y = MathUtils.damp(groupRef.current.rotation.y, data.delta * factor * deltaRotation[1], lambda, dt);
+            groupRef.current.rotation.z = MathUtils.damp(groupRef.current.rotation.z, data.delta * factor * deltaRotation[2], lambda, dt);
+        }
+    })
+    return (
+        <group {...props}>
+            <group ref={groupRef}>
+                {children}
+            </group>
+        </group>
+    )
+}
+
+export function FadeGroup({factor=0.1, children}) {
+    const data = useScroll();
+    const groupRef = useRef<Group>(null);
+    useFrame(()=>{
+        if (groupRef.current) {
+            groupRef.current.scale.set(1 + data.range(0, factor) * data.offset, 1 + data.range(0, factor) * data.offset, 1 + data.range(0, factor) * data.offset);
+        }
+    })
+    return (
+        <group ref={groupRef}>
+            {children}
+        </group>
+    )
+}
+ 
+export function HidingObject({page=1, children}) {
+    const hidden = useHide3D(page)
+    // Wrap children to add visible prop that is !hidden
+    const newChildren = Children.map(children, child => {
+        return cloneElement(child, {
+            visible: !hidden
+        });
+    });
+    return newChildren
+}
+
+export function CameraStartGroup({children, ...args}) {
+    const {defaultCameraProps} = useContext(ViewerContext)
+    return (
+        <group position={defaultCameraProps.position} rotation={defaultCameraProps.rotation} {...args}>
+            {children}
+        </group>
+    )
+}
+
 export const DisableRender = () => useFrame(() => null, 1000);
 
 export function TitleScreen(props) {
@@ -109,7 +210,7 @@ export function TitleScreen(props) {
                 </Fade>
             </div>
         </Fragment> : <Fragment>
-            <div className="w-full h-full flex flex-col px-8">
+            <div className="w-full h-full flex flex-col">
                 <Fade delay={500} duration={1500} up>
                     <div className="text-5xl md:text-[60px] font-bold max-w-[500px] mr-auto">
                         {props.text["top-title"]}
@@ -128,23 +229,21 @@ export function TitleScreen(props) {
 }
 
 export function Screen1(props) {
+    const md = useMediaQuery("(min-width: 768px)");
     return (
         <Fragment>
-            <MagicDiv className="flex flex-col gap-4 w-full h-full">
+            <MagicDiv className="flex flex-col gap-4 w-full h-full justify-center content-center">
                 <Fade delay={500}>
                     <div className="font-black text-center md:text-left px-8 pb-4 md:px-16 text-4xl md:text-5xl">
                         {props.text["subtitle"]}
                     </div>
                 </Fade>
-                <Fade delay={700}>
-                    <div className="px-8 md:px-16 md:text-xl">
+                <Fade delay={600}>
+                    <div className="px-8 md:px-16 md:text-xl text-center md:text-left">
                         {props.text["p1"]}
                     </div>
                 </Fade>
                 {/* Fade in image carousel of related topics */}
-            </MagicDiv>
-            <MagicDiv className="flex md:hidden flex-col gap-4 w-full h-full bg-teal-400">
-                
             </MagicDiv>
         </Fragment>
     );
@@ -153,21 +252,18 @@ export function Screen1(props) {
 export function Screen2(props) {
     return (
         <Fragment>
-            <MagicDiv className="flex flex-col gap-4 w-full h-full">
+            <MagicDiv className="flex flex-col gap-4 w-full h-full justify-center content-center">
                 <Fade delay={500}>
                     <div className="font-black text-center md:text-left px-8 pb-4 md:px-16 text-4xl md:text-5xl">
                         {props.text["subtitle2"]}
                     </div>
                 </Fade>
-                <Fade delay={700}>
-                    <div className="px-8 md:px-16 md:text-xl">
+                <Fade delay={600}>
+                    <div className="px-8 md:px-16 md:text-xl text-center md:text-left">
                         {props.text["p2"]}
                     </div>
                 </Fade>
                 {/* Fade in video / animation depicting preservation process */}
-            </MagicDiv>
-            <MagicDiv className="flex md:hidden flex-col gap-4 w-full h-full bg-teal-400">
-                
             </MagicDiv>
         </Fragment>
     );
@@ -180,7 +276,7 @@ export function EndScreen({text, gotoBrowse}: {
     return (
         <MagicDiv className="w-full h-full flex flex-col justify-center items-center gap-4">
             <MagicButton solid className="text-3xl md:text-4xl h-16 md:h-18" onClick={gotoBrowse}>
-                瀏覽內容
+                {text["browseAction"]}
             </MagicButton>
         </MagicDiv>
     )
@@ -189,7 +285,7 @@ export function EndScreen({text, gotoBrowse}: {
 export function EndScreenB({text}) {
     return (
         <MagicDiv className="w-full h-full flex flex-col justify-center items-center gap-4">
-            <h2 className="text-3xl md:text-4xl font-black text-center">暫未公布任何項目<br/>敬請留意社交媒體</h2>
+            <h2 className="text-xl md:text-4xl font-black text-center">{text["noContentPartA"]}<br/>{text["noContentPartB"] }</h2>
             <div className="flex flex-row gap-2">
                 <MagicIcon fillCurrent IconComponent={InstagramIcon} className="h-8 w-8 cursor-pointer" onClick={()=>{
                     window.open("https://www.instagram.com/thelostmetropolishk/");
