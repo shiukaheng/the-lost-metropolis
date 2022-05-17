@@ -57,6 +57,7 @@ export const PotreeObject: VaporComponent = ({cloudName="cloud.js", baseUrl, poi
             pointCloud.material.size = pointSize
             pointCloud.pointSizeType = pointSizeType
             pointCloud.material.shape = pointShape
+            pointCloud.material.outputColorEncoding = 1
         }
     }, [pointSize, pointSizeType, pointShape, pointCloud])
     //

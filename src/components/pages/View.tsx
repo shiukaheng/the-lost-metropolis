@@ -19,7 +19,7 @@ function View({ ...props}) {
     return (
         <div className='absolute w-full h-full'>
             <Viewer post={post} className="absolute w-full h-full">
-                <GameControls force={10} friction={0.97}/>
+                <GameControls force={10} friction={0.06}/>
             </Viewer>
             <Fade>
                 <div className="absolute w-full h-full p-8 md:p-20 pointer-events-none">
