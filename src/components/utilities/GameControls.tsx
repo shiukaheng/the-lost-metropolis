@@ -38,7 +38,10 @@ export default function GameControls({mass=1, force=1, friction=0.99}) {
         // Apply the velocity to the camera position: s = s0 + vt
         camera.position.add(cameraVelocityRef.current.clone().multiplyScalar(delta));
         // Apply friction to the velocity
-        cameraVelocityRef.current.multiplyScalar(friction);
+        if (delta !== 0) { // Fix division by zero
+            cameraVelocityRef.current.multiplyScalar(friction / delta);
+        }
+        
     })
     return (
         <CustomPointerLockControls/>
