@@ -93,10 +93,10 @@ function Home() {
                                 {/* <FollowMouseGroup> */}
                                     <group position={[0,-11,0]}>
                                         <PopGroup position={[3, 0, 1]} deltaPosition={[0, 0, 0]} deltaRotation={[0, -0.2, 0]} lambda={1}>
-                                            <Image scale={[10,10,10]} url={imageUrl1}/>
+                                            <Image scale={[10,10,10]} url={imageUrl1} toneMapped={false}/>
                                         </PopGroup>
                                         <PopGroup position={[-3, -4, 3.5]} deltaPosition={[0, 0, 0]} deltaRotation={[0, 0.2, 0]} lambda={1}>
-                                            <Image url={imageUrl2} scale={[9, 6, 10]}/>
+                                            <Image url={imageUrl2} scale={[9, 6, 10]} toneMapped={false}/>
                                         </PopGroup> 
                                     </group>
                                 {/* </FollowMouseGroup> */}

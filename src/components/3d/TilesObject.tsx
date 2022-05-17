@@ -2,7 +2,13 @@
 
 import { Loader3DTiles, LoaderProps, LoaderOptions } from 'three-loader-3dtiles'
 import { useLoader, useThree, useFrame } from '@react-three/fiber'
-import { Loader } from 'three'
+import { Loader, MeshBasicMaterial } from 'three'
+import { VaporComponent, VaporComponentProps } from '../viewer/ComponentDeclarations';
+import { Suspense } from 'react';
+import { genericInputs } from '../viewer/genericInputs';
+import { StringType } from '../viewer/ArgumentTypes';
+import { ErrorBoundary } from 'react-error-boundary';
+import ErrorObject from './subcomponents/ErrorObject';
 
 class Loader3DTilesBridge extends Loader {
   props: LoaderProps;
@@ -29,11 +35,16 @@ class Loader3DTilesBridge extends Loader {
   }
 };
 
-export function TilesObject(props: LoaderOptions) {
+type ProtoTilesObjectProps = {
+  url: string;
+} & LoaderOptions
+
+export function ProtoTilesObject(props: ProtoTilesObjectProps) {
   const threeState = useThree();
   const loaderProps = {
     renderer: threeState.gl,
     options: {
+      // material: new MeshBasicMaterial(),
       ...props
     }
   }
@@ -44,6 +55,8 @@ export function TilesObject(props: LoaderOptions) {
     loader.setProps(loaderProps);    
   })
 
+  console.log(model)
+
   useFrame(({ gl, camera }, dt) => {
     runtime.update(dt, gl, camera);
   });
@@ -53,4 +66,32 @@ export function TilesObject(props: LoaderOptions) {
       <primitive object={model} />
     </group>
   )
+}
+
+type TilesObjectProps = {
+  url: string;
+} & VaporComponentProps
+
+// By default uses sRGB encoding
+
+export const TilesObject: VaporComponent = ({url, ...props}: TilesObjectProps) => {
+  return (
+    <ErrorBoundary fallbackRender={({error, resetErrorBoundary}) => (
+      <ErrorObject error={error} position={props.position} scale={props.scale} onClick={resetErrorBoundary} objectID={props.objectID}/>
+    )}>
+      <Suspense fallback={null}>
+        <ProtoTilesObject url={url} dracoDecoderPath={"https://unpkg.com/three@0.137.0/examples/js/libs/draco"} basisTranscoderPath={"https://unpkg.com/three@0.137.0/examples/js/libs/basis"} {...props} />
+      </Suspense>
+    </ErrorBoundary>
+  )
+}
+
+TilesObject.displayName = "3D Tiles"
+TilesObject.componentType = "TilesObject"
+TilesObject.inputs = {
+  ...genericInputs,
+  url: {
+    type: StringType,
+    default: ""
+  }
 }

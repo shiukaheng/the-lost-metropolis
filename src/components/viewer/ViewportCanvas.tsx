@@ -50,7 +50,7 @@ function ViewportCanvas({children, paused, ...props}) {
         </CompositeSuspense>
     ))
     return (
-        <Canvas linear flat invalidateFrameloop={paused} {...props}>
+        <Canvas invalidateFrameloop={paused} {...props}>
             <ContextBridge>
                 <CameraHelper/>
                 <PotreeManager pointBudget={1000000}>

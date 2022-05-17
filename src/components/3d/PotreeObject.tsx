@@ -65,6 +65,8 @@ export const PotreeObject: VaporComponent = ({cloudName="cloud.js", baseUrl, poi
     );
 }
 
+// By default uses linear encoding
+
 PotreeObject.displayName = "Potree object"
 PotreeObject.componentType = "PotreeObject"
 PotreeObject.inputs = {

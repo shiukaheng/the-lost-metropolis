@@ -9,6 +9,7 @@ import { LinkObject } from "../3d/LinkObject"
 import { NexusObject } from "../3d/NexusObject"
 import { PotreeObject } from "../3d/PotreeObject"
 import { TestObject } from "../3d/TestObject"
+import { TilesObject } from "../3d/TilesObject"
 import { EditorInputType } from "./ArgumentTypes"
 
 export interface VaporComponentProps {
@@ -35,7 +36,6 @@ export interface VaporComponent extends FunctionComponent<VaporComponentProps> {
 
 export const components = [
     TestObject,
-    // PotreeObject,
     PotreeAssetObject,
     LinkObject,
     InfoObject,
@@ -44,7 +44,8 @@ export const components = [
     NexusObject,
     NexusAssetObject,
     AmbientLightObject,
-    PotreeObject
+    PotreeObject,
+    TilesObject
 ]
 
 export function getComponentFromTypeName(componentType): VaporComponent {
