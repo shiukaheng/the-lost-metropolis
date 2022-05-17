@@ -7,6 +7,7 @@
     "start": "vite --host",
     "build": "vite build",
     "deploy-hosting": "yarn build && firebase deploy --only hosting",
+    "deploy": "yarn build && firebase deploy",
     "preview": "vite preview",
     "kill-ports": "kill-port --port 5333,5377,5355,5341,5366,4000,4500",
     "firebase-emu": "firebase emulators:start --only functions,firestore,storage,auth",
