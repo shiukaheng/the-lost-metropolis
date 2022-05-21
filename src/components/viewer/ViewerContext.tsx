@@ -1,5 +1,5 @@
 import { Camera } from "@react-three/fiber"
-import { createContext, ReactElement, RefObject } from "react"
+import { createContext, MutableRefObject, ReactElement, RefObject } from "react"
 import { SceneChild } from "../../../api/types/SceneChild"
 
 // Define viewer context
@@ -37,7 +37,7 @@ export type DefaultCameraPropType = {
 interface ViewerContextProps {
     defaultCameraProps: DefaultCameraPropType,
     setDefaultCameraProps: (props) => void,
-    cameraRef: RefObject<Camera>,
+    cameraRef: MutableRefObject<Camera>,
     audioListener: AudioListener | null,
     // Let sceneChildren be a list of VaporComponent instances
     sceneChildren: SceneChild[],

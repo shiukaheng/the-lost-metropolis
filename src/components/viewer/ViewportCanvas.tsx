@@ -12,6 +12,8 @@ import { InteractionManager, XR } from "@react-three/xr"
 function CameraHelper() {
     const {defaultCameraProps, cameraRef, audioListener} = useContext(ViewerContext)
     const { camera } = useThree()
+    // Keep camera reference up to date, and move camera back to starting pose if camera updated / pose updated (hacky, but works)
+    // Todo: Allow different poses for XR and non-XR
     useLayoutEffect(()=>{
         cameraRef.current = camera
         if (camera) {
@@ -29,6 +31,7 @@ function CameraHelper() {
             }
         }
     }, [defaultCameraProps, camera])
+    // Keep audio listener reference up to date
     useLayoutEffect(()=>{
         if (camera) {
             audioListener.removeFromParent()
