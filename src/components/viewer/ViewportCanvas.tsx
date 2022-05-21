@@ -7,6 +7,7 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber"
 import { ViewerContext } from "../viewer/ViewerContext"
 import { SettingsContext, ThemeContext } from "../App"
 import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing'
+import { InteractionManager, XR } from "@react-three/xr"
 
 function CameraHelper() {
     const {defaultCameraProps, cameraRef, audioListener} = useContext(ViewerContext)
@@ -41,8 +42,8 @@ function CameraHelper() {
 }
 
 // Convenience component to provide common contexts to viewport children, in the future may include 3DTilesManager, NexusManager, etc which serves to manage 3DTilesObject and NexusObject on each render.
-// TODO: Provide a way to change the child manager's parameters, e.g. pointBudget, etc.
-function ViewportCanvas({children, paused, ...props}) {
+// TODO: Register managers required and add dynamically (same with ContextBridge required contexts)
+function ViewportCanvas({children, paused=false, foveation=0, ...props}) {
     const ContextBridge = useContextBridge(EditorContext, ViewerContext, SettingsContext, ThemeContext)
     const wrappedChildren = Children.map(children, (child) => (
         <CompositeSuspense>
@@ -50,12 +51,16 @@ function ViewportCanvas({children, paused, ...props}) {
         </CompositeSuspense>
     ))
     return (
-        <Canvas invalidateFrameloop={paused} {...props}>
+        <Canvas vr invalidateFrameloop={paused} {...props}>
             <ContextBridge>
-                <CameraHelper/>
-                <PotreeManager pointBudget={1000000}>
-                    {wrappedChildren}
-                </PotreeManager>
+                <XR foveation={foveation}>
+                    <CameraHelper/>
+                    <PotreeManager>
+                        <InteractionManager>
+                            {wrappedChildren}
+                        </InteractionManager>
+                    </PotreeManager>
+                </XR>
             </ContextBridge>
         </Canvas>
     );
