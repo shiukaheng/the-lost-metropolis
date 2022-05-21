@@ -29,7 +29,7 @@ function XRButtons({threeStateRef}: {
                     e.stopPropagation()
                     requestSession((threeStateRef.current?.gl as WebGLRenderer), "immersive-ar")
                 }}>
-                    <MagicIcon IconComponent={AR}/>
+                    <MagicIcon fillCurrent invertColors IconComponent={AR}/>
                 </MagicButton>
             }
             {supportVR &&
@@ -37,7 +37,7 @@ function XRButtons({threeStateRef}: {
                     e.stopPropagation()
                     requestSession((threeStateRef.current?.gl as WebGLRenderer), "immersive-vr")
                 }}>
-                    <MagicIcon IconComponent={VR}/>
+                    <MagicIcon fillCurrent invertColors IconComponent={VR}/>
                 </MagicButton>
             }
         </Fragment>
