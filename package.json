@@ -4,7 +4,7 @@
   "source": "./src/index.html",
   "scripts": {
     "install": "cd functions && npm install",
-    "start": "vite --host",
+    "start": "vite --host 0.0.0.0",
     "build": "vite build",
     "deploy-hosting": "yarn build && firebase deploy --only hosting",
     "deploy": "yarn build && firebase deploy",

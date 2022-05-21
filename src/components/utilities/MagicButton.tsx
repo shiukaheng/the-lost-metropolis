@@ -26,7 +26,7 @@ function MagicButton({ languageSpecificChildren=null, style={}, solid=false, chi
     const additionalTransition = foregroundColorCSSProps.concat(backgroundColorCSSProps).map((val) => (val.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()+` ${theme.transitionDuration}s`)).join(", ")
     const [pending, setPending] = useState(false)
 
-    const buttonClassnames = `select-none px-4 rounded-3xl ${(disabled || pending) ? "opacity-50" : "md:hover:opacity-50 cursor-pointer"} font-serif font-bold md:text-xl h-9 md:h-10 transition-opacity duration-500`
+    const buttonClassnames = `whitespace-nowrap select-none px-4 rounded-3xl ${(disabled || pending) ? "opacity-50" : "md:hover:opacity-50 cursor-pointer"} font-serif font-bold md:text-xl h-9 md:h-10 transition-opacity duration-500`
     const solidButtonClassnames = ""
     const nonSolidButtonClassnames = "border bg-transparent"
 
@@ -45,7 +45,7 @@ function MagicButton({ languageSpecificChildren=null, style={}, solid=false, chi
 
     return (
         <Fragment>
-            <input onClick={disabled ? undefined : async (e)=>{
+            <button onClick={disabled ? undefined : async (e)=>{
                 // If the onClick function is synchronous, just call it; if asynchronous, set pending to true and call it; when it resolves, set pending to false
                 if (onClick.constructor.name === "Function") {
                     onClick(e)
@@ -56,14 +56,16 @@ function MagicButton({ languageSpecificChildren=null, style={}, solid=false, chi
                         setPending(false)
                     }
                 }
-            }} {...props} type="button" className={mergedClassNames} value={languageSpecificChildren ? languageSpecificChildren[settings.lang] : children} style={
+            }} {...props} className={mergedClassNames} style={
                 autoColor ? {
                     ...(Object.assign({}, ...backgroundColorCSSProps.map((val) => ({[val]: formatRGBCSS(theme.backgroundColor)})))),
                     ...(Object.assign({}, ...foregroundColorCSSProps.map((val) => ({[val]: formatRGBCSS(theme.foregroundColor)})))),
                     transition: mergeTransitions ? existingTransition+", "+additionalTransition : additionalTransition,
                     ...style
                 } : {...style}
-            }/>
+            }>
+                {languageSpecificChildren ? languageSpecificChildren[settings.lang] : children}
+            </button>
             {mergeTransitions ? <div ref={testDiv} className={mergedClassNames} style={{display: "none"}}/> : null}
         </Fragment>
         
