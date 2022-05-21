@@ -6,7 +6,7 @@ import { useKeyPress } from "../../utilities";
 import { CustomPointerLockControls } from "./CustomPointerLockControls";
 
 // WASD / Arrow Keys + Shift (down) + Space (up) + Pointer Lock controls
-export default function GameControls({mass=1, force=1, friction=0.99}) {
+export default function GameControls({mass=1, force=1, friction=2}) {
     const cameraVelocityRef = useRef(new Vector3(0, 0, 0));
     const forward1 = useKeyPress("w");
     const forward2 = useKeyPress("ArrowUp");
@@ -38,9 +38,10 @@ export default function GameControls({mass=1, force=1, friction=0.99}) {
         // Apply the velocity to the camera position: s = s0 + vt
         camera.position.add(cameraVelocityRef.current.clone().multiplyScalar(delta));
         // Apply friction to the velocity
-        if (delta !== 0) { // Fix division by zero
-            cameraVelocityRef.current.multiplyScalar(friction / delta);
-        }
+        // if (delta !== 0) { // Fix division by zero
+        //     cameraVelocityRef.current.multiplyScalar(friction * delta);
+        // }
+        cameraVelocityRef.current.sub(cameraVelocityRef.current.clone().multiplyScalar(friction * delta));
         
     })
     return (
