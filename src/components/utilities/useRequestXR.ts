@@ -23,6 +23,7 @@ function makeOnSessionStart(renderer: WebGLRenderer, sessionRef: React.MutableRe
     }
 }
 
+// Perhaps move this into ViewerManager? Components will benefit from knowing if they are in XR mode
 export function useRequestXR(optionalFeatures=['local-floor'], sessionInit={}) {
     const sessionRef = useRef<XRSession | null>(null);
     const [inSession, setInSession] = useState(false)
