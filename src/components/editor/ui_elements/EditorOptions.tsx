@@ -54,23 +54,6 @@ function TransformModeSetter({transformMode, setTransformMode, transformSpace, s
     )
 }
 
-function LanguageSwitcher() {
-    const {activeLanguage, setActiveLanguage} = useContext(EditorContext)
-    const options = languageLiteral.map(l => ({value: l, label: l}))
-    const title = useMultiLang({
-        en: "language to edit",
-        zh: "編輯語言"
-    })
-    return (
-        <div className="flex flex-col gap-2">
-            <div>{title}</div>
-            <ThemedSelect options={options} onChange={(selected, _) => {
-            setActiveLanguage(selected.value)
-            }} value={options.find(o => o.value===activeLanguage)}/>
-        </div>
-    )
-}
-
 export default function EditorOptions() {
     const { transformMode, setTransformMode, transformSpace, setTransformSpace, setOverrideInteractions, overrideInteractions } = useContext(EditorContext)
     const heading = useMultiLang({"en": "editor options", "zh": "編輯器選項"})
@@ -78,7 +61,6 @@ export default function EditorOptions() {
     const bypassLabel = useMultiLang({"en": "bypass editor interactions", "zh": "跳過編輯器互動"})
     return (
         <EditorEmbeddedWidget title={heading} stickyKey="editorOptionsExpanded">
-            <LanguageSwitcher/>
             <div className="flex flex-row gap-2">
                 <div>{transformationLabel}</div>
                 <TransformModeSetter {...{ transformMode, setTransformMode, transformSpace, setTransformSpace }}/>
