@@ -5,28 +5,27 @@ import { WebGLRenderer, XRSessionMode } from "three";
     Adapted from https://github.com/pmndrs/react-xr/blob/master/src/webxr/VRButton.js
 */
 
-function makeOnSessionStart(renderer: WebGLRenderer, sessionRef: React.MutableRefObject<XRSession | null>, setInSession: React.Dispatch<React.SetStateAction<boolean>>) {
+function makeOnSessionStart(renderer: WebGLRenderer, sessionRef: React.MutableRefObject<XRSession | null>, onSessionStart: () => void, onSessionEnd: () => void) {
     return async function (session: XRSession) {
         console.log("session started", session)
-        const onSessionEnd = () => {
-            sessionRef.current?.removeEventListener("end", onSessionEnd);
+        const _onSessionEnd = () => {
+            sessionRef.current?.removeEventListener("end", _onSessionEnd);
             console.log("session ended", session)
             // Set text to "enter xr"
             sessionRef.current = null;
-            setInSession(false);
+            onSessionEnd();
         }
-        session.addEventListener("end", onSessionEnd);
+        session.addEventListener("end", _onSessionEnd);
         await renderer.xr.setSession(session)
         // Set text to "exit xr"
         sessionRef.current = session
-        setInSession(true)
+        onSessionStart();
     }
 }
 
 // Perhaps move this into ViewerManager? Components will benefit from knowing if they are in XR mode
-export function useRequestXR(optionalFeatures=['local-floor'], sessionInit={}, renderer: WebGLRenderer) {
-    const sessionRef = useRef<XRSession | null>(null);
-    const [inSession, setInSession] = useState(false)
+export function useRequestXR(optionalFeatures=['local-floor'], sessionInit={}, renderer: WebGLRenderer, sessionRef: React.MutableRefObject<XRSession | null>) {
+    const [sessionMode, setSessionMode] = useState<XRSessionMode | null>(null)
 
     const requestSession = useCallback((sessionType: XRSessionMode) => {
         if (sessionRef.current === null) {
@@ -36,7 +35,7 @@ export function useRequestXR(optionalFeatures=['local-floor'], sessionInit={}, r
                 return;
             }
             navigator.xr.requestSession(sessionType, {...sessionInit, optionalFeatures: newOptionalFeatures}).then(
-                makeOnSessionStart(renderer, sessionRef, setInSession)
+                makeOnSessionStart(renderer, sessionRef, ()=>{setSessionMode(sessionType)}, ()=>{setSessionMode(null)})
             );
         } else {
             sessionRef.current.end();
@@ -48,8 +47,7 @@ export function useRequestXR(optionalFeatures=['local-floor'], sessionInit={}, r
 
     return {
         requestSession,
-        sessionRef,
-        inSession
+        sessionMode
     };
 }
 
