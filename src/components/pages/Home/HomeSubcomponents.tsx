@@ -97,7 +97,7 @@ export function useHide3D(page) {
     return hidden;
 }
 
-export function FadeFilter3D({cameraOffset=20.5, planeScale=20, page=0.5, visible=true}) {
+export function FadeFilter3D({cameraOffset=20.5, planeScale=25, page=0.5, visible=true}) {
     const matRef = useRef<MeshBasicMaterial>(null);
     useFadeOpacity3D(page, matRef);
     return (
