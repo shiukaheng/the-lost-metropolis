@@ -5,6 +5,7 @@ import { SettingsContext, ThemeContext } from '../App';
 import Logo from "./Logo"
 import MagicDiv from './MagicDiv';
 import { Condition, logOut } from '../../utilities';
+import { ContentContext } from '../providers/ContentProvider';
 
 function MultiLangNavLink({text, to, className="", ...props}) {
     const navigate = useNavigate();
@@ -27,6 +28,7 @@ export default function NavigationBar(props) {
     const {setSettings} = useContext(SettingsContext)
     const {setTheme} = useContext(ThemeContext)
     const navigate = useNavigate()
+    const posts = useContext(ContentContext)
     return (
         // <div className="flex flex-col gap-2 pr-16"> DESKTOP
         <div className="flex flex-col gap-2 p-8 md:p-20 md:pr-8">
@@ -36,9 +38,11 @@ export default function NavigationBar(props) {
                 <MultiLangNavLink text={{"en": "home", "zh": "首頁"}} to="/"/>
                 <LoggedInFilter>
                     <MultiLangNavLink text={{"en": "dashboard", "zh": "管理"}} to="/dashboard"/>
+                </LoggedInFilter>
+                <Condition condition={posts !== null && posts.length > 0}>
                     <MultiLangNavLink text={{"en": "browse", "zh": "瀏覽"}} to="/browse"/>
                     <MultiLangNavLink text={{"en": "list", "zh": "列表"}} to="/list"/>
-                </LoggedInFilter>
+                </Condition>
                 <LoggedInFilter>
                     <MagicDiv mergeTransitions={true} className="nav-button" onClick={()=>{
                         logOut()
