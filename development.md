@@ -73,6 +73,29 @@ Note: Perhaps it would be better to make the naming more consistent, and elimina
 - Remember to update both Post and PostDocData schemas
 - Also, update importPost and exportPost in the api
 
+# Viewer
+- The viewer is a bungled chunk of mess that needs to be refactored.. but essentially, it is a container for 3D components and performs two roles:
+  - Allows imperative changes to the child 3D components (adding them, modifying them, removing them) during runtime - allows for programmatic creation of components
+  - Provides runtime parameters and references as context, and allow modification during rendering (e.g. camera position, positional audio listener, etc)
+- The component is further broken down into two parts:
+  - The ViewerManager component, which manages the state variables and the child components
+  - The ViewerUI component, which outputs the DOM elements for actually viewing the components
+    - The ViewerUI is minimal, and does not contain any game controls, which can be supplied by child components.
+  - This architecture is designed so that mutations of the Viewer can be easily made with extra state variables and display of 3d components by sandwiching extra logic between the two components.
+  - Alternatively, the ViewerUI can be swapped out entirely, as it is done in Editor.
+  - So in a sense ViewerManager is the core of all the 3D experiences in Vapor.
+- The overarching problem is that all the variables and setters are passed by a single context object, and so when any of the variables change, the entire state of the viewer is changed, leading to a lot of unnecessary re-renders. This should be fixed to use a proper state management system, I am eyeing zustand for this.
+- Moreover, the code on managing the context variables should be compartmentalized into individual hooks for easier management.
+
+# Viewport
+- The Viewport is a component used to render the 3D components, it is expected to be used by all 3D viewers since it performs a few essential roles:
+  - Manages the ErrorBoundary so any errors in the 3D components are caught and displayed in the Viewport.
+  - Uses ViewPort canvas, intercepts three.js runtime variables and passes them to the ViewportManager component.
+
+# Editor (Referring to the 3D editor component)
+- The Editor is a mutated Viewer component that serves as a visual interface for editing the 3D components.
+- The extra state and references are mostly for managing the UI of the editor, and the actual editing of the components is done by the Viewer component.
+
 # Improvements
 
 - Currently ViewerContext and EditorContext are just one big object with unrelated functionality, and some setValue functions are even passed down, causing some infinite rendering loop issues if setting of one property affects the value of another. Should seperate these into different contexts, but the reason why I initially structured like this is for ease of use. Perhaps find a state management library to improve this? Using useLazyEffect custom hook to get around this but is incredibly hacky. Basically does deep check of dependencyArray to see if the value has actually changed, and only actually call the callback if it did change. Will have impact on performance since these comparisons are not cheap if the dependencies are complex.
