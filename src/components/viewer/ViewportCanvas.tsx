@@ -7,7 +7,7 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber"
 import { ViewerContext } from "../viewer/ViewerContext"
 import { SettingsContext, ThemeContext } from "../App"
 import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing'
-import { InteractionManager, XR } from "@react-three/xr"
+import { InteractionManager, useXR, XR } from "@react-three/xr"
 import { twMerge } from "tailwind-merge"
 
 /**
@@ -22,35 +22,35 @@ function CameraHelper() {
     useLayoutEffect(()=>{
         cameraRef.current = camera
         if (camera) {
-            if (xrMode !== null) {
-                if (defaultXRCameraProps.position) {
-                    camera.position.fromArray(defaultXRCameraProps.position)
-                }
-                if (defaultXRCameraProps.rotation) {
-                    camera.rotation.fromArray(defaultXRCameraProps.rotation)
-                }
-                if (defaultXRCameraProps.fov) {
-                    camera.fov = defaultXRCameraProps.fov
-                }
-                if (defaultXRCameraProps.position || defaultXRCameraProps.rotation || defaultXRCameraProps.fov) {
-                    camera.updateProjectionMatrix()
-                }
-            } else {
-                if (defaultCameraProps.position) {
-                    camera.position.fromArray(defaultCameraProps.position)
-                }
-                if (defaultCameraProps.rotation) {
-                    camera.rotation.fromArray(defaultCameraProps.rotation)
-                }
-                if (defaultCameraProps.fov) {
-                    camera.fov = defaultCameraProps.fov
-                }
-                if (defaultCameraProps.position || defaultCameraProps.rotation || defaultCameraProps.fov) {
-                    camera.updateProjectionMatrix()
-                }
+            if (defaultCameraProps.position) {
+                camera.position.fromArray(defaultCameraProps.position)
+            }
+            if (defaultCameraProps.rotation) {
+                camera.rotation.fromArray(defaultCameraProps.rotation)
+            }
+            if (defaultCameraProps.fov) {
+                camera.fov = defaultCameraProps.fov
+            }
+            if (defaultCameraProps.position || defaultCameraProps.rotation || defaultCameraProps.fov) {
+                camera.updateProjectionMatrix()
             }
         }
     }, [defaultCameraProps, defaultXRCameraProps, camera, xrMode])
+    const {player} = useXR()
+    useLayoutEffect(()=>{
+        if (player && xrMode !== null) {
+            if (defaultXRCameraProps.position) {
+                player.position.fromArray(defaultXRCameraProps.position)
+            }
+            if (defaultXRCameraProps.rotation) {
+                player.rotation.fromArray(defaultXRCameraProps.rotation)
+            }
+        }
+        if (xrMode === null) {
+            player.position.set(0,0,0)
+            player.rotation.set(0,0,0)
+        }
+    }, [player, xrMode])
     // Keep audio listener reference up to date
     useLayoutEffect(()=>{
         if (camera) {
