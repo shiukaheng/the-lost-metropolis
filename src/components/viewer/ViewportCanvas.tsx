@@ -1,6 +1,6 @@
 import { useContextBridge } from "@react-three/drei"
 import { PotreeManager } from "../3d/managers/PotreeManager"
-import { Children, forwardRef, useContext, useEffect, useLayoutEffect, useRef, useState } from "react"
+import { Children, forwardRef, useCallback, useContext, useEffect, useLayoutEffect, useRef, useState } from "react"
 import CompositeSuspense from "../3d/subcomponents/CompositeSuspense"
 import { EditorContext } from "../editor/EditorContext"
 import { Canvas, useFrame, useThree } from "@react-three/fiber"
@@ -8,7 +8,6 @@ import { ViewerContext } from "../viewer/ViewerContext"
 import { SettingsContext, ThemeContext } from "../App"
 import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing'
 import { InteractionManager, XR } from "@react-three/xr"
-import { useRequestXR } from "../utilities/useRequestXR"
 
 /**
  * Helper component that helps ViewerManager set camera position during mount, and keep audio listener with camera.
@@ -24,10 +23,10 @@ function CameraHelper() {
         if (camera) {
             if (xrMode !== null) {
                 if (defaultXRCameraProps.position) {
-                    camera.position.set(defaultXRCameraProps.position)
+                    camera.position.fromArray(defaultXRCameraProps.position)
                 }
                 if (defaultXRCameraProps.rotation) {
-                    camera.rotation.set(defaultXRCameraProps.rotation)
+                    camera.rotation.fromArray(defaultXRCameraProps.rotation)
                 }
                 if (defaultXRCameraProps.fov) {
                     camera.fov = defaultXRCameraProps.fov
@@ -68,13 +67,27 @@ function CameraHelper() {
  * Helps ViewerManager update XR related state / references
  */
 function XRHelper() {
+    const {xrSessionRef, _setXrMode, xrRequesterRef} = useContext(ViewerContext)
     const gl = useThree((state) => state.gl)
-    const {_setXrMode, xrSessionRef, xrRequesterRef} = useContext(ViewerContext)
-    const {requestSession, sessionMode} = useRequestXR([], {}, gl, xrSessionRef)
+    const requestSession = useCallback((mode, options={requiredFeatures:["local-floor"]}) => {
+        navigator.xr?.requestSession(mode, options).then(session => {
+            xrSessionRef.current = session
+
+            function onSessionEnd() {
+                xrSessionRef.current?.removeEventListener("end", onSessionEnd);
+                xrSessionRef.current = null
+                _setXrMode(null)
+            }
+
+            session.addEventListener("end", onSessionEnd)
+            console.log(session)
+            gl.xr.setSession(session).then(()=>{
+                xrSessionRef.current = session
+                _setXrMode(mode)
+            })
+        })
+    }, [gl])
     xrRequesterRef.current = requestSession
-    useEffect(()=>{
-        _setXrMode(sessionMode)
-    }, [sessionMode])
     return null
 }
 

@@ -21,7 +21,8 @@ const defaultViewerContext: ViewerContextProps = {
     // C. XR session management
     xrMode: null,
     _setXrMode: () => {}, // Require intervention from XRHelper
-    xrSessionRef: null, // Require intervention from XRHelper
+    xrSessionRef: {current: null}, // Require intervention from XRHelper
+    xrRequesterRef: {current: null}, // Require intervention from XRHelper
     // D. General camera management
     cameraRef: {
         current: null
@@ -57,7 +58,7 @@ interface ViewerContextProps {
     xrMode: null | XRSessionMode,
     _setXrMode: (mode:null | XRSessionMode) => void, // Require intervention from XRHelper
     xrSessionRef: MutableRefObject<null | XRSession>, // Require intervention from XRHelper
-    xrRequesterRef: MutableRefObject<null | ((XRSessionMode)=>void)>, // Require intervention from XRHelper
+    xrRequesterRef: MutableRefObject<null | ((mode: XRSessionMode, options: any)=>void)>, // Require intervention from XRHelper
     // D. General camera management
     cameraRef: MutableRefObject<null | Camera>,
     audioListener: AudioListener | null,

@@ -16,9 +16,7 @@ import { ReactComponent as AR } from './View/AR.svg';
 import MagicIcon from '../utilities/MagicIcon';
 import { XRRequesterRefExtractor } from '../viewer/ViewportCanvas';
 
-function XRButtons({xrRequesterGetterRef}: {
-    xrRequesterGetterRef: XRRequesterGetterRef;
-}) {
+function XRButtons({xrRequesterGetterRef}) {
     const supportedXRModes = useSupportedXRModes()
     const supportAR = supportedXRModes && supportedXRModes.includes("immersive-ar")
     const supportVR = supportedXRModes && supportedXRModes.includes("immersive-vr")
@@ -77,10 +75,7 @@ function View({ ...props}) {
     );
 }
 
-export type XRRequesterGetter = (()=>(MutableRefObject<(mode: XRSessionMode)=>{}>))
-export type XRRequesterGetterRef = MutableRefObject<null | XRRequesterGetter>
-
-function requestXR(xrRequesterGetterRef: XRRequesterGetterRef, mode) {
+function requestXR(xrRequesterGetterRef, mode) {
     if (xrRequesterGetterRef.current) {
         xrRequesterGetterRef.current().current(mode)
     }
