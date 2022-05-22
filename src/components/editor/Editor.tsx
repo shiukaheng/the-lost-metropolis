@@ -10,7 +10,7 @@ import EditorOptions from './ui_elements/EditorOptions';
 import { deserializeChildren, exportChildren, PostScene, useStatefulDeserialize, useStatefulSerialize } from './ui_elements/EditorIO';
 import { Condition, KeyPressCallback, useBufferedPost, useKeyPress, useMultiLang } from '../../utilities';
 import EditorSceneSettings from './ui_elements/EditorSceneSettings';
-import { EditorContext } from './EditorContext';
+import { EditorContext, MovementMode } from './EditorContext';
 import { ViewerManager } from '../viewer/Viewer';
 import { ViewerContext } from '../viewer/ViewerContext';
 import MagicButton from '../utilities/MagicButton';
@@ -125,10 +125,32 @@ function EditorManager() {
             }
         }
     }
+
+    // Movement mode
+    const [movementMode, setMovementMode] = useState<MovementMode>("orbit")
     
     return (
         <EditorContext.Provider value={
-            {selectedIDs, setSelectedIDs, addSelectedIDs, removeSelectedIDs, transformMode, setTransformMode, transformSpace, setTransformSpace, overrideInteractions, setOverrideInteractions, shiftPressed, setSceneChildren, removeSceneChildren, clientAssets, activeLanguage, setActiveLanguage}
+            {
+                selectedIDs, 
+                setSelectedIDs, 
+                addSelectedIDs, 
+                removeSelectedIDs, 
+                transformMode, 
+                setTransformMode, 
+                transformSpace, 
+                setTransformSpace, 
+                overrideInteractions, 
+                setOverrideInteractions, 
+                shiftPressed, 
+                setSceneChildren, 
+                removeSceneChildren, 
+                clientAssets, 
+                activeLanguage, 
+                setActiveLanguage,
+                movementMode,
+                setMovementMode,
+            }
         }>
             <KeyPressCallback keyName={"Escape"} onDown={()=>{setSelectedIDs([])}}/>
             <div className="flex flex-row absolute w-full h-full overflow-hidden">

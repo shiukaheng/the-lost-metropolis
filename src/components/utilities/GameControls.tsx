@@ -1,12 +1,13 @@
 import { PointerLockControls } from "@react-three/drei";
-import { useFrame } from "@react-three/fiber";
-import { useRef } from "react";
+import { useFrame, useThree } from "@react-three/fiber";
+import { useEffect, useRef } from "react";
 import { Vector3 } from "three"
 import { useKeyPress } from "../../utilities";
 import { CustomPointerLockControls } from "./CustomPointerLockControls";
 
 // WASD / Arrow Keys + Shift (down) + Space (up) + Pointer Lock controls
-export default function GameControls({mass=1, force=1, friction=2}) {
+export default function GameControls({mass=1, force=10, friction=2}) {
+    const gl = useThree((state) => state.gl)
     const cameraVelocityRef = useRef(new Vector3(0, 0, 0));
     const forward1 = useKeyPress("w");
     const forward2 = useKeyPress("ArrowUp");
@@ -42,8 +43,20 @@ export default function GameControls({mass=1, force=1, friction=2}) {
         //     cameraVelocityRef.current.multiplyScalar(friction * delta);
         // }
         cameraVelocityRef.current.sub(cameraVelocityRef.current.clone().multiplyScalar(friction * delta));
-        
     })
+    useEffect(()=>{
+        // Add pointerlock change listener to domElement of gl
+        const domElement = gl.domElement;
+        const pointerlockChange = (e) => {
+            if (cameraVelocityRef.current) {
+                cameraVelocityRef.current.set(0, 0, 0);
+            }
+        }
+        domElement.ownerDocument.addEventListener("pointerlockchange", pointerlockChange);
+        return () => {
+            domElement.ownerDocument.removeEventListener("pointerlockchange", pointerlockChange);
+        }
+    }, [])
     return (
         <CustomPointerLockControls/>
     )

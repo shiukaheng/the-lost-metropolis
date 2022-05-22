@@ -2,7 +2,7 @@ import { ReactComponent as Translate } from "../svgs/translate.svg"
 import { ReactComponent as Rotate } from "../svgs/rotate.svg"
 import { ReactComponent as Scale } from "../svgs/scale.svg"
 import { ThemeContext } from "../../App"
-import { formatRGBCSS, useMultiLang } from "../../../utilities";
+import { formatRGBCSS, useMultiLang, useMultiLangObject } from "../../../utilities";
 import MagicDiv from "../../utilities/MagicDiv"
 import { useContext, useState } from "react";
 import EditorEmbeddedWidget from "./EditorEmbeddedWidget";
@@ -54,16 +54,52 @@ function TransformModeSetter({transformMode, setTransformMode, transformSpace, s
     )
 }
 
+function MovementModeSetter() {
+    const {movementMode, setMovementMode} = useContext(EditorContext)
+    // Dropdown options to allow user to select the movement mode
+    const labels = useMultiLangObject({
+        "orbit": {
+            "en": "orbit",
+            "zh": "常軌"
+        }, 
+        "pointerlock": {
+            "en": "first person",
+            "zh": "第一人"
+        }
+    })
+    const options = [
+        {
+            value: "orbit",
+            label: labels["orbit"]
+        },
+        {
+            value: "pointerlock",
+            label: labels["pointerlock"]
+        }
+    ]
+    return (
+        <ThemedSelect className="grow" options={options} onChange={(selected, _) => {
+            setMovementMode(selected.value)
+            }} 
+            value={options.find(o => o.value===movementMode)}/>
+    )
+}
+
 export default function EditorOptions() {
     const { transformMode, setTransformMode, transformSpace, setTransformSpace, setOverrideInteractions, overrideInteractions } = useContext(EditorContext)
     const heading = useMultiLang({"en": "editor options", "zh": "編輯器選項"})
     const transformationLabel = useMultiLang({"en": "transformation", "zh": "變換"})
+    const movementLabel = useMultiLang({"en": "navigation", "zh": "移動模式"})
     const bypassLabel = useMultiLang({"en": "bypass editor interactions", "zh": "跳過編輯器互動"})
     return (
         <EditorEmbeddedWidget title={heading} stickyKey="editorOptionsExpanded">
             <div className="flex flex-row gap-2">
                 <div>{transformationLabel}</div>
                 <TransformModeSetter {...{ transformMode, setTransformMode, transformSpace, setTransformSpace }}/>
+            </div>
+            <div className="flex flex-row gap-2">
+                <div>{movementLabel}</div>
+                <MovementModeSetter/>
             </div>
             <EditorInput propName={bypassLabel} typeName="boolean" value={!overrideInteractions} setValue={()=>{setOverrideInteractions((v)=>(!v))}}/>
         </EditorEmbeddedWidget>

@@ -3,6 +3,9 @@ import ViewportCanvas from "../Viewer/ViewportCanvas"
 import { OrbitControls } from '@react-three/drei'
 import { ErrorBoundary } from "react-error-boundary";
 import MagicDiv from "../utilities/MagicDiv";
+import { EditorContext } from "./EditorContext";
+import { useContext } from "react";
+import GameControls from "../utilities/GameControls";
 
 function Fallback({error, resetErrorBoundary}) {
     return (
@@ -15,11 +18,17 @@ function Fallback({error, resetErrorBoundary}) {
 }
 
 function EditorViewport({children, ...props}) {
+    const {movementMode} = useContext(EditorContext)
     return (
         <div {...props}>
             <ErrorBoundary FallbackComponent={Fallback}>
                 <ViewportCanvas> 
-                    <OrbitControls enablePan enableRotate enableZoom makeDefault/>
+                    {
+                        (movementMode==="orbit") && <OrbitControls enablePan enableRotate enableZoom makeDefault/>
+                    }
+                    {
+                        (movementMode==="pointerlock") && <GameControls/>
+                    }
                     {children}
                 </ViewportCanvas>
             </ErrorBoundary>

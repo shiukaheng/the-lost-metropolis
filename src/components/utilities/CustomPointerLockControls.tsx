@@ -134,7 +134,7 @@ export type PointerLockControlsProps = ReactThreeFiber.Object3DNode<
 }
 
 export const CustomPointerLockControls = React.forwardRef<PointerLockControlsImpl, PointerLockControlsProps>(
-  ({ selector, onChange, onLock, onUnlock, ...props }, ref) => {
+  ({ selector=".viewport-canvas", onChange, onLock, onUnlock, ...props }, ref) => {
     const { camera, ...rest } = props
     const gl = useThree(({ gl }) => gl)
     const defaultCamera = useThree(({ camera }) => camera)

@@ -8,6 +8,7 @@ import { ViewerContext } from "../viewer/ViewerContext"
 import { SettingsContext, ThemeContext } from "../App"
 import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing'
 import { InteractionManager, XR } from "@react-three/xr"
+import { twMerge } from "tailwind-merge"
 
 /**
  * Helper component that helps ViewerManager set camera position during mount, and keep audio listener with camera.
@@ -99,7 +100,7 @@ export function XRRequesterRefExtractor({requesterRefGetterRef}) { // This is TE
 
 // Convenience component to provide common contexts to viewport children, in the future may include 3DTilesManager, NexusManager, etc which serves to manage 3DTilesObject and NexusObject on each render.
 // TODO: Register managers required and add dynamically (same with ContextBridge required contexts)
-function ViewportCanvas({children, paused=false, foveation=0, ...props}) {
+function ViewportCanvas({children, paused=false, foveation=0, className, ...props}) {
     const ContextBridge = useContextBridge(EditorContext, ViewerContext, SettingsContext, ThemeContext)
     const wrappedChildren = Children.map(children, (child) => (
         <CompositeSuspense>
@@ -107,7 +108,7 @@ function ViewportCanvas({children, paused=false, foveation=0, ...props}) {
         </CompositeSuspense>
     ))
     return (
-        <Canvas vr invalidateFrameloop={paused} {...props}>
+        <Canvas vr invalidateFrameloop={paused} className={twMerge(className, "viewport-canvas")} {...props}>
             <ContextBridge>
                 <XR foveation={foveation}>
                     <CameraHelper/>

@@ -2,6 +2,8 @@ import { createContext } from "react"
 import { LanguageLiteral, languageLiteral } from "../../../api/types/LanguageLiteral"
 import { ClientAsset } from "../../api_client/types/ClientAsset"
 
+export type MovementMode = "pointerlock" | "orbit"
+
 const defaultEditorContext = {
     selectedIDs: [] as string[],
     setSelectedIDs: (ids:[]) => { },
@@ -19,6 +21,8 @@ const defaultEditorContext = {
     clientAssets: [] as ClientAsset[],
     activeLanguage: languageLiteral[0] as LanguageLiteral,
     setActiveLanguage: (language:LanguageLiteral) => { },
+    movementMode: "orbit" as MovementMode,
+    setMovementMode: (mode:MovementMode) => { },
 }
 
 const EditorContext = createContext(defaultEditorContext)

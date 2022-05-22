@@ -25,7 +25,7 @@ function EditorSceneSettings() {
                 <EditorInput propName={defaultCameraPosLabel} typeName="vector3" value={defaultCameraProps.position} setValue={(position)=>{setDefaultCameraProps({...defaultCameraProps, position})}}/>
                 <EditorInput propName={defaultCameraRotLabel} typeName="euler" value={defaultCameraProps.rotation} setValue={(rotation)=>{setDefaultCameraProps({...defaultCameraProps, rotation})}}/>
                 <EditorInput propName={defaultCameraFOVLabel} typeName="number" value={defaultCameraProps.fov} setValue={(fov)=>{setDefaultCameraProps({...defaultCameraProps, fov})}}/>
-                <EditorButton text={setToCurrentPoseLabel} className="text-center w-[250px]" onClick={()=>{
+                <EditorButton text={setToCurrentPoseLabel} className="text-center" onClick={()=>{
                     if (cameraRef.current) {
                         setDefaultCameraProps({
                             position: cameraRef.current.position.toArray(),
@@ -38,7 +38,7 @@ function EditorSceneSettings() {
                 <EditorInput propName={defaultXRCameraPosLabel} typeName="vector3" value={defaultXRCameraProps.position} setValue={(position)=>{setDefaultXRCameraProps({...defaultXRCameraProps, position})}}/>
                 <EditorInput propName={defaultXRCameraRotLabel} typeName="euler" value={defaultXRCameraProps.rotation} setValue={(rotation)=>{setDefaultXRCameraProps({...defaultXRCameraProps, rotation})}}/>
                 <EditorInput propName={defaultXRCameraFOVLabel} typeName="number" value={defaultXRCameraProps.fov} setValue={(fov)=>{setDefaultXRCameraProps({...defaultXRCameraProps, fov})}}/>
-                <EditorButton text={setXRToCurrentPoseLabel} className="text-center w-[250px]" onClick={()=>{
+                <EditorButton text={setXRToCurrentPoseLabel} className="text-center" onClick={()=>{
                     if (cameraRef.current) {
                         setDefaultXRCameraProps({
                             position: cameraRef.current.position.toArray(),

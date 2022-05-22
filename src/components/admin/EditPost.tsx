@@ -67,7 +67,7 @@ function EditorSceneOverlay({hidden}) {
                 <Editor/>
             </FullScreen>
             <div className="absolute w-full h-full p-8 pointer-events-none">
-                <MagicIcon IconComponent={ ArrowsExpandIcon } className="w-8 h-8 ml-auto pointer-events-auto" clickable onClick={handle.enter}/>
+                <MagicIcon fillCurrent invertColors IconComponent={ ArrowsExpandIcon } className="w-8 h-8 ml-auto pointer-events-auto" clickable onClick={handle.enter}/>
             </div>
         </div>
     )
