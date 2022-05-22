@@ -14,9 +14,9 @@ import { ReactComponent as VR } from './View/VR.svg';
 import { ReactComponent as AR } from './View/AR.svg';
 import MagicIcon from '../utilities/MagicIcon';
 import { XRRequesterRefExtractor } from '../viewer/ViewportCanvas';
+import { useMediaQuery } from 'react-responsive';
 
-function XRButtons({xrRequesterGetterRef}) {
-    const supportedXRModes = useSupportedXRModes()
+function XRButtons({supportedXRModes, xrRequesterGetterRef}) {
     const supportAR = supportedXRModes && supportedXRModes.includes("immersive-ar")
     const supportVR = supportedXRModes && supportedXRModes.includes("immersive-vr")
     return (
@@ -48,6 +48,8 @@ function View({ ...props}) {
     const title = useMultiLang(post?.title)
     const threeStateRef = useRef<null | RootState>(null) 
     const xrRequesterGetterRef = useRef<null | XRRequesterGetter>(null)
+    const supportedXRModes = useSupportedXRModes()
+    const md = useMediaQuery({ query: '(min-width: 768px)' })
     if (post === null) {
         navigate("/")
         return null
@@ -64,10 +66,11 @@ function View({ ...props}) {
                     <div className="flex flex-row place-content-between h-12 gap-4">
                         <MagicDiv className='text-3xl md:text-4xl font-black'>{title}</MagicDiv>
                         <div className="ml-auto flex flex-row gap-4">
-                            <XRButtons xrRequesterGetterRef={xrRequesterGetterRef}/>
+                            {md && <XRButtons xrRequesterGetterRef={xrRequesterGetterRef} supportedXRModes={supportedXRModes}/>}
                             <MagicButton className='pointer-events-auto' onClick={(e)=>{e.stopPropagation(); navigate(`/browse/${id}`);}} languageSpecificChildren={{"en": "back", "zh": "返回"}}/>
                         </div>
                     </div>
+                    {!md && <XRButtons xrRequesterGetterRef={xrRequesterGetterRef} supportedXRModes={supportedXRModes}/>}
                 </div>
             </Fade>
         </div>
