@@ -59,7 +59,7 @@ interface ViewerContextProps {
     xrSessionRef: MutableRefObject<null | XRSession>, // Require intervention from XRHelper
     xrRequesterRef: MutableRefObject<null | ((XRSessionMode)=>void)>, // Require intervention from XRHelper
     // D. General camera management
-    cameraRef: MutableRefObject<Camera>,
+    cameraRef: MutableRefObject<null | Camera>,
     audioListener: AudioListener | null,
     // E. 3D component management
     sceneChildren: SceneChild[],

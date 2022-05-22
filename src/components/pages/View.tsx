@@ -7,27 +7,27 @@ import { Viewer } from '../viewer/Viewer';
 import {Fade} from 'react-reveal';
 import GameControls from '../utilities/GameControls';
 import { RootState } from "@react-three/fiber";
-import { Fragment, useRef } from 'react';
+import { Fragment, MutableRefObject, useRef } from 'react';
 import { ThreeExtractor } from '../utilities/ThreeExtractor';
-import { useRequestXR, useSupportedXRModes } from '../utilities/useRequestXR';
+import { useSupportedXRModes } from '../utilities/useRequestXR';
 import { WebGLRenderer } from 'three';
 import { ReactComponent as VR } from './View/VR.svg';
 import { ReactComponent as AR } from './View/AR.svg';
 import MagicIcon from '../utilities/MagicIcon';
+import { XRRequesterRefExtractor } from '../viewer/ViewportCanvas';
 
-function XRButtons({threeStateRef}: {
-    threeStateRef: React.MutableRefObject<null | RootState>
+function XRButtons({xrRequesterGetterRef}: {
+    xrRequesterGetterRef: XRRequesterGetterRef;
 }) {
     const supportedXRModes = useSupportedXRModes()
     const supportAR = supportedXRModes && supportedXRModes.includes("immersive-ar")
     const supportVR = supportedXRModes && supportedXRModes.includes("immersive-vr")
-    const {requestSession, inSession} = useRequestXR()
     return (
         <Fragment>
             {supportAR &&
                 <MagicButton solid className='pointer-events-auto' onClick={(e)=>{
                     e.stopPropagation()
-                    requestSession((threeStateRef.current?.gl as WebGLRenderer), "immersive-ar")
+                    requestXR(xrRequesterGetterRef, "immersive-ar")
                 }}>
                     <MagicIcon fillCurrent invertColors IconComponent={AR}/>
                 </MagicButton>
@@ -35,7 +35,7 @@ function XRButtons({threeStateRef}: {
             {supportVR &&
                 <MagicButton solid className='pointer-events-auto' onClick={(e)=>{
                     e.stopPropagation()
-                    requestSession((threeStateRef.current?.gl as WebGLRenderer), "immersive-vr")
+                    requestXR(xrRequesterGetterRef, "immersive-vr")
                 }}>
                     <MagicIcon fillCurrent invertColors IconComponent={VR}/>
                 </MagicButton>
@@ -50,6 +50,7 @@ function View({ ...props}) {
     const navigate = useNavigate();
     const title = useMultiLang(post?.title)
     const threeStateRef = useRef<null | RootState>(null) 
+    const xrRequesterGetterRef = useRef<null | XRRequesterGetter>(null)
     if (post === null) {
         navigate("/")
         return null
@@ -59,13 +60,14 @@ function View({ ...props}) {
             <Viewer post={post} className="absolute w-full h-full">
                 <GameControls force={10} friction={2}/>
                 <ThreeExtractor threeRef={threeStateRef}/>
+                <XRRequesterRefExtractor requesterRefGetterRef={xrRequesterGetterRef}/>
             </Viewer>
             <Fade>
                 <div className="absolute w-full h-full p-8 md:p-20 pointer-events-none">
                     <div className="flex flex-row place-content-between h-12 gap-4">
                         <MagicDiv className='text-3xl md:text-4xl font-black'>{title}</MagicDiv>
                         <div className="ml-auto flex flex-row gap-4">
-                            <XRButtons threeStateRef={threeStateRef}/>
+                            <XRButtons xrRequesterGetterRef={xrRequesterGetterRef}/>
                             <MagicButton className='pointer-events-auto' onClick={(e)=>{e.stopPropagation(); navigate(`/browse/${id}`);}} languageSpecificChildren={{"en": "back", "zh": "返回"}}/>
                         </div>
                     </div>
@@ -73,6 +75,15 @@ function View({ ...props}) {
             </Fade>
         </div>
     );
+}
+
+export type XRRequesterGetter = (()=>(MutableRefObject<(mode: XRSessionMode)=>{}>))
+export type XRRequesterGetterRef = MutableRefObject<null | XRRequesterGetter>
+
+function requestXR(xrRequesterGetterRef: XRRequesterGetterRef, mode) {
+    if (xrRequesterGetterRef.current) {
+        xrRequesterGetterRef.current().current(mode)
+    }
 }
 
 export default View;

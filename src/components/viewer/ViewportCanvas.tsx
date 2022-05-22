@@ -1,6 +1,6 @@
 import { useContextBridge } from "@react-three/drei"
 import { PotreeManager } from "../3d/managers/PotreeManager"
-import { Children, useContext, useEffect, useLayoutEffect, useRef, useState } from "react"
+import { Children, forwardRef, useContext, useEffect, useLayoutEffect, useRef, useState } from "react"
 import CompositeSuspense from "../3d/subcomponents/CompositeSuspense"
 import { EditorContext } from "../editor/EditorContext"
 import { Canvas, useFrame, useThree } from "@react-three/fiber"
@@ -75,6 +75,12 @@ function XRHelper() {
     useEffect(()=>{
         _setXrMode(sessionMode)
     }, [sessionMode])
+    return null
+}
+
+export function XRRequesterRefExtractor({requesterRefGetterRef}) { // This is TERRIBLE
+    const {xrRequesterRef} = useContext(ViewerContext)
+    requesterRefGetterRef.current = ()=>xrRequesterRef
     return null
 }
 

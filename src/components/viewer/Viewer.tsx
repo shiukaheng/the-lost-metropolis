@@ -7,6 +7,7 @@ import Viewport from "./Viewport"
 import { Post } from "../../../api/types/Post"
 import { useContextBridge } from "@react-three/drei"
 import { SettingsContext, ThemeContext } from "../App"
+import { Camera } from "@react-three/fiber"
 
 /**
  * Non-visual component that manages the viewer state, including scene configuration and scene children.
@@ -18,7 +19,15 @@ function ViewerManager({children, defaultCameraProps}: {children: any, defaultCa
         rotation: [0,0,0],
         fov: 50
     })
-    const cameraRef = useRef(null) // Will be updated by Viewport
+
+    const [_defaultXRCameraProps, setDefaultXRCameraProps] = useState<DefaultCameraPropType>(defaultCameraProps || {
+        position: [0,0,1],
+        rotation: [0,0,0],
+        fov: 50
+    })
+
+    const cameraRef = useRef<Camera>(null) // Will be updated by Viewport
+
     const [sceneChildren, setSceneChildren] = useState([])
     // Make selectedIDs react to setSceneChildren
 
@@ -55,8 +64,38 @@ function ViewerManager({children, defaultCameraProps}: {children: any, defaultCa
     const [potreePointBudget, setPotreePointBudget] = useState(1e6)
     const [potreeOptimisePointBudget, setPotreeOptimisePointBudget] = useState(false)
 
+    // XR
+    const [xrMode, _setXrMode] = useState<null | XRSessionMode>(null)
+    const xrSessionRef = useRef<null | XRSession>(null)
+    const xrRequesterRef = useRef<null | ((XRSessionMode)=>void)>(null)
+
     return (
-        <ViewerContext.Provider value={{defaultCameraProps: _defaultCameraProps, setDefaultCameraProps, cameraRef, sceneChildren, setSceneChildren, addSceneChildren, removeSceneChildren, updateSceneChildren, audioListener, potreePointBudget, setPotreePointBudget, potreeOptimisePointBudget, setPotreeOptimisePointBudget}}>
+        <ViewerContext.Provider value={{
+            // A. Camera prop management
+            defaultCameraProps: _defaultCameraProps, 
+            setDefaultCameraProps, 
+            // B. XR Camera prop management
+            defaultXRCameraProps: _defaultXRCameraProps,
+            setDefaultXRCameraProps,
+            // C. XR session management
+            xrMode,
+            _setXrMode,
+            xrSessionRef,
+            xrRequesterRef,
+            // D. General camera management
+            cameraRef, 
+            audioListener, 
+            // E. 3D component management
+            sceneChildren, 
+            setSceneChildren, 
+            addSceneChildren, 
+            removeSceneChildren, 
+            updateSceneChildren, 
+            // F. Potree management
+            potreePointBudget, 
+            setPotreePointBudget, 
+            potreeOptimisePointBudget, 
+            setPotreeOptimisePointBudget}}>
             {children}
         </ViewerContext.Provider>
     );
