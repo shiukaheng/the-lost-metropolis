@@ -89,6 +89,7 @@ function XRHelper() {
         })
     }, [gl])
     xrRequesterRef.current = requestSession
+    window.requestSession = requestSession
     return null
 }
 
