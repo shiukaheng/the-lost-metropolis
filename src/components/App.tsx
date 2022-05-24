@@ -32,6 +32,7 @@ import { PointCloudOctreeGeometryNode } from '@pnext/three-loader';
 import { Post } from '../../api/types/Post';
 import VaporAPI from '../api_client/api';
 import { Instance } from '../../api/utility_types';
+import Debug3D from './development/Debug3D';
 
 export const defaultSettings = {
     lang: "zh" as LanguageLiteral
@@ -114,15 +115,17 @@ export function App() {
     }, [theme.backgroundColor])
 
     return (
-        <AuthProvider>
-            <ContentProvider>
-                <SettingsContext.Provider value={{settings, setSettings}}>
-                    <ThemeContext.Provider value={{theme, setTheme, changesRef}}>
-                        <SiteRouter/>
-                    </ThemeContext.Provider>
-                </SettingsContext.Provider>
-            </ContentProvider>
-        </AuthProvider>
+        <Debug3D/>
+        // <AuthProvider>
+        //     <ContentProvider>
+        //         <SettingsContext.Provider value={{settings, setSettings}}>
+        //             <ThemeContext.Provider value={{theme, setTheme, changesRef}}>
+        //                 <SiteRouter/>
+                        
+        //             </ThemeContext.Provider>
+        //         </SettingsContext.Provider>
+        //     </ContentProvider>
+        // </AuthProvider>
     )
 }
 
