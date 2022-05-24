@@ -43,5 +43,9 @@ TilesObject.inputs = {
   url: {
     type: StringType,
     default: ""
+  },
+  maxDepth: {
+    type: NumberType,
+    default: 3
   }
 }
