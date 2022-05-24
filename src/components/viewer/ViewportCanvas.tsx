@@ -39,6 +39,9 @@ function CameraHelper() {
     const {player} = useXR()
     useLayoutEffect(()=>{
         if (player && xrMode !== null) {
+            cameraRef.current?.position.set(0, 0, 0)
+            cameraRef.current?.rotation.set(0, 0, 0)
+            cameraRef.current?.updateProjectionMatrix()
             if (defaultXRCameraProps.position) {
                 player.position.fromArray(defaultXRCameraProps.position)
             }

@@ -115,17 +115,16 @@ export function App() {
     }, [theme.backgroundColor])
 
     return (
-        <Debug3D/>
-        // <AuthProvider>
-        //     <ContentProvider>
-        //         <SettingsContext.Provider value={{settings, setSettings}}>
-        //             <ThemeContext.Provider value={{theme, setTheme, changesRef}}>
-        //                 <SiteRouter/>
+        <AuthProvider>
+            <ContentProvider>
+                <SettingsContext.Provider value={{settings, setSettings}}>
+                    <ThemeContext.Provider value={{theme, setTheme, changesRef}}>
+                        <SiteRouter/>
                         
-        //             </ThemeContext.Provider>
-        //         </SettingsContext.Provider>
-        //     </ContentProvider>
-        // </AuthProvider>
+                    </ThemeContext.Provider>
+                </SettingsContext.Provider>
+            </ContentProvider>
+        </AuthProvider>
     )
 }
 
