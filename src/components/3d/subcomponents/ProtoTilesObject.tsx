@@ -3,8 +3,9 @@ import { LRUCache, TilesRenderer, PriorityQueue } from '3d-tiles-renderer';
 import { useEffect, useRef, useContext, useCallback } from "react";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
-import { Group } from "three";
+import { ArrayCamera, Group } from "three";
 import { TilesContext } from "../managers/TilesManager";
+import { useXR } from "@react-three/xr";
 
 export type ProtoTilesObjectProps = {
     url: string;
@@ -38,6 +39,7 @@ export function ProtoTilesObject({
     onPreprocessURL=null,
      ...props}: ProtoTilesObjectProps) {
     const {gl, camera} = useThree()
+    const { isPresenting } = useXR()
     const containerRef = useRef<Group>()
     const tilesRendererRef = useRef<TilesRenderer>()
     const dracoLoaderRef = useRef<DRACOLoader>()
@@ -100,6 +102,32 @@ export function ProtoTilesObject({
             tilesRendererRef.current.update()
         }
     })
+    // Change camera if XR is active
+    useEffect(()=>{
+        if (tilesRendererRef.current) {
+            if (isPresenting) {
+                const xrCamera = (gl.xr.getCamera() as ArrayCamera) // Wrong types!
+                console.log(xrCamera)
+                // Remove all cameras so we can use the XR camera instead
+                tilesRendererRef.current?.cameras.forEach(
+                    c => tilesRendererRef.current?.deleteCamera(c)
+                )
+                tilesRendererRef.current.setCamera(xrCamera)
+                const leftCam = xrCamera.cameras[0]
+                if (leftCam) {
+                    tilesRendererRef.current.setResolution(xrCamera, leftCam.viewport.z, leftCam.viewport.w)
+                }
+
+            } else {
+                // Delete all cameras
+                tilesRendererRef.current?.cameras.forEach(
+                    c => tilesRendererRef.current?.deleteCamera(c)
+                )
+                tilesRendererRef.current.setCamera(camera)
+                tilesRendererRef.current.setResolutionFromRenderer(camera, gl)
+            }
+        }
+    }, [isPresenting, camera, gl])
     return (
         <group ref={containerRef} {...props}/>
     )
