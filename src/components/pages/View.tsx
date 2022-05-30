@@ -64,13 +64,17 @@ function View({ ...props}) {
             <Fade>
                 <div className="absolute w-full h-full p-8 md:p-20 pointer-events-none">
                     <div className="flex flex-row place-content-between h-12 gap-4">
-                        <MagicDiv className='text-3xl md:text-4xl font-black'>{title}</MagicDiv>
+                        <MagicDiv className='text-2xl md:text-4xl font-black'>{title}</MagicDiv>
                         <div className="ml-auto flex flex-row gap-4">
                             {md && <XRButtons xrRequesterGetterRef={xrRequesterGetterRef} supportedXRModes={supportedXRModes}/>}
                             <MagicButton className='pointer-events-auto' onClick={(e)=>{e.stopPropagation(); navigate(`/browse/${id}`);}} languageSpecificChildren={{"en": "back", "zh": "返回"}}/>
                         </div>
                     </div>
-                    {!md && <XRButtons xrRequesterGetterRef={xrRequesterGetterRef} supportedXRModes={supportedXRModes}/>}
+                    {!md && 
+                        <div className="flex flex-row h-12 gap-4">
+                            <XRButtons xrRequesterGetterRef={xrRequesterGetterRef} supportedXRModes={supportedXRModes}/>
+                        </div>
+                    }
                 </div>
             </Fade>
         </div>

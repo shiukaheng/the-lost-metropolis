@@ -13,6 +13,7 @@ import { useNavigate } from 'react-router-dom';
 import { MultiLangObject } from '../../../../api/types/MultiLangObject';
 import { twMerge } from 'tailwind-merge';
 import { Group, MathUtils, MeshBasicMaterial } from 'three';
+import { SearchIcon } from '@heroicons/react/outline';
 
 function RevealDiv({ predicate, children }: { predicate: (data: ScrollControlsState) => boolean; children: React.ReactNode; }) {
     const data = useScroll();
@@ -275,7 +276,11 @@ export function EndScreen({text, gotoBrowse}: {
 }) {
     return (
         <MagicDiv className="w-full h-full flex flex-col justify-center items-center gap-4">
-            <MagicButton solid className="text-3xl md:text-4xl h-16 md:h-18" onClick={gotoBrowse}>
+            <MagicButton solid className="text-2xl md:text-4xl h-16 md:h-18 rounded-full px-7 md:px-9 font-black" onClick={gotoBrowse}>
+                {/* <div className='flex flex-row gap-2'>
+                    <MagicIcon fillCurrent invertColors IconComponent={SearchIcon}/>
+                    <div></div>
+                </div> */}
                 {text["browseAction"]}
             </MagicButton>
         </MagicDiv>
@@ -286,7 +291,7 @@ export function EndScreenB({text}) {
     return (
         <MagicDiv className="w-full h-full flex flex-col justify-center items-center gap-4">
             <h2 className="text-xl md:text-4xl font-black text-center">{text["noContentPartA"]}<br/>{text["noContentPartB"] }</h2>
-            <div className="flex flex-row gap-2">
+            <div className="inline">
                 <MagicIcon fillCurrent IconComponent={InstagramIcon} className="h-8 w-8 cursor-pointer" onClick={()=>{
                     window.open("https://www.instagram.com/thelostmetropolishk/");
                 }}/>
