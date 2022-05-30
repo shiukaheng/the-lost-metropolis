@@ -11,8 +11,8 @@ import useMediaQuery from 'react-hook-media-query'
 import { ContentContext } from '../providers/ContentProvider'
 import { useNavigate } from 'react-router-dom'
 import { MeshBasicMaterial } from 'three'
-import imageUrl1 from "./Home/media/JC-09621.jpg"
-import imageUrl2 from "./Home/media/JC-09627.jpg"
+import imageUrl1 from "./Home/media/cat.jpg"
+import imageUrl2 from "./Home/media/DSC09963s copy.jpg"
 
 console.log(imageUrl1)
 
@@ -43,7 +43,7 @@ function Home() {
             "en": "the old districts of hong kong are a glimpse into a bygone era; but as society moves on, they already have their fate set in stone to either be redeveloped, or be gentrified into tourist destinations."
         },
         "subtitle2": {
-            "zh": "重構身邊往往被遺忘的故事",
+            "zh": "元宇宙中重聚遺忘的故事",
             "en": "virtually reincarnating lost spaces"
         },
         "p2": {
