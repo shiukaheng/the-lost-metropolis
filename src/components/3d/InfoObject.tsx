@@ -38,9 +38,11 @@ export const InfoObject: VaporComponent = ({text=createEmptyMultilangString(), i
                 ?
                 <AnimatedLabelIcon iconUrl={infoIconURL} onClick={()=>{setExpanded(!expanded)}} iconScale={scale} iconOpacity={opacity} skirtHidden={!expanded} scale={iconSize} objectID={props.objectID} position={props.position}/>
                 :
-                <UnifiedInteractive {...props} onClick={()=>{setExpanded(!expanded)}} parentObjectID={props.objectID}>
-                    <AnimatedText scale={scale} gpuAccelerateSDF={true} fillOpacity={opacity} text={displayText} maxWidth={wrapText ? textMaxWidth : Infinity} fontSize={fontSize} renderOrder={1} font="https://fonts.gstatic.com/s/notoseriftc/v20/XLYgIZb5bJNDGYxLBibeHZ0BhnQ.woff"/>
-                </UnifiedInteractive>
+                <Billboard>
+                    <UnifiedInteractive {...props} onClick={()=>{setExpanded(!expanded)}} parentObjectID={props.objectID}>
+                        <AnimatedText scale={scale} gpuAccelerateSDF={true} fillOpacity={opacity} text={displayText} maxWidth={wrapText ? textMaxWidth : Infinity} fontSize={fontSize} renderOrder={1} font="https://fonts.gstatic.com/s/notoseriftc/v20/XLYgIZb5bJNDGYxLBibeHZ0BhnQ.woff"/>
+                    </UnifiedInteractive>
+                </Billboard>
             )
         )
     );
