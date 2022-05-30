@@ -9,6 +9,8 @@ import { SettingsContext, ThemeContext } from "../App"
 import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing'
 import { InteractionManager, useXR, XR } from "@react-three/xr"
 import { twMerge } from "tailwind-merge"
+import { XRGestures } from "../../lib/XRGestures/XRGestures"
+import { Event } from "three"
 
 /**
  * Helper component that helps ViewerManager set camera position during mount, and keep audio listener with camera.
@@ -100,6 +102,38 @@ export function XRRequesterRefExtractor({requesterRefGetterRef}) { // This is TE
     const {xrRequesterRef} = useContext(ViewerContext)
     requesterRefGetterRef.current = ()=>xrRequesterRef
     return null
+}
+
+export function XRGesturesHelper({onTap, onDoubleTap, onPress, onSwipe, onPan, onPinch, onRotate}: {
+    onTap?: (e: Event)=>void,
+    onDoubleTap?: (e: Event)=>void,
+    onPress?: (e: Event)=>void,
+    onSwipe?: (e: Event)=>void,
+    onPan?: (e: Event)=>void,
+    onPinch?: (e: Event)=>void,
+    onRotate?: (e: Event)=>void,
+}) {
+    const XRGesturesRef = useRef<undefined | XRGestures>()
+    const gl = useThree((state) => state.gl)
+    useEffect(()=>{
+        XRGesturesRef.current = (gl !== undefined) ? new XRGestures(gl) : undefined
+        if (XRGesturesRef.current) {
+            onTap && XRGesturesRef.current.addEventListener("tap", onTap)
+            onDoubleTap && XRGesturesRef.current.addEventListener("doubletap", onDoubleTap)
+            onPress && XRGesturesRef.current.addEventListener("press", onPress)
+            onSwipe && XRGesturesRef.current.addEventListener("swipe", onSwipe)
+            onPan && XRGesturesRef.current.addEventListener("pan", onPan)
+            onPinch && XRGesturesRef.current.addEventListener("pinch", onPinch)
+            onRotate && XRGesturesRef.current.addEventListener("rotate", onRotate)
+        }
+        return ()=>{
+            XRGesturesRef.current = undefined
+        }
+    }, [gl, onTap, onDoubleTap, onPress, onSwipe, onPan, onPinch, onRotate])
+    // Update XR gestures
+    useFrame(()=>{
+        XRGesturesRef.current?.update()
+    })
 }
 
 // Convenience component to provide common contexts to viewport children, in the future may include 3DTilesManager, NexusManager, etc which serves to manage 3DTilesObject and NexusObject on each render.
