@@ -8,6 +8,7 @@ import { Post } from "../../../api/types/Post"
 import { useContextBridge } from "@react-three/drei"
 import { SettingsContext, ThemeContext } from "../App"
 import { Camera } from "@react-three/fiber"
+import { XRLocomotion } from "../utilities/Controls"
 
 /**
  * Non-visual component that manages the viewer state, including scene configuration and scene children.
@@ -114,6 +115,7 @@ function ViewerUI({post, children, ...props}: ViewerProps) {
     }, [post])
     return (    
         <Viewport {...props}>
+            <XRLocomotion/>
             {sceneChildren}
             {children}
         </Viewport>
