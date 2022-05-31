@@ -3,20 +3,20 @@
 import { useFrame, useThree } from "@react-three/fiber";
 import { useXR, useXRFrame } from "@react-three/xr";
 import { useCallback, useContext, useEffect, useRef } from "react";
-import { Intersection, MathUtils, Object3D, Vector3 } from "three";
+import { ArrayCamera, Intersection, MathUtils, Object3D, Raycaster, Vector2, Vector3 } from "three";
+import { XRGestures } from "../../lib/XRGestures/XRGestures";
 import { ViewerContext } from "../viewer/ViewerContext";
-import { XRGesturesHelper } from "../viewer/ViewportCanvas";
+import { Event } from "three";
 
 
-export function useXRGestures({onTap, onDoubleTap, onPress, onSwipe, onPan, onPinch, onRotate}: {
-    onTap?: (e: Event)=>void,
-    onDoubleTap?: (e: Event)=>void,
-    onPress?: (e: Event)=>void,
-    onSwipe?: (e: Event)=>void,
-    onPan?: (e: Event)=>void,
-    onPinch?: (e: Event)=>void,
-    onRotate?: (e: Event)=>void,
-}) {
+export function useXRGestures(
+    onTap?: (e: Event)=>void, 
+    onDoubleTap?: (e: Event)=>void, 
+    onPress?: (e: Event)=>void, 
+    onSwipe?: (e: Event)=>void, 
+    onPan?: (e: Event)=>void, 
+    onPinch?: (e: Event)=>void, 
+    onRotate?: (e: Event)=>void) {
     const XRGesturesRef = useRef<undefined | XRGestures>()
     const gl = useThree((state) => state.gl)
     useEffect(()=>{
@@ -32,8 +32,10 @@ export function useXRGestures({onTap, onDoubleTap, onPress, onSwipe, onPan, onPi
         }
         return ()=>{
             XRGesturesRef.current = undefined
+            onTap && XRGesturesRef.current?.removeEventListener("tap", onTap)
+            
         }
-    }, [gl, onTap, onDoubleTap, onPress, onSwipe, onPan, onPinch, onRotate])
+    }, [gl])
     // Update XR gestures
     useFrame(()=>{
         XRGesturesRef.current?.update()
@@ -70,7 +72,7 @@ type TeleportableDestination = {
  */
 function processIntersections(intersections: Intersection<Object3D>[], upVector=new Vector3(0, 1, 0), maxDeg=10): TeleportDestination {
     for (const intersection of intersections) {
-        if (intersection.object.userData.isTeleportDestination) {
+        if (intersection.object.userData.isTeleportTarget) {
             const normal = intersection.face?.normal
             if (normal) {
                 const angle = MathUtils.radToDeg(normal.angleTo(upVector))
@@ -94,10 +96,10 @@ function processIntersections(intersections: Intersection<Object3D>[], upVector=
                     normal: null,
                 }
             }
-        } else if (intersection.object.userData.bypassTeleportDestination) {
-            // If object marked explicitly with ".bypassTeleportDestination", then don't check for teleport destination
+        } else if (intersection.object.userData.bypassTeleportRaycaster) {
+            // If object marked explicitly with ".bypassTeleportRaycaster", then don't check for teleport destination
         } else {
-            // If object is neither marked with ".bypassTeleportDestination" nor with ".isTeleportDestination", then return a non-valid destination
+            // If object is neither marked with ".bypassTeleportRaycaster" nor with ".isTeleportTarget", then return a non-valid destination
             return {
                 valid: false,
                 position: intersection.point,
@@ -114,21 +116,30 @@ function processIntersections(intersections: Intersection<Object3D>[], upVector=
 }
 
 export function useARControls(onInteract, onTeleport: (TeleportableDestination)=>void) {
-    const {camera, raycaster, scene} = useThree();
+    const {scene, gl, camera: normalCamera} = useThree();
+    const raycasterRef = useRef<null | Raycaster>();
+    useEffect(()=>{
+        raycasterRef.current = new Raycaster();
+    }, [])
     const attemptTeleport = useCallback(()=>{
-        // Raycast from AR camera and check if it hits a teleportable object
-        raycaster.setFromCamera(zero, camera);
-        const intersects = raycaster.intersectObjects(scene.children, true);
-        const destination = processIntersections(intersects)
-        if (destination.valid) {
-            onTeleport(destination)
+        if (raycasterRef.current) {
+            // Raycast from AR camera and check if it hits a teleportable object
+            console.log("Attempt teleport")
+            raycasterRef.current.setFromCamera(zero, normalCamera);
+            const intersects = raycasterRef.current.intersectObjects(scene.children, true);
+            console.log(normalCamera, scene.children, raycasterRef.current, intersects)
+            const destination = processIntersections(intersects)
+            if (destination.valid) {
+                onTeleport(destination)
+            }
         }
     }, [])
-    useXRGestures({
-        onDoubleTap: (e)=>{
+    useXRGestures(
+        undefined,
+        (e)=>{
             attemptTeleport()
-        }
-    })
+        },
+    )
 }
 
 export function useVRControls(onInteract, onTeleport) {
@@ -190,10 +201,9 @@ export function XRLocomotion({locomotionLambda=1.5}) {
     const gl = useThree((state)=>state.gl)
 
     const moveTo = useCallback((destination: Vector3)=>{
-        // Remember to subtract 
-        // New target position = destination - ( XR Camera position - player position )
-        // New target position = destination - XR Camera position + player position
-        targetPositionRef.current.copy(destination).sub(gl.xr.getCamera().position).add(player.position)
+        const newDest = new Vector3().copy(destination).sub(gl.xr.getCamera().position).add(player.position)
+        newDest.y = destination.y
+        targetPositionRef.current.copy(destination)
     }, [player])
 
     // const moveToRaw = useCallback((x, y, z)=>{

@@ -14,7 +14,7 @@ export const TestObject: VaporComponent = ({color, wireframe, position, rotation
     const editorContext = useContext(EditorContext)
     return (
         <UnifiedInteractive onClick={()=>{console.log(`${props.name} clicked.`)}} parentObjectID={props.objectID}>
-            <mesh {...{position, rotation, scale}}>
+            <mesh userData={{isTeleportTarget: true}} {...{position, rotation, scale}}>
                 <boxBufferGeometry attach="geometry" args={[1, 1, 1]} />
                 <meshBasicMaterial attach="material" color={color} wireframe={wireframe}/>
             </mesh>

@@ -1,4 +1,10 @@
 # Todo
+
+## Urgent
+- Refactor XRLocomotion, and also make it cleanup after itself (or just eliminate the XRGestures class entirely)
+- Implement VR controls for XRLocomotion
+## Non-urgent
+
 - Seperate this into multiple smaller repositories
     - vapor-types: all the types / schemas shared across the platform
     - vapor-api: api for javascript clients to interact with the backend
@@ -95,6 +101,13 @@ Note: Perhaps it would be better to make the naming more consistent, and elimina
 # Editor (Referring to the 3D editor component)
 - The Editor is a mutated Viewer component that serves as a visual interface for editing the 3D components.
 - The extra state and references are mostly for managing the UI of the editor, and the actual editing of the components is done by the Viewer component.
+
+# Implementation of scene interactions
+Scene interaction is particularly challenging for this project, because the same scene needs to be consumed on normal desktop devices, VR headsets, and on mobile phones via AR, and how the user interacts with the objects will vary depending on each type of viewing experience (i.e., mouse clicking for desktop, tapping screen on phones, controllers on headsets). A naive approach would be to have each type of object / interaction add their own listeners to create the behaviour, but because our project does not required a wide range of user interactions (no grabbing, no advanced game mechanics), we decided to unify the interactions in the following categories for desktop, VR, and AR respectively:
+
+Mouse crosshair hover, controller pointer hover, AR crosshair hover
+
+# Implementation of locomotion
 
 # Improvements
 

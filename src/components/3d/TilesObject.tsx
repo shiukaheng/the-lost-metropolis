@@ -20,6 +20,7 @@ export type TilesObjectProps = {
   autoDisableRendererCulling?: boolean,
   optimizeRaycast?: boolean,
   onPreprocessURL?: null | ((url: string) => string),
+  isTeleportTarget?: boolean,
 } & VaporComponentProps
 
 // // By default uses sRGB encoding

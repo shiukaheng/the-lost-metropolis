@@ -221,4 +221,13 @@ export class XRGestures extends EventDispatcher{
             this.dispatchEvent( { type: 'pan', delta } );
         }
     }
+
+    // dispose() {
+    //     // Clear event listeners
+    //     this.controller1.userData.gestures.onSelectStart = undefined;
+    //     this.controller1.userData.gestures.onSelectEnd = undefined;
+      
+    //     this.controller2.userData.gestures.onSelectStart = undefined;
+    //     this.controller2.userData.gestures.onSelectEnd = undefined;
+    // }
 }

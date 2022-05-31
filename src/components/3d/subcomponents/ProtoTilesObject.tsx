@@ -20,6 +20,7 @@ export type ProtoTilesObjectProps = {
     autoDisableRendererCulling?: boolean,
     optimizeRaycast?: boolean,
     onPreprocessURL?: null | ((url: string) => string),
+    isTeleportTarget?: boolean,
     // Allow extra props
     [key: string]: any;
 }
@@ -37,6 +38,7 @@ export function ProtoTilesObject({
     autoDisableRendererCulling=true,
     optimizeRaycast=true,
     onPreprocessURL=null,
+    isTeleportTarget=true,
      ...props}: ProtoTilesObjectProps) {
     const {gl, camera} = useThree()
     const { isPresenting } = useXR()
@@ -129,6 +131,6 @@ export function ProtoTilesObject({
         }
     }, [isPresenting, camera, gl])
     return (
-        <group ref={containerRef} {...props}/>
+        <group ref={containerRef} userData={{isTeleportTarget}} {...props}/>
     )
 }
