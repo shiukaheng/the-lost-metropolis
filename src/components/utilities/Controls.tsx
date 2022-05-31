@@ -1,23 +1,144 @@
 // All use*Controls must be used in components within a provider of ViewerContext, i.e. Viewer
 
-import { useFrame } from "@react-three/fiber";
+import { useFrame, useThree } from "@react-three/fiber";
 import { useXR, useXRFrame } from "@react-three/xr";
 import { useCallback, useContext, useEffect, useRef } from "react";
-import { MathUtils, Vector3 } from "three";
+import { Intersection, MathUtils, Object3D, Vector3 } from "three";
 import { ViewerContext } from "../viewer/ViewerContext";
+import { XRGesturesHelper } from "../viewer/ViewportCanvas";
 
-// use*Controls provide a convenient way to hook into controller callbacks
-export function useARControls(onTap, onDoubleTap, onPress) {
+
+export function useXRGestures({onTap, onDoubleTap, onPress, onSwipe, onPan, onPinch, onRotate}: {
+    onTap?: (e: Event)=>void,
+    onDoubleTap?: (e: Event)=>void,
+    onPress?: (e: Event)=>void,
+    onSwipe?: (e: Event)=>void,
+    onPan?: (e: Event)=>void,
+    onPinch?: (e: Event)=>void,
+    onRotate?: (e: Event)=>void,
+}) {
+    const XRGesturesRef = useRef<undefined | XRGestures>()
+    const gl = useThree((state) => state.gl)
+    useEffect(()=>{
+        XRGesturesRef.current = (gl !== undefined) ? new XRGestures(gl) : undefined
+        if (XRGesturesRef.current) {
+            onTap && XRGesturesRef.current.addEventListener("tap", onTap)
+            onDoubleTap && XRGesturesRef.current.addEventListener("doubletap", onDoubleTap)
+            onPress && XRGesturesRef.current.addEventListener("press", onPress)
+            onSwipe && XRGesturesRef.current.addEventListener("swipe", onSwipe)
+            onPan && XRGesturesRef.current.addEventListener("pan", onPan)
+            onPinch && XRGesturesRef.current.addEventListener("pinch", onPinch)
+            onRotate && XRGesturesRef.current.addEventListener("rotate", onRotate)
+        }
+        return ()=>{
+            XRGesturesRef.current = undefined
+        }
+    }, [gl, onTap, onDoubleTap, onPress, onSwipe, onPan, onPinch, onRotate])
+    // Update XR gestures
+    useFrame(()=>{
+        XRGesturesRef.current?.update()
+    })
 }
 
-export function useVRControls(onTrigger) {
+
+// use*Controls provide a convenient way to hook into controller callbacks
+
+function checkValidTarget() {
+
+}
+
+const zero = new Vector2(0,0)
+
+type TeleportDestination = {
+    valid: boolean,
+    position: Vector3 | null, // could be null if no destination is found at all
+    normal: Vector3 | null, // could be null if the destination is not a plane or if there is no destination found at all
+}
+
+type TeleportableDestination = {
+    valid: true,
+    position: Vector3,
+    normal: Vector3 | null
+}
+
+/**
+ * Processes a list of intersections from raycaster to determine whether there is a teleport destination
+ * @param intersections the list of intersections from raycaster
+ * @param upVector the up vector to use for determining the validity of the teleport destination
+ * @param maxDeg the maximum angle between the up vector and the normal of the teleport destination for it to be considered valid
+ * @returns a TeleportDestination object
+ */
+function processIntersections(intersections: Intersection<Object3D>[], upVector=new Vector3(0, 1, 0), maxDeg=10): TeleportDestination {
+    for (const intersection of intersections) {
+        if (intersection.object.userData.isTeleportDestination) {
+            const normal = intersection.face?.normal
+            if (normal) {
+                const angle = MathUtils.radToDeg(normal.angleTo(upVector))
+                if (angle <= maxDeg) {
+                    return {
+                        valid: true,
+                        position: intersection.point,
+                        normal,
+                    }
+                } else {
+                    return {
+                        valid: false,
+                        position: intersection.point,
+                        normal,
+                    }
+                }
+            } else {
+                return {
+                    valid: false,
+                    position: intersection.point,
+                    normal: null,
+                }
+            }
+        } else if (intersection.object.userData.bypassTeleportDestination) {
+            // If object marked explicitly with ".bypassTeleportDestination", then don't check for teleport destination
+        } else {
+            // If object is neither marked with ".bypassTeleportDestination" nor with ".isTeleportDestination", then return a non-valid destination
+            return {
+                valid: false,
+                position: intersection.point,
+                normal: intersection.face?.normal || null,
+            }
+        }
+    }
+    // If nothing comes up as a teleport destination, return a non-valid destination
+    return {
+        valid: false,
+        position: null,
+        normal: null,
+    }
+}
+
+export function useARControls(onInteract, onTeleport: (TeleportableDestination)=>void) {
+    const {camera, raycaster, scene} = useThree();
+    const attemptTeleport = useCallback(()=>{
+        // Raycast from AR camera and check if it hits a teleportable object
+        raycaster.setFromCamera(zero, camera);
+        const intersects = raycaster.intersectObjects(scene.children, true);
+        const destination = processIntersections(intersects)
+        if (destination.valid) {
+            onTeleport(destination)
+        }
+    }, [])
+    useXRGestures({
+        onDoubleTap: (e)=>{
+            attemptTeleport()
+        }
+    })
+}
+
+export function useVRControls(onInteract, onTeleport) {
 }
 
 // export function useDesktopControls() {
     // Perhaps this can be unified here later, but for now it's unnecessary as we have a separate component for desktop controls
 // }
 
-export function XRLocomotion({locomotionLambda=0.1}) {
+export function XRLocomotion({locomotionLambda=1.5}) {
     // Allows locomotion on XR devices.
 
     // For AR: 
@@ -38,7 +159,7 @@ export function XRLocomotion({locomotionLambda=0.1}) {
     // For both AR and VR:
     // We teleport / move the user by moving the player object (group of camera and controllers) from the useXR hook.
     // Teleportation will retain user's orientation.
-    // The actual targeted location for teleportation should be the target location minus the offset from the user's current position.
+    // The actual targeted location for teleportation should be the target location minus the offset from the XR space's  world origin.
     // During VR locomotion animation, display helmet overlay to reduce the user's field of view for better experience.
     // Use Three.js's damp to transition to target position, but clear target if user exits XR.
 
@@ -47,7 +168,7 @@ export function XRLocomotion({locomotionLambda=0.1}) {
     const lastPositionRef = useRef<Vector3>(new Vector3())
     const dtRef = useRef<number>(0)
 
-    const {defaultXRCameraProps} = useContext(ViewerContext)
+    const {defaultXRCameraProps, xrMode} = useContext(ViewerContext)
     useEffect(()=>{
         targetPositionRef.current.set(...defaultXRCameraProps.position)
     }, [defaultXRCameraProps])
@@ -55,19 +176,34 @@ export function XRLocomotion({locomotionLambda=0.1}) {
     // Move the player to the target position
     const {player} = useXR()
     useFrame((state, dt)=>{
-        lastPositionRef.current.copy(player.position)
-        dtRef.current = dt
-        player.position.set(
-            MathUtils.damp(player.position.x, targetPositionRef.current.x, locomotionLambda, dt),
-            MathUtils.damp(player.position.y, targetPositionRef.current.y, locomotionLambda, dt),
-            MathUtils.damp(player.position.z, targetPositionRef.current.z, locomotionLambda, dt)
-        )
+        if (state.gl.xr.isPresenting) {
+            lastPositionRef.current.copy(player.position)
+            dtRef.current = dt
+            player.position.set(
+                MathUtils.damp(player.position.x, targetPositionRef.current.x, locomotionLambda, dt),
+                MathUtils.damp(player.position.y, targetPositionRef.current.y, locomotionLambda, dt),
+                MathUtils.damp(player.position.z, targetPositionRef.current.z, locomotionLambda, dt)
+            )
+        }
     })
 
+    const gl = useThree((state)=>state.gl)
+
     const moveTo = useCallback((destination: Vector3)=>{
-        targetPositionRef.current.copy(destination).sub(player.position)
+        // Remember to subtract 
+        // New target position = destination - ( XR Camera position - player position )
+        // New target position = destination - XR Camera position + player position
+        targetPositionRef.current.copy(destination).sub(gl.xr.getCamera().position).add(player.position)
     }, [player])
 
-    window.moveTo = moveTo
-    return null
+    // const moveToRaw = useCallback((x, y, z)=>{
+    //     moveTo(new Vector3(x, y, z))
+    // }, [])
+
+    // window.moveTo = moveToRaw
+
+    useARControls(undefined, (dest:TeleportableDestination)=>{
+        moveTo(dest.position)
+    })
+
 }
