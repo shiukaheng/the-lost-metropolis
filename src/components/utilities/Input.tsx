@@ -340,6 +340,24 @@ function MagicStringInput({value, setValue, data}: {
     )
 }
 
+function StringOptionInput({value, setValue, data}: {
+    value: string,
+    setValue: (value: string) => void,
+    data: {
+        options: string[]
+    }
+}) {
+    const options = data.options
+    return (
+        <ThemedSelect className="flex-grow" options={options.map(option => ({
+            label: option,
+            value: option
+        }))} onChange={(selectedOption, _)=>{
+            setValue(selectedOption.value)
+        }} value={options.find(option => option === value)}/>
+    )
+}
+
 // There are still some thoughts on whether to create a new Input component, or supply stuff in the data property to modify input component behavior if the input type is a particular subset of one of the existing input types, e.g., StringInput vs URLInput.
 // Perhaps a good way to think about this is if the number of potential subsets are small, it's better to create a new component, but if the number of potential subsets is large, it's better to pass info in the data property to modify the behavior of one input component. 
 
@@ -360,6 +378,7 @@ const InputComponentMap: Partial<{[key in ArgumentLiteral]: InputComponent}> = {
     "multilang-string": MultiLangStringInput,
     "magic-string": MagicStringInput,
     "asset": AssetInput,
+    "string-option": StringOptionInput
 }
 
 type InputProps = {

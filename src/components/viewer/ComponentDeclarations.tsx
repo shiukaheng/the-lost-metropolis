@@ -8,6 +8,7 @@ import InfoObject from "../3d/InfoObject"
 import { LinkObject } from "../3d/LinkObject"
 import { NexusObject } from "../3d/NexusObject"
 import { PotreeObject } from "../3d/PotreeObject"
+import { TeleporterPlane } from "../3d/TeleporterPlane"
 import { TestObject } from "../3d/TestObject"
 import { TilesObject } from "../3d/TilesObject"
 import { EditorInputType } from "./ArgumentTypes"
@@ -28,6 +29,15 @@ export type VaporInputType = {
 
 export type VaporInputsType = Record<string, VaporInputType>
 
+/**
+ * VaporComponent interface is used to define the required properties for a component used in Vapor, as it requires extra information for the editor to know what props
+ * are needed for the component.
+ * 
+ * @interface VaporComponent
+ * @member {string} displayName - The display name of the component.
+ * @member {string} componentType - A unique string that identifies the component type.
+ * @member {VaporInputsType} inputs - A dictionary of inputs that the component requires.
+ */
 export interface VaporComponent extends FunctionComponent<VaporComponentProps> {
     displayName: string,
     componentType: string,
@@ -45,7 +55,8 @@ export const components = [
     NexusAssetObject,
     AmbientLightObject,
     PotreeObject,
-    TilesObject
+    TilesObject,
+    TeleporterPlane
 ]
 
 export function getComponentFromTypeName(componentType): VaporComponent {

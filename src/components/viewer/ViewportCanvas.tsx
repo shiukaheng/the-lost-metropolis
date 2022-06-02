@@ -32,8 +32,6 @@ function CameraHelper() {
             if (defaultCameraProps.position || defaultCameraProps.rotation || defaultCameraProps.fov) {
                 camera.updateProjectionMatrix()
             }
-            // Allow controllers to be rendered
-            camera.layers.enable(3)
         }
     }, [defaultCameraProps, defaultXRCameraProps, camera, xrMode])
     const {player} = useXR()
@@ -64,13 +62,6 @@ function CameraHelper() {
             audioListener.removeFromParent()
         }
     }, [camera])
-    const layersSyncer = useCallback(()=>{
-        const xrCamera = gl.xr.getCamera()
-        xrCamera.cameras.forEach((c: Camera) => {
-            c.layers.mask = camera.layers.mask
-        })
-    }, [camera, gl])
-    useFrame(layersSyncer) // Looks dirty to do it every frame, but apparently that's how WebXRManager does it too...
     return null
 }
 
@@ -108,6 +99,10 @@ export function XRRequesterRefExtractor({requesterRefGetterRef}) { // This is TE
     requesterRefGetterRef.current = ()=>xrRequesterRef
     return null
 }
+
+// function LayersHelper() {
+
+// }
 
 // Convenience component to provide common contexts to viewport children, in the future may include 3DTilesManager, NexusManager, etc which serves to manage 3DTilesObject and NexusObject on each render.
 // TODO: Register managers required and add dynamically (same with ContextBridge required contexts)

@@ -31,8 +31,8 @@ type TeleportableDestination = {
  */
 function processIntersections(intersections: Intersection<Object3D>[], upVector=new Vector3(0, 1, 0), maxDeg=10): TeleportDestination {
     for (const intersection of intersections) {
-        if (intersection.object.userData !== undefined) {
-            switch (intersection.object.userData.teleportDestination) {
+        if (intersection.object.userData.teleportEffect !== undefined) {
+            switch (intersection.object.userData.teleportEffect) {
                 case "target":
                     // Check if the intersection has the right normal
                     if (validNormal(intersection?.face?.normal, upVector, maxDeg)) {
@@ -55,7 +55,7 @@ function processIntersections(intersections: Intersection<Object3D>[], upVector=
                         normal: intersection?.face?.normal || null
                     }
                 default:
-                    throw new Error(`Unknown teleport effect type: ${intersection.object.userData.teleportDestination}`);
+                    throw new Error(`Unknown teleport effect type: ${intersection.object.userData.teleportEffect}`);
             }
         }
     }
@@ -198,7 +198,7 @@ export function useVRControls(onTeleport: (TeleportableDestination)=>void, maxSe
     const positionRef = useRef<Vector3>(new Vector3())
     useEffect(()=>{
         raycasterRef.current.layers.set(3);
-    })
+    }, [])
     const controllersRef = useRef<ControllersObject>({
         left: null,
         right: null,
@@ -253,6 +253,7 @@ export function useVRControls(onTeleport: (TeleportableDestination)=>void, maxSe
                 maxSegments,
                 hSegmentLength,
             )
+            // console.log(targetTraceRef.current)
             lastTargetTraceRef.current = targetTraceRef.current
         } else {
             targetTraceRef.current = null
@@ -493,4 +494,5 @@ export function applyTeleportationTargetEffect(object: Object3D, effect: TargetE
         object.userData.teleportEffect = undefined
         object.layers.disable(3)
     }
+    console.log(object)
 }

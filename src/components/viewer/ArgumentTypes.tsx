@@ -97,11 +97,6 @@ export const MagicStringType: EditorInputType = {
     typeCheck: (value) => magicStringSchema.isValidSync(value),
 }
 
-// export const AssetType: EditorInputType = {
-//     typeName: "asset",
-//     typeCheck: (value) => resolvedAssetSchema.isValidSync(value)
-// }
-
 export function createAssetType(acceptedAssetTypes?: string[], acceptedTags?: string[]): EditorInputType {
     return {
         typeName: "asset",
@@ -113,4 +108,14 @@ export function createAssetType(acceptedAssetTypes?: string[], acceptedTags?: st
     }
 }
 
-export type ArgumentLiteral = "number" | "string" | "url" | "vector" | "vector3" | "vector4" | "vector2" | "color" | "quaternion" | "euler" | "matrix3" | "matrix4" | "matrix" | "boolean" | "multiline-string" | "asset" | "multilang-string" | "magic-string"
+export function createStringOptionType(acceptedStrings: string[]): EditorInputType {
+    return {
+        typeName: "string-option",
+        typeCheck: (value) => acceptedStrings.includes(value),
+        data: {
+            "options": acceptedStrings
+        }
+    }
+}
+
+export type ArgumentLiteral = "number" | "string" | "url" | "vector" | "vector3" | "vector4" | "vector2" | "color" | "quaternion" | "euler" | "matrix3" | "matrix4" | "matrix" | "boolean" | "multiline-string" | "asset" | "multilang-string" | "magic-string" | "string-option"
