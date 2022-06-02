@@ -22,8 +22,6 @@ export type TilesObjectProps = {
   onPreprocessURL?: null | ((url: string) => string),
 } & VaporComponentProps
 
-// // By default uses sRGB encoding
-
 export const TilesObject: VaporComponent = ({...props}: TilesObjectProps) => {
   return (
     <ErrorBoundary fallbackRender={({error, resetErrorBoundary}) => (
