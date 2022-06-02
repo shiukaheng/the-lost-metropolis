@@ -7,7 +7,6 @@ import MagicDiv from "../utilities/MagicDiv";
 
 type ViewportProps = {
     children?: ReactNode,
-    paused?: boolean,
 }
 
 function Fallback({error, resetErrorBoundary}) {
@@ -20,7 +19,7 @@ function Fallback({error, resetErrorBoundary}) {
     )
 }
 
-function Viewport({children, paused=false, ...props}:ViewportProps) {
+function Viewport({children, ...props}:ViewportProps) {
     return (
         <div {...props}>
             <ErrorBoundary FallbackComponent={Fallback}>

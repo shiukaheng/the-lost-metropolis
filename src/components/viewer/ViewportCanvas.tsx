@@ -105,7 +105,7 @@ export function XRRequesterRefExtractor({requesterRefGetterRef}) { // This is TE
 
 // Convenience component to provide common contexts to viewport children, in the future may include 3DTilesManager, NexusManager, etc which serves to manage 3DTilesObject and NexusObject on each render.
 // TODO: Register managers required and add dynamically (same with ContextBridge required contexts)
-function ViewportCanvas({children, paused=false, foveation=0, className, ...props}) {
+function ViewportCanvas({children, foveation=0, className, ...props}) {
     const ContextBridge = useContextBridge(EditorContext, ViewerContext, SettingsContext, ThemeContext)
     const wrappedChildren = Children.map(children, (child) => (
         <CompositeSuspense>
@@ -113,7 +113,7 @@ function ViewportCanvas({children, paused=false, foveation=0, className, ...prop
         </CompositeSuspense>
     ))
     return (
-        <Canvas vr invalidateFrameloop={paused} className={twMerge(className, "viewport-canvas")} {...props}>
+        <Canvas className={twMerge(className, "viewport-canvas")} {...props}>
             <ContextBridge>
                 <XR foveation={foveation}>
                     <CameraHelper/>
