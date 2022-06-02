@@ -1,0 +1,1 @@
+The "assset_adapters" folder is for wrapper components that convert normal R3F components that take in url / blob resources to components that take in Vapor assets.
