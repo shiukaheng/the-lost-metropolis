@@ -10,6 +10,7 @@ import { EditorContext } from "../EditorContext";
 import EditorInput from "./EditorInput"
 import { languageLiteral } from "../../../../api/types/LanguageLiteral";
 import { ThemedSelect } from "../../utilities/ThemedSelect";
+import { Input } from "../../utilities/Input";
 
 function TransformModeSetter({transformMode, setTransformMode, transformSpace, setTransformSpace}) {
     const {theme} = useContext(ThemeContext)
@@ -85,21 +86,74 @@ function MovementModeSetter() {
     )
 }
 
+
+function LayerSetters() {
+    const {viewingLayerVisible, setViewingLayerVisible, editingLayerVisible, setEditingLayerVisible, teleportLayerVisible, setTeleportLayerVisible} = useContext(EditorContext)
+    const text = useMultiLangObject({
+        "title": {
+            "en": "editor layers",
+            "zh": "編輯器圖層"
+        },
+        "viewing": {
+            "en": "viewing",
+            "zh": "檢視"
+        },
+        "editing": {
+            "en": "editing",
+            "zh": "編輯器"
+        },
+        "teleport": {
+            "en": "teleport",
+            "zh": "傳送"
+        }
+    })
+    // Checkboxes to allow user to select which layers to show
+    return (
+        <table>
+            <tbody>
+                <tr>
+                    <td className="">{text["viewing"]}</td>
+                    <td className="">
+                        <Input typeName="boolean" value={viewingLayerVisible} setValue={(value)=>{setViewingLayerVisible(value)}}/>
+                    </td>
+                </tr>
+                <tr>
+                    <td className="">{text["editing"]}</td>
+                    <td className="">
+                        <Input typeName="boolean" value={editingLayerVisible} setValue={(value)=>{setEditingLayerVisible(value)}}/>
+                    </td>
+                </tr>
+                <tr>
+                    <td className="">{text["teleport"]}</td>
+                    <td className="">
+                        <Input typeName="boolean" value={teleportLayerVisible} setValue={(value)=>{setTeleportLayerVisible(value)}}/>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    )
+}
+
 export default function EditorOptions() {
     const { transformMode, setTransformMode, transformSpace, setTransformSpace, setOverrideInteractions, overrideInteractions } = useContext(EditorContext)
     const heading = useMultiLang({"en": "editor options", "zh": "編輯器選項"})
     const transformationLabel = useMultiLang({"en": "transformation", "zh": "變換"})
     const movementLabel = useMultiLang({"en": "navigation", "zh": "移動模式"})
     const bypassLabel = useMultiLang({"en": "bypass editor interactions", "zh": "跳過編輯器互動"})
+    const layersLabel = useMultiLang({"en": "editor layers", "zh": "編輯器圖層"})
     return (
         <EditorEmbeddedWidget title={heading} stickyKey="editorOptionsExpanded">
             <div className="flex flex-row gap-2">
                 <div>{transformationLabel}</div>
                 <TransformModeSetter {...{ transformMode, setTransformMode, transformSpace, setTransformSpace }}/>
             </div>
-            <div className="flex flex-row gap-2">
+            <div className="flex flex-col gap-2">
                 <div>{movementLabel}</div>
                 <MovementModeSetter/>
+            </div>
+            <div className="flex flex-col gap-2">
+                <div>{layersLabel}</div>
+                <LayerSetters/>
             </div>
             <EditorInput propName={bypassLabel} typeName="boolean" value={!overrideInteractions} setValue={()=>{setOverrideInteractions((v)=>(!v))}}/>
         </EditorEmbeddedWidget>

@@ -91,9 +91,11 @@ export function useARControls(onTeleport: (TeleportableDestination)=>void) {
         }
     }, [])
     const doubleTapHandler = useCallback(()=>{
+        // console.log(xrMode)
         if (xrMode === "immersive-ar") {
             attemptTeleport()
         }
+        attemptTeleport()
     }, [xrMode, attemptTeleport])
     useXRGestures(
         undefined,

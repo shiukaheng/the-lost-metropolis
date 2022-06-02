@@ -1,4 +1,4 @@
-import { cloneElement, useContext, useEffect } from 'react';
+import { cloneElement, useContext, useEffect, useLayoutEffect } from 'react';
 import EditorViewport from "./EditorViewport";
 import DebugPlane from '../3d/DebugPlane';
 import { useState } from 'react';
@@ -8,9 +8,9 @@ import MagicDiv from '../utilities/MagicDiv';
 import EditorTransformControls from './ui_elements/EditorTransformControls';
 import EditorOptions from './ui_elements/EditorOptions';
 import { deserializeChildren, exportChildren, PostScene, useStatefulDeserialize, useStatefulSerialize } from './ui_elements/EditorIO';
-import { Condition, KeyPressCallback, useBufferedPost, useKeyPress, useMultiLang } from '../../utilities';
+import { Condition, KeyPressCallback, useBufferedPost, useKeyPress, useLazyEffect, useMultiLang } from '../../utilities';
 import EditorSceneSettings from './ui_elements/EditorSceneSettings';
-import { EditorContext, MovementMode } from './EditorContext';
+import { defaultEditorContext, EditorContext, MovementMode } from './EditorContext';
 import { ViewerManager } from '../viewer/Viewer';
 import { ViewerContext } from '../viewer/ViewerContext';
 import MagicButton from '../utilities/MagicButton';
@@ -22,6 +22,7 @@ import { Asset } from '../../../api/types/Asset';
 import { ClientAsset } from '../../api_client/types/ClientAsset';
 import { targetAssetLiteralSchema } from '../../../api/types/AssetLiteral';
 import { languageLiteral, LanguageLiteral } from '../../../api/types/LanguageLiteral';
+import { useThree } from '@react-three/fiber';
 
 function Editor() {
     return (
@@ -128,6 +129,11 @@ function EditorManager() {
 
     // Movement mode
     const [movementMode, setMovementMode] = useState<MovementMode>("orbit")
+
+    // Layer management
+    const [viewingLayerVisible, setViewingLayerVisible] = useState(defaultEditorContext.viewingLayerVisible)
+    const [editingLayerVisible, setEditingLayerVisible] = useState(defaultEditorContext.editingLayerVisible)
+    const [teleportLayerVisible, setTeleportLayerVisible] = useState(defaultEditorContext.teleportLayerVisible)
     
     return (
         <EditorContext.Provider value={
@@ -150,6 +156,13 @@ function EditorManager() {
                 setActiveLanguage,
                 movementMode,
                 setMovementMode,
+                // Layer management
+                viewingLayerVisible,
+                setViewingLayerVisible,
+                editingLayerVisible,
+                setEditingLayerVisible,
+                teleportLayerVisible,
+                setTeleportLayerVisible,
             }
         }>
             <KeyPressCallback keyName={"Escape"} onDown={()=>{setSelectedIDs([])}}/>
@@ -183,6 +196,7 @@ function EditorManager() {
                     <div className="bg-black w-full h-full" onClick={()=>{audioListener.context.resume()}}>
                         <EditorViewport className="w-full h-full">
                             <DebugPlane rotation={[Math.PI/2, 0, 0]}/>
+                            <LayerHelper/>
                             {wrappedSceneChildren}
                         </EditorViewport>
                     </div>
@@ -191,6 +205,29 @@ function EditorManager() {
             </div>
         </EditorContext.Provider>
     );
+}
+
+function LayerHelper() {
+    const {camera} = useThree()
+    const {viewingLayerVisible, editingLayerVisible, teleportLayerVisible} = useContext(EditorContext)
+    useLayoutEffect(()=>{
+        if (viewingLayerVisible) {
+            camera.layers.enable(0)
+        } else {
+            camera.layers.disable(0)
+        }
+        if (editingLayerVisible) {
+            camera.layers.enable(5)
+        } else {
+            camera.layers.disable(5)
+        }
+        if (teleportLayerVisible) {
+            camera.layers.enable(3)
+        } else {
+            camera.layers.disable(3)
+        }
+    }, [viewingLayerVisible, editingLayerVisible, teleportLayerVisible, camera])
+    return null
 }
 
 export {Editor}
