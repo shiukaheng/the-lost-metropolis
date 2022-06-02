@@ -75,7 +75,7 @@ export function useARControls(onTeleport: (TeleportableDestination)=>void) {
     const raycasterRef = useRef<null | Raycaster>();
     useEffect(()=>{
         raycasterRef.current = new Raycaster();
-        raycasterRef.current.layers.set(0);
+        raycasterRef.current.layers.set(3);
     }, [])
     const attemptTeleport = useCallback(()=>{
         if (raycasterRef.current) {
@@ -197,7 +197,7 @@ export function useVRControls(onTeleport: (TeleportableDestination)=>void, maxSe
     const directionRef = useRef<Vector3>(new Vector3())
     const positionRef = useRef<Vector3>(new Vector3())
     useEffect(()=>{
-        raycasterRef.current.layers.set(0);
+        raycasterRef.current.layers.set(3);
     })
     const controllersRef = useRef<ControllersObject>({
         left: null,
