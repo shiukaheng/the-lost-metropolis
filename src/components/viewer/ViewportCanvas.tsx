@@ -3,7 +3,7 @@ import { PotreeManager } from "../3d/managers/PotreeManager"
 import { Children, useCallback, useContext, useLayoutEffect } from "react"
 import CompositeSuspense from "../3d/subcomponents/CompositeSuspense"
 import { EditorContext } from "../editor/EditorContext"
-import { Canvas, useFrame, useThree } from "@react-three/fiber"
+import { Camera, Canvas, useFrame, useThree } from "@react-three/fiber"
 import { ViewerContext } from "../viewer/ViewerContext"
 import { SettingsContext, ThemeContext } from "../App"
 import { InteractionManager, useXR, XR } from "@react-three/xr"
@@ -64,16 +64,13 @@ function CameraHelper() {
             audioListener.removeFromParent()
         }
     }, [camera])
-    useFrame(()=>{
-        const camera = gl.xr.getCamera()
-        if (camera && camera.cameras.length !== 0 && !camera.hasLayersApplied) {
-            camera.cameras.forEach((c) => {
-                c.layers.enable(3) // Make sure controllers are rendered
-            })
-            console.log(camera)
-            camera.hasLayersApplied = true
-        }
-    }) // Looks dirty to do it every frame, but apparently that's how WebXRManager does it too...
+    const layersSyncer = useCallback(()=>{
+        const xrCamera = gl.xr.getCamera()
+        xrCamera.cameras.forEach((c: Camera) => {
+            c.layers.mask = camera.layers.mask
+        })
+    }, [camera, gl])
+    useFrame(layersSyncer) // Looks dirty to do it every frame, but apparently that's how WebXRManager does it too...
     return null
 }
 
