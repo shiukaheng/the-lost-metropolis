@@ -5,5 +5,5 @@ export type TargetEffect = "target" | "blocker" | "bypass"
 // "bypass" will have no effect on the raycast, will lead to better performance as the raycast will not be performed
 
 export type TeleportTargetComponentProps = {
-    effect: TargetEffect
+    teleportEffect: TargetEffect
 }
