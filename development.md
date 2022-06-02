@@ -117,8 +117,9 @@ TBD
 # Layers
 - 0: Default layer, this is the only layer that will be rendered by default.
 - 1, 2: Reserved for WebXR
-- 3: Teleportation effectors, used for raycasting and finding teleportation targets
+- 3: Teleportation effectors, used for raycasting and finding teleportation targets, mesh basic material can be used to render the effectors for debugging.
 - 4: Interactive effectors, used for raycasting and finding interactive objects - Not implemented yet
+- 5: Editor layer, used for rendering the editor UI (i.e., gizmos)
 
 # Teleportation raycasting
 Raycasting is used in Vapor mainly for finding the floor for locomotion and interacting with objects. However due to the use of massive models, it may become infeasible to raycast some larger models. It is important we consider which models are too big for raycasting, and move these objects to a different layer so they are not raycasted. If we do still want to raycast them, we can consider using a simplified mesh to do the raycasting instead.
@@ -137,6 +138,8 @@ For each component we will have to manually implement using the teleportEffect p
 - "bypass" objects:
   - userData.teleportEffect will be set to undefined
   - layers.disable(3) will be called
+
+For convenience, you can call each descendant with the applyTeleportationTargetEffect function.
 
 # Improvements
 
