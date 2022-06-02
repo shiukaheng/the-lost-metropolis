@@ -22,7 +22,7 @@ type TeleportableDestination = {
 }
 
 /**
- * Processes a list of intersections from raycaster to determine whether there is a teleport destination
+ * THE function to determine what is a valid destination or not
  * @param intersections the list of intersections from raycaster
  * @param upVector the up vector to use for determining the validity of the teleport destination
  * @param maxDeg the maximum angle between the up vector and the normal of the teleport destination for it to be considered valid
@@ -30,42 +30,31 @@ type TeleportableDestination = {
  */
 function processIntersections(intersections: Intersection<Object3D>[], upVector=new Vector3(0, 1, 0), maxDeg=10): TeleportDestination {
     for (const intersection of intersections) {
-        if (intersection.object.userData.isTeleportTarget) {
-            const normal = intersection.face?.normal
-            if (normal) {
-                const angle = MathUtils.radToDeg(normal.angleTo(upVector))
-                if (angle <= maxDeg) {
-                    return {
-                        valid: true,
-                        position: intersection.point,
-                        normal,
+        if (intersection.object.userData !== undefined) {
+            switch (intersection.object.userData.teleportDestination) {
+                case "target":
+                    // Check if the intersection has the right normal
+                    if (validNormal(intersection?.face?.normal, upVector, maxDeg)) {
+                        return {
+                            valid: true,
+                            position: intersection.point,
+                            normal: intersection?.face?.normal || null
+                        };
+                    } else {
+                        return {
+                            valid: false,
+                            position: intersection.point,
+                            normal: intersection?.face?.normal || null
+                        }
                     }
-                } else {
+                case "blocker":
                     return {
                         valid: false,
                         position: intersection.point,
-                        normal,
+                        normal: intersection?.face?.normal || null
                     }
-                }
-            } else {
-                return {
-                    valid: false,
-                    position: intersection.point,
-                    normal: null,
-                }
-            }
-        } else if (intersection.object.userData.bypassTeleportRaycaster) {
-            // If object marked explicitly with ".bypassTeleportRaycaster", then don't check for teleport destination
-        } else {
-            // If object is neither marked with ".bypassTeleportRaycaster" nor with ".isTeleportTarget", then return a non-valid destination
-            // console.log(
-            //     intersection.object
-            // )
-            // intersection.object.visible = true
-            return {
-                valid: false,
-                position: intersection.point,
-                normal: intersection.face?.normal || null,
+                default:
+                    throw new Error(`Unknown teleport effect type: ${intersection.object.userData.teleportDestination}`);
             }
         }
     }
@@ -478,4 +467,14 @@ export function XRLocomotion(
             <VRVisualizer targetTraceRef={parabolicRaycastFrameRef} maxSegments={maxParabolicSegments}/>
         </Fragment> 
     )
+}
+
+function validNormal(normal: Vector3 | undefined, upVector: Vector3, maxDeg: number): boolean {
+    if (normal) {
+        // Check angleTo with upVector
+        const angle = normal.angleTo(upVector)
+        return (angle <= maxDeg)
+    } else {
+        return false
+    }
 }
