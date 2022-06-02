@@ -165,9 +165,6 @@ class XRControllerModelFactory {
           if (cachedAsset) { // If it is cached
             scene = cachedAsset.scene.clone()
             addAssetSceneToControllerModel(controllerModel, scene)
-            // controllerModel.traverse((child) => { // Set layers
-            //   child.layers.set(3)
-            // })
           } else {
             if (!this.gltfLoader) {
               throw new Error('GLTFLoader not set.')
@@ -182,9 +179,6 @@ class XRControllerModelFactory {
                 scene = asset.scene.clone()
 
                 addAssetSceneToControllerModel(controllerModel, scene)
-                // controllerModel.traverse((child) => { // Set layers
-                //   child.layers.set(3)
-                // })
               },
               null,
               () => {
