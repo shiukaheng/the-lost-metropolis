@@ -2,7 +2,7 @@
 import { VaporComponent, VaporComponentProps } from '../viewer/ComponentDeclarations';
 import { Suspense } from 'react';
 import { genericInputs } from '../viewer/genericInputs';
-import { NumberType, StringType } from '../viewer/ArgumentTypes';
+import { BooleanType, NumberType, StringType } from '../viewer/ArgumentTypes';
 import { ErrorBoundary } from 'react-error-boundary';
 import ErrorObject from './subcomponents/ErrorObject';
 import { ProtoTilesObject } from './subcomponents/ProtoTilesObject';
@@ -20,7 +20,6 @@ export type TilesObjectProps = {
   autoDisableRendererCulling?: boolean,
   optimizeRaycast?: boolean,
   onPreprocessURL?: null | ((url: string) => string),
-  isTeleportTarget?: boolean,
 } & VaporComponentProps
 
 // // By default uses sRGB encoding

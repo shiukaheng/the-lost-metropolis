@@ -7,6 +7,8 @@ import { ArrayCamera, Group } from "three";
 import { TilesContext } from "../managers/TilesManager";
 import { useXR } from "@react-three/xr";
 
+// As a more long term target, allow TilesObject to incorporate BVH per tile for faster raycasting
+
 export type ProtoTilesObjectProps = {
     url: string;
     dracoDecoderUrl?: string;
@@ -20,7 +22,6 @@ export type ProtoTilesObjectProps = {
     autoDisableRendererCulling?: boolean,
     optimizeRaycast?: boolean,
     onPreprocessURL?: null | ((url: string) => string),
-    isTeleportTarget?: boolean,
     // Allow extra props
     [key: string]: any;
 }
@@ -131,6 +132,6 @@ export function ProtoTilesObject({
         }
     }, [isPresenting, camera, gl])
     return (
-        <group ref={containerRef} userData={{isTeleportTarget}} {...props}/>
+        <group ref={containerRef} {...props}/>
     )
 }
