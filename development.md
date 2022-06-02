@@ -60,7 +60,7 @@ EditorInputTypes are not actually typescript types, but are objects attached to 
 Each type consists of the following:
 - typeName: a unique string identifier for the type of input
 - typeCheck: a predicate function that returns true if the input is of the correct type
-- data (optional): an object containing additional data that is used by to modify behaviour of the input component, this maybe supplied during the definition of a VaporComponent, or during runtime by the Editor
+- data (optional): an object containing additional data that is used by to modify behaviour of the input component, this may be supplied during the definition of a VaporComponent, or during runtime by the Editor
 
 The values of all input types has to be JSON-serializable, but other than that, there are no limitations as the values are stored as is in the database.
 The backend has no idea what the input type is and does not enforce any type checking, the types are entirely for the Editor to use and supplied directly to VaporComponents.
