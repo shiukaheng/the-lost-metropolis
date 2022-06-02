@@ -15,6 +15,7 @@ export class XRGestures extends EventDispatcher{
     startDistance: number;
     startVector: Vector3;
     startPosition: Vector3;
+    cleanup: () => void;
     constructor( renderer: WebGLRenderer ){
         super();
         
@@ -62,7 +63,7 @@ export class XRGestures extends EventDispatcher{
             
             self.touchCount++;
             
-            console.log( `onSelectStart touchCount: ${ self.touchCount }` );
+            // console.log( `onSelectStart touchCount: ${ self.touchCount }` );
         }
         
         function onSelectEnd( ){
@@ -94,6 +95,13 @@ export class XRGestures extends EventDispatcher{
             
             self.touchCount--;
         }
+
+        this.cleanup = () => {
+            this.controller1.removeEventListener( 'selectstart', onSelectStart );
+            this.controller1.removeEventListener( 'selectend', onSelectEnd );
+            this.controller2.removeEventListener( 'selectstart', onSelectStart );
+            this.controller2.removeEventListener( 'selectend', onSelectEnd );
+        }
     }
     
     get multiTouch(){
@@ -104,7 +112,7 @@ export class XRGestures extends EventDispatcher{
             result = this.controller1.userData.selectPressed && this.controller2.userData.selectPressed;
         }
         const self = this;
-        console.log( `XRGestures multiTouch: ${result} touchCount:${self.touchCount}`);
+        // console.log( `XRGestures multiTouch: ${result} touchCount:${self.touchCount}`);
         return result;
     }
     
@@ -222,12 +230,7 @@ export class XRGestures extends EventDispatcher{
         }
     }
 
-    // dispose() {
-    //     // Clear event listeners
-    //     this.controller1.userData.gestures.onSelectStart = undefined;
-    //     this.controller1.userData.gestures.onSelectEnd = undefined;
-      
-    //     this.controller2.userData.gestures.onSelectStart = undefined;
-    //     this.controller2.userData.gestures.onSelectEnd = undefined;
-    // }
+    dispose() {
+        this.cleanup()
+    }
 }

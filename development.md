@@ -5,6 +5,9 @@
 - Implement VR controls for XRLocomotion
 ## Non-urgent
 
+- Controllers should really be moved to layer 3, so it does not get raycasted, but still gets rendered. However, somehow the controllers are not getting rendered.
+  More debugging is needed.
+
 - Seperate this into multiple smaller repositories
     - vapor-types: all the types / schemas shared across the platform
     - vapor-api: api for javascript clients to interact with the backend
@@ -108,6 +111,12 @@ Scene interaction is particularly challenging for this project, because the same
 Mouse crosshair hover, controller pointer hover, AR crosshair hover
 
 # Implementation of locomotion
+TBD
+
+# Raycasting
+Raycasting in used in Vapor mainly for finding the floor for locomotion and interacting with objects. However due to the use of massive models, it may become infeasible to raycast some larger models. It is important we consider which models are too big for raycasting, and move these objects to a different layer so they are not raycasted. If we do still want to raycast them, we can consider using a simplified mesh to do the raycasting instead.
+
+Objects can be marked with "bypassTeleportRaycaster" set to true in the userData prop to be ignored as a teleportation or teleportation blocking target, but this will not prevent them from being actually raycasted or improve in performance.
 
 # Improvements
 

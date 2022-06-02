@@ -1,23 +1,20 @@
 import { useContextBridge } from "@react-three/drei"
 import { PotreeManager } from "../3d/managers/PotreeManager"
-import { Children, forwardRef, useCallback, useContext, useEffect, useLayoutEffect, useRef, useState } from "react"
+import { Children, useCallback, useContext, useLayoutEffect } from "react"
 import CompositeSuspense from "../3d/subcomponents/CompositeSuspense"
 import { EditorContext } from "../editor/EditorContext"
 import { Canvas, useFrame, useThree } from "@react-three/fiber"
 import { ViewerContext } from "../viewer/ViewerContext"
 import { SettingsContext, ThemeContext } from "../App"
-import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing'
 import { InteractionManager, useXR, XR } from "@react-three/xr"
 import { twMerge } from "tailwind-merge"
-import { Event } from "three"
-
 /**
  * Helper component that helps ViewerManager set camera position during mount, and keep audio listener with camera.
  * @returns 
  */
 function CameraHelper() {
     const {defaultCameraProps, defaultXRCameraProps, cameraRef, audioListener, xrMode} = useContext(ViewerContext)
-    const { camera } = useThree()
+    const { camera, gl } = useThree()
     // Keep camera reference up to date, and move camera back to starting pose if camera updated / pose updated (hacky, but works)
     // Todo: Allow different poses for XR and non-XR
     useLayoutEffect(()=>{
@@ -35,6 +32,8 @@ function CameraHelper() {
             if (defaultCameraProps.position || defaultCameraProps.rotation || defaultCameraProps.fov) {
                 camera.updateProjectionMatrix()
             }
+            // Allow controllers to be rendered
+            camera.layers.enable(3)
         }
     }, [defaultCameraProps, defaultXRCameraProps, camera, xrMode])
     const {player} = useXR()
@@ -65,6 +64,16 @@ function CameraHelper() {
             audioListener.removeFromParent()
         }
     }, [camera])
+    useFrame(()=>{
+        const camera = gl.xr.getCamera()
+        if (camera && camera.cameras.length !== 0 && !camera.hasLayersApplied) {
+            camera.cameras.forEach((c) => {
+                c.layers.enable(3) // Make sure controllers are rendered
+            })
+            console.log(camera)
+            camera.hasLayersApplied = true
+        }
+    }) // Looks dirty to do it every frame, but apparently that's how WebXRManager does it too...
     return null
 }
 
