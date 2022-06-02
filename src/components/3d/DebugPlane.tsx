@@ -15,7 +15,7 @@ type DebugPlaneProps = VaporComponentProps & {
 
 export const DebugPlane: VaporComponent = ({width=10, height=10, width_segments=10, height_segments=10, color="white", ...props}:DebugPlaneProps) => {
     return (
-        <mesh userData={{isTeleportTarget: true}} {...props}>
+        <mesh {...props}>
             <planeBufferGeometry attach="geometry" args={[width, height, width_segments, height_segments]} />
             <meshBasicMaterial attach="material" color={color} wireframe={true} />
         </mesh>

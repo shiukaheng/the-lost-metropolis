@@ -39,7 +39,6 @@ export function ProtoTilesObject({
     autoDisableRendererCulling=true,
     optimizeRaycast=true,
     onPreprocessURL=null,
-    isTeleportTarget=true,
      ...props}: ProtoTilesObjectProps) {
     const {gl, camera} = useThree()
     const { isPresenting } = useXR()
