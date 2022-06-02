@@ -3,6 +3,7 @@
 ## Urgent
 - Refactor XRLocomotion, and also make it cleanup after itself (or just eliminate the XRGestures class entirely)
 - Implement VR controls for XRLocomotion
+
 ## Non-urgent
 
 - Controllers should really be moved to layer 3, so it does not get raycasted, but still gets rendered. However, somehow the controllers are not getting rendered.
@@ -113,10 +114,29 @@ Mouse crosshair hover, controller pointer hover, AR crosshair hover
 # Implementation of locomotion
 TBD
 
-# Raycasting
-Raycasting in used in Vapor mainly for finding the floor for locomotion and interacting with objects. However due to the use of massive models, it may become infeasible to raycast some larger models. It is important we consider which models are too big for raycasting, and move these objects to a different layer so they are not raycasted. If we do still want to raycast them, we can consider using a simplified mesh to do the raycasting instead.
+# Layers
+- 0: Default layer, this is the only layer that will be rendered by default.
+- 1, 2: Reserved for WebXR
+- 3: Teleportation effectors, used for raycasting and finding teleportation targets
+- 4: Interactive effectors, used for raycasting and finding interactive objects - Not implemented yet
 
-Objects can be marked with "bypassTeleportRaycaster" set to true in the userData prop to be ignored as a teleportation or teleportation blocking target, but this will not prevent them from being actually raycasted or improve in performance.
+# Teleportation raycasting
+Raycasting is used in Vapor mainly for finding the floor for locomotion and interacting with objects. However due to the use of massive models, it may become infeasible to raycast some larger models. It is important we consider which models are too big for raycasting, and move these objects to a different layer so they are not raycasted. If we do still want to raycast them, we can consider using a simplified mesh to do the raycasting instead.
+
+To allow for a smooth transition for adopting raycasting, the raycaster will cast on a different layer, so only objects that have been opted into raycasting will be raycasted and old components not updated to use this system will not be affected.
+
+To create VaporComponents that will affect teleportation, we will follow the convention of merging the component prop with the TeleportTargetComponentProps type, which adds a teleportEffect prop to the component, which controls how the object will be affected by teleportation. "target" will make the object an teleportation target, "blocker" will block teleportation beams, and "bypass" makes it transparent to teleportation.
+
+For each component we will have to manually implement using the teleportEffect prop, since some components may have subcomponents that need to be raycasted. For components / subcomponents that follow the convention, the objects will need to have the following properties set:
+- "target" objects:
+  - userData.teleportEffect will be set to "target"
+  - layers.enable(3) will be called
+- "blocker" objects:
+  - userData.teleportEffect will be set to "blocker"
+  - layers.enable(3) will be called
+- "bypass" objects:
+  - userData.teleportEffect will be set to undefined
+  - layers.disable(3) will be called
 
 # Improvements
 
