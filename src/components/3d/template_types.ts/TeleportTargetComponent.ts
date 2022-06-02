@@ -1,3 +1,7 @@
+import { RefObject, useLayoutEffect } from "react"
+import { Object3D } from "three"
+import { applyTeleportationTargetEffect } from "../../utilities/Controls"
+
 export type TargetEffect = "target" | "blocker" | "bypass"
 
 // "target" will allow the user to teleport to the target
@@ -6,4 +10,12 @@ export type TargetEffect = "target" | "blocker" | "bypass"
 
 export type TeleportTargetComponentProps = {
     teleportEffect: TargetEffect
+}
+
+export const useTeleportEffect = (objectRef: RefObject<Object3D>, teleportEffect: TargetEffect) => {
+    useLayoutEffect(()=>{
+        if(objectRef.current){
+            applyTeleportationTargetEffect(objectRef.current, teleportEffect)
+        }
+    }, [teleportEffect])
 }
