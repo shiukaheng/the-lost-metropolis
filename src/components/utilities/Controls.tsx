@@ -427,10 +427,16 @@ export function XRLocomotion(
     const dtRef = useRef<number>(0) // Used for VR transition animation to determine movement velocity
     const {defaultXRCameraProps, xrMode} = useContext(ViewerContext)
     const gl = useThree((state)=>state.gl)
+
     useEffect(()=>{
         targetPositionRef.current.set(...defaultXRCameraProps.position)
     }, [defaultXRCameraProps])
     const {player} = useXR()
+
+    // Reset target position to the XR camera's initial position if camera changes
+    useEffect(()=>{
+        targetPositionRef.current.set(...defaultXRCameraProps.position)
+    }, [defaultXRCameraProps, xrMode])
 
     // Function for setting new target position
     const moveTo = useCallback((destination: Vector3)=>{
