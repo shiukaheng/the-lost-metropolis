@@ -33,6 +33,7 @@ import { Post } from '../../api/types/Post';
 import VaporAPI from '../api_client/api';
 import { Instance } from '../../api/utility_types';
 import Debug3D from './development/Debug3D';
+import { CompatabilityWrapper } from './utilities/CompatabilityWrapper';
 
 export const defaultSettings = {
     lang: "zh" as LanguageLiteral
@@ -134,38 +135,40 @@ function SiteRouter() {
         <ThemeSetter/>
         <LoadingScreen ready={posts !== null}>
             <div className="absolute w-full h-full">
-                <AnimatedSwitch pathPreprocessor={(path) => {
-                    if (path.split("/")[1] !== "view") {
-                        path = "";
-                    }
-                    return path;
-                } }>
-                    <Route path="/view/:id" element={<View />} /> 
-                    <Route path="*" element={<div className="w-full h-full">
-                        <Background />
-                        <AppContainer>
-                            <NavigationBar />
-                            <AnimatedSwitch pathPreprocessor={
-                                // Prevent the animation from triggering when under navigating in the browse directory, since it already has a sliding animation
-                                (path) => {
-                                    if (path.split("/")[1] === "browse") {
-                                        path = "browse";
-                                    }
-                                    return path;
-                                } }>
-                                <Route path="/" element={<Home />} />
-                                <Route path="/browse" element={<ShowcaseView/>} />
-                                <Route path="/browse/:id" element={<ShowcaseView/>} />
-                                <Route path="/list" element={<ListView />} />
-                                <Route path="/about" element={<About />} />
-                                <Route path="/login" element={<Login />} />
-                                <Route path="/dashboard" element={<Dashboard />} />
-                                <Route path="/edit/:id" element={<EditPost/>} />
-                                <Route path="/uploadTest" element={<UploadAssetPage/>} />
-                            </AnimatedSwitch>
-                        </AppContainer>
-                    </div>} />
-                </AnimatedSwitch>
+                <CompatabilityWrapper>
+                    <AnimatedSwitch pathPreprocessor={(path) => {
+                        if (path.split("/")[1] !== "view") {
+                            path = "";
+                        }
+                        return path;
+                    } }>
+                        <Route path="/view/:id" element={<View />} /> 
+                        <Route path="*" element={<div className="w-full h-full">
+                            <Background />
+                            <AppContainer>
+                                <NavigationBar />
+                                <AnimatedSwitch pathPreprocessor={
+                                    // Prevent the animation from triggering when under navigating in the browse directory, since it already has a sliding animation
+                                    (path) => {
+                                        if (path.split("/")[1] === "browse") {
+                                            path = "browse";
+                                        }
+                                        return path;
+                                    } }>
+                                    <Route path="/" element={<Home />} />
+                                    <Route path="/browse" element={<ShowcaseView/>} />
+                                    <Route path="/browse/:id" element={<ShowcaseView/>} />
+                                    <Route path="/list" element={<ListView />} />
+                                    <Route path="/about" element={<About />} />
+                                    <Route path="/login" element={<Login />} />
+                                    <Route path="/dashboard" element={<Dashboard />} />
+                                    <Route path="/edit/:id" element={<EditPost/>} />
+                                    <Route path="/uploadTest" element={<UploadAssetPage/>} />
+                                </AnimatedSwitch>
+                            </AppContainer>
+                        </div>} />
+                    </AnimatedSwitch>
+                </CompatabilityWrapper>
             </div>
         </LoadingScreen>
     </Router>;
