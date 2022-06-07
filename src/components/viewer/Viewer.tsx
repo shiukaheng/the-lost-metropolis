@@ -151,7 +151,7 @@ function Viewer({post, className, style, children, ...props}: ViewerProps) {
     )
 }
 
-export function FadeInAudio({fadeInSeconds=1}) {
+function FadeInAudio({fadeInSeconds=1}) {
     const {eventDispatcher, audioListener} = useContext(ViewerContext)
     const viewerContextRef = useRefContext(ViewerContext)
     const volumeRef = useRef(0)
