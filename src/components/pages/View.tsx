@@ -1,13 +1,13 @@
 import { useParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
-import { useMultiLang, usePost } from '../../utilities';
+import { NonXRComponents, useMultiLang, usePost } from '../../utilities';
 import MagicButton from '../utilities/MagicButton';
 import MagicDiv from '../utilities/MagicDiv';
 import { Viewer } from '../viewer/Viewer';
 import {Fade} from 'react-reveal';
 import GameControls from '../utilities/GameControls';
 import { RootState } from "@react-three/fiber";
-import { Fragment, useRef } from 'react';
+import { Fragment, useContext, useRef } from 'react';
 import { ThreeExtractor } from '../utilities/ThreeExtractor';
 import { useSupportedXRModes } from '../utilities/useRequestXR';
 import { ReactComponent as VR } from './View/VR.svg';
@@ -15,6 +15,7 @@ import { ReactComponent as AR } from './View/AR.svg';
 import MagicIcon from '../utilities/MagicIcon';
 import { XRRequesterRefExtractor } from '../viewer/ViewportCanvas';
 import { useMediaQuery } from 'react-responsive';
+import { ViewerContext } from '../viewer/ViewerContext';
 
 function XRButtons({supportedXRModes, xrRequesterGetterRef}) {
     const supportAR = supportedXRModes && supportedXRModes.includes("immersive-ar")
@@ -41,6 +42,7 @@ function XRButtons({supportedXRModes, xrRequesterGetterRef}) {
     )
 }
 
+
 function View({ ...props}) {
     const { id } = useParams();
     const [post, _] = usePost(id || null)
@@ -57,7 +59,9 @@ function View({ ...props}) {
     return (
         <div className='absolute w-full h-full'>
             <Viewer post={post} className="absolute w-full h-full">
-                <GameControls force={10} friction={2}/>
+                <NonXRComponents>
+                    <GameControls force={10} friction={2}/>
+                </NonXRComponents>
                 <ThreeExtractor threeRef={threeStateRef}/>
                 <XRRequesterRefExtractor requesterRefGetterRef={xrRequesterGetterRef}/>
             </Viewer>
