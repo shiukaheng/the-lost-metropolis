@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react"
 import { XRGestures } from "../../../lib/XRGestures/XRGestures";
 import { Event } from "three";
 import { useFrame, useThree } from "@react-three/fiber";
+import { useXR } from "@react-three/xr";
 
 export function useXRGestures(
     onTap?: (e: Event)=>void, 
@@ -36,3 +37,10 @@ export function useXRGestures(
     })
 }
 
+export function useXRGesturesB(onTap, onDoubleTap) {
+    // Imitate useXRGestures but implement using react hooks.
+    const {controllers} = useXR()
+    useEffect(()=>{
+        console.log(controllers)
+    }, [controllers])
+}
