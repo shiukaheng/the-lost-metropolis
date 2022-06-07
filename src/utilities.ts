@@ -622,3 +622,12 @@ export function useRefContext<T>(context: Context<T>): MutableRefObject<T | unde
     }, [value])
     return ref
 }
+
+export function NonXRComponents({children}) {
+    const {xrMode} = useContext(ViewerContext)
+    if (xrMode) {
+        return null
+    } else {
+        return children
+    }
+}
