@@ -2,6 +2,11 @@
 
 import { Clock, EventDispatcher, Group, Vector3, WebGLRenderer } from "three";
 
+// Observation: For mobile immersive-ar experiences, touch register as select events, and controller location is updated
+// with where the user is pointing - however, I'm unsure of how the touch position maps to the controller location.
+// Main problem is that its mapping a 2D position to a 3D position. Maybe the most intuitive assumption is that
+// if I raycast using the controllers anyway it will be exactly where the user is pointing.
+
 export class XRGestures extends EventDispatcher{
     controller1: Group;
     controller2: Group;
@@ -50,7 +55,7 @@ export class XRGestures extends EventDispatcher{
         
         const self = this;
         
-        function onSelectStart( ){
+        function onSelectStart(){
             const data = this.userData.gestures;
             
             data.startPosition = undefined;
