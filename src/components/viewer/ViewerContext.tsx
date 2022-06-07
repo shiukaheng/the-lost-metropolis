@@ -1,6 +1,6 @@
 import { Camera } from "@react-three/fiber"
 import { createContext, MutableRefObject, ReactElement, RefObject } from "react"
-import { XRSessionMode } from "three"
+import { EventDispatcher, XRSessionMode } from "three"
 import { SceneChild } from "../../../api/types/SceneChild"
 
 const defaultViewerContext: ViewerContextProps = {
@@ -39,6 +39,8 @@ const defaultViewerContext: ViewerContextProps = {
     setPotreePointBudget: (budget:number) => {},
     potreeOptimisePointBudget: false,
     setPotreeOptimisePointBudget: (optimise:boolean) => {},
+    // G. Event management
+    eventDispatcher: new EventDispatcher(),
 }
 
 export type DefaultCameraPropType = {
@@ -73,6 +75,8 @@ interface ViewerContextProps {
     setPotreePointBudget: (budget:number) => void,
     potreeOptimisePointBudget: boolean,
     setPotreeOptimisePointBudget: (optimise:boolean) => void,
+    // G. Event management
+    eventDispatcher: EventDispatcher,
 }
 
 const ViewerContext = createContext(defaultViewerContext)

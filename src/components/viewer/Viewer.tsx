@@ -1,14 +1,15 @@
 import { cloneElement, useRef, useState, useContext, useEffect } from "react"
 import { joinChildren } from "../editor/utilities"
 import { DefaultCameraPropType, ViewerContext } from "./ViewerContext"
-import { AudioListener } from "three"
+import { AudioListener, EventDispatcher } from "three"
 import { useStatefulDeserialize } from "../editor/ui_elements/EditorIO"
 import Viewport from "./Viewport"
 import { Post } from "../../../api/types/Post"
 import { useContextBridge } from "@react-three/drei"
 import { SettingsContext, ThemeContext } from "../App"
-import { Camera } from "@react-three/fiber"
+import { Camera, useFrame } from "@react-three/fiber"
 import { XRLocomotion } from "../utilities/Controls"
+import { useRefContext, useThreeEventListener } from "../../utilities"
 
 /**
  * Non-visual component that manages the viewer state, including scene configuration and scene children.
@@ -58,7 +59,8 @@ function ViewerManager({children, defaultCameraProps}: {children: any, defaultCa
 
     // Create AudioListener
     const [audioListener] = useState(()=>{
-        return new AudioListener()
+        const audioListener = new AudioListener()
+        return audioListener
     })
 
     // Args for Potree
@@ -69,6 +71,9 @@ function ViewerManager({children, defaultCameraProps}: {children: any, defaultCa
     const [xrMode, _setXrMode] = useState<null | XRSessionMode>(null)
     const xrSessionRef = useRef<null | XRSession>(null)
     const xrRequesterRef = useRef<null | ((XRSessionMode)=>void)>(null)
+
+    // Events
+    const [eventDispatcher, _setEventDispatcher] = useState(new EventDispatcher())
 
     return (
         <ViewerContext.Provider value={{
@@ -96,7 +101,10 @@ function ViewerManager({children, defaultCameraProps}: {children: any, defaultCa
             potreePointBudget, 
             setPotreePointBudget, 
             potreeOptimisePointBudget, 
-            setPotreeOptimisePointBudget}}>
+            setPotreeOptimisePointBudget,
+            // G. Event management
+            eventDispatcher,
+        }}>
             {children}
         </ViewerContext.Provider>
     );
@@ -135,9 +143,40 @@ interface ViewerProps {
 function Viewer({post, className, style, children, ...props}: ViewerProps) {
     return (
         <ViewerManager {...props}>
-            <ViewerUI post={post} {...{className, style, children}}/>
+            <ViewerUI post={post} {...{className, style}}>
+                <FadeInAudio/>
+                {children}
+            </ViewerUI>
         </ViewerManager>
     )
+}
+
+export function FadeInAudio({fadeInSeconds=1}) {
+    const {eventDispatcher, audioListener} = useContext(ViewerContext)
+    const viewerContextRef = useRefContext(ViewerContext)
+    const volumeRef = useRef(0)
+    const timePassed = useRef(0)
+    const numResumes = useRef(0)
+    const firstResume = useRef(false)
+    useThreeEventListener("audio-resumed", ()=>{
+        numResumes.current++
+        if (numResumes.current === 1) {
+            firstResume.current = true
+        }
+    }, eventDispatcher)
+    useFrame((state, dt)=>{
+        if (firstResume.current || viewerContextRef?.current?.audioListener?.context?.state === "running") {
+            timePassed.current += dt
+            if (timePassed.current <= fadeInSeconds) {
+                volumeRef.current = timePassed.current / fadeInSeconds
+                viewerContextRef.current?.audioListener.setMasterVolume(volumeRef.current)
+            } else {
+                viewerContextRef.current?.audioListener.setMasterVolume(1)
+                firstResume.current = false
+            }
+        }
+    })
+    return null
 }
 
 export { ViewerManager, Viewer }

@@ -1,5 +1,5 @@
 import { extend, useLoader, useThree, Vector3 } from "@react-three/fiber";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import * as THREE from "three";
 import { ViewerContext } from "../viewer/ViewerContext";
@@ -8,6 +8,7 @@ import DepthKitMaterial from "./materials/DepthKitMaterial";
 import { VaporComponent, VaporComponentProps } from "../viewer/ComponentDeclarations";
 import { genericInputs } from "../viewer/genericInputs"
 import { BooleanType, NumberType, URLType, Vector3Type } from "../viewer/ArgumentTypes";
+import { useThreeEventListener } from "../../utilities";
 
 const VERTS_WIDE = 256;
 const VERTS_TALL = 256;
@@ -125,7 +126,8 @@ function AdvancedVideoTexture({
   muted = true,
   getPositionalAudio = (audioSource: any) => {}
 }) {
-  const { audioListener } = useContext(ViewerContext)
+  const { audioListener, xrMode, eventDispatcher } = useContext(ViewerContext)
+  const gl = useThree((state)=>state.gl)
   const [positionalAudio, setPositionalAudio] = useState(null);
   const [video] = useState(() => {
     const video = document.createElement("video");
@@ -134,7 +136,7 @@ function AdvancedVideoTexture({
     video.setAttribute("crossorigin", "anonymous");
     video.setAttribute("webkit-playsinline", "webkit-playsinline");
     video.setAttribute("playsinline", "playsinline");
-    console.log(Date.now(), "Creating Video Element", video);
+    // console.log(Date.now(), "Creating Video Element", video);
     const newPositionalAudio = new THREE.PositionalAudio(audioListener);
     // Override default source node with video element
     newPositionalAudio.setMediaElementSource(video);
@@ -171,12 +173,20 @@ function AdvancedVideoTexture({
   // Set autoplay, loop, muted
   useEffect(() => {
     if (video) {
-      video.autoplay = autoplay;
       video.loop = loop;
+      video.autoplay = autoplay; // For videos with sound, autoplay will only start when user first interacts with the page
       video.muted = muted;
     }
-  }, [video, autoplay, loop, muted]);
-
+  }, [video, loop, autoplay, muted]);
+  // Make video autoplay on first interaction
+  const playVideo = useCallback(() => {
+    if (video) {
+      video.play();
+    }
+  }, [video]);
+  useThreeEventListener("audio-start", playVideo, eventDispatcher);
+  
+  // Trigger play if audio context is resumed, 
   return (
     <videoTexture
       attach="videoTexture"
@@ -231,7 +241,7 @@ function buildGeometry(verts_wide = VERTS_WIDE, verts_tall = VERTS_TALL) {
   geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
   geometry.setAttribute("uv", new THREE.BufferAttribute(uvs, 2));
   geometry.setIndex(new THREE.BufferAttribute(index, 1));
-  console.log(Date.now(), "Building Geometry from outside", geometry);
+  // console.log(Date.now(), "Building Geometry from outside", geometry);
   return geometry;
 }
 

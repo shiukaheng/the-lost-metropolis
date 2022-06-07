@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useLayoutEffect, useContext, useCallback } from "react"
+import { useState, useEffect, useRef, useLayoutEffect, useContext, useCallback, Context, MutableRefObject } from "react"
 import { AuthContext } from "./components/admin/AuthProvider";
 import { defaultTheme, languages, SettingsContext, ThemeContext, ThemeContextType } from "./components/App";
 import { ContentContext } from "./components/providers/ContentProvider";
@@ -14,10 +14,11 @@ import { MultiLangObject } from "../api/types/MultiLangObject";
 import { auth } from "./firebase-config.js"
 import { signOut } from "firebase/auth";
 import { Theme } from "../api/types/Theme";
-import { Instance, Instance } from "../api/utility_types";
+import { Instance } from "../api/utility_types";
 import { Sponsor } from "../api/types/Sponsor";
 import { Asset } from "../api/types/Asset";
 import { MagicString } from "../api/types/MagicString";
+import { EventDispatcher } from "three";
 
 export function formatRGBCSS(color: number[]): string {
     return "rgb(" + color[0] + "," + color[1] + "," + color[2] + ")";
@@ -542,4 +543,82 @@ export function useMagicString(value: MagicString) {
     } else {
         return value[settings.lang]
     }
+}
+
+// From: https://usehooks.com/useEventListener/
+export function useEventListener(eventName, handler, element = window) {
+    // Create a ref that stores handler
+    const savedHandler = useRef();
+    // Update ref.current value if handler changes.
+    // This allows our effect below to always get latest handler ...
+    // ... without us needing to pass it in effect deps array ...
+    // ... and potentially cause effect to re-run every render.
+    useEffect(() => {
+        savedHandler.current = handler;
+    }, [handler]);
+    useEffect(
+        () => {
+            // Make sure element supports addEventListener
+            // On
+            const isSupported = element && element.addEventListener;
+            if (!isSupported) return;
+            // Create event listener that calls handler function stored in ref
+            const eventListener = (event) => savedHandler.current(event);
+            // Add event listener
+            element.addEventListener(eventName, eventListener);
+            // Remove event listener on cleanup
+            return () => {
+                element.removeEventListener(eventName, eventListener);
+            };
+        },
+        [eventName, element] // Re-run if eventName or element changes
+    );
+}
+
+export type EventDispatcherEvent = {
+    type: string,
+    message: any,
+    // Allow for additional data to be passed along
+    [key: string]: any
+}
+
+export type EventDispatcherListener = (event: EventDispatcherEvent)=>void
+
+/**
+ * Hook for using Mr. Doob's EventDispatcher instead of native events, similar to useEventListener
+ * @param eventName the event name string to listen to
+ * @param handler the handler function to call when the event is dispatched
+ * @param dispatcher the EventDispatcher instance to use
+ */
+export function useThreeEventListener(eventName: string, handler: EventDispatcherListener, dispatcher: EventDispatcher) {
+    const savedHandler = useRef<EventDispatcherListener>(()=>{});
+    // Update ref.current value if handler changes.
+    useEffect(()=>{
+        savedHandler.current = handler;
+    }, [handler])
+    // Create event listener that calls handler function stored in ref
+    useEffect(()=>{
+        if (!dispatcher) {
+            console.warn("No EventDispatcher instance provided")
+            return
+        }
+        // Create event listener that calls handler function stored in ref
+        const eventListener = (event) => savedHandler.current(event);
+        // Add event listener
+        dispatcher.addEventListener(eventName, eventListener);
+        // Remove event listener on cleanup
+        return () => {
+            dispatcher.removeEventListener(eventName, eventListener);
+        };
+        
+    })   
+}
+
+export function useRefContext<T>(context: Context<T>): MutableRefObject<T | undefined> {
+    const ref = useRef<T>()
+    const value = useContext(context)
+    useEffect(()=>{
+        ref.current = value
+    }, [value])
+    return ref
 }
