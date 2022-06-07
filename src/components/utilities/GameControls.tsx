@@ -2,7 +2,7 @@ import { PointerLockControls } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useRef } from "react";
 import { Vector3 } from "three"
-import { useKeyPress } from "../../utilities";
+import { useEventListener, useKeyPress } from "../../utilities";
 import { CustomPointerLockControls } from "./CustomPointerLockControls";
 
 // WASD / Arrow Keys + Shift (down) + Space (up) + Pointer Lock controls
@@ -44,19 +44,11 @@ export default function GameControls({mass=1, force=10, friction=2}) {
         // }
         cameraVelocityRef.current.sub(cameraVelocityRef.current.clone().multiplyScalar(friction * delta));
     })
-    useEffect(()=>{
-        // Add pointerlock change listener to domElement of gl
-        const domElement = gl.domElement;
-        const pointerlockChange = (e) => {
-            if (cameraVelocityRef.current) {
-                cameraVelocityRef.current.set(0, 0, 0);
-            }
-        }
-        domElement.ownerDocument.addEventListener("pointerlockchange", pointerlockChange);
-        return () => {
-            domElement.ownerDocument.removeEventListener("pointerlockchange", pointerlockChange);
-        }
-    }, [])
+    // Set velocity to zero if window / tab loses focus
+    const onBlur = () => {
+        cameraVelocityRef.current.set(0, 0, 0);
+    }
+    useEventListener("blur", onBlur, window);
     return (
         <CustomPointerLockControls/>
     )
