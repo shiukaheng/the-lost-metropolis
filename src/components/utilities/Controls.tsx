@@ -4,11 +4,12 @@ import { useFrame, useThree } from "@react-three/fiber";
 import { useXR, useXREvent, XRController } from "@react-three/xr";
 import { Fragment, RefObject, useCallback, useContext, useEffect, useRef } from "react";
 import { BufferAttribute, BufferGeometry, Group, Intersection, Layers, Line, LineBasicMaterial, Material, MathUtils, Mesh, Object3D, Ray, Raycaster, Scene, Vector2, Vector3 } from "three";
-import { useXRGestures } from "./controls/useXRGestures";
+import { useXRGestures, useXRGesturesB } from "./controls/useXRGestures";
 
 import { ViewerContext } from "../viewer/ViewerContext";
 import { DefaultXRControllers } from "./controls/DefaultXRControllers";
 import { TargetEffect } from "../3d/template_types.ts/TeleportTargetComponent";
+import { useThreeEventListener } from "../../utilities";
 
 type TeleportDestination = {
     valid: boolean,
@@ -97,10 +98,14 @@ export function useARControls(onTeleport: (TeleportableDestination)=>void) {
         }
         attemptTeleport()
     }, [xrMode, attemptTeleport])
-    useXRGestures(
+    useXRGesturesB(
         undefined,
         doubleTapHandler,
     )
+    // useEffect(()=>{
+    //     // Debug: log controllers and events
+    //     useThreeEventListener("")
+    // }, [gl])
 }
 
 /**
