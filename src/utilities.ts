@@ -19,6 +19,7 @@ import { Sponsor } from "../api/types/Sponsor";
 import { Asset } from "../api/types/Asset";
 import { MagicString } from "../api/types/MagicString";
 import { EventDispatcher } from "three";
+import { ViewerContext } from "./components/viewer/ViewerContext";
 
 export function formatRGBCSS(color: number[]): string {
     return "rgb(" + color[0] + "," + color[1] + "," + color[2] + ")";
@@ -590,7 +591,7 @@ export type EventDispatcherListener = (event: EventDispatcherEvent)=>void
  * @param handler the handler function to call when the event is dispatched
  * @param dispatcher the EventDispatcher instance to use
  */
-export function useThreeEventListener(eventName: string, handler: EventDispatcherListener, dispatcher: EventDispatcher) {
+export function useThreeEventListener(eventName: string, handler: EventDispatcherListener, dispatcher: EventDispatcher | null) {
     const savedHandler = useRef<EventDispatcherListener>(()=>{});
     // Update ref.current value if handler changes.
     useEffect(()=>{
@@ -599,7 +600,7 @@ export function useThreeEventListener(eventName: string, handler: EventDispatche
     // Create event listener that calls handler function stored in ref
     useEffect(()=>{
         if (!dispatcher) {
-            console.warn("No EventDispatcher instance provided")
+            // console.warn("No EventDispatcher instance provided")
             return
         }
         // Create event listener that calls handler function stored in ref
@@ -630,4 +631,20 @@ export function NonXRComponents({children}) {
     } else {
         return children
     }
+}
+
+export function useArrayUpdateDiff(array: any[]) {
+    const oldArrayRef = useRef<any>([])
+    const [diff, setDiff] = useState({added: [], removed: []})
+    useEffect(()=>{
+        // On "array" change
+        // Diff what references are added and removed
+        const added = array.filter(x => !oldArrayRef.current.includes(x))
+        const removed = oldArrayRef.current.filter(x => !array.includes(x))
+        // Call callback with added 
+        setDiff({added, removed})
+        // Update old array
+        oldArrayRef.current = array
+    }, [array])
+    return diff
 }

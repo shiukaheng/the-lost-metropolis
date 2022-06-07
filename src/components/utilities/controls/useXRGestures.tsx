@@ -1,8 +1,11 @@
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { XRGestures } from "../../../lib/XRGestures/XRGestures";
-import { Event } from "three";
+import { Clock, Event, Group, Raycaster, Vector3, WebXRManager } from "three";
 import { useFrame, useThree } from "@react-three/fiber";
 import { useXR } from "@react-three/xr";
+import { useArrayUpdateDiff, useThreeEventListener } from "../../../utilities";
+import { useCallback } from "react";
+import { connectStorageEmulator } from "firebase/storage";
 
 export function useXRGestures(
     onTap?: (e: Event)=>void, 
@@ -37,10 +40,38 @@ export function useXRGestures(
     })
 }
 
-export function useXRGesturesB(onTap, onDoubleTap) {
-    // Imitate useXRGestures but implement using react hooks.
-    const {controllers} = useXR()
+export function useXRGesturesB(onTap, onDoubleTap, doubleTapExpires=0.2) {
+    const {gl} = useThree()
+    const [controller, setController] = useState<Group|null>(null)
+    const [clock] = useState<Clock>(()=>new Clock())
+    const [raycaster] = useState<Raycaster>(()=>{
+        const r = new Raycaster()
+        r.layers.set(3)
+        return r
+    })
+    const timeoutIDRef = useRef<number|null>(null)
+    // Retrive controller from xr
     useEffect(()=>{
-        console.log(controllers)
-    }, [controllers])
+        // console.log(xr)
+        setController(gl.xr.getController(0))
+    }, [gl])
+    // Add listeners to controller
+    const handler = useCallback((e)=>{
+        if (timeoutIDRef.current) {
+            clearTimeout(timeoutIDRef.current)
+            timeoutIDRef.current = null
+        }
+        // raycaster.set(controller!.position, controller!.getWorldDirection(new Vector3()))
+        // If dt is less than doubleTapExpires, then it is a double tap
+        const dt = clock.getDelta()
+        if (clock.running && dt < doubleTapExpires) {
+            onDoubleTap && onDoubleTap(controller?.getWorldPosition(new Vector3()), controller?.getWorldDirection(new Vector3()).multiplyScalar(-1))
+        } else {
+            timeoutIDRef.current = setTimeout(()=>{
+                onTap && onTap(controller?.getWorldPosition(new Vector3()), controller?.getWorldDirection(new Vector3()))
+            }, doubleTapExpires*1000)
+        }
+    }, [controller])
+    // Make useFrame call onTap if 
+    useThreeEventListener("selectstart", handler, controller)
 }

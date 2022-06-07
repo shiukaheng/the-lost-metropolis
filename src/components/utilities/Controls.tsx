@@ -9,7 +9,7 @@ import { useXRGestures, useXRGesturesB } from "./controls/useXRGestures";
 import { ViewerContext } from "../viewer/ViewerContext";
 import { DefaultXRControllers } from "./controls/DefaultXRControllers";
 import { TargetEffect } from "../3d/template_types.ts/TeleportTargetComponent";
-import { useThreeEventListener } from "../../utilities";
+import { useRefContext, useThreeEventListener } from "../../utilities";
 
 type TeleportDestination = {
     valid: boolean,
@@ -72,32 +72,33 @@ const zero = new Vector2(0,0)
 
 export function useARControls(onTeleport: (TeleportableDestination)=>void) {
     const {scene, gl, camera: normalCamera} = useThree();
-    const { xrMode } = useContext(ViewerContext);
+    // const { xrMode } = useContext(ViewerContext);
+    const viewerContextRef = useRefContext(ViewerContext)
     const raycasterRef = useRef<null | Raycaster>();
     useEffect(()=>{
         raycasterRef.current = new Raycaster();
         raycasterRef.current.layers.set(3);
     }, [])
-    const attemptTeleport = useCallback(()=>{
+    const attemptTeleport = useCallback((pv, dv)=>{
+        // console.log(raycasterRef.current)
         if (raycasterRef.current) {
             // Raycast from AR camera and check if it hits a teleportable object
-            console.log("Attempt teleport")
-            raycasterRef.current.setFromCamera(zero, normalCamera);
+            // raycasterRef.current.setFromCamera(zero, normalCamera);
+            raycasterRef.current.set(pv, dv);
             const intersects = raycasterRef.current.intersectObjects(scene.children, true);
-            console.log(normalCamera, scene.children, raycasterRef.current, intersects)
+            // console.log(normalCamera, scene.children, raycasterRef.current, intersects)
             const destination = processIntersections(intersects)
             if (destination.valid) {
                 onTeleport(destination)
             }
         }
     }, [])
-    const doubleTapHandler = useCallback(()=>{
-        // console.log(xrMode)
-        if (xrMode === "immersive-ar") {
-            attemptTeleport()
+    const doubleTapHandler = useCallback((pv, dv)=>{
+        if (viewerContextRef.current?.xrMode === "immersive-ar") {
+            // console.log("Double tap")
+            attemptTeleport(pv, dv)
         }
-        attemptTeleport()
-    }, [xrMode, attemptTeleport])
+    }, [attemptTeleport])
     useXRGesturesB(
         undefined,
         doubleTapHandler,
@@ -507,5 +508,5 @@ export function applyTeleportationTargetEffect(object: Object3D, effect: TargetE
         object.userData.teleportEffect = undefined
         object.layers.disable(3)
     }
-    console.log(object)
+    // console.log(object)
 }

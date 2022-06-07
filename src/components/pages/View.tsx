@@ -59,9 +59,7 @@ function View({ ...props}) {
     return (
         <div className='absolute w-full h-full'>
             <Viewer post={post} className="absolute w-full h-full">
-                <NonXRComponents>
-                    <GameControls force={10} friction={2}/>
-                </NonXRComponents>
+                <GameControls force={10} friction={2}/>
                 <ThreeExtractor threeRef={threeStateRef}/>
                 <XRRequesterRefExtractor requesterRefGetterRef={xrRequesterGetterRef}/>
             </Viewer>
