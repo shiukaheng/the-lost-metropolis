@@ -2,6 +2,8 @@ import { ReactThreeFiber, useThree } from '@react-three/fiber'
 import * as React from 'react'
 import * as THREE from 'three'
 
+// Copied to increase angular resolution
+
 import { Camera, Euler, EventDispatcher, Vector3 } from 'three'
 
 class PointerLockControlsImpl extends EventDispatcher {
