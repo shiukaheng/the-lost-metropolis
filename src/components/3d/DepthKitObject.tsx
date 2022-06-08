@@ -10,8 +10,8 @@ import { genericInputs } from "../viewer/genericInputs"
 import { BooleanType, NumberType, URLType, Vector3Type } from "../viewer/ArgumentTypes";
 import { useThreeEventListener } from "../../utilities";
 
-const VERTS_WIDE = 256;
-const VERTS_TALL = 256;
+const VERTS_WIDE = 128;
+const VERTS_TALL = 128;
 
 extend({ DepthKitMaterial });
 
