@@ -57,7 +57,7 @@ export const useOnLoseFocus = (onLoseFocus: () => void) => {
     }, [onFocus])
 }
 
-export function useRefState(initialValue) {
+export function useRefState<T>(initialValue: T): [MutableRefObject<T>, T, (value: T) => void] {
     const [value, setValue] = useState(initialValue);
     const ref = useRef(initialValue);
     useEffect(()=>{

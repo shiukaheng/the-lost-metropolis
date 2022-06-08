@@ -2,6 +2,7 @@ import { FunctionComponent } from "react"
 import { AmbientLightObject } from "../3d/AmbientLightObject"
 import { NexusAssetObject } from "../3d/asset_adapters/NexusAssetObject"
 import { PotreeAssetObject } from "../3d/asset_adapters/PotreeAssetObject"
+import { AudioObject } from "../3d/AudioObject"
 import DebugPlane from "../3d/DebugPlane"
 import { DepthKitObject } from "../3d/DepthKitObject"
 import InfoObject from "../3d/InfoObject"
@@ -56,7 +57,8 @@ export const components = [
     AmbientLightObject,
     PotreeObject,
     TilesObject,
-    TeleporterPlane
+    TeleporterPlane,
+    AudioObject
 ]
 
 export function getComponentFromTypeName(componentType): VaporComponent {

@@ -1,13 +1,8 @@
 # Todo
 
 ## Urgent
-- Refactor XRLocomotion, and also make it cleanup after itself (or just eliminate the XRGestures class entirely)
-- Implement VR controls for XRLocomotion
 
 ## Non-urgent
-
-- Controllers should really be moved to layer 3, so it does not get raycasted, but still gets rendered. However, somehow the controllers are not getting rendered.
-  More debugging is needed.
 
 - Seperate this into multiple smaller repositories
     - vapor-types: all the types / schemas shared across the platform
@@ -18,6 +13,12 @@
 - Create asset uploading client
 - Make assets renameable and identifiable by ID -> Improve Assets schema and unify for frontend and backend
 - Make .vaps format support multiple assets within one file
+- Change transformation gizmo from constantly updating transformation props to imperatively updating a transformAnimationGroup injected into scene graph to reduce the number of updates
+- Background image uploading function broken when filename has special characters like "-"
+- Improve editor UX, right now it is ambiguous whether the action is instantly updated or reuqires "update"
+- Find a way to cull unreferenced assets
+- Finalize VaporComponents to all use assets system
+
 
 # Asset types
 

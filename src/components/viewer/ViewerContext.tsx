@@ -2,6 +2,7 @@ import { Camera } from "@react-three/fiber"
 import { createContext, MutableRefObject, ReactElement, RefObject } from "react"
 import { EventDispatcher, XRSessionMode } from "three"
 import { SceneChild } from "../../../api/types/SceneChild"
+import { AudioListener } from "three"
 
 const defaultViewerContext: ViewerContextProps = {
     // A. Camera prop management
