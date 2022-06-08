@@ -1,7 +1,7 @@
 import GenericPage from '../utilities/GenericPage'
 import { PotreeObject } from '../3d/PotreeObject'
 import { useMultiLangObject, useTheme } from '../../utilities'
-import { ScrollControls, Scroll, Image, Plane } from "@react-three/drei"
+import { ScrollControls, Scroll } from "@react-three/drei"
 import { Suspense, useCallback, useContext, useState } from 'react'
 import { Viewer } from '../viewer/Viewer'
 import { SettingsContext } from '../App'
@@ -13,6 +13,7 @@ import { useNavigate } from 'react-router-dom'
 import { MeshBasicMaterial } from 'three'
 import imageUrl1 from "./Home/media/cat.jpg"
 import imageUrl2 from "./Home/media/signs2.jpg"
+import { Image } from '../utilities/modifiedDrei/Image'
 
 console.log(imageUrl1)
 
@@ -69,7 +70,7 @@ function Home() {
     })
 
     // Set different amount of pages using mediaQuery since in mobile version, the Page1 and Page2 components will have double height
-    const scrollPages = 4
+    const scrollPages = 3
     return (
         <GenericPage className="relative w-full h-full homepage">
             <ApplySettings />
@@ -93,10 +94,10 @@ function Home() {
                                 {/* <FollowMouseGroup> */}
                                     <group position={[0,-11,0]}>
                                         <PopGroup position={[3, 0, 1]} deltaPosition={[0, 0, 0]} deltaRotation={[0, -0.2, 0]} lambda={1}>
-                                            <Image scale={[10,10,10]} url={imageUrl1} toneMapped={false}/>
+                                            <Image scale={[10,10,10]} url={imageUrl1}/>
                                         </PopGroup>
                                         <PopGroup position={[-3, -4, 3.5]} deltaPosition={[0, 0, 0]} deltaRotation={[0, 0.2, 0]} lambda={1}>
-                                            <Image url={imageUrl2} scale={[9, 6, 10]} toneMapped={false}/>
+                                            <Image url={imageUrl2} scale={[9, 6, 10]}/>
                                         </PopGroup> 
                                     </group>
                                 {/* </FollowMouseGroup> */}
@@ -107,10 +108,11 @@ function Home() {
                     <Scroll html className="w-full h-full">
                         <TitleScreen lang={settings.lang} text={text}></TitleScreen>
                         <Screen1 text={text}></Screen1>
-                        <Screen2 text={text}></Screen2>
-                        {
-                            (posts && posts?.length > 0) ? <EndScreen text={text} gotoBrowse={gotoBrowse}/> : <EndScreenB text={text}/>
-                        }
+                        <Screen2 text={text}>
+                            {
+                                (posts && posts?.length > 0) ? <EndScreen text={text} gotoBrowse={gotoBrowse}/> : <EndScreenB text={text}/>
+                            }
+                        </Screen2>
                     </Scroll>
                 </ScrollControls>
             </Viewer>

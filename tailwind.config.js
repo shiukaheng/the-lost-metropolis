@@ -6,7 +6,12 @@ module.exports = {
     fontFamily: {
       serif: ["Noto Serif TC", "serif"]
     },
-    extend: {},
+    extend: {
+      screens: {
+        // Make "md" only available if the screen is in landscape
+        'md': {'raw': '(min-width: 768px) and (min-width: 1024px)'},
+      }
+    },
   },
   variants: {
     extend: {},

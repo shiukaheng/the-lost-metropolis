@@ -14,6 +14,7 @@ import { MultiLangObject } from '../../../../api/types/MultiLangObject';
 import { twMerge } from 'tailwind-merge';
 import { Group, MathUtils, MeshBasicMaterial } from 'three';
 import { SearchIcon } from '@heroicons/react/outline';
+import { ContentContext } from '../../providers/ContentProvider';
 
 function RevealDiv({ predicate, children }: { predicate: (data: ScrollControlsState) => boolean; children: React.ReactNode; }) {
     const data = useScroll();
@@ -233,14 +234,15 @@ export function Screen1(props) {
     const md = useMediaQuery("(min-width: 768px)");
     return (
         <Fragment>
-            <MagicDiv className="flex flex-col gap-4 w-full h-full justify-center content-center">
+            <MagicDiv className="flex flex-col gap-4 w-full h-full justify-center content-center items-start">
+                <div className='md:h-64'/>
                 <Fade delay={500}>
-                    <div className="font-black text-center md:text-left px-8 pb-4 md:px-16 text-4xl md:text-5xl">
+                    <div className="font-black text-center md:text-left px-8 pb-4 md:px-16 text-4xl md:text-5xl md:w-[70%]">
                         {props.text["subtitle"]}
                     </div>
                 </Fade>
                 <Fade delay={600}>
-                    <div className="px-8 md:px-16 md:text-xl text-center md:text-left">
+                    <div className="px-8 md:px-16 md:text-xl text-center md:text-left md:w-[70%]">
                         {props.text["p1"]}
                     </div>
                 </Fade>
@@ -250,21 +252,29 @@ export function Screen1(props) {
     );
 }
 
-export function Screen2(props) {
+export function Screen2({children, ...props}) {
     return (
         <Fragment>
-            <MagicDiv className="flex flex-col gap-4 w-full h-full justify-center content-center">
+            <MagicDiv className="flex flex-col gap-4 w-full items-end">
                 <Fade delay={500}>
-                    <div className="font-black text-center md:text-left px-8 pb-4 md:px-16 text-4xl md:text-5xl">
+                    <div className="font-black text-center md:text-left px-8 pb-4 md:px-16 text-4xl md:text-5xl md:w-[70%]">
                         {props.text["subtitle2"]}
                     </div>
                 </Fade>
                 <Fade delay={600}>
-                    <div className="px-8 md:px-16 md:text-xl text-center md:text-left">
+                    <div className="px-8 md:px-16 md:text-xl text-center md:text-left md:w-[70%]">
                         {props.text["p2"]}
                     </div>
                 </Fade>
                 {/* Fade in video / animation depicting preservation process */}
+                <Fade delay={700}>
+                    {/* Align all of the div's content center */}
+                    <div className="w-full px-8 md:px-16 text-center pt-6 md:pt-32">
+                        {
+                            children
+                        }
+                    </div>
+                </Fade>
             </MagicDiv>
         </Fragment>
     );
@@ -275,27 +285,27 @@ export function EndScreen({text, gotoBrowse}: {
     gotoBrowse: () => void
 }) {
     return (
-        <MagicDiv className="w-full h-full flex flex-col justify-center items-center gap-4">
-            <MagicButton solid className="text-2xl md:text-4xl h-16 md:h-18 rounded-full px-7 md:px-9 font-black" onClick={gotoBrowse}>
+        <Fragment>
+            <MagicButton className="text-2xl md:text-[80px] h-16 md:h-28 rounded-full px-7 md:px-48 font-black" onClick={gotoBrowse}>
                 {/* <div className='flex flex-row gap-2'>
                     <MagicIcon fillCurrent invertColors IconComponent={SearchIcon}/>
                     <div></div>
                 </div> */}
                 {text["browseAction"]}
             </MagicButton>
-        </MagicDiv>
+        </Fragment>
     )
 }
 
 export function EndScreenB({text}) {
     return (
-        <MagicDiv className="w-full h-full flex flex-col justify-center items-center gap-4">
+        <Fragment>
             <h2 className="text-xl md:text-4xl font-black text-center">{text["noContentPartA"]}<br/>{text["noContentPartB"] }</h2>
             <div className="inline">
                 <MagicIcon fillCurrent IconComponent={InstagramIcon} className="h-8 w-8 cursor-pointer" onClick={()=>{
                     window.open("https://www.instagram.com/thelostmetropolishk/");
                 }}/>
             </div>
-        </MagicDiv>
+        </Fragment>
     )
 }

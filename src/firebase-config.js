@@ -30,7 +30,8 @@ export const storage = getStorage(app);
 export const functions = getFunctions(app, "asia-east1");
 
 // Check if we are in the dev environment (localhost test)
-if (window.location.hostname === "localhost") {
+
+if ((import.meta.env.MODE === "development") && (window.location.hostname === "localhost")) {
   connectFirestoreEmulator(db, "lvh.me", 5377)
   connectAuthEmulator(auth, "http://lvh.me:5366")
   connectStorageEmulator(storage, "lvh.me", 5341)

@@ -322,7 +322,7 @@ export default class VaporAPI {
      * Resolves an asset's root path given a post ID and an asset ID
      */
     static resolveAsset(postID: string, assetID: string): string {
-        if (window.location.hostname === "localhost") {
+        if ((import.meta.env.MODE === "development") && (window.location.hostname === "localhost")) {
             return `http://localhost:5341/the-lost-metropolis-production-static/${postID}/${assetID}/`
         } else {
             return `https://static.thelostmetropolis.org/${postID}/${assetID}/`

@@ -66,11 +66,6 @@ export function ProtoTilesObject({
         dracoLoaderRef.current.setDecoderPath(dracoDecoderUrl);
     }, [dracoDecoderUrl])
     useEffect(()=>{
-        // Cleanup existing tiles renderer
-        if (tilesRendererRef.current) {
-            tilesRendererRef.current.group.removeFromParent()
-            tilesRendererRef.current.dispose()
-        }
         // Create new tiles renderer and add to container
         tilesRendererRef.current = new TilesRenderer(url);
         const loader = new GLTFLoader( tilesRendererRef.current.manager );
@@ -78,6 +73,9 @@ export function ProtoTilesObject({
         tilesRendererRef.current.manager.addHandler( /\.gltf$/, loader );
         tilesRendererRef.current.setCamera(camera);
         tilesRendererRef.current.setResolutionFromRenderer(camera, gl);
+        tilesRendererRef.current.onLoadModel = (model, tile) => {
+            console.log("Loaded model", model, tile)
+        }
         (containerRef.current as Group).add(tilesRendererRef.current.group);
         updateRendererProps();
         // Link to TilesManager if available
@@ -91,6 +89,13 @@ export function ProtoTilesObject({
                 tilesRendererRef.current.lruCache = (tilesManager.lruCacheRef.current as LRUCache)
                 tilesRendererRef.current.downloadQueue = (tilesManager.downloadQueueRef.current as PriorityQueue)
                 tilesRendererRef.current.parseQueue = (tilesManager.parseQueueRef.current as PriorityQueue)
+            }
+        }
+        // Cleanup
+        return ()=>{
+            if (tilesRendererRef.current) {
+                tilesRendererRef.current.group.removeFromParent()
+                tilesRendererRef.current.dispose()
             }
         }
     }, [gl, camera, tilesManager])

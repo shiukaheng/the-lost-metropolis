@@ -13,7 +13,8 @@
     "firebase-emu": "firebase emulators:start --only functions,firestore,storage,auth",
     "functions-watch": "cd functions && npm run watch",
     "open-browser": "node ./scripts/open_browser.js",
-    "dev": "yarn kill-ports && yarn concurrently \"yarn firebase-emu\" \"yarn start\" \"yarn functions-watch\" \"yarn open-browser\""
+    "dev": "yarn kill-ports && yarn concurrently \"yarn firebase-emu\" \"yarn start\" \"yarn functions-watch\" \"yarn open-browser\"",
+    "dev-hosting": "yarn start --mode hosting" 
   },
   "repository": "https://github.com/shiukaheng/the-lost-metropolis-draft.git",
   "author": "Heng <31088159+shiukaheng@users.noreply.github.com>",
