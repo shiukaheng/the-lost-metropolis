@@ -12,7 +12,7 @@ import { ContentContext } from '../providers/ContentProvider'
 import { useNavigate } from 'react-router-dom'
 import { MeshBasicMaterial } from 'three'
 import imageUrl1 from "./Home/media/cat.jpg"
-import imageUrl2 from "./Home/media/DSC09963s copy.jpg"
+import imageUrl2 from "./Home/media/signs2.jpg"
 
 console.log(imageUrl1)
 
