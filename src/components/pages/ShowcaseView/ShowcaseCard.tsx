@@ -21,7 +21,7 @@ function ShowcaseContentCard({post}: {post: Instance<Roled<Post>>}) {
             <div className="grow"/>
             <div className="flex flex-col md:flex-row md:flex-wrap gap-2 md:gap-4">
                 {
-                    post.data.sponsors.map(sponsorInstance => <SponsorDisplay sponsorInstance={sponsorInstance} postInstance={post}/>)
+                    post.data.sponsors.map(sponsorInstance => <SponsorDisplay key={sponsorInstance.id} sponsorInstance={sponsorInstance} postInstance={post}/>)
                 }
             </div>
             {/* Add sponsors here */}
