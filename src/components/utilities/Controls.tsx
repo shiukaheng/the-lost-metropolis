@@ -43,6 +43,7 @@ function processIntersections(intersections: Intersection<Object3D>[], upVector=
                             normal: intersection?.face?.normal || null
                         };
                     } else {
+                        // console.log("rejected", intersection.face?.normal, upVector, maxDeg)
                         return {
                             valid: false,
                             position: intersection.point,
@@ -201,12 +202,13 @@ type ControllersObject = {
 export function useVRControls(onTeleport: (TeleportableDestination)=>void, maxSegments=20, hSegmentLength=0.1, maxDistance=3): RefObject<ParabolicRaycastFrame> {
     // References for each controller
     const scene = useThree(gl => gl.scene)
-    const raycasterRef = useRef<Raycaster>(new Raycaster())
-    const directionRef = useRef<Vector3>(new Vector3())
-    const positionRef = useRef<Vector3>(new Vector3())
+    const raycasterRef = useRef<null | Raycaster>();
     useEffect(()=>{
+        raycasterRef.current = new Raycaster();
         raycasterRef.current.layers.set(3);
     }, [])
+    const directionRef = useRef<Vector3>(new Vector3())
+    const positionRef = useRef<Vector3>(new Vector3())
     const controllersRef = useRef<ControllersObject>({
         left: null,
         right: null,

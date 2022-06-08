@@ -269,7 +269,7 @@ export function Screen2({children, ...props}) {
                 {/* Fade in video / animation depicting preservation process */}
                 <Fade delay={700}>
                     {/* Align all of the div's content center */}
-                    <div className="w-full px-8 md:px-16 text-center pt-6 md:pt-32">
+                    <div className="w-full px-8 md:px-16 text-center pt-6 md:pt-16">
                         {
                             children
                         }
@@ -286,7 +286,7 @@ export function EndScreen({text, gotoBrowse}: {
 }) {
     return (
         <Fragment>
-            <MagicButton className="text-2xl md:text-[80px] h-16 md:h-28 rounded-full px-7 md:px-48 font-black" onClick={gotoBrowse}>
+            <MagicButton className="text-2xl md:text-[70px] h-16 md:h-24 rounded-full px-7 md:px-48 font-black" onClick={gotoBrowse}>
                 {/* <div className='flex flex-row gap-2'>
                     <MagicIcon fillCurrent invertColors IconComponent={SearchIcon}/>
                     <div></div>

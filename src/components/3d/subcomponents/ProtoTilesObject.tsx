@@ -73,9 +73,6 @@ export function ProtoTilesObject({
         tilesRendererRef.current.manager.addHandler( /\.gltf$/, loader );
         tilesRendererRef.current.setCamera(camera);
         tilesRendererRef.current.setResolutionFromRenderer(camera, gl);
-        tilesRendererRef.current.onLoadModel = (model, tile) => {
-            console.log("Loaded model", model, tile)
-        }
         (containerRef.current as Group).add(tilesRendererRef.current.group);
         updateRendererProps();
         // Link to TilesManager if available
