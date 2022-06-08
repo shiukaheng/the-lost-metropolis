@@ -29,3 +29,4 @@ yarn-error.log*
 .firebase
 .vscode/settings.json
 ui-debug.log
+.vscode/settings.json
