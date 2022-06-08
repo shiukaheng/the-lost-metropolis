@@ -46,7 +46,7 @@ Asset types (e.g. Potree2) are format specifications for a collection of files t
 VaporComponent types are special 3D components that have extra logic that allows it to be recognized in the Editor and allows prop editing
 
 - To create a new VaporComponent:
-  - Create a new file in /src/components/3d
+  - Create a new file in /src/components/3d (use "nvc" snippet to create a new component)
   - After the function definition, be sure to add the following extra properties to the function:
     - displayName: The component type name displayed in the editor
     - componentType: An identifying string for the component type
