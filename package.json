@@ -70,7 +70,7 @@
     "styled-components": "^5.3.5",
     "tailwind-merge": "^1.2.1",
     "tailwind-styled-components": "^2.1.7",
-    "three": "mrdoob/three.js#22362/head",
+    "three": "0.129.0",
     "three-loader-3dtiles": "^1.1.8",
     "three-stdlib": "^2.10.1",
     "troika-three-text": "^0.46.4",

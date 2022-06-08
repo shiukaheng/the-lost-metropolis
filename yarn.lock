@@ -8703,9 +8703,10 @@ three-stdlib@^2.10.1, three-stdlib@^2.8.6:
     potpack "^1.0.1"
     zstddec "^0.0.2"
 
-three@mrdoob/three.js#22362/head:
-  version "0.131.1"
-  resolved "https://codeload.github.com/mrdoob/three.js/tar.gz/8d4ee3db272f50c7b1043e278abb72bd83c07432"
+three@0.129.0:
+  version "0.129.0"
+  resolved "https://registry.yarnpkg.com/three/-/three-0.129.0.tgz#f5e530bbc96eac5d5b4749cb5da886ef0d42f554"
+  integrity sha512-wiWio1yVRg2Oj6WEWsTHQo5eSzYpEwSBtPSi3OofNpvFbf26HFfb9kw4FZJNjII4qxzp0b1xLB11+tKkBGB1ZA==
 
 through2@^0.6.3:
   version "0.6.5"
