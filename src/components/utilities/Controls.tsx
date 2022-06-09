@@ -72,7 +72,7 @@ function processIntersections(intersections: Intersection<Object3D>[], upVector=
 const zero = new Vector2(0,0)
 
 export function useARControls(onTeleport: (TeleportableDestination)=>void) {
-    const {scene, gl, camera: normalCamera} = useThree();
+    const {scene} = useThree();
     // const { xrMode } = useContext(ViewerContext);
     const viewerContextRef = useRefContext(ViewerContext)
     const raycasterRef = useRef<null | Raycaster>();
@@ -161,9 +161,7 @@ function parabolicRaycast(scene: Scene, raycaster: Raycaster, origin: Vector3, d
         raycaster.set(path[i-1], deltaOrigin)
         raycaster.far = deltaOrigin.length()
         // Try and raycast
-        const destination = processIntersections(raycaster.intersectObjects(scene.children.filter(
-            x => !(x.userData.bypassTeleportRaycaster)
-        )))
+        const destination = processIntersections(raycaster.intersectObjects(scene.children, true))
         if (destination.position !== null) { // Return if there are any hits in the current segment
             path.push(destination.position)
             return {
