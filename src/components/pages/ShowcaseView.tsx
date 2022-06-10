@@ -31,6 +31,10 @@ function ShowcasePanel() {
     // const { setTheme, changesRef } = useContext(ThemeContext)
     // If no specified ID, show the first post. If no posts, set activeID and activeIndex to null
     const [activeID, setActiveID] = useState(id || (posts && posts.length > 0 ? posts[0].id : null));
+    // Make activeID update to again if changed later
+    useEffect(()=>{
+        setActiveID(id || (posts && posts.length > 0 ? posts[0].id : null))
+    }, [id])
     // If has activeID, find the index of the post with that ID, otherwise set to null
     const activeIndex: number | null = (posts && posts.length > 0) ? posts.findIndex(post => post.id === activeID) : null;
     const setActiveIndex = (index) => {
