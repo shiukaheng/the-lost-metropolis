@@ -7,8 +7,6 @@ uniform float height;
 uniform bool isPoints;
 uniform float pointSize;
 
-uniform float time;
-
 uniform vec2 focalLength;
 uniform vec2 principalPoint;
 uniform vec2 imageDimensions;

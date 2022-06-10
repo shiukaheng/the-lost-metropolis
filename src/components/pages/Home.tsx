@@ -1,7 +1,7 @@
 import GenericPage from '../utilities/GenericPage'
 import { PotreeObject } from '../3d/PotreeObject'
 import { useMultiLangObject, useTheme } from '../../utilities'
-import { ScrollControls, Scroll } from "@react-three/drei"
+import { ScrollControls, Scroll, MeshReflectorMaterial } from "@react-three/drei"
 import { Suspense, useCallback, useContext, useState } from 'react'
 import { Viewer } from '../viewer/Viewer'
 import { SettingsContext } from '../App'
@@ -13,7 +13,9 @@ import { useNavigate } from 'react-router-dom'
 import { MeshBasicMaterial } from 'three'
 import imageUrl1 from "./Home/media/cat.jpg"
 import imageUrl2 from "./Home/media/signs2.jpg"
+import wavesUrl from "./Home/media/waves.jpg"
 import { Image } from '../utilities/modifiedDrei/Image'
+import { useTexture } from '../utilities/modifiedDrei/useTexture'
 
 console.log(imageUrl1)
 
@@ -71,6 +73,7 @@ function Home() {
 
     // Set different amount of pages using mediaQuery since in mobile version, the Page1 and Page2 components will have double height
     const scrollPages = 3
+
     return (
         <GenericPage className="relative w-full h-full homepage">
             <ApplySettings />
@@ -99,6 +102,7 @@ function Home() {
                                         <PopGroup position={[-3, -4, 3.5]} deltaPosition={[0, 0, 0]} deltaRotation={[0, 0.2, 0]} lambda={1}>
                                             <Image url={imageUrl2} scale={[9, 6, 10]}/>
                                         </PopGroup> 
+                                        <Reflector position={[-3, -5.5, 2]} scale={[30,30,30]} rotation={[-Math.PI/2, 0 ,0]}/>
                                     </group>
                                 {/* </FollowMouseGroup> */}
                             </Suspense>
@@ -125,7 +129,28 @@ export default Home
 function PotreeScene({visible=true}) {
     return <Scroll>
         <FollowMouseGroup>
+            <ambientLight intensity={1} />
             <PotreeObject objectID="homepageShowcase" pointShape={0} pointSize={1} pointSizeType={0} scale={[0.9, 0.9, 0.9]} rotation={[-.5, 0.3, 0.088]} position={[-10, -3, 12]} baseUrl={"https://static.thelostmetropolis.org/BigShotCleanV2/"} cloudName="metadata.json" visible={visible}/>
         </FollowMouseGroup>
     </Scroll>
+}
+
+function Reflector({...props}) {
+    const wavesTexture = useTexture(wavesUrl)
+    return (
+        <mesh {...props}>
+            <planeGeometry/>
+            {/* <meshBasicMaterial/> */}
+            <MeshReflectorMaterial
+                mixStrength={4} // Strength of the reflections
+                mixContrast={1} // Contrast of the reflections
+                resolution={1024} // Off-buffer resolution, lower=faster, higher=better quality, slower
+                mirror={1} // Mirror environment, 0 = texture colors, 1 = pick up env colors
+                metalness={0.95}
+                distortionMap={wavesTexture}
+                distortion={0.5}
+                reflectorOffset={-0.15}
+            />
+        </mesh>
+    )
 }
