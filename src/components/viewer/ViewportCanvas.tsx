@@ -166,7 +166,6 @@ function AudioContextHelper() {
             if (e.target.state === "closed") {
                 eventDispatcher.dispatchEvent({type: "audio-ended"})
             }
-            console.log(e.target.state)
         }
         // Cleanup
         return ()=>{

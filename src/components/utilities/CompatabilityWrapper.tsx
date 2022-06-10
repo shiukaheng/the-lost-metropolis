@@ -47,7 +47,7 @@ function memoizedDetectCompatibility(): Compatiblity {
     // Memoize within the same session using window. A bit hacky, but it works.
     if (window.compatibility === undefined) {
         window.compatibility = detectCompatability()
-        console.log("Detected compatibility:", window.compatibility)
+        // console.log("Detected compatibility:", window.compatibility)
     }
     return window.compatibility
 }

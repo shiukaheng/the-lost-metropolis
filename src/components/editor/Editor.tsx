@@ -193,13 +193,13 @@ function EditorManager() {
                     }
                 </MagicDiv>
                 <MagicDiv backgroundColorCSSProps={["backgroundColor"]} className="relative w-full h-full overflow-clip">
-                    <div className="bg-black w-full h-full" onClick={()=>{audioListener.context.resume()}}>
+                    <MagicDiv mergeTransitions foregroundColorCSSProps={["backgroundColor"]} className="w-full h-full" onClick={()=>{audioListener.context.resume()}}>
                         <EditorViewport className="w-full h-full">
                             <DebugPlane rotation={[Math.PI/2, 0, 0]}/>
                             <LayerHelper/>
                             {wrappedSceneChildren}
                         </EditorViewport>
-                    </div>
+                    </MagicDiv>
                 </MagicDiv>
                 
             </div>

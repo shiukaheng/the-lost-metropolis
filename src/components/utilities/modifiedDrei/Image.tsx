@@ -121,7 +121,7 @@ const ImageBase = React.forwardRef(
   }
 )
 
-console.log(LinearEncoding, sRGBEncoding)
+// console.log(LinearEncoding, sRGBEncoding)
 
 const ImageWithUrl = React.forwardRef(({ url, encoding=sRGBEncoding, ...props }: ImageProps, ref: React.ForwardedRef<THREE.Mesh>) => {
   const encodingSetter = useCallback((textures: Texture | Texture[]) => {

@@ -17,8 +17,6 @@ import wavesUrl from "./Home/media/waves.jpg"
 import { Image } from '../utilities/modifiedDrei/Image'
 import { useTexture } from '../utilities/modifiedDrei/useTexture'
 
-console.log(imageUrl1)
-
 function Home() {
     const { settings } = useContext(SettingsContext) // Somehow the settings context is not being passed down to the children if its inside of Scroll
     const [opaque, setOpaque] = useState(false)
