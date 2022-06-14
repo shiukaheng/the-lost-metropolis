@@ -286,7 +286,7 @@ export function EndScreen({text, gotoBrowse}: {
 }) {
     return (
         <Fragment>
-            <MagicButton className="text-2xl md:text-[70px] h-16 md:h-24 rounded-full px-7 md:px-48 font-black" onClick={gotoBrowse}>
+            <MagicButton className="text-2xl md:text-[50px] h-16 md:h-24 rounded-full px-7 md:px-48 font-black" onClick={gotoBrowse}>
                 {/* <div className='flex flex-row gap-2'>
                     <MagicIcon fillCurrent invertColors IconComponent={SearchIcon}/>
                     <div></div>

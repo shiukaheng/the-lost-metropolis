@@ -35,8 +35,17 @@ import { Instance } from '../../api/utility_types';
 import Debug3D from './development/Debug3D';
 import { CompatabilityWrapper } from './utilities/CompatabilityWrapper';
 
+function getDefaultLang(): LanguageLiteral {
+    // Check if the browser has a language preference, if it is anything chinese, then use "zh", otherwise use "en"
+    const lang = navigator.language.split("-")[0];
+    if (lang === "zh") {
+        return "zh";
+    }
+    return "en";
+}
+
 export const defaultSettings = {
-    lang: "zh" as LanguageLiteral
+    lang: getDefaultLang()
 }
 
 export const languages = ["en", "zh"]
