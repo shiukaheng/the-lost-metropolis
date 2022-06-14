@@ -5,7 +5,7 @@ import { ErrorBoundary } from "react-error-boundary";
 import MagicDiv from "../utilities/MagicDiv";
 import { EditorContext } from "./EditorContext";
 import { useContext } from "react";
-import GameControls from "../utilities/GameControls";
+import DOMControls from "../utilities/controls/DOMControls";
 
 function Fallback({error, resetErrorBoundary}) {
     return (
@@ -27,7 +27,7 @@ function EditorViewport({children, ...props}) {
                         (movementMode==="orbit") && <OrbitControls enablePan enableRotate enableZoom makeDefault/>
                     }
                     {
-                        (movementMode==="pointerlock") && <GameControls/>
+                        (movementMode==="pointerlock") && <DOMControls/>
                     }
                     {children}
                 </ViewportCanvas>

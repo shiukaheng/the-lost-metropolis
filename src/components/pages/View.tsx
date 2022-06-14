@@ -5,7 +5,7 @@ import MagicButton from '../utilities/MagicButton';
 import MagicDiv from '../utilities/MagicDiv';
 import { Viewer } from '../viewer/Viewer';
 import {Fade} from 'react-reveal';
-import GameControls from '../utilities/GameControls';
+import DOMControls from '../utilities/controls/DOMControls';
 import { RootState } from "@react-three/fiber";
 import { Fragment, useContext, useRef } from 'react';
 import { ThreeExtractor } from '../utilities/ThreeExtractor';
@@ -59,7 +59,7 @@ function View({ ...props}) {
     return (
         <div className='absolute w-full h-full'>
             <Viewer post={post} className="absolute w-full h-full">
-                <GameControls force={2} friction={2}/>
+                <DOMControls force={2} friction={2}/>
                 <ThreeExtractor threeRef={threeStateRef}/>
                 <XRRequesterRefExtractor requesterRefGetterRef={xrRequesterGetterRef}/>
             </Viewer>

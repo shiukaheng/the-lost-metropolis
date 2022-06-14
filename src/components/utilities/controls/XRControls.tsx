@@ -392,7 +392,7 @@ export function ARVisualizer({targzetRef}) {
     return null
 }
 
-export function XRLocomotion(
+export function XRControls(
     {
         locomotionLambda=1.5, 
         maxParabolicSegments=20,

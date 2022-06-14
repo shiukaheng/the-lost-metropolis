@@ -8,7 +8,7 @@ import { Post } from "../../../api/types/Post"
 import { useContextBridge } from "@react-three/drei"
 import { SettingsContext, ThemeContext } from "../App"
 import { Camera, useFrame } from "@react-three/fiber"
-import { XRLocomotion } from "../utilities/Controls"
+import { XRControls } from "../utilities/controls/XRControls"
 import { useRefContext, useThreeEventListener } from "../../utilities"
 
 /**

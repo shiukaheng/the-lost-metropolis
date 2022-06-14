@@ -1,6 +1,6 @@
 import { RefObject, useCallback, useLayoutEffect } from "react"
 import { Object3D } from "three"
-import { applyTeleportationTargetEffect } from "../../utilities/Controls"
+import { applyTeleportationTargetEffect } from "../../utilities/controls/XRControls"
 import { createStringOptionType } from "../../viewer/ArgumentTypes"
 
 export type TargetEffect = "target" | "blocker" | "bypass"

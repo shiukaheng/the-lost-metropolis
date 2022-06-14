@@ -1,12 +1,23 @@
 import { PointerLockControls } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useRef } from "react";
+import { useDeviceSelectors } from "react-device-detect";
 import { Vector3 } from "three"
-import { useEventListener, useKeyPress } from "../../utilities";
-import { CustomPointerLockControls } from "./CustomPointerLockControls";
+import { useEventListener, useKeyPress } from "../../../utilities";
+import { CustomPointerLockControls } from "../CustomPointerLockControls";
+
+export default function DOMControls({mass=1, force=10, friction=2}) {
+    const [selectors, data] = useDeviceSelectors(window.navigator.userAgent)
+    const { isMobile } = selectors
+    return (
+        isMobile ?
+        null :
+        <GameControls mass={mass} force={force} friction={friction}/>
+    )
+}
 
 // WASD / Arrow Keys + Shift (down) + Space (up) + Pointer Lock controls
-export default function GameControls({mass=1, force=10, friction=2}) {
+export function DesktopControls({mass=1, force=10, friction=2}) {
     const gl = useThree((state) => state.gl)
     const cameraVelocityRef = useRef(new Vector3(0, 0, 0));
     const forward1 = useKeyPress("w");
@@ -53,3 +64,7 @@ export default function GameControls({mass=1, force=10, friction=2}) {
         <CustomPointerLockControls/>
     )
 }
+
+// Touch based controls (drag to pan camera, pinch to zoom, double tap to raycast to floor and move to that point)
+// export function TouchControls() {
+    
