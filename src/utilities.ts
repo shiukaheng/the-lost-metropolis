@@ -547,7 +547,7 @@ export function useMagicString(value: MagicString) {
 }
 
 // From: https://usehooks.com/useEventListener/
-export function useEventListener(eventName, handler, element = window) {
+export function useEventListener(eventName, handler, element: any = window) {
     // Create a ref that stores handler
     const savedHandler = useRef();
     // Update ref.current value if handler changes.

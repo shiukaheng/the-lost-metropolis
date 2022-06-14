@@ -30,8 +30,8 @@ import {
     // "target" sets the location of focus, where the object orbits around
     target = new Vector3()
     // How far you can dolly in and out ( PerspectiveCamera only )
-    minDistance = 0
-    maxDistance = Infinity
+    minDistance = 0.1
+    maxDistance = 0.1
     // How far you can zoom in and out ( OrthographicCamera only )
     minZoom = 0
     maxZoom = Infinity
@@ -63,7 +63,8 @@ import {
     // If auto-rotate is enabled, you must call controls.update() in your animation loop
     autoRotate = false
     autoRotateSpeed = 2.0 // 30 seconds per orbit when fps is 60
-    reverseOrbit = false // true if you want to reverse the orbit to mouse drag from left to right = orbits left
+    reverseOrbit = true // true if you want to reverse the orbit to mouse drag from left to right = orbits left
+    groupRef = null
     // The four arrow keys
     keys = { LEFT: 'ArrowLeft', UP: 'ArrowUp', RIGHT: 'ArrowRight', BOTTOM: 'ArrowDown' }
     // Mouse buttons
@@ -103,6 +104,9 @@ import {
       this.target0 = this.target.clone()
       this.position0 = this.object.position.clone()
       this.zoom0 = this.object instanceof PerspectiveCamera ? this.object.zoom : 1
+
+      // Set control defaults from camera
+      this.target = object.getWorldPosition(new Vector3()).add(object.getWorldDirection(new Vector3()).multiplyScalar(0.1))
   
       //
       // public methods
@@ -259,7 +263,11 @@ import {
   
           position.copy(scope.target).add(offset)
   
-          scope.object.lookAt(scope.target)
+          if (this.groupRef && this.groupRef.current) {
+            scope.object.lookAt(scope.target.clone().add(this.groupRef.current.position))
+          } else {
+            scope.object.lookAt(scope.target)
+          }
   
           if (scope.enableDamping === true) {
             sphericalDelta.theta *= 1 - scope.dampingFactor

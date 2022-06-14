@@ -1,19 +1,22 @@
 import { PointerLockControls } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";
-import { useEffect, useRef } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { useDeviceSelectors } from "react-device-detect";
-import { Vector3 } from "three"
+import { useMediaQuery } from "react-responsive";
+import { Vector3, Euler, Raycaster } from "three"
 import { useEventListener, useKeyPress } from "../../../utilities";
+import { defaultViewerContext, ViewerContext } from "../../viewer/ViewerContext";
 import { CustomPointerLockControls } from "../CustomPointerLockControls";
-import { OrbitControls } from "./mobile/OrbitControls";
+import { OrbitControls } from "./mobile/OrbitControlsComponent";
 
 export default function DOMControls({mass=1, force=10, friction=2}) {
     const [selectors, data] = useDeviceSelectors(window.navigator.userAgent)
     const { isMobile } = selectors
+    // const isMobile = useMediaQuery({ query: "(max-width: 768px)" })
     return (
         isMobile ?
-        null :
-        <GameControls mass={mass} force={force} friction={friction}/>
+        <TouchControls/> :
+        <DesktopControls mass={mass} force={force} friction={friction}/>
     )
 }
 
@@ -67,8 +70,33 @@ export function DesktopControls({mass=1, force=10, friction=2}) {
 }
 
 // Touch based controls (drag to pan camera, pinch to zoom, double tap to raycast to floor and move to that point)
-export function TouchControls({orientataionControls=false}) {
+export function TouchControls({cameraOffset=0.1}) {
+    const {defaultCameraProps} = useContext(ViewerContext)
+    const [target, setTarget] = useState(new Vector3(0, 0, 0))
+    useEffect(()=>{
+        const camPos = new Vector3(...defaultCameraProps.position)
+        const camRot = new Euler(...defaultCameraProps.rotation)
+        // Apply rotation to new Vector3 to get lookAt direction vector
+        const lookAt = new Vector3(0, 0, -1).applyEuler(camRot)
+        setTarget(new Vector3(...defaultCameraProps.position).add(lookAt.multiplyScalar(cameraOffset)))
+    }, [defaultCameraProps])
     return (
-        <OrbitControls />
+        <OrbitControls target={target} maxDistance={cameraOffset} minDistance={cameraOffset} dampingFactor={0.2} panSpeed={5} rotateSpeed={0.5}/>
+        // <DoubleTapTeleporter/>
     )
 }
+
+// function DoubleTapTeleporter({}) {
+//     const {camera} = useThree()
+//     const raycasterRef = useRef<Raycaster>()
+//     // Raycast to layer 3
+//     useEffect(()=>{
+//         raycasterRef.current = new Raycaster()
+//         raycasterRef.current.layers.set(3)
+//     }, [])
+//     const teleport = useCallback((x,y) => {
+//         raycasterRef.current.setFromCamera(new Vector2(x,y), camera)
+        
+        
+//     return null
+// }

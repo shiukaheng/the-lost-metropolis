@@ -30,7 +30,7 @@ type TeleportableDestination = {
  * @param maxDeg the maximum angle between the up vector and the normal of the teleport destination for it to be considered valid
  * @returns a TeleportDestination object
  */
-function processIntersections(intersections: Intersection<Object3D>[], upVector=new Vector3(0, 1, 0), maxDeg=10): TeleportDestination {
+export function processIntersections(intersections: Intersection<Object3D>[], upVector=new Vector3(0, 1, 0), maxDeg=10): TeleportDestination {
     for (const intersection of intersections) {
         if (intersection.object.userData.teleportEffect !== undefined) {
             switch (intersection.object.userData.teleportEffect) {
