@@ -16,6 +16,7 @@ import MagicIcon from '../utilities/MagicIcon';
 import { XRRequesterRefExtractor } from '../viewer/ViewportCanvas';
 import { useMediaQuery } from 'react-responsive';
 import { ViewerContext } from '../viewer/ViewerContext';
+import { XRControls } from '../utilities/controls/XRControls';
 
 function XRButtons({supportedXRModes, xrRequesterGetterRef}) {
     const supportAR = supportedXRModes && supportedXRModes.includes("immersive-ar")

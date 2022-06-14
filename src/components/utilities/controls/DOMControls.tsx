@@ -5,6 +5,7 @@ import { useDeviceSelectors } from "react-device-detect";
 import { Vector3 } from "three"
 import { useEventListener, useKeyPress } from "../../../utilities";
 import { CustomPointerLockControls } from "../CustomPointerLockControls";
+import { OrbitControls } from "./mobile/OrbitControls";
 
 export default function DOMControls({mass=1, force=10, friction=2}) {
     const [selectors, data] = useDeviceSelectors(window.navigator.userAgent)
@@ -66,5 +67,8 @@ export function DesktopControls({mass=1, force=10, friction=2}) {
 }
 
 // Touch based controls (drag to pan camera, pinch to zoom, double tap to raycast to floor and move to that point)
-// export function TouchControls() {
-    
+export function TouchControls({orientataionControls=false}) {
+    return (
+        <OrbitControls />
+    )
+}

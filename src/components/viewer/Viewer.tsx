@@ -123,7 +123,7 @@ function ViewerUI({post, children, ...props}: ViewerProps) {
     }, [post])
     return (    
         <Viewport {...props}>
-            <XRLocomotion/>
+            <XRControls/>
             {sceneChildren}
             {children}
         </Viewport>
