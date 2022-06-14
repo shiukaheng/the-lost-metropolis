@@ -1,6 +1,6 @@
 import { PointerLockControls } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useDeviceSelectors } from "react-device-detect";
 import { useMediaQuery } from "react-responsive";
 import { Vector3, Euler, Raycaster } from "three"
@@ -34,8 +34,10 @@ export function DesktopControls({mass=1, force=10, friction=2}) {
     const right2 = useKeyPress("ArrowRight");
     const up = useKeyPress(" ");
     const down = useKeyPress("Shift");
+    const deltaVelocity = useMemo(() => new Vector3(0, 0, 0), []);
     useFrame(({camera}, delta) => {
-        const deltaVelocity = new Vector3(0, 0, 0);
+        // const deltaVelocity = new Vector3(0, 0, 0);
+        deltaVelocity.set(0, 0, 0);
         // Start of as force vector in camera local space
         (forward1 || forward2) && (deltaVelocity.z -= 1);
         (backward1 || backward2) && (deltaVelocity.z += 1);
