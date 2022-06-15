@@ -32,6 +32,7 @@ export function useCameraUpdateHelper() {
             camera.fov = defaultCameraProps.fov
             camera.updateProjectionMatrix()
         }
+        console.log("Camera updated", camera.position, camera.rotation)
     }, [])
 }
 
@@ -41,6 +42,10 @@ export function useXRCameraUpdateHelper() {
     useLayoutEffect(()=>{
         player.position.set(...defaultXRCameraProps.position)
         player.rotation.set(...defaultXRCameraProps.rotation)
+        return ()=>{
+            player.position.set(0,0,0)
+            player.rotation.set(0,0,0)
+        }
     }, [])
 }
 

@@ -75,7 +75,6 @@ export function DesktopControls({mass=1, force=10, friction=2}) {
 
 // Touch based controls (drag to pan camera, pinch to zoom, double tap to raycast to floor and move to that point)
 export function TouchControls({cameraOffset=0.1}) {
-    useCameraUpdateHelper()
     const {xrMode} = useContext(ViewerContext)
     return (
         xrMode ?
