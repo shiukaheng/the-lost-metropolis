@@ -74,10 +74,14 @@ export function DesktopControls({mass=1, force=10, friction=2}) {
 // Touch based controls (drag to pan camera, pinch to zoom, double tap to raycast to floor and move to that point)
 export function TouchControls({cameraOffset=0.1}) {
     const {defaultCameraProps, xrMode} = useContext(ViewerContext)
-    const [target, setTarget] = useState(new Vector3(0, 0, 0))
+    const [target, setTarget] = useState<[number, number, number]>([0,0,0])
+    useEffect(()=>{
+        console.log("Default position changed", defaultCameraProps.position)
+        setTarget(defaultCameraProps.position)
+    }, [defaultCameraProps.position])
     return (
         xrMode ?
         null :
-        <OrbitControls maxDistance={cameraOffset} minDistance={cameraOffset} dampingFactor={0.2} panSpeed={5} rotateSpeed={0.5}/>
+        <OrbitControls maxDistance={cameraOffset} minDistance={cameraOffset} dampingFactor={0.2} panSpeed={5} rotateSpeed={0.5} target={target}/>
     )
 }

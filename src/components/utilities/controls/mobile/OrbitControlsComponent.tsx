@@ -1,7 +1,7 @@
 import { EventManager, ReactThreeFiber, useFrame, useThree } from '@react-three/fiber'
 import * as React from 'react'
 import { useRef } from 'react'
-import { Camera, Event, Group, MathUtils, Object3D, Raycaster, Vector3 } from 'three'
+import { Camera, Event, Group, MathUtils, Matrix4, Object3D, Raycaster, Vector3 } from 'three'
 import { useEventListener } from '../../../../utilities'
 import { processIntersections } from '../XRControls'
 import { OrbitControls as OrbitControlsImpl } from "./orbitControls"
@@ -40,37 +40,15 @@ export const OrbitControls = React.forwardRef<OrbitControlsImpl, OrbitControlsPr
     const explDomElement = (domElement || events.connected || gl.domElement) as HTMLElement
     const controls = React.useMemo(() => new OrbitControlsImpl(explCamera), [explCamera])
 
+    window.logCamPos = React.useCallback(() => {
+      console.log(explCamera.position.toArray())
+    } , [explCamera])
+
     useFrame(() => {
       if (controls.enabled) controls.update()
     }, -1)
 
-    // Move the camera into a group for easy translation, and on unmount, remove the group and set the camera to the appropriate position
-    const groupRef = useRef<Group>(new Group())
-    const originalParentRef = useRef<Object3D>()
-    React.useEffect(()=>{
-      if(!explCamera.parent) return
-      originalParentRef.current = explCamera.parent
-      explCamera.parent.remove(explCamera)
-      groupRef.current.add(explCamera)
-      originalParentRef.current.add(groupRef.current)
-      return () => {
-        if ((!(groupRef.current.parent)) || (!(originalParentRef.current))) return
-        // Compute camera transform and move the camera back to the original parent
-        const groupTransform = groupRef.current.matrixWorld
-        const cameraTransform = explCamera.matrixWorld
-        const newCameraTransform = groupTransform.clone().invert().multiply(cameraTransform)
-        // Remove the group from the scene
-        groupRef.current.parent.remove(groupRef.current)
-        // Move the camera back to the original parent
-        explCamera.removeFromParent()
-        originalParentRef.current.add(explCamera)
-        // Move the camera back to the original position
-        explCamera.matrixWorld.copy(newCameraTransform)
-      }
-    }, [explCamera])
-
-    const positionOffsetTarget = useRef<Vector3>(new Vector3())
-    // const lookAtTargetOffsetTarget = useRef<Vector3>(new Vector3())
+    const [offsetTarget, setOffsetTarget] = React.useState<[number, number, number]>([0, 0, 0])
 
     // Raycast to layer 3 on double-taps
     const raycaster = React.useMemo(() => {
@@ -92,22 +70,18 @@ export const OrbitControls = React.forwardRef<OrbitControlsImpl, OrbitControlsPr
         const floor = processIntersections(intersects)
         if (floor.valid && floor.position) {
           // Preserving floor height (which is NOT absolute height), move the camera from the current position to the destination position
-          positionOffsetTarget.current.copy(destination.position).sub(floor.position)
+          // positionOffsetTarget.current.copy(destination.position).sub(floor.position)
+          const offset = destination.position.clone().sub(floor.position)
+          setOffsetTarget(offset.toArray())
         } else {
           // No current floor found, just move the camera to the destination position from camera position
-          positionOffsetTarget.current.copy(destination.position).sub(explCamera.getWorldPosition(new Vector3()))
+          // positionOffsetTarget.current.copy(destination.position).sub(explCamera.getWorldPosition(new Vector3()))
+          const offset = destination.position.clone().sub(explCamera.getWorldPosition(new Vector3()))
+          setOffsetTarget(offset.toArray())
         }
+        console.log('Double-tap detected, moving camera to', offsetTarget)
       }
-    }, [explCamera, explDomElement])
-
-    // Sync camera group position with positionOffsetTarget, with damping
-    useFrame((state, dt) => {
-      if (positionOffsetTarget.current && groupRef.current) {
-        groupRef.current.position.x = MathUtils.damp(groupRef.current.position.x, positionOffsetTarget.current.x, locomotionLambda, dt)
-        groupRef.current.position.y = MathUtils.damp(groupRef.current.position.y, positionOffsetTarget.current.y, locomotionLambda, dt)
-        groupRef.current.position.z = MathUtils.damp(groupRef.current.position.z, positionOffsetTarget.current.z, locomotionLambda, dt)
-      }
-    })
+    }, [explCamera, explDomElement, offsetTarget])
 
     const lastTapTime = useRef<number | null>(null)
 
@@ -157,6 +131,6 @@ export const OrbitControls = React.forwardRef<OrbitControlsImpl, OrbitControlsPr
       }
     }, [makeDefault, controls])
 
-    return <primitive ref={ref} groupRef={groupRef} object={controls} enableDamping={enableDamping} {...restProps} />
+    return <primitive ref={ref} object={controls} enableDamping={enableDamping} {...restProps} />
   }
 )

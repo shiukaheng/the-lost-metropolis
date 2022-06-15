@@ -10,54 +10,38 @@ import { InteractionManager, useXR, XR } from "@react-three/xr"
 import { twMerge } from "tailwind-merge"
 import { useEventListener } from "../../utilities"
 
+export function useCameraUpdateHelper() {
+    const {defaultCameraProps} = useContext(ViewerContext)
+    const {camera} = useThree()
+    useLayoutEffect(()=>{
+        camera.position.set(...defaultCameraProps.position)
+        camera.rotation.set(...defaultCameraProps.rotation)
+    }, [defaultCameraProps])
+}
+
+export function useXRCameraUpdateHelper() {
+    const {defaultXRCameraProps} = useContext(ViewerContext)
+    const {player} = useXR()
+    useLayoutEffect(()=>{
+        player.position.set(...defaultXRCameraProps.position)
+        player.rotation.set(...defaultXRCameraProps.rotation)
+    }, [defaultXRCameraProps])
+}
+
 /**
  * Helper component that helps ViewerManager set camera position during mount, and keep audio listener with camera.
  * @returns 
  */
 function CameraHelper() {
-    const {defaultCameraProps, defaultXRCameraProps, cameraRef, audioListener, xrMode} = useContext(ViewerContext)
+    const {cameraRef, audioListener} = useContext(ViewerContext)
     const { camera, gl } = useThree()
-    // Keep camera reference up to date, and move camera back to starting pose if camera updated / pose updated (hacky, but works)
-    // Todo: Allow different poses for XR and non-XR
+    // Keep camera reference in ViewerContext up to date
     useLayoutEffect(()=>{
         cameraRef.current = camera
-        if (camera) {
-            if (defaultCameraProps.position) {
-                camera.position.fromArray(defaultCameraProps.position)
-            }
-            if (defaultCameraProps.rotation) {
-                camera.rotation.fromArray(defaultCameraProps.rotation)
-            }
-            if (defaultCameraProps.fov) {
-                camera.fov = defaultCameraProps.fov
-            }
-            if (defaultCameraProps.position || defaultCameraProps.rotation || defaultCameraProps.fov) {
-                camera.updateProjectionMatrix()
-            }
-        }
-    }, [defaultCameraProps, defaultXRCameraProps, camera, xrMode])
-    const {player} = useXR()
-    useLayoutEffect(()=>{
-        if (player && xrMode !== null) {
-            cameraRef.current?.position.set(0, 0, 0)
-            cameraRef.current?.rotation.set(0, 0, 0)
-            cameraRef.current?.updateProjectionMatrix()
-            if (defaultXRCameraProps.position) {
-                player.position.fromArray(defaultXRCameraProps.position)
-            }
-            if (defaultXRCameraProps.rotation) {
-                player.rotation.fromArray(defaultXRCameraProps.rotation)
-            }
-        }
-        if (xrMode === null) {
-            player.position.set(0,0,0)
-            player.rotation.set(0,0,0)
-        }
-    }, [player, xrMode])
-    // Keep audio listener reference up to date
+    }, [cameraRef])
+    // Keep audio listener attached to camera
     useLayoutEffect(()=>{
         if (camera) {
-            audioListener.removeFromParent()
             camera.add(audioListener)
         }
         return ()=>{

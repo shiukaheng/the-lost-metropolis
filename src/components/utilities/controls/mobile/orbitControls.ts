@@ -28,7 +28,7 @@ import {
     // Set to false to disable this control
     enabled = true
     // "target" sets the location of focus, where the object orbits around
-    target = new Vector3()
+    _target = new Vector3()
     // How far you can dolly in and out ( PerspectiveCamera only )
     minDistance = 0.1
     maxDistance = 0.1
@@ -59,12 +59,7 @@ import {
     panSpeed = 1.0
     screenSpacePanning = true // if false, pan orthogonal to world-space direction camera.up
     keyPanSpeed = 7.0 // pixels moved per arrow key push
-    // Set to true to automatically rotate around the target
-    // If auto-rotate is enabled, you must call controls.update() in your animation loop
-    autoRotate = false
-    autoRotateSpeed = 2.0 // 30 seconds per orbit when fps is 60
     reverseOrbit = true // true if you want to reverse the orbit to mouse drag from left to right = orbits left
-    groupRef = null
     // The four arrow keys
     keys = { LEFT: 'ArrowLeft', UP: 'ArrowUp', RIGHT: 'ArrowRight', BOTTOM: 'ArrowDown' }
     // Mouse buttons
@@ -101,12 +96,12 @@ import {
       this.domElement = domElement
   
       // for reset
-      this.target0 = this.target.clone()
+      this.target0 = this._target.clone()
       this.position0 = this.object.position.clone()
       this.zoom0 = this.object instanceof PerspectiveCamera ? this.object.zoom : 1
 
       // Set control defaults from camera
-      this.target = object.getWorldPosition(new Vector3()).add(object.getWorldDirection(new Vector3()).multiplyScalar(0.1))
+      // this._target = object.getWorldPosition(new Vector3()).add(object.getWorldDirection(new Vector3()).multiplyScalar(0.1))
       console.log("Set default target")
   
       //
@@ -157,7 +152,7 @@ import {
         scope.update()
       }
   
-      this.getDistance = (): number => scope.object.position.distanceTo(scope.target)
+      this.getDistance = (): number => scope.object.position.distanceTo(scope._target)
   
       this.listenToKeyEvents = (domElement: HTMLElement): void => {
         domElement.addEventListener('keydown', onKeyDown)
@@ -165,13 +160,13 @@ import {
       }
   
       this.saveState = (): void => {
-        scope.target0.copy(scope.target)
+        scope.target0.copy(scope._target)
         scope.position0.copy(scope.object.position)
         scope.zoom0 = scope.object instanceof PerspectiveCamera ? scope.object.zoom : 1
       }
   
       this.reset = (): void => {
-        scope.target.copy(scope.target0)
+        scope._target.copy(scope.target0)
         scope.object.position.copy(scope.position0)
         if (scope.object instanceof PerspectiveCamera) {
           scope.object.zoom = scope.zoom0
@@ -201,17 +196,13 @@ import {
         return function update(): boolean {
           const position = scope.object.position
   
-          offset.copy(position).sub(scope.target)
+          offset.copy(position).sub(scope._target)
   
           // rotate offset to "y-axis-is-up" space
           offset.applyQuaternion(quat)
   
           // angle from z-axis around y-axis
           spherical.setFromVector3(offset)
-  
-          if (scope.autoRotate && state === STATE.NONE) {
-            rotateLeft(getAutoRotationAngle())
-          }
   
           if (scope.enableDamping) {
             spherical.theta += sphericalDelta.theta * scope.dampingFactor
@@ -252,9 +243,9 @@ import {
           // move target to panned location
   
           if (scope.enableDamping === true) {
-            scope.target.addScaledVector(panOffset, scope.dampingFactor)
+            scope._target.addScaledVector(panOffset, scope.dampingFactor)
           } else {
-            scope.target.add(panOffset)
+            scope._target.add(panOffset)
           }
   
           offset.setFromSpherical(spherical)
@@ -262,16 +253,11 @@ import {
           // rotate offset back to "camera-up-vector-is-up" space
           offset.applyQuaternion(quatInverse)
   
-          position.copy(scope.target).add(offset)
+
+          // KEY PART THAT CONTROLS CAMERA POSITION
+          position.copy(scope._target).add(offset)
   
-          if (this.groupRef && this.groupRef.current) {
-            const target = scope.target.clone().add(this.groupRef.current.position)
-            scope.object.lookAt(target)
-            // console.log("group", target)
-          } else {
-            scope.object.lookAt(scope.target)
-            // console.log("no group", scope.target)
-          }
+          scope.object.lookAt(scope._target)
   
           if (scope.enableDamping === true) {
             sphericalDelta.theta *= 1 - scope.dampingFactor
@@ -386,9 +372,9 @@ import {
   
       const pointers: PointerEvent[] = []
       const pointerPositions: { [key: string]: Vector2 } = {}
-  
-      function getAutoRotationAngle(): number {
-        return ((2 * Math.PI) / 60 / 60) * scope.autoRotateSpeed
+
+      window.logTarget = ()=>{
+        console.log(this._target)
       }
   
       function getZoomScale(): number {
@@ -441,7 +427,7 @@ import {
   
       // deltaX and deltaY are in pixels; right and down are positive
       const pan = (() => {
-        const offset = new Vector3()
+        const offset = new Vector3() 
   
         return function pan(deltaX: number, deltaY: number) {
           const element = scope.domElement
@@ -449,7 +435,7 @@ import {
           if (element && scope.object instanceof PerspectiveCamera && scope.object.isPerspectiveCamera) {
             // perspective
             const position = scope.object.position
-            offset.copy(position).sub(scope.target)
+            offset.copy(position).sub(scope._target)
             let targetDistance = offset.length()
   
             // half of the fov is center to top of screen
@@ -970,6 +956,17 @@ import {
       if (domElement !== undefined) this.connect(domElement)
       // force an update at start
       this.update()
+
+      
+    }
+
+    get target() {
+      return this._target
+    }
+
+    set target(value) {
+      this._target = value
+      console.log("target set", value)
     }
   }
   
