@@ -6,6 +6,7 @@ import { useMediaQuery } from "react-responsive";
 import { Vector3, Euler, Raycaster } from "three"
 import { useEventListener, useKeyPress } from "../../../utilities";
 import { defaultViewerContext, ViewerContext } from "../../viewer/ViewerContext";
+import { useCameraUpdateHelper } from "../../viewer/ViewportCanvas";
 import { CustomPointerLockControls } from "../CustomPointerLockControls";
 import { OrbitControls } from "./mobile/OrbitControlsComponent";
 
@@ -22,6 +23,7 @@ export default function DOMControls({mass=1, force=10, friction=2}) {
 
 // WASD / Arrow Keys + Shift (down) + Space (up) + Pointer Lock controls
 export function DesktopControls({mass=1, force=10, friction=2}) {
+    useCameraUpdateHelper()
     const gl = useThree((state) => state.gl)
     const cameraVelocityRef = useRef(new Vector3(0, 0, 0));
     const forward1 = useKeyPress("w");
@@ -73,6 +75,7 @@ export function DesktopControls({mass=1, force=10, friction=2}) {
 
 // Touch based controls (drag to pan camera, pinch to zoom, double tap to raycast to floor and move to that point)
 export function TouchControls({cameraOffset=0.1}) {
+    useCameraUpdateHelper()
     const {defaultCameraProps, xrMode} = useContext(ViewerContext)
     const [target, setTarget] = useState<[number, number, number]>([0,0,0])
     useEffect(()=>{

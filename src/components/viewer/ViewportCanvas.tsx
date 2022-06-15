@@ -9,6 +9,17 @@ import { SettingsContext, ThemeContext } from "../App"
 import { InteractionManager, useXR, XR } from "@react-three/xr"
 import { twMerge } from "tailwind-merge"
 import { useEventListener } from "../../utilities"
+import { PerspectiveCamera } from "three"
+
+export function GenericCameraUpdater() {
+    useCameraUpdateHelper()
+    return null
+}
+
+export function GenericXRCameraUpdater() {
+    useXRCameraUpdateHelper()
+    return null
+}
 
 export function useCameraUpdateHelper() {
     const {defaultCameraProps} = useContext(ViewerContext)
@@ -16,7 +27,12 @@ export function useCameraUpdateHelper() {
     useLayoutEffect(()=>{
         camera.position.set(...defaultCameraProps.position)
         camera.rotation.set(...defaultCameraProps.rotation)
-    }, [defaultCameraProps])
+        console.log(camera, defaultCameraProps)
+        if (camera instanceof PerspectiveCamera) {
+            camera.fov = defaultCameraProps.fov
+            camera.updateProjectionMatrix()
+        }
+    }, [])
 }
 
 export function useXRCameraUpdateHelper() {
@@ -25,7 +41,7 @@ export function useXRCameraUpdateHelper() {
     useLayoutEffect(()=>{
         player.position.set(...defaultXRCameraProps.position)
         player.rotation.set(...defaultXRCameraProps.rotation)
-    }, [defaultXRCameraProps])
+    }, [])
 }
 
 /**

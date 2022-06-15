@@ -16,6 +16,7 @@ import imageUrl2 from "./Home/media/signs2.jpg"
 import wavesUrl from "./Home/media/waves.jpg"
 import { Image } from '../utilities/modifiedDrei/Image'
 import { useTexture } from '../utilities/modifiedDrei/useTexture'
+import { GenericCameraUpdater } from '../viewer/ViewportCanvas'
 
 function Home() {
     const { settings } = useContext(SettingsContext) // Somehow the settings context is not being passed down to the children if its inside of Scroll
@@ -80,6 +81,7 @@ function Home() {
                 rotation: [0, 0, 0],
                 fov: 30
             }}>
+                <GenericCameraUpdater/>
                 {
                     opaque && <DisableRender />
                 }

@@ -10,6 +10,7 @@ import { ViewerContext } from "../../viewer/ViewerContext";
 import { DefaultXRControllers } from "../controls/DefaultXRControllers";
 import { TargetEffect } from "../../3d/template_types.ts/TeleportTargetComponent";
 import { useRefContext, useThreeEventListener } from "../../../utilities";
+import { GenericXRCameraUpdater, useXRCameraUpdateHelper } from "../../viewer/ViewportCanvas";
 
 type TeleportDestination = {
     valid: boolean,
@@ -476,11 +477,15 @@ export function XRControls(
     // Binding for VR teleportation triggers
 
     // Todo: Subcomponents for visualizing AR teleportation target, and VR parabola and target.
-
     return (
         <Fragment>
             <DefaultXRControllers/>
             <VRVisualizer targetTraceRef={parabolicRaycastFrameRef} maxSegments={maxParabolicSegments}/>
+            {
+                (xrMode !== null) ?
+                <GenericXRCameraUpdater/>
+                : null 
+            }
         </Fragment> 
     )
 }
