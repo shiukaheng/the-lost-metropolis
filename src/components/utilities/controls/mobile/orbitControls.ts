@@ -4,6 +4,7 @@ import {
     EventDispatcher,
     Matrix4,
     MOUSE,
+    Object3D,
     OrthographicCamera,
     PerspectiveCamera,
     Quaternion,
@@ -23,12 +24,12 @@ import {
   const moduloWrapAround = (offset: number, capacity: number) => ((offset % capacity) + capacity) % capacity
   
   class OrbitControls extends EventDispatcher {
-    object: Camera
+    controlObject: Object3D
     domElement: HTMLElement | undefined
     // Set to false to disable this control
     enabled = true
     // "target" sets the location of focus, where the object orbits around
-    _target = new Vector3()
+    target: Object3D
     // How far you can dolly in and out ( PerspectiveCamera only )
     minDistance = 0.1
     maxDistance = 0.1
@@ -84,25 +85,16 @@ import {
   
     listenToKeyEvents: (domElement: HTMLElement) => void
     saveState: () => void
-    reset: () => void
     update: () => void
     connect: (domElement: HTMLElement) => void
     dispose: () => void
   
-    constructor(object: Camera, domElement?: HTMLElement) {
+    constructor(object: Object3D, domElement?: HTMLElement) {
       super()
   
-      this.object = object
+      this.controlObject = object
       this.domElement = domElement
-  
-      // for reset
-      this.target0 = this._target.clone()
-      this.position0 = this.object.position.clone()
-      this.zoom0 = this.object instanceof PerspectiveCamera ? this.object.zoom : 1
-
-      // Set control defaults from camera
-      // this._target = object.getWorldPosition(new Vector3()).add(object.getWorldDirection(new Vector3()).multiplyScalar(0.1))
-      console.log("Set default target")
+      console.log(object)
   
       //
       // public methods
@@ -152,7 +144,7 @@ import {
         scope.update()
       }
   
-      this.getDistance = (): number => scope.object.position.distanceTo(scope._target)
+      this.getDistance = (): number => scope.controlObject.position.distanceTo(scope.target.position)
   
       this.listenToKeyEvents = (domElement: HTMLElement): void => {
         domElement.addEventListener('keydown', onKeyDown)
@@ -160,24 +152,9 @@ import {
       }
   
       this.saveState = (): void => {
-        scope.target0.copy(scope._target)
-        scope.position0.copy(scope.object.position)
-        scope.zoom0 = scope.object instanceof PerspectiveCamera ? scope.object.zoom : 1
-      }
-  
-      this.reset = (): void => {
-        scope._target.copy(scope.target0)
-        scope.object.position.copy(scope.position0)
-        if (scope.object instanceof PerspectiveCamera) {
-          scope.object.zoom = scope.zoom0
-          scope.object.updateProjectionMatrix()
-        }
-  
-        scope.dispatchEvent(changeEvent)
-  
-        scope.update()
-  
-        state = STATE.NONE
+        scope.target0.copy(scope.target.position)
+        scope.position0.copy(scope.controlObject.position)
+        scope.zoom0 = scope.controlObject instanceof PerspectiveCamera ? scope.controlObject.zoom : 1
       }
   
       // this method is exposed, but perhaps it would be better if we can make it private...
@@ -194,9 +171,13 @@ import {
         const twoPI = 2 * Math.PI
   
         return function update(): boolean {
-          const position = scope.object.position
+          if (!this.target || !object) {
+            return false
+          }
+
+          const position = scope.controlObject.position
   
-          offset.copy(position).sub(scope._target)
+          offset.copy(position).sub(scope.target.position)
   
           // rotate offset to "y-axis-is-up" space
           offset.applyQuaternion(quat)
@@ -206,10 +187,10 @@ import {
   
           if (scope.enableDamping) {
             spherical.theta += sphericalDelta.theta * scope.dampingFactor
-            spherical.phi += sphericalDelta.phi * scope.dampingFactor
+            spherical.phi -= sphericalDelta.phi * scope.dampingFactor // I dont even want to know why I need to negate this.. But AHH AS LONG AS IT WORKS RELIABLY!
           } else {
             spherical.theta += sphericalDelta.theta
-            spherical.phi += sphericalDelta.phi
+            spherical.phi -= sphericalDelta.phi
           }
   
           // restrict theta to be between desired limits
@@ -243,9 +224,9 @@ import {
           // move target to panned location
   
           if (scope.enableDamping === true) {
-            scope._target.addScaledVector(panOffset, scope.dampingFactor)
+            scope.target.position.addScaledVector(panOffset, scope.dampingFactor)
           } else {
-            scope._target.add(panOffset)
+            scope.target.position.add(panOffset)
           }
   
           offset.setFromSpherical(spherical)
@@ -255,9 +236,9 @@ import {
   
 
           // KEY PART THAT CONTROLS CAMERA POSITION
-          position.copy(scope._target).add(offset)
+          position.copy(scope.target.position).add(offset)
   
-          scope.object.lookAt(scope._target)
+          scope.controlObject.lookAt(scope.target.getWorldPosition(new Vector3()))
   
           if (scope.enableDamping === true) {
             sphericalDelta.theta *= 1 - scope.dampingFactor
@@ -278,13 +259,13 @@ import {
   
           if (
             zoomChanged ||
-            lastPosition.distanceToSquared(scope.object.position) > EPS ||
-            8 * (1 - lastQuaternion.dot(scope.object.quaternion)) > EPS
+            lastPosition.distanceToSquared(scope.controlObject.position) > EPS ||
+            8 * (1 - lastQuaternion.dot(scope.controlObject.quaternion)) > EPS
           ) {
             scope.dispatchEvent(changeEvent)
   
-            lastPosition.copy(scope.object.position)
-            lastQuaternion.copy(scope.object.quaternion)
+            lastPosition.copy(scope.controlObject.position)
+            lastQuaternion.copy(scope.controlObject.quaternion)
             zoomChanged = false
   
             return true
@@ -372,10 +353,6 @@ import {
   
       const pointers: PointerEvent[] = []
       const pointerPositions: { [key: string]: Vector2 } = {}
-
-      window.logTarget = ()=>{
-        console.log(this._target)
-      }
   
       function getZoomScale(): number {
         return Math.pow(0.95, scope.zoomSpeed)
@@ -416,7 +393,7 @@ import {
             v.setFromMatrixColumn(objectMatrix, 1)
           } else {
             v.setFromMatrixColumn(objectMatrix, 0)
-            v.crossVectors(scope.object.up, v)
+            v.crossVectors(scope.controlObject.up, v)
           }
   
           v.multiplyScalar(distance)
@@ -432,27 +409,27 @@ import {
         return function pan(deltaX: number, deltaY: number) {
           const element = scope.domElement
   
-          if (element && scope.object instanceof PerspectiveCamera && scope.object.isPerspectiveCamera) {
+          if (element && scope.controlObject instanceof PerspectiveCamera && scope.controlObject.isPerspectiveCamera) {
             // perspective
-            const position = scope.object.position
-            offset.copy(position).sub(scope._target)
+            const position = scope.controlObject.position
+            offset.copy(position).sub(scope.target.position)
             let targetDistance = offset.length()
   
             // half of the fov is center to top of screen
-            targetDistance *= Math.tan(((scope.object.fov / 2) * Math.PI) / 180.0)
+            targetDistance *= Math.tan(((scope.controlObject.fov / 2) * Math.PI) / 180.0)
   
             // we use only clientHeight here so aspect ratio does not distort speed
-            panLeft((2 * deltaX * targetDistance) / element.clientHeight, scope.object.matrix)
-            panUp((2 * deltaY * targetDistance) / element.clientHeight, scope.object.matrix)
-          } else if (element && scope.object instanceof OrthographicCamera && scope.object.isOrthographicCamera) {
+            panLeft((2 * deltaX * targetDistance) / element.clientHeight, scope.controlObject.matrix)
+            panUp((2 * deltaY * targetDistance) / element.clientHeight, scope.controlObject.matrix)
+          } else if (element && scope.controlObject instanceof OrthographicCamera && scope.controlObject.isOrthographicCamera) {
             // orthographic
             panLeft(
-              (deltaX * (scope.object.right - scope.object.left)) / scope.object.zoom / element.clientWidth,
-              scope.object.matrix,
+              (deltaX * (scope.controlObject.right - scope.controlObject.left)) / scope.controlObject.zoom / element.clientWidth,
+              scope.controlObject.matrix,
             )
             panUp(
-              (deltaY * (scope.object.top - scope.object.bottom)) / scope.object.zoom / element.clientHeight,
-              scope.object.matrix,
+              (deltaY * (scope.controlObject.top - scope.controlObject.bottom)) / scope.controlObject.zoom / element.clientHeight,
+              scope.controlObject.matrix,
             )
           } else {
             // camera neither orthographic nor perspective
@@ -463,11 +440,11 @@ import {
       })()
   
       function dollyOut(dollyScale: number) {
-        if (scope.object instanceof PerspectiveCamera && scope.object.isPerspectiveCamera) {
+        if (scope.controlObject instanceof PerspectiveCamera && scope.controlObject.isPerspectiveCamera) {
           scale /= dollyScale
-        } else if (scope.object instanceof OrthographicCamera && scope.object.isOrthographicCamera) {
-          scope.object.zoom = Math.max(scope.minZoom, Math.min(scope.maxZoom, scope.object.zoom * dollyScale))
-          scope.object.updateProjectionMatrix()
+        } else if (scope.controlObject instanceof OrthographicCamera && scope.controlObject.isOrthographicCamera) {
+          scope.controlObject.zoom = Math.max(scope.minZoom, Math.min(scope.maxZoom, scope.controlObject.zoom * dollyScale))
+          scope.controlObject.updateProjectionMatrix()
           zoomChanged = true
         } else {
           console.warn('WARNING: OrbitControls.js encountered an unknown camera type - dolly/zoom disabled.')
@@ -476,11 +453,11 @@ import {
       }
   
       function dollyIn(dollyScale: number) {
-        if (scope.object instanceof PerspectiveCamera && scope.object.isPerspectiveCamera) {
+        if (scope.controlObject instanceof PerspectiveCamera && scope.controlObject.isPerspectiveCamera) {
           scale *= dollyScale
-        } else if (scope.object instanceof OrthographicCamera && scope.object.isOrthographicCamera) {
-          scope.object.zoom = Math.max(scope.minZoom, Math.min(scope.maxZoom, scope.object.zoom / dollyScale))
-          scope.object.updateProjectionMatrix()
+        } else if (scope.controlObject instanceof OrthographicCamera && scope.controlObject.isOrthographicCamera) {
+          scope.controlObject.zoom = Math.max(scope.minZoom, Math.min(scope.maxZoom, scope.controlObject.zoom / dollyScale))
+          scope.controlObject.updateProjectionMatrix()
           zoomChanged = true
         } else {
           console.warn('WARNING: OrbitControls.js encountered an unknown camera type - dolly/zoom disabled.')
@@ -958,15 +935,6 @@ import {
       this.update()
 
       
-    }
-
-    get target() {
-      return this._target
-    }
-
-    set target(value) {
-      this._target = value
-      console.log("target set", value)
     }
   }
   

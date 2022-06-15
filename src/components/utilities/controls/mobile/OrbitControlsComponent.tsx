@@ -1,8 +1,10 @@
 import { EventManager, ReactThreeFiber, useFrame, useThree } from '@react-three/fiber'
 import * as React from 'react'
 import { useRef } from 'react'
-import { Camera, Event, Group, MathUtils, Matrix4, Object3D, Raycaster, Vector3 } from 'three'
+import { Camera, Event, Group, MathUtils, Matrix4, Object3D, Quaternion, Raycaster, Vector3 } from 'three'
 import { useEventListener } from '../../../../utilities'
+import { ViewerContext } from '../../../viewer/ViewerContext'
+import { useCameraUpdateHelper } from '../../../viewer/ViewportCanvas'
 import { processIntersections } from '../XRControls'
 import { OrbitControls as OrbitControlsImpl } from "./orbitControls"
 
@@ -18,16 +20,29 @@ export type OrbitControlsProps = Omit<
       onEnd?: (e?: Event) => void
       onStart?: (e?: Event) => void
       regress?: boolean
-      target?: ReactThreeFiber.Vector3
+      target?: Object3D
       doubleTapMaxDelay?: number
       locomotionLambda?: number
+      cameraOffset?: number
     }
   >,
   'ref'
 >
 
+// To repurpose OrbitControls into our desired TouchControls:
+// Limit the offset length to be a short constant (for a depth effect, and inside-out controls)
+// DON'T put the camera in the group, for less complexity
+// Modify OrbitControls to take a TargetObject instead of a target
+// Create an Object3D, initializing its pose as the scene camera
+// Create a TargetObject, intializing its pose a set distance forward from the Object3D, in the direction the camera is looking
+// Put both Object3D and TargetObject in a group
+// Initialize OrbitControls with a generic Object3D as the camera, and the TargetObject
+// Copy camera position to the Object3D's position
+
+
 export const OrbitControls = React.forwardRef<OrbitControlsImpl, OrbitControlsProps>(
-  ({ makeDefault, camera, regress, domElement, enableDamping = true, onChange, onStart, onEnd, doubleTapMaxDelay=300, locomotionLambda=1.5, ...restProps }, ref) => {
+  ({ makeDefault, camera, regress, domElement, enableDamping = true, onChange, onStart, onEnd, doubleTapMaxDelay=300, locomotionLambda=1.5, cameraOffset=0.1, ...restProps }, ref) => {
+    useCameraUpdateHelper()
     const invalidate = useThree((state) => state.invalidate)
     const defaultCamera = useThree((state) => state.camera)
     const gl = useThree((state) => state.gl)
@@ -40,15 +55,38 @@ export const OrbitControls = React.forwardRef<OrbitControlsImpl, OrbitControlsPr
     const explDomElement = (domElement || events.connected || gl.domElement) as HTMLElement
     const controls = React.useMemo(() => new OrbitControlsImpl(explCamera), [explCamera])
 
-    window.logCamPos = React.useCallback(() => {
-      console.log(explCamera.position.toArray())
-    } , [explCamera])
+    // Initialize objects and group
+    const proxyCamera = React.useMemo(()=>new Object3D(), [])
+    const target = React.useMemo(()=>new Object3D(), [])
+    const transformGroup = React.useMemo(()=>new Group(), [])
+
+    React.useEffect(()=>{
+        proxyCamera.position.copy(explCamera.position)
+        proxyCamera.rotation.copy(explCamera.rotation)
+        // Set the target to be a distance forward from the proxy camera, in the direction the camera is looking
+        const forward = new Vector3(0,0,1)
+        forward.applyQuaternion(proxyCamera.quaternion)
+        target.position.copy(proxyCamera.position).add(forward.multiplyScalar(cameraOffset))
+        transformGroup.add(proxyCamera, target)
+        console.log("Copied camera position to proxy camera position")
+    }, [])
 
     useFrame(() => {
       if (controls.enabled) controls.update()
     }, -1)
 
-    const [offsetTarget, setOffsetTarget] = React.useState<[number, number, number]>([0, 0, 0])
+    const worldPosVec = React.useMemo(()=>new Vector3(), [])
+    const worldQuatVec = React.useMemo(()=>new Quaternion(), [])
+
+    useFrame((state, dt)=>{
+      explCamera.position.copy(proxyCamera.getWorldPosition(worldPosVec))
+      explCamera.quaternion.copy(proxyCamera.getWorldQuaternion(worldQuatVec))
+      transformGroup.position.x = MathUtils.damp(transformGroup.position.x, groupOffsetTarget[0], locomotionLambda, dt)
+      transformGroup.position.y = MathUtils.damp(transformGroup.position.y, groupOffsetTarget[1], locomotionLambda, dt)
+      transformGroup.position.z = MathUtils.damp(transformGroup.position.z, groupOffsetTarget[2], locomotionLambda, dt)
+    })
+
+    const [groupOffsetTarget, setGroupOffsetTarget] = React.useState<[number, number, number]>([0, 0, 0])
 
     // Raycast to layer 3 on double-taps
     const raycaster = React.useMemo(() => {
@@ -72,16 +110,16 @@ export const OrbitControls = React.forwardRef<OrbitControlsImpl, OrbitControlsPr
           // Preserving floor height (which is NOT absolute height), move the camera from the current position to the destination position
           // positionOffsetTarget.current.copy(destination.position).sub(floor.position)
           const offset = destination.position.clone().sub(floor.position)
-          setOffsetTarget(offset.toArray())
+          setGroupOffsetTarget(offset.toArray())
         } else {
           // No current floor found, just move the camera to the destination position from camera position
           // positionOffsetTarget.current.copy(destination.position).sub(explCamera.getWorldPosition(new Vector3()))
           const offset = destination.position.clone().sub(explCamera.getWorldPosition(new Vector3()))
-          setOffsetTarget(offset.toArray())
+          setGroupOffsetTarget(offset.toArray())
         }
-        console.log('Double-tap detected, moving camera to', offsetTarget)
+        console.log('Double-tap detected, moving camera to', groupOffsetTarget)
       }
-    }, [explCamera, explDomElement, offsetTarget])
+    }, [explCamera, explDomElement, groupOffsetTarget])
 
     const lastTapTime = useRef<number | null>(null)
 
@@ -131,6 +169,6 @@ export const OrbitControls = React.forwardRef<OrbitControlsImpl, OrbitControlsPr
       }
     }, [makeDefault, controls])
 
-    return <primitive ref={ref} object={controls} enableDamping={enableDamping} {...restProps} />
+    return <primitive ref={ref} object={controls} target={target} controlObject={proxyCamera} enableDamping={enableDamping} {...restProps} />
   }
 )

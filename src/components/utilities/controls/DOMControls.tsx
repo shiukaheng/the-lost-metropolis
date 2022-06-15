@@ -3,7 +3,7 @@ import { useFrame, useThree } from "@react-three/fiber";
 import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useDeviceSelectors } from "react-device-detect";
 import { useMediaQuery } from "react-responsive";
-import { Vector3, Euler, Raycaster } from "three"
+import { Vector3, Euler, Raycaster, Object3D } from "three"
 import { useEventListener, useKeyPress } from "../../../utilities";
 import { defaultViewerContext, ViewerContext } from "../../viewer/ViewerContext";
 import { useCameraUpdateHelper } from "../../viewer/ViewportCanvas";
@@ -76,15 +76,10 @@ export function DesktopControls({mass=1, force=10, friction=2}) {
 // Touch based controls (drag to pan camera, pinch to zoom, double tap to raycast to floor and move to that point)
 export function TouchControls({cameraOffset=0.1}) {
     useCameraUpdateHelper()
-    const {defaultCameraProps, xrMode} = useContext(ViewerContext)
-    const [target, setTarget] = useState<[number, number, number]>([0,0,0])
-    useEffect(()=>{
-        console.log("Default position changed", defaultCameraProps.position)
-        setTarget(defaultCameraProps.position)
-    }, [defaultCameraProps.position])
+    const {xrMode} = useContext(ViewerContext)
     return (
         xrMode ?
         null :
-        <OrbitControls maxDistance={cameraOffset} minDistance={cameraOffset} dampingFactor={0.2} panSpeed={5} rotateSpeed={0.5} target={target}/>
+        <OrbitControls maxDistance={cameraOffset} minDistance={cameraOffset} dampingFactor={0.2} panSpeed={5} rotateSpeed={0.5}/>
     )
 }

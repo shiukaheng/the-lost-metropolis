@@ -27,7 +27,7 @@ export function useCameraUpdateHelper() {
     useLayoutEffect(()=>{
         camera.position.set(...defaultCameraProps.position)
         camera.rotation.set(...defaultCameraProps.rotation)
-        console.log(camera, defaultCameraProps)
+        // console.log(camera, defaultCameraProps)
         if (camera instanceof PerspectiveCamera) {
             camera.fov = defaultCameraProps.fov
             camera.updateProjectionMatrix()
@@ -84,7 +84,7 @@ function XRHelper() {
             }
 
             session.addEventListener("end", onSessionEnd)
-            console.log(session)
+            // console.log(session)
             gl.xr.setSession(session).then(()=>{
                 xrSessionRef.current = session
                 _setXrMode(mode)
