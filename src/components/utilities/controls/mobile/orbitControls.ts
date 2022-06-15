@@ -107,6 +107,7 @@ import {
 
       // Set control defaults from camera
       this.target = object.getWorldPosition(new Vector3()).add(object.getWorldDirection(new Vector3()).multiplyScalar(0.1))
+      console.log("Set default target")
   
       //
       // public methods
@@ -264,9 +265,12 @@ import {
           position.copy(scope.target).add(offset)
   
           if (this.groupRef && this.groupRef.current) {
-            scope.object.lookAt(scope.target.clone().add(this.groupRef.current.position))
+            const target = scope.target.clone().add(this.groupRef.current.position)
+            scope.object.lookAt(target)
+            // console.log("group", target)
           } else {
             scope.object.lookAt(scope.target)
+            // console.log("no group", scope.target)
           }
   
           if (scope.enableDamping === true) {

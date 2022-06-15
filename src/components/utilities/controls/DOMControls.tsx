@@ -75,31 +75,9 @@ export function DesktopControls({mass=1, force=10, friction=2}) {
 export function TouchControls({cameraOffset=0.1}) {
     const {defaultCameraProps, xrMode} = useContext(ViewerContext)
     const [target, setTarget] = useState(new Vector3(0, 0, 0))
-    useEffect(()=>{
-        const camPos = new Vector3(...defaultCameraProps.position)
-        const camRot = new Euler(...defaultCameraProps.rotation)
-        // Apply rotation to new Vector3 to get lookAt direction vector
-        const lookAt = new Vector3(0, 0, -1).applyEuler(camRot)
-        setTarget(new Vector3(...defaultCameraProps.position).add(lookAt.multiplyScalar(cameraOffset)))
-    }, [defaultCameraProps])
     return (
         xrMode ?
         null :
-        <OrbitControls target={target} maxDistance={cameraOffset} minDistance={cameraOffset} dampingFactor={0.2} panSpeed={5} rotateSpeed={0.5}/>
+        <OrbitControls maxDistance={cameraOffset} minDistance={cameraOffset} dampingFactor={0.2} panSpeed={5} rotateSpeed={0.5}/>
     )
 }
-
-// function DoubleTapTeleporter({}) {
-//     const {camera} = useThree()
-//     const raycasterRef = useRef<Raycaster>()
-//     // Raycast to layer 3
-//     useEffect(()=>{
-//         raycasterRef.current = new Raycaster()
-//         raycasterRef.current.layers.set(3)
-//     }, [])
-//     const teleport = useCallback((x,y) => {
-//         raycasterRef.current.setFromCamera(new Vector2(x,y), camera)
-        
-        
-//     return null
-// }
