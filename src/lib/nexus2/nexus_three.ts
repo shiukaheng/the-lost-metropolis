@@ -23,7 +23,7 @@ THE SOFTWARE.
 */
 
 import { Nexus } from "./nexus";
-import {BufferGeometry, BufferAttribute, Mesh, Vector3, Sphere, MeshLambertMaterial, MeshBasicMaterial, DataTexture, RGBFormat, VertexColors, Vector2, Box3, Ray, Matrix4} from "three"
+import {BufferGeometry, BufferAttribute, Mesh, Vector3, Sphere, MeshLambertMaterial, MeshBasicMaterial, DataTexture, RGBFormat, VertexColors, Vector2, Box3, Ray, Matrix4, sRGBEncoding} from "three"
 
 function nocenter() { throw "Centering and in general applying matrix to geometry is unsupported."; }
 
@@ -85,6 +85,8 @@ export class NexusObject extends Mesh {
 				geometry.setAttribute( 'color', new BufferAttribute(colors, 4));
 				if(mesh.autoMaterial) {
 					var texture = new DataTexture( new Uint8Array([1, 1, 1]), 1, 1, RGBFormat );
+					console.log("autoMaterial")
+					texture.encoding = sRGBEncoding
 					texture.needsUpdate = true;
 					mesh.material = new materialType( { vertexColors: VertexColors, map: texture } );
 				}
