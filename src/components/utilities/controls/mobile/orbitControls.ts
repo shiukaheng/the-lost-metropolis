@@ -94,7 +94,7 @@ import {
   
       this.controlObject = object
       this.domElement = domElement
-      console.log(object)
+      // console.log(object)
   
       //
       // public methods

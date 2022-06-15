@@ -80,6 +80,6 @@ export function TouchControls({cameraOffset=0.1}) {
     return (
         xrMode ?
         null :
-        <OrbitControls maxDistance={cameraOffset} minDistance={cameraOffset} dampingFactor={0.2} panSpeed={5} rotateSpeed={0.5}/>
+        <OrbitControls cameraOffset={cameraOffset} maxDistance={cameraOffset} minDistance={cameraOffset} dampingFactor={0.2} panSpeed={5} rotateSpeed={0.5}/>
     )
 }

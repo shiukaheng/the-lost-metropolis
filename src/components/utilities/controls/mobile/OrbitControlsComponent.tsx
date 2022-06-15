@@ -68,7 +68,7 @@ export const OrbitControls = React.forwardRef<OrbitControlsImpl, OrbitControlsPr
         forward.applyQuaternion(proxyCamera.quaternion)
         target.position.copy(proxyCamera.position).add(forward.multiplyScalar(cameraOffset))
         transformGroup.add(proxyCamera, target)
-        console.log("Copied camera position to proxy camera position")
+        // console.log("Copied camera position to proxy camera position")
     }, [])
 
     useFrame(() => {
@@ -107,17 +107,22 @@ export const OrbitControls = React.forwardRef<OrbitControlsImpl, OrbitControlsPr
         const intersects = raycaster.intersectObjects(scene.children, true)
         const floor = processIntersections(intersects)
         if (floor.valid && floor.position) {
-          // Preserving floor height (which is NOT absolute height), move the camera from the current position to the destination position
-          // positionOffsetTarget.current.copy(destination.position).sub(floor.position)
-          const offset = destination.position.clone().sub(floor.position)
-          setGroupOffsetTarget(offset.toArray())
+          // If a current floor is found, move the camera to the destination position from the floor position, with translating the y coordinate with the
+          const target = new Vector3().copy(destination.position).sub(proxyCamera.position)
+          setGroupOffsetTarget((old)=>{
+            return [target.x, old[1] + destination.position.y - floor.position.y, target.z]
+          })
+          
         } else {
-          // No current floor found, just move the camera to the destination position from camera position
-          // positionOffsetTarget.current.copy(destination.position).sub(explCamera.getWorldPosition(new Vector3()))
-          const offset = destination.position.clone().sub(explCamera.getWorldPosition(new Vector3()))
-          setGroupOffsetTarget(offset.toArray())
+          // No current floor found, just move the camera to the destination position from camera position, without translating the y coordinate
+          // Take consideration of the proxyCamera's position within the transformGroup
+          // transformGroup.position = destination.position.clone().sub(proxyCamera.position)
+          const target = new Vector3().copy(destination.position).sub(proxyCamera.position)
+          setGroupOffsetTarget((old)=>{
+            return [target.x, old[1], target.z]
+          })
         }
-        console.log('Double-tap detected, moving camera to', groupOffsetTarget)
+        // console.log('Double-tap detected, moving camera to', groupOffsetTarget)
       }
     }, [explCamera, explDomElement, groupOffsetTarget])
 
