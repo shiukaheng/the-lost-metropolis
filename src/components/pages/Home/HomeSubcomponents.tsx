@@ -212,7 +212,7 @@ export function TitleScreen(props) {
                 </Fade>
             </div>
         </Fragment> : <Fragment>
-            <div className="w-full h-full flex flex-col">
+            <div className="w-full h-full flex flex-col p-8 md:p-0">
                 <Fade delay={500} duration={1500} up>
                     <div className="text-5xl md:text-[60px] font-bold max-w-[500px] mr-auto">
                         {props.text["top-title"]}
@@ -220,7 +220,7 @@ export function TitleScreen(props) {
                 </Fade>
                 <div className="grow" />
                 <Fade delay={800} duration={2000} down>
-                    <div className="text-[24px] md:text-[32px] pb-2 pr-2 md:p-0 font-black text-right align-bottom max-w-[400px] ml-auto">
+                    <div className="text-[24px] md:text-[32px] font-black text-right align-bottom max-w-[400px] ml-auto">
                         {props.text["scroll"]}
                     </div>
                 </Fade>
