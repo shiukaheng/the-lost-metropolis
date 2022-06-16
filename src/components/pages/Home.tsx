@@ -53,8 +53,8 @@ function Home() {
             "en": "we feel a sense of mission to preserve and document them, in a way faithful to its physical form and at the same time, documenting its story with its community."
         },
         "scroll": {
-            "zh": "↓",
-            "en": "↓"
+            "zh": "下滑↓",
+            "en": "scroll↓"
         },
         "browseAction": {
             "zh": "瀏覽內容",

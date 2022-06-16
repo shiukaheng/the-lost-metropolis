@@ -219,9 +219,9 @@ export function TitleScreen(props) {
                     </div>
                 </Fade>
                 <div className="grow" />
-                <Fade delay={800} duration={2000} cascade down>
-                    <div className="text-[64px] font-black text-right align-bottom max-w-[400px] ml-auto">
-                        ↓
+                <Fade delay={800} duration={2000} down>
+                    <div className="text-[24px] md:text-[32px] pb-2 pr-2 md:p-0 font-black text-right align-bottom max-w-[400px] ml-auto">
+                        {props.text["scroll"]}
                     </div>
                 </Fade>
             </div>
