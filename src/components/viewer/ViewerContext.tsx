@@ -42,6 +42,9 @@ const defaultViewerContext: ViewerContextProps = {
     setPotreeOptimisePointBudget: (optimise:boolean) => {},
     // G. Event management
     eventDispatcher: new EventDispatcher(),
+    // H. Navigation options
+    flySpeed: 2,
+    setFlySpeed: (speed:number) => {},
 }
 
 export type DefaultCameraPropType = {
@@ -78,6 +81,9 @@ interface ViewerContextProps {
     setPotreeOptimisePointBudget: (optimise:boolean) => void,
     // G. Event management
     eventDispatcher: EventDispatcher,
+    // H. Navigation options
+    flySpeed: number,
+    setFlySpeed: (speed:number) => void,
 }
 
 const ViewerContext = createContext(defaultViewerContext)

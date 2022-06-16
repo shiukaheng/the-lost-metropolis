@@ -83,6 +83,7 @@ Note: Perhaps it would be better to make the naming more consistent, and elimina
 # Updating post schema
 - Remember to update both Post and PostDocData schemas
 - Also, update importPost and exportPost in the api
+- If you update the "configuration" property, remember to add the needed handlers in useStatefulSerialize and useStatefulDeserialize
 
 # Viewer
 - The viewer is a bungled chunk of mess that needs to be refactored.. but essentially, it is a container for 3D components and performs two roles:

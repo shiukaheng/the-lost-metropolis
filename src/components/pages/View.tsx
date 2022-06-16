@@ -60,7 +60,7 @@ function View({ ...props}) {
     return (
         <div className='absolute w-full h-full'>
             <Viewer post={post} className="absolute w-full h-full">
-                <DOMControls force={2} friction={2}/>
+                <DOMControls force={post.configuration.flySpeed} friction={2}/>
                 <ThreeExtractor threeRef={threeStateRef}/>
                 <XRRequesterRefExtractor requesterRefGetterRef={xrRequesterGetterRef}/>
             </Viewer>

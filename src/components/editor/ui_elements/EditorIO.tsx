@@ -114,13 +114,14 @@ export type PostScene = InferType<typeof postSceneSchema>
  * @returns serialization function
  */
 export function useStatefulSerialize(): ()=>PostScene {
-    const {sceneChildren, defaultCameraProps, defaultXRCameraProps, potreePointBudget} = useContext(ViewerContext)
+    const {sceneChildren, defaultCameraProps, defaultXRCameraProps, potreePointBudget, flySpeed} = useContext(ViewerContext)
     return () => ({
         sceneChildren: exportChildren(sceneChildren),
         configuration: {
             defaultCameraProps: defaultCameraProps,
             potreePointBudget: potreePointBudget,
-            defaultXRCameraProps: defaultXRCameraProps
+            defaultXRCameraProps: defaultXRCameraProps,
+            flySpeed: flySpeed,
         }
     })
 }
@@ -130,13 +131,14 @@ export function useStatefulSerialize(): ()=>PostScene {
  * @returns function that deserializes a {@link PostScene} object to the scene in {@link ViewerContext}
  */
 export function useStatefulDeserialize(): (post: PostScene) => void { 
-    const {setSceneChildren, setDefaultCameraProps, setDefaultXRCameraProps, setPotreePointBudget} = useContext(ViewerContext)
+    const {setSceneChildren, setDefaultCameraProps, setDefaultXRCameraProps, setPotreePointBudget, setFlySpeed} = useContext(ViewerContext)
     return (post: PostScene) => {
         setSceneChildren(deserializeChildren(post.sceneChildren));
         // Scene configuration
         setDefaultCameraProps(post.configuration.defaultCameraProps);
         setDefaultXRCameraProps(post.configuration.defaultXRCameraProps);
         setPotreePointBudget(post.configuration.potreePointBudget);
+        setFlySpeed(post.configuration.flySpeed);
     }
 }
 

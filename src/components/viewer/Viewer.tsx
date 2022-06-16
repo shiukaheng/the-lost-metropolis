@@ -75,6 +75,9 @@ function ViewerManager({children, defaultCameraProps}: {children: any, defaultCa
     // Events
     const [eventDispatcher, _setEventDispatcher] = useState(new EventDispatcher())
 
+    // Navigation options
+    const [flySpeed, setFlySpeed] = useState(2)
+
     return (
         <ViewerContext.Provider value={{
             // A. Camera prop management
@@ -104,6 +107,9 @@ function ViewerManager({children, defaultCameraProps}: {children: any, defaultCa
             setPotreeOptimisePointBudget,
             // G. Event management
             eventDispatcher,
+            // H. Navigation options
+            flySpeed,
+            setFlySpeed,
         }}>
             {children}
         </ViewerContext.Provider>

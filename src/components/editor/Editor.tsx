@@ -35,7 +35,7 @@ function Editor() {
 // Todo seperate Editor UI from EditorManager
 
 function EditorManager() {
-    const {sceneChildren, setSceneChildren: _setSceneChildren, audioListener, defaultCameraProps, setDefaultCameraProps, defaultXRCameraProps, potreePointBudget, setPotreePointBudget} = useContext(ViewerContext)
+    const {sceneChildren, setSceneChildren: _setSceneChildren, audioListener, defaultCameraProps, setDefaultCameraProps, defaultXRCameraProps, potreePointBudget, setPotreePointBudget, flySpeed} = useContext(ViewerContext)
     // Setup state for editor
     const [selectedIDs, setSelectedIDs] = useState<string[]>([])
     const [transformMode, setTransformMode] = useState("translate")
@@ -99,7 +99,7 @@ function EditorManager() {
     useEffect(() => {
         const newBuffer = serialize()
         setBuffer(newBuffer)
-    }, [sceneChildren, defaultCameraProps, potreePointBudget, defaultXRCameraProps])
+    }, [sceneChildren, defaultCameraProps, potreePointBudget, defaultXRCameraProps, flySpeed])
 
     // Update internal state when buffer changes, which only happens if we change sceneChildren (handled), and pull
     const updateLabel = useMultiLang({"en": "update", "zh": "更新"})

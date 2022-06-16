@@ -32,7 +32,7 @@ export function useCameraUpdateHelper() {
             camera.fov = defaultCameraProps.fov
             camera.updateProjectionMatrix()
         }
-        console.log("Camera updated", camera.position, camera.rotation)
+        // console.log("Camera updated", camera.position, camera.rotation)
     }, [])
 }
 
