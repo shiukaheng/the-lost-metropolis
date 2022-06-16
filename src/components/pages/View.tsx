@@ -65,8 +65,8 @@ function View({ ...props}) {
                 <XRRequesterRefExtractor requesterRefGetterRef={xrRequesterGetterRef}/>
             </Viewer>
             <Fade>
-                <div className="absolute w-full h-full p-8 md:p-20 pointer-events-none">
-                    <div className="flex flex-row place-content-between h-12 gap-4">
+                <div className="absolute w-full h-full p-8 md:p-20 pointer-events-none flex flex-col gap-4">
+                    <div className="flex flex-row place-content-between gap-4">
                         <MagicDiv className='text-2xl md:text-4xl font-black'>{title}</MagicDiv>
                         <div className="ml-auto flex flex-row gap-4">
                             {md && <XRButtons xrRequesterGetterRef={xrRequesterGetterRef} supportedXRModes={supportedXRModes}/>}
