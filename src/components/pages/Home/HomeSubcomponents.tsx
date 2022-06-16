@@ -269,7 +269,7 @@ export function Screen2({children, ...props}) {
                 {/* Fade in video / animation depicting preservation process */}
                 <Fade delay={700}>
                     {/* Align all of the div's content center */}
-                    <div className="w-full px-8 md:px-16 text-center pt-6 md:pt-16">
+                    <div className="w-full px-8 md:px-16 text-center pt-4 md:pt-16">
                         {
                             children
                         }

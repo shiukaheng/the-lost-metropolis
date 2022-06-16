@@ -37,11 +37,11 @@ function Home() {
             "en": "scroll to explore ↓"
         },
         "subtitle": {
-            "zh": "建築不單盛載著歷史，更有一份情懷",
+            "zh": "建築不單盛載歷史，更有一份情懷",
             "en": "historical places are quietly disappearing"
         },
         "p1": {
-            "zh": "偶然發現某些定格於大半世紀前的建築物與老店，彷彿能從它們中窺看時代的變遷，圍繞著建築的人和事更是歷史的標記。可惜，在急速發展的社會中，舊建築已經完成它服務社區的歷史任務。久而久之，舊建築逐漸被人遺忘、丟空。令人婉惜的是，當年的人、事、和情懷都隨著建築的日久失修而消失。",
+            "zh": "偶然發現定格於大半世紀前的建築物與老店，彷彿能窺看時代變遷，圍繞著建築的人和事更是歷史的標記。可惜，在急速發展的社會中，舊建築已經完成它服務社區的歷史任務。久而久之，舊建築逐漸被人遺忘、丟空。令人婉惜的是，當年的人、事、和情懷都隨著建築的日久失修而消失。",
             "en": "the old districts of hong kong are a glimpse into a bygone era; but as society moves on, they already have their fate set in stone to either be redeveloped, or be gentrified into tourist destinations."
         },
         "subtitle2": {
@@ -49,8 +49,8 @@ function Home() {
             "en": "virtually reincarnating lost spaces"
         },
         "p2": {
-            "zh": "也許我們急促的社會沒有空間再容納下這些時代遺物；甚至當有少數的可以原址保留，活化的過程亦很容易令失去它們本身蘊含的活歷史。《情迷香港》以一種沉浸式的載體，把即將面臨清拆重建的社區空間轉化為可供探索與互動的虛擬掃描複製品。在掃描的基礎上，場景裏更加入聲音景觀以及與該空間有關之人物採訪錄像，以豐富觀眾聽覺的感受與對人文歷史的認知。",
-            "en": "we feel a sense of mission to preserve and document them, in a way faithful to its physical form and at the same time, documenting its story with its community. the lost metropolis virtually reincarnate these lost spaces through immersive installations, 3d scanning and oral history interviews."
+            "zh": "《情迷香港》以沉浸式的載體，將面臨清拆的社區空間轉化為可供探索與互動的虛擬掃描複製品。場景裏更加入聲音景觀以及與該空間有關之人物採訪錄像，以豐富觀眾聽覺的感受與對人文歷史的認知。",
+            "en": "we feel a sense of mission to preserve and document them, in a way faithful to its physical form and at the same time, documenting its story with its community."
         },
         "scroll": {
             "zh": "↓",
