@@ -144,7 +144,7 @@ function SiteRouter() {
         <ThemeSetter/>
         <LoadingScreen ready={posts !== null}>
             <div className="absolute w-full h-full">
-                <CompatabilityWrapper>
+                {/* <CompatabilityWrapper> */}
                     <AnimatedSwitch pathPreprocessor={(path) => {
                         if (path.split("/")[1] !== "view") {
                             path = "";
@@ -177,7 +177,7 @@ function SiteRouter() {
                             </AppContainer>
                         </div>} />
                     </AnimatedSwitch>
-                </CompatabilityWrapper>
+                {/* </CompatabilityWrapper> */}
             </div>
         </LoadingScreen>
     </Router>;
