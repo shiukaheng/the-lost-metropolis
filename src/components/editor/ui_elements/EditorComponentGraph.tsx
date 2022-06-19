@@ -81,6 +81,8 @@ export default function EditorComponentGraph() {
                     })
                     // add new children to scene children
                     addSceneChildren(newComponents)
+                    // set selection to the ids of the new children
+                    setSelectedIDs(newComponents.map(child => child.props.objectID))
                 }}
             />
             <div className="flex flex-row gap-2">
