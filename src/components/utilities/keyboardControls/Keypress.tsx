@@ -2,17 +2,24 @@ import { Fragment, useEffect, useRef, useState } from "react";
 import { useEventListener } from "../../../utilities";
 
 function useBasicKeypress(keyName="", onDown=()=>{}, onUp=()=>{}) {
+    const downRef = useRef(false);
     const [isDown, setIsDown] = useState(false);
     useEventListener("keydown", (e)=>{
         if (e.key.toLowerCase() === keyName.toLowerCase()) {
-            setIsDown(true);
-            onDown();
+            if (!downRef.current) {
+                downRef.current = true;
+                setIsDown(true);
+                onDown();
+            }
         }
     });
     useEventListener("keyup", (e)=>{
         if (e.key.toLowerCase() === keyName.toLowerCase()) {
-            setIsDown(false);
-            onUp();
+            if (downRef.current) {
+                downRef.current = false;
+                setIsDown(false);
+                onUp();
+            }
         }
     });
     return isDown;

@@ -61,28 +61,28 @@ export default function EditorComponentGraph() {
                 setSceneChildren(sceneChildren.filter(child => !(selectedIDs.includes(child.props.objectID))))
             }}/>
             <ClipboardHelper 
-            onCopy={()=>{
-                // cloneDeep selected children
-                const clonedChildren = sceneChildren.filter(child => selectedIDs.includes(child.props.objectID)).map(child => cloneDeep(child))
-                return JSON.stringify(clonedChildren)
-            }}
-            onPaste={(content)=>{
-                // parse JSON and add to scene children
-                const parsedContent = JSON.parse(content as string)
-                // create new IDs for each child
-                const newComponents = parsedContent.map(child => {
-                    const newID = uuidv4()
-                    return {
-                        ...child,
-                        props: {
-                            ...child.props,
-                            objectID: newID
+                onCopy={()=>{
+                    // cloneDeep selected children
+                    const clonedChildren = sceneChildren.filter(child => selectedIDs.includes(child.props.objectID)).map(child => cloneDeep(child))
+                    return clonedChildren
+                }}
+                onPaste={(content)=>{
+                    // create new IDs for each child
+                    const newComponents = content.map(child => {
+                        const newID = uuidv4()
+                        return {
+                            ...child,
+                            key: newID,
+                            props: {
+                                ...child.props,
+                                objectID: newID
+                            }
                         }
-                    }
-                })
-                // add new children to scene children
-                addSceneChildren(newComponents)
-            }}/>
+                    })
+                    // add new children to scene children
+                    addSceneChildren(newComponents)
+                }}
+            />
             <div className="flex flex-row gap-2">
                 <Select className="flex-grow" options={componentOptions} styles={customStyles} onChange={(value, _)=>setAddChildrenType(() => value.value)}/>
                 <MagicDiv mergeTransitions className={`editor-secondary-button ${(addChildrenType===null) ? "disabled" : ""}`} onClick={()=>{

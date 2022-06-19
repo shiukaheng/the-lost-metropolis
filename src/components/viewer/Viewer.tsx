@@ -51,6 +51,7 @@ function ViewerManager({children, defaultCameraProps}: {children: any, defaultCa
     
     // Create convenience functions for adding and removing children
     const addSceneChildren = (newChildren) => {
+        // console.log(joinChildren(sceneChildren, newChildren))
         setSceneChildren(joinChildren(sceneChildren, newChildren))
     }
     const removeSceneChildren = (childrenToRemove) => {

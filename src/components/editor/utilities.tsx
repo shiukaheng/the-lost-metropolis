@@ -1,7 +1,7 @@
 import { formatRGBCSS } from "../../utilities"
 import { Theme } from "../App"
 
-function joinChildren(sceneChildren, childrenToUpdate) {
+function updateChildren(sceneChildren, childrenToUpdate) {
     // return new sceneChildren but with the children whose props.id is in updateChildren
     const idsToBeUpdated = childrenToUpdate.map(child => child.props.objectID)
     return sceneChildren.map(child => {
@@ -11,6 +11,23 @@ function joinChildren(sceneChildren, childrenToUpdate) {
             return child
         }
     })
+}
+
+function joinChildren(...sceneChildrens) {
+    // Returns a new array of sceneChildren but with a union of all children. We identify children by props.id. Later lists have higher priority.
+    return sceneChildrens.reduce((acc: any[], curr) => {
+        // console.log(acc, curr)
+        // For each child in curr, if it is not in acc, add it, otherwise, replace it.
+        curr.forEach(child => {
+            const index = acc.findIndex(item => item.props.objectID === child.props.objectID)
+            if (index === -1) {
+                acc.push(child)
+            } else {
+                acc[index] = child
+            }
+        })
+        return acc
+    }, [])
 }
 
 function wrapOnClick(onClick:(e)=>void, context, id) {
@@ -82,4 +99,4 @@ export function createSelectStyles(theme: Theme) {
     };
 }
 
-export { joinChildren, wrapOnClick, wrapOnHover, wrapOnBlur }
+export { joinChildren, updateChildren, wrapOnClick, wrapOnHover, wrapOnBlur }
