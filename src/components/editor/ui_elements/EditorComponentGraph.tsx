@@ -9,6 +9,9 @@ import { EditorContext } from "../EditorContext";
 import { ViewerContext } from "../../viewer/ViewerContext";
 import { components, VaporComponent, VaporInputsType } from "../../viewer/ComponentDeclarations"
 import { createSelectStyles } from "../utilities";
+import { Keypress } from "../../utilities/keyboardControls/Keypress";
+import {cloneDeep} from "lodash"
+import { ClipboardHelper } from "../../utilities/keyboardControls/Clipboard";
 
 function getDefaultInputs(inputObject:VaporInputsType) {
     var defaultInputs = {}
@@ -41,7 +44,7 @@ function SceneChildItem({child, onClick, selected}) {
 
 // Component for selecting scene or deleting scene components, stays in sync with the editor viewport
 export default function EditorComponentGraph() {
-    const {sceneChildren} = useContext(ViewerContext)
+    const {sceneChildren, addSceneChildren} = useContext(ViewerContext)
     const {selectedIDs, setSelectedIDs, addSelectedIDs, removeSelectedIDs, shiftPressed, setSceneChildren} = useContext(EditorContext)
     const [addChildrenType, setAddChildrenType] = useState<null|VaporComponent>(null)
     const heading = useMultiLang({"en": "components", "zh": "組件"})
@@ -56,6 +59,29 @@ export default function EditorComponentGraph() {
         <EditorEmbeddedWidget title={heading} stickyKey="compGraphExpanded">
             <KeyPressCallback keyName="Delete" onDown={()=>{
                 setSceneChildren(sceneChildren.filter(child => !(selectedIDs.includes(child.props.objectID))))
+            }}/>
+            <ClipboardHelper 
+            onCopy={()=>{
+                // cloneDeep selected children
+                const clonedChildren = sceneChildren.filter(child => selectedIDs.includes(child.props.objectID)).map(child => cloneDeep(child))
+                return JSON.stringify(clonedChildren)
+            }}
+            onPaste={(content)=>{
+                // parse JSON and add to scene children
+                const parsedContent = JSON.parse(content as string)
+                // create new IDs for each child
+                const newComponents = parsedContent.map(child => {
+                    const newID = uuidv4()
+                    return {
+                        ...child,
+                        props: {
+                            ...child.props,
+                            objectID: newID
+                        }
+                    }
+                })
+                // add new children to scene children
+                addSceneChildren(newComponents)
             }}/>
             <div className="flex flex-row gap-2">
                 <Select className="flex-grow" options={componentOptions} styles={customStyles} onChange={(value, _)=>setAddChildrenType(() => value.value)}/>

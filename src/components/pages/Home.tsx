@@ -76,7 +76,7 @@ function Home() {
     return (
         <GenericPage className="relative w-full h-full homepage">
             <ApplySettings />
-            <Viewer className="absolute w-full h-full overflow-hidden flex-grow rounded-3xl" defaultCameraProps={{
+            <Viewer className="absolute w-full h-full overflow-clip flex-grow rounded-3xl safari-clip-fix" defaultCameraProps={{
                 position: [-4, -7, 30],
                 rotation: [0, 0, 0],
                 fov: 30
