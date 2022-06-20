@@ -82,7 +82,7 @@ function _DepthKitObject({ metaUrl="", videoUrl="", posterUrl="", autoplay=true,
           extrinsics: metaInf.extrinsics
         }}
       >
-        <AdvancedVideoTexture getPositionalAudio={setPositionalAudio} {...{videoUrl, posterUrl, autoplay, loop, muted}} />
+        <AdvancedVideoTexture getPositionalAudio={setPositionalAudio} {...{videoUrl, posterUrl, autoplay, loop, muted, volume}} />
       </depthKitMaterial>
       <group ref={audioGroupRef} position={audioPositionOffset}/>
     </mesh>
