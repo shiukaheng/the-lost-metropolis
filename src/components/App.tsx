@@ -5,13 +5,13 @@ import { BrowserRouter as Router, Route, useLocation, useParams } from "react-ro
 import NavigationBar from "./utilities/NavigationBar"
 import AppContainer from "./utilities/AppContainer"
 import { useNavigate } from 'react-router-dom';
-import { useState, createContext, useLayoutEffect, useContext, MutableRefObject, useRef, useEffect } from "react";
+import { useState, createContext, useLayoutEffect, useContext, MutableRefObject, useRef, useEffect, useMemo } from "react";
 import MagicDiv from "./utilities/MagicDiv";
 import Background from "./utilities/Background";
 import AnimatedSwitch from "./utilities/AnimatedSwitch";
 import { FC } from "react";
 import View from "./pages/View";
-import { formatRGBCSS, KeyPressCallback, mergeThemes, removeThemeTransition, useStickyState } from "../utilities";
+import { formatRGBCSS, KeyPressCallback, mergeThemes, removeThemeTransition, useFilteredPosts, useStickyState } from "../utilities";
 import Login from "./admin/Login";
 
 // All pages
@@ -139,7 +139,7 @@ export function App() {
 }
 
 function SiteRouter() {
-    const posts = hidePosts(useContext(ContentContext))
+    const posts = useFilteredPosts()
     return <Router>
         <ThemeSetter/>
         <LoadingScreen ready={posts !== null}>
@@ -222,7 +222,7 @@ function inferTheme(postInstance: Instance<Post>) {
 
 function ThemeSetter() {
     const { theme, setTheme, changesRef } = useContext(ThemeContext)
-    const posts = hidePosts(useContext(ContentContext))
+    const posts = useFilteredPosts()
 
     // Detect theme from url (perhaps better than using component logic)
     // Whenever URL changes or post list changes, update theme

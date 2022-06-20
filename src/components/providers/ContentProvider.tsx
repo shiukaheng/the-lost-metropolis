@@ -22,13 +22,20 @@ export const ContentProvider = ({children}) => {
     const [content, setContent] = useState<Instance<Roled<Post>>[] | null>(null);
     useEffect(()=>{
         const unsub = VaporAPI.subscribePosts(
-            // TODO: Make this backend logic
             (postInstances) => {
-                setContent(postInstances.sort(
-                    (a, b) => {
-                        return new Date(b.data.createdAt).getTime() - new Date(a.data.createdAt).getTime();
-                    }
-                ));
+                console.log("Got posts", postInstances);
+                if (postInstances === null) {
+                    setContent(null);
+                } else {
+                    setContent(
+                        postInstances.sort(
+                            (a, b) => {
+                                return new Date(b.data.createdAt).getTime() - new Date(a.data.createdAt).getTime();
+                            }
+                        )
+                    )
+                }
+                // setContent(postInstances);
             }
         )
         return () => {

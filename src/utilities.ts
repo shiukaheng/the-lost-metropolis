@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef, useLayoutEffect, useContext, useCallback, Context, MutableRefObject } from "react"
+import { useState, useEffect, useRef, useLayoutEffect, useContext, useCallback, Context, MutableRefObject, useMemo } from "react"
 import { AuthContext } from "./components/admin/AuthProvider";
 import { defaultTheme, languages, SettingsContext, ThemeContext, ThemeContextType } from "./components/App";
-import { ContentContext } from "./components/providers/ContentProvider";
+import { ContentContext, hidePosts } from "./components/providers/ContentProvider";
 import { cloneDeep, isEqual, mapValues } from "lodash"
 import { useFrame } from "@react-three/fiber";
 import { Post, postSchema } from "../api/types/Post";
@@ -662,4 +662,22 @@ export function useDeviceType(): DeviceType {
         }
     }, [mobile])
     return deviceType;
+}
+
+export function usePosts() {
+    const posts = useContext(ContentContext)
+    return posts
+}
+
+export function usePostsFilter(posts) {
+    const filtered = useMemo(()=>{
+        return hidePosts(posts)
+    }, [posts])
+    return filtered
+}
+
+export function useFilteredPosts() {
+    const unfilteredPosts = usePosts()
+    const filteredPosts = usePostsFilter(unfilteredPosts)
+    return filteredPosts
 }

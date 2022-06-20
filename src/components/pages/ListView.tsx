@@ -12,14 +12,14 @@ import { ContentContext, hidePosts } from '../providers/ContentProvider';
 import { AuthContext } from '../admin/AuthProvider';
 import MagicIcon from '../utilities/MagicIcon';
 import { EyeIcon, EyeOffIcon } from '@heroicons/react/outline';
-import { useMultiLang } from '../../utilities';
+import { useFilteredPosts, useMultiLang } from '../../utilities';
 
 const StyledRow = tw.tr`border-b border-t border-current md:hover:opacity-50 transition-opacity duration-500 cursor-pointer table-row`
 const StyledCell = tw.td`text-left font-serif md:text-lg font-semibold pt-2 pb-6 table-cell`
 
 function ListView() {
     const navigate = useNavigate();
-    const posts = hidePosts(useContext(ContentContext))
+    const posts = useFilteredPosts()
     const {settings} = useContext(SettingsContext)
     const {currentUser} = useContext(AuthContext)
     const roleDisplay = {

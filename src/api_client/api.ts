@@ -255,7 +255,7 @@ export default class VaporAPI {
      * Subscribes to all posts the current user has access to 
      * @param getPostCallback callback for new arrays of {@link Post} wrapped in {@link Instance} and {@link Roled}
      */
-    static subscribePosts(getPostCallback: (postInstances: Array<Instance<Roled<Post>>>) => void): () => void {
+    static subscribePosts(getPostCallback: (postInstances: Array<Instance<Roled<Post>>> | null) => void): () => void {
         return subToRefWithRoleAuthSensitive(
             VaporAPI.postsRef, 
             (user) => {

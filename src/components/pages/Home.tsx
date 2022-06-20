@@ -1,6 +1,6 @@
 import GenericPage from '../utilities/GenericPage'
 import { PotreeObject } from '../3d/PotreeObject'
-import { useMultiLangObject, useTheme } from '../../utilities'
+import { useFilteredPosts, useMultiLangObject, useTheme } from '../../utilities'
 import { ScrollControls, Scroll, MeshReflectorMaterial } from "@react-three/drei"
 import { Suspense, useCallback, useContext, useState } from 'react'
 import { Viewer } from '../viewer/Viewer'
@@ -22,7 +22,7 @@ function Home() {
     const { settings } = useContext(SettingsContext) // Somehow the settings context is not being passed down to the children if its inside of Scroll
     const [opaque, setOpaque] = useState(false)
     const md = useMediaQuery('(min-width: 768px)')
-    const posts = hidePosts(useContext(ContentContext))
+    const posts = useFilteredPosts()
     const navigate = useNavigate()
     const gotoBrowse = useCallback(()=>{
         navigate("/browse")

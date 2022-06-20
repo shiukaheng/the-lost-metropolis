@@ -5,7 +5,7 @@ import SwipeableViews from 'react-swipeable-views';
 import { useParams } from 'react-router';
 import { useNavigate } from 'react-router-dom';
 import { defaultTheme, ThemeContext } from '../App';
-import { formatRGBCSS, mergeThemes, removeThemeTransition, useTheme } from '../../utilities';
+import { formatRGBCSS, mergeThemes, removeThemeTransition, useFilteredPosts, usePostsFilter, useTheme } from '../../utilities';
 import { ContentContext, hidePosts } from '../providers/ContentProvider';
 import LoadingScreen from '../utilities/LoadingScreen';
 import MagicDiv from '../utilities/MagicDiv';
@@ -13,7 +13,7 @@ import { themeSchema } from '../../../api/types/Theme';
 import MagicIcon from '../utilities/MagicIcon';
 
 function ShowcaseView() {
-    const posts = hidePosts(useContext(ContentContext));
+    const posts = useFilteredPosts()
     return (
         <LoadingScreen ready={posts!==null} loadingDivClassname="page-margins">
             <ShowcasePanel/>
@@ -25,7 +25,7 @@ export default ShowcaseView;
 
 function ShowcasePanel() {
     const posts = useContext(ContentContext)
-    const listedPosts = hidePosts(posts);
+    const listedPosts = usePostsFilter(posts)
     const { theme } = useContext(ThemeContext);
     const { id } = useParams();
     const navigate = useNavigate();

@@ -10,7 +10,7 @@ import PostList, { ColumnMaker } from '../utilities/PostList';
 import { ContentContext } from '../providers/ContentProvider';
 import { AuthContext } from '../admin/AuthProvider';
 import MagicIcon from '../utilities/MagicIcon';
-import { EyeIcon, EyeOffIcon } from '@heroicons/react/outline';
+import { EyeIcon, EyeOffIcon, LockClosedIcon } from '@heroicons/react/outline';
 import { useMultiLang } from '../../utilities';
 
 function Dashboard() {
@@ -30,7 +30,7 @@ function Dashboard() {
         (post, index) => (post.data.title[settings.lang]),
         (post, index) => new Date(post.data.createdAt).toLocaleDateString("en-UK"),
         (post, index) => roleDisplay[post.data.role],
-        (post, index) => post.data.public ? <MagicIcon IconComponent={EyeIcon}/> : <MagicIcon IconComponent={EyeOffIcon}/>,
+        (post, index) => post.data.public ? (post.data.listed ? <MagicIcon IconComponent={EyeIcon}/> : <MagicIcon IconComponent={EyeOffIcon}/>) : <MagicIcon IconComponent={LockClosedIcon}/>,
     ] :
     [
         (post, index) => index,

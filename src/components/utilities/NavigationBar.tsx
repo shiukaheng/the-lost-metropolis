@@ -4,7 +4,7 @@ import { AuthContext } from '../admin/AuthProvider';
 import { SettingsContext, ThemeContext } from '../App';
 import Logo from "./Logo"
 import MagicDiv from './MagicDiv';
-import { Condition, logOut } from '../../utilities';
+import { Condition, logOut, useFilteredPosts } from '../../utilities';
 import { ContentContext, hidePosts } from '../providers/ContentProvider';
 
 function MultiLangNavLink({text, to, className="", ...props}) {
@@ -28,7 +28,7 @@ export default function NavigationBar(props) {
     const {setSettings} = useContext(SettingsContext)
     const {setTheme} = useContext(ThemeContext)
     const navigate = useNavigate()
-    const posts = hidePosts(useContext(ContentContext))
+    const posts = useFilteredPosts()
     return (
         // <div className="flex flex-col gap-2 pr-16"> DESKTOP
         <div className="flex flex-col gap-2 p-8 md:p-20 md:pr-8">
