@@ -20,6 +20,7 @@ export function naiveExport(post: Post): PostDocData {
         editors: post.editors,
         viewers: post.viewers,
         public: post.public,
+        listed: post.listed,
         theme: post.theme,
         tags: post.tags,
         sponsors: post.sponsors,

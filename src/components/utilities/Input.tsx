@@ -26,6 +26,7 @@ type InputComponentProps = {
     value: any,
     setValue: (newValue: any) => void,
     data?: any,
+    disabled?: boolean,
 }
 
 type InputComponent = React.FC<InputComponentProps>;
@@ -62,15 +63,16 @@ function NumberInput({value, setValue}) {
 }
 
 // Component for inputting boolean
-function BooleanInput({value, setValue, data}: {
+function BooleanInput({value, setValue, data, disabled}: {
     value: boolean,
     setValue: (newValue: boolean) => void,
     data?: {
         tooltip?: string,
     }
+    disabled?: boolean,
 }) {
     return (
-        <input data-tip={data?.tooltip} title={data?.tooltip} className="boolean-input-field" type="checkbox" checked={value} onChange={(e) => setValue(e.target.checked)}/>
+        <input disabled={disabled} data-tip={data?.tooltip} title={data?.tooltip} className="boolean-input-field" type="checkbox" checked={value} onChange={(e) => setValue(e.target.checked)}/>
     );
 }
 
@@ -387,9 +389,10 @@ type InputProps = {
     setValue: (value: any) => void
     data?: any
     className?: string
+    disabled?: boolean
 }
 
-function Input({typeName, value, setValue, data, className=""}:InputProps) {
+function Input({typeName, value, setValue, data, className="", disabled=false}:InputProps) {
     // Props:
     // propName is the display name of the property, used to display the name of the property in the editor
     // value is the current value of the property, used to display the current value of the property in the editor
@@ -398,7 +401,7 @@ function Input({typeName, value, setValue, data, className=""}:InputProps) {
     return (
         <MagicDiv className={twMerge("flex flex-row gap-2 flex-grow", className)}>
             {
-                createElement(InputComponentMap[typeName], {value, setValue, data})
+                createElement(InputComponentMap[typeName], {value, setValue:(disabled ? ()=>{} : setValue), data, disabled})
             }
         </MagicDiv>
     )

@@ -21,7 +21,7 @@ import ListView from "./pages/ListView";
 import About from "./pages/About"
 import { AuthContext, AuthProvider } from "./admin/AuthProvider";
 import Dashboard from "./admin/Dashboard";
-import { ContentContext, ContentProvider } from "./providers/ContentProvider";
+import { ContentContext, ContentProvider, hidePosts } from "./providers/ContentProvider";
 import { EditPost } from "./admin/EditPost";
 import LoadingScreen from "./utilities/LoadingScreen";
 import { preloadFont } from "troika-three-text";
@@ -139,7 +139,7 @@ export function App() {
 }
 
 function SiteRouter() {
-    const posts = useContext(ContentContext)
+    const posts = hidePosts(useContext(ContentContext))
     return <Router>
         <ThemeSetter/>
         <LoadingScreen ready={posts !== null}>

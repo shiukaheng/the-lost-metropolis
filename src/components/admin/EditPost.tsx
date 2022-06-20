@@ -76,10 +76,11 @@ function EditorSceneOverlay({hidden}) {
 function EditingForm({className="", editor3dMode=false}) {
     const { id } = useParams();
     const navigate = useNavigate()
-    const [buffer, setBuffer, post, push, pull, changed, overwriteWarning] = useBufferedPost(id, ["title", "description", "public", "theme", "sponsors"]);
+    const [buffer, setBuffer, post, push, pull, changed, overwriteWarning] = useBufferedPost(id, ["title", "description", "public", "theme", "sponsors", "listed"]);
     const titleLabel = useMultiLang({"en": "title", "zh": "標題"});
     const descriptionLabel = useMultiLang({"en": "description", "zh": "描述"});
     const publicLabel = useMultiLang({"en": "public", "zh": "公開"});
+    const listedLabel = useMultiLang({"en": "listed", "zh": "列出"});
     const saveLabel = useMultiLang({"en": "update", "zh": "更新"});
     const [activeLanguage, setActiveLanguage] = useState(languages[0]);
     const deleteDefaultLabel = useMultiLang({"en": "delete", "zh": "刪除"});
@@ -175,6 +176,13 @@ function EditingForm({className="", editor3dMode=false}) {
                                     <td>{publicLabel}</td>
                                     <td>
                                         <Input typeName="boolean" value={buffer.public} setValue={(value) => setBuffer({...buffer, public: value})} />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>{listedLabel}</td>
+                                    <td>
+                                        {/* Disable listed property if its not public */}
+                                        <Input disabled={!buffer.public} typeName="boolean" value={buffer.listed} setValue={(value) => setBuffer({...buffer, listed: value})} />
                                     </td>
                                 </tr>
                                 <tr>

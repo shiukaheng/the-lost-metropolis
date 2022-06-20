@@ -15,7 +15,7 @@ const StyledHeaderRow = tw.tr`border-b border-current table-row text-ellipsis`
 const StyledCell = tw.td`text-left font-serif md:text-lg font-semibold pt-2 pb-6 table-cell`
 const StyledHeaderCell = tw.td`text-left font-serif md:text-lg font-bold pt-2 pb-2 table-cell`
 
-export type ColumnMaker = (post: Instance<Roled<Post>>, index: number) => JSX.Element
+export type ColumnMaker = (post: Instance<Roled<Post>>, index: number) => React.ReactNode
 
 interface PostListProps {
     posts: Instance<Roled<Post>>[]

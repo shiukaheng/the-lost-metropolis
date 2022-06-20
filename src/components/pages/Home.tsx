@@ -8,7 +8,7 @@ import { SettingsContext } from '../App'
 import { FollowMouseGroup } from './Home/HighlightViewport'
 import { ApplySettings, DisableRender, FadeFilter, TitleScreen, Screen1, Screen2, EndScreen, EndScreenB, FadeFilter3D, HidingObject, CameraStartGroup, PopGroup } from './Home/HomeSubcomponents'
 import useMediaQuery from 'react-hook-media-query'
-import { ContentContext } from '../providers/ContentProvider'
+import { ContentContext, hidePosts } from '../providers/ContentProvider'
 import { useNavigate } from 'react-router-dom'
 import { MeshBasicMaterial } from 'three'
 import imageUrl1 from "./Home/media/cat.jpg"
@@ -22,7 +22,7 @@ function Home() {
     const { settings } = useContext(SettingsContext) // Somehow the settings context is not being passed down to the children if its inside of Scroll
     const [opaque, setOpaque] = useState(false)
     const md = useMediaQuery('(min-width: 768px)')
-    const posts = useContext(ContentContext)
+    const posts = hidePosts(useContext(ContentContext))
     const navigate = useNavigate()
     const gotoBrowse = useCallback(()=>{
         navigate("/browse")

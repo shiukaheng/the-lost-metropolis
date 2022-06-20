@@ -35,6 +35,7 @@ import { userIDSchema } from "./UserID"
     editors: array(userIDSchema).required().default([]),
     viewers: array(userIDSchema).required().default([]),
     public: boolean().required().default(false),
+    listed: boolean().required().default(true),
     theme: themeSchema.required(),
     tags: array(string().required()).required().default([]),
     sponsors: array(object({

@@ -44,6 +44,7 @@ export const postDocDataSchema = object({
     editors: array(string()).required(),
     viewers: array(string()).required(),
     public: boolean().required(),
+    listed: boolean().required(),
     theme: themeSchema.required(),
     tags: array(string().required()).required(),
     sponsors: array(object({

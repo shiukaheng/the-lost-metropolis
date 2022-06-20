@@ -310,6 +310,7 @@ export default class VaporAPI {
             editors: docData.editors,
             viewers: docData.viewers,
             public: docData.public,
+            listed: docData.listed,
             createdAt: docData.createdAt.toDate().toISOString(),
             updatedAt: docData.updatedAt.toDate().toISOString(),
             theme: docData.theme,

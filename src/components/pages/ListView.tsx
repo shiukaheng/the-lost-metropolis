@@ -8,7 +8,7 @@ import MagicDiv from '../utilities/MagicDiv';
 import GenericPage from '../utilities/GenericPage';
 import LoadingScreen from '../utilities/LoadingScreen';
 import PostList, { ColumnMaker } from '../utilities/PostList';
-import { ContentContext } from '../providers/ContentProvider';
+import { ContentContext, hidePosts } from '../providers/ContentProvider';
 import { AuthContext } from '../admin/AuthProvider';
 import MagicIcon from '../utilities/MagicIcon';
 import { EyeIcon, EyeOffIcon } from '@heroicons/react/outline';
@@ -19,7 +19,7 @@ const StyledCell = tw.td`text-left font-serif md:text-lg font-semibold pt-2 pb-6
 
 function ListView() {
     const navigate = useNavigate();
-    const posts = useContext(ContentContext)
+    const posts = hidePosts(useContext(ContentContext))
     const {settings} = useContext(SettingsContext)
     const {currentUser} = useContext(AuthContext)
     const roleDisplay = {

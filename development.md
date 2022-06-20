@@ -4,6 +4,11 @@
 
 ## Non-urgent
 
+- Make better unlisted post function
+    - Make unlisted posts unqueryable
+    - Create convenience functions for getting posts: usePost() - that dynamically uses either the ContentContext or ad-hoc fetches the post from the database if it is not unlisted (since ContentContext should not have unlisted posts!)
+    - Remove hidePosts function
+
 - Seperate this into multiple smaller repositories
     - vapor-types: all the types / schemas shared across the platform
     - vapor-api: api for javascript clients to interact with the backend
