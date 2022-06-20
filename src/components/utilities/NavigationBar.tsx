@@ -34,7 +34,7 @@ export default function NavigationBar(props) {
         <div className="flex flex-col gap-2 p-8 md:p-20 md:pr-8">
             <Logo />
             {/* <div className="flex justify-center flex-col"> DESKTOP*/} 
-            <div className="flex justify-left flex-row md:flex-col">
+            <div className="flex justify-left flex-row md:flex-col flex-wrap">
                 <MultiLangNavLink text={{"en": "home", "zh": "首頁"}} to="/"/>
                 <LoggedInFilter>
                     <MultiLangNavLink text={{"en": "dashboard", "zh": "管理"}} to="/dashboard"/>
