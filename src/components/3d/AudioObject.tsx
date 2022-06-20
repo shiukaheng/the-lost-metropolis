@@ -15,6 +15,7 @@ type AudioObjectProps = VaporComponentProps & {
     refDistance?: number;
     volume?: number;
     positional?: boolean;
+    randomizeStart?: boolean;
 }
 
 function useAudioFile(url) {
@@ -24,7 +25,7 @@ function useAudioFile(url) {
 /**
  * Creates an audio object of specified class, pre-connected to the viewer's audio listener.
  */
-function useThreeAudio(url: string, positional: boolean): Audio | PositionalAudio | null {
+function useThreeAudio(url: string, positional: boolean, randomizeStart: boolean=false): Audio | PositionalAudio | null {
     const audioFile = useAudioFile(url) as AudioBuffer;
     const [objectRef, object, setObject] = useRefState<Audio|PositionalAudio|null>(null);
     const {audioListener, eventDispatcher} = useContext(ViewerContext);
@@ -37,12 +38,19 @@ function useThreeAudio(url: string, positional: boolean): Audio | PositionalAudi
         newAudioObject.setBuffer(audioFile);
         setObject(newAudioObject);
         return ()=>{
-            console.log(objectRef.current);
+            // console.log(objectRef.current);
             objectRef.current?.disconnect();
         }
     }, [audioListener, positional]);
     const play = useCallback(()=>{
-        objectRef.current?.play();
+        // Play if not already playing
+        if (objectRef.current && !objectRef.current.isPlaying) {
+            // Randomize start time if specified using currentTime property
+            if (randomizeStart) {
+                objectRef.current.offset = Math.random() * audioFile.duration;
+            }
+            objectRef.current.play();
+        }
     }, []);
     useThreeEventListener("audio-start", play, eventDispatcher);
     useEffect(()=>{
@@ -54,8 +62,8 @@ function useThreeAudio(url: string, positional: boolean): Audio | PositionalAudi
     return object;
 }
 
-export const AudioObject: VaporComponent = ({url, autoplay, loop, refDistance, volume, positional, ...props}: AudioObjectProps) => {
-    const threeAudioObject = useThreeAudio(url, positional || false);
+export const AudioObject: VaporComponent = ({url, autoplay, loop, refDistance, volume, positional, randomizeStart=false, ...props}: AudioObjectProps) => {
+    const threeAudioObject = useThreeAudio(url, positional || false, randomizeStart);
     const groupRef = useRef<Group>(null);
     useEffect(()=>{
         if (threeAudioObject) {
@@ -66,7 +74,7 @@ export const AudioObject: VaporComponent = ({url, autoplay, loop, refDistance, v
                 threeAudioObject.setRefDistance(refDistance || 1);
             }
         }
-        console.log(groupRef.current?.children)
+        // console.log(groupRef.current?.children)
     }, [threeAudioObject, loop, refDistance, volume])
     return (
         <group {...props} ref={groupRef}>
@@ -103,4 +111,8 @@ AudioObject.inputs = {
         type: BooleanType,  
         default: false,
     },
+    randomizeStart: {
+        type: BooleanType,
+        default: false,
+    }
 };
