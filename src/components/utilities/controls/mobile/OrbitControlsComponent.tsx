@@ -107,7 +107,8 @@ export const OrbitControls = React.forwardRef<OrbitControlsImpl, OrbitControlsPr
         const intersects = raycaster.intersectObjects(scene.children, true)
         const floor = processIntersections(intersects)
         if (floor.valid && floor.position) {
-          // If a current floor is found, move the camera to the destination position from the floor position, with translating the y coordinate with the
+          // If a current floor is found, move the camera to the destination position from the floor position, with translating the y coordinate with the camera offset
+          // TODO: Fix floor detection to happen with previous destination, and not camera position (as it is animated)
           const target = new Vector3().copy(destination.position).sub(proxyCamera.position)
           setGroupOffsetTarget((old)=>{
             return [target.x, old[1] + destination.position.y - floor.position.y, target.z]
