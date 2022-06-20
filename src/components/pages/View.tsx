@@ -59,7 +59,7 @@ function View({ ...props}) {
         navigate("/")
         return null
     }
-    console.log(defaultTheme)
+    // console.log(defaultTheme)
     return (
         <ThemeContext.Provider value={{theme: defaultTheme, setTheme: (t)=>{}}}>
         <div className='absolute w-full h-full'>
