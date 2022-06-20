@@ -23,6 +23,7 @@ type DepthKitObjectProps = VaporComponentProps & {
   loop?: boolean;
   muted?: boolean;
   audioPositionOffset?: Vector3;
+  volume?: number;
 }
 
 export const DepthKitObject: VaporComponent = (props:DepthKitObjectProps) => {
@@ -34,7 +35,7 @@ export const DepthKitObject: VaporComponent = (props:DepthKitObjectProps) => {
   </ErrorBoundary>);
 }
 
-function _DepthKitObject({ metaUrl="", videoUrl="", posterUrl="", autoplay=true, loop=true, muted=false, audioPositionOffset=[0,0,0], ...props }:DepthKitObjectProps) {
+function _DepthKitObject({ metaUrl="", videoUrl="", posterUrl="", autoplay=true, loop=true, muted=false, audioPositionOffset=[0,0,0], volume=1, ...props }:DepthKitObjectProps) {
   const mesh = useRef(null);
   const audioGroupRef = useRef(null)
   const [positionalAudio, setPositionalAudio] = useState(null);
@@ -124,6 +125,7 @@ function AdvancedVideoTexture({
   autoplay = true,
   loop = false,
   muted = true,
+  volume = 1,
   getPositionalAudio = (audioSource: any) => {}
 }) {
   const { audioListener, xrMode, eventDispatcher } = useContext(ViewerContext)
@@ -176,8 +178,9 @@ function AdvancedVideoTexture({
       video.loop = loop;
       video.autoplay = autoplay; // For videos with sound, autoplay will only start when user first interacts with the page
       video.muted = muted;
+      video.volume = volume;
     }
-  }, [video, loop, autoplay, muted]);
+  }, [video, loop, autoplay, muted, volume]);
   // Make video autoplay on first interaction
   const playVideo = useCallback(() => {
     if (video) {
@@ -268,6 +271,10 @@ DepthKitObject.inputs = {
   loop: {
       type: BooleanType,
       default: true
+  },
+  volume: {
+      type: NumberType,
+      default: 1
   },
   muted: {
       type: BooleanType,
