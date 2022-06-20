@@ -18,6 +18,7 @@ import { useMediaQuery } from 'react-responsive';
 import { ViewerContext } from '../viewer/ViewerContext';
 import { XRControls } from '../utilities/controls/XRControls';
 import { ControlTips } from './View/ControlTips';
+import { defaultTheme, ThemeContext } from '../App';
 
 function XRButtons({supportedXRModes, xrRequesterGetterRef}) {
     const supportAR = supportedXRModes && supportedXRModes.includes("immersive-ar")
@@ -58,7 +59,9 @@ function View({ ...props}) {
         navigate("/")
         return null
     }
+    console.log(defaultTheme)
     return (
+        <ThemeContext.Provider value={{theme: defaultTheme, setTheme: (t)=>{}}}>
         <div className='absolute w-full h-full'>
             <Viewer post={post} className="absolute w-full h-full">
                 <DOMControls force={post.configuration.flySpeed} friction={2}/>
@@ -83,6 +86,7 @@ function View({ ...props}) {
                 </div>
             </Fade>
         </div>
+        </ThemeContext.Provider>
     );
 }
 

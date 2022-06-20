@@ -3,7 +3,7 @@ import { formatRGBCSS, useMounted } from "../../utilities";
 import { ThemeContext } from "../App";
 import { twMerge } from "tailwind-merge"
 
-export default function MagicIcon({IconComponent, clickable=false, onClick=()=>{}, disabled=false, fillCurrent=false, invertColors=false, className="", ...props}:
+export default function MagicIcon({IconComponent, clickable=false, onClick=()=>{}, disabled=false, fillCurrent=false, autoColor=true, invertColors=false, className="", ...props}:
 {
     IconComponent: React.ComponentType<any>,
     clickable?: boolean,
@@ -41,8 +41,10 @@ export default function MagicIcon({IconComponent, clickable=false, onClick=()=>{
                 }
             },
             style: {
-                color: invertColors ? formatRGBCSS(theme.backgroundColor) : formatRGBCSS(theme.foregroundColor),
-                transition: `color ${theme.transitionDuration}s, opacity 0.5s`
+                ...(autoColor ? {
+                    color: invertColors ? formatRGBCSS(theme.backgroundColor) : formatRGBCSS(theme.foregroundColor),
+                    transition: `color ${theme.transitionDuration}s, opacity 0.5s`
+                }: {}),
             },
             ...props
         })        
