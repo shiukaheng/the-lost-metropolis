@@ -17,6 +17,7 @@ import { XRRequesterRefExtractor } from '../viewer/ViewportCanvas';
 import { useMediaQuery } from 'react-responsive';
 import { ViewerContext } from '../viewer/ViewerContext';
 import { XRControls } from '../utilities/controls/XRControls';
+import { ControlTips } from './View/ControlTips';
 
 function XRButtons({supportedXRModes, xrRequesterGetterRef}) {
     const supportAR = supportedXRModes && supportedXRModes.includes("immersive-ar")
@@ -78,6 +79,7 @@ function View({ ...props}) {
                             <XRButtons xrRequesterGetterRef={xrRequesterGetterRef} supportedXRModes={supportedXRModes}/>
                         </div>
                     }
+                    <ControlTips className='mt-auto max-w-[550px]'/>
                 </div>
             </Fade>
         </div>

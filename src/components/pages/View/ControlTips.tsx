@@ -1,6 +1,7 @@
 import { useDeviceType, useMultiLangObject } from "../../../utilities";
+import MagicDiv from "../../utilities/MagicDiv";
 import MagicIcon from "../../utilities/MagicIcon";
-import { ReactComponent as Arrows } from './ControlTips/arrow.svg';
+import { ReactComponent as Arrows } from './ControlTips/arrows.svg';
 import { ReactComponent as Click } from './ControlTips/click.svg';
 
 export function ControlTipsInner() {
@@ -17,17 +18,30 @@ export function ControlTipsInner() {
     })
     if (deviceType === "mobile") {
         return (
-            <div>
-                <MagicIcon IconComponent={Click}/>
+            <div className="flex flex-row gap-4">
+                <div className="shrink-0">
+                    <MagicIcon fillCurrent className="w-12 h-12 translate-y-[-2]" IconComponent={Click}/>
+                </div>
                 <div className="font-bold">{tips["mobile"]}</div>
             </div>
         )
     } else if (deviceType === "desktop") {
         return (
-            <div>
-                <MagicIcon IconComponent={Arrows}/>
+            <div className="flex flex-row gap-4">
+                <div className="shrink-0">
+                    <MagicIcon fillCurrent className="w-12 h-12 translate-y-[-2]" IconComponent={Arrows}/>
+                </div>
                 <div className="font-bold">{tips["desktop"]}</div>
             </div>
         )
     }
+    return null;
+}
+
+export function ControlTips({className=""}) {
+    return (
+        <MagicDiv mergeTransitions className={className}>
+            <ControlTipsInner/>
+        </MagicDiv>
+    )
 }
