@@ -8,6 +8,7 @@ import { Post } from "../../../../api/types/Post";
 import { getSponsorImageURL, useMultiLang, useMultiLangObject } from "../../../utilities";
 import { Sponsor } from "../../../../api/types/Sponsor";
 import { twMerge } from "tailwind-merge";
+import { ControlTips, ControlTipsInner } from "../View/ControlTips";
 
 function ShowcaseContentCard({post}: {post: Instance<Roled<Post>>}) {
     const navigate = useNavigate();

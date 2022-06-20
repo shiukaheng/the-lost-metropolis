@@ -23,7 +23,6 @@ export const ContentProvider = ({children}) => {
     useEffect(()=>{
         const unsub = VaporAPI.subscribePosts(
             (postInstances) => {
-                console.log("Got posts", postInstances);
                 if (postInstances === null) {
                     setContent(null);
                 } else {

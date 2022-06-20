@@ -20,6 +20,7 @@ import { Asset } from "../api/types/Asset";
 import { MagicString } from "../api/types/MagicString";
 import { EventDispatcher } from "three";
 import { ViewerContext } from "./components/viewer/ViewerContext";
+import { useMediaQuery } from "react-responsive";
 
 export function formatRGBCSS(color: number[]): string {
     return "rgb(" + color[0] + "," + color[1] + "," + color[2] + ")";
@@ -680,4 +681,12 @@ export function useFilteredPosts() {
     const unfilteredPosts = usePosts()
     const filteredPosts = usePostsFilter(unfilteredPosts)
     return filteredPosts
+}
+
+export function useIsLoggedIn() {
+    const {currentUser} = useContext(AuthContext)
+    const isLoggedIn = useMemo(()=>{
+        return currentUser !== null
+    }, [currentUser])
+    return isLoggedIn
 }

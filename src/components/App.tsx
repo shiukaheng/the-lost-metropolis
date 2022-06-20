@@ -11,7 +11,7 @@ import Background from "./utilities/Background";
 import AnimatedSwitch from "./utilities/AnimatedSwitch";
 import { FC } from "react";
 import View from "./pages/View";
-import { formatRGBCSS, KeyPressCallback, mergeThemes, removeThemeTransition, useFilteredPosts, useStickyState } from "../utilities";
+import { formatRGBCSS, KeyPressCallback, mergeThemes, removeThemeTransition, useFilteredPosts, usePosts, useStickyState } from "../utilities";
 import Login from "./admin/Login";
 
 // All pages
@@ -222,7 +222,7 @@ function inferTheme(postInstance: Instance<Post>) {
 
 function ThemeSetter() {
     const { theme, setTheme, changesRef } = useContext(ThemeContext)
-    const posts = useFilteredPosts()
+    const posts = usePosts()
 
     // Detect theme from url (perhaps better than using component logic)
     // Whenever URL changes or post list changes, update theme
@@ -245,9 +245,6 @@ function ThemeSetter() {
                     setTheme(inferTheme(post))
                 }
             }
-        } else if (splitPath[1] === "browse" && splitPath[2] === undefined && posts && posts.length > 0) {
-            // If we are in the browse directory without an id, use the first post's theme
-            setTheme(inferTheme(posts[0]))
         } else {
             // Otherwise, use the default theme
             setTheme(defaultTheme)
