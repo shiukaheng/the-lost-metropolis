@@ -648,3 +648,18 @@ export function useArrayUpdateDiff(array: any[]) {
     }, [array])
     return diff
 }
+
+export type DeviceType = 'desktop' | 'mobile';
+
+export function useDeviceType(): DeviceType {
+    const [deviceType, setDeviceType] = useState<DeviceType>('desktop');
+    const mobile = useMediaQuery({ query: '(max-width: 768px)' });
+    useEffect(()=>{
+        if (mobile) {
+            setDeviceType('mobile');
+        } else {
+            setDeviceType('desktop');
+        }
+    }, [mobile])
+    return deviceType;
+}

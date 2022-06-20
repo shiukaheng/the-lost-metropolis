@@ -222,7 +222,7 @@ function inferTheme(postInstance: Instance<Post>) {
 
 function ThemeSetter() {
     const { theme, setTheme, changesRef } = useContext(ThemeContext)
-    const posts = useContext(ContentContext)
+    const posts = hidePosts(useContext(ContentContext))
 
     // Detect theme from url (perhaps better than using component logic)
     // Whenever URL changes or post list changes, update theme
