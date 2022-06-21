@@ -47,7 +47,7 @@ function ShowcasePanel() {
     // Making browser update if activeID / id changes. Why this would not cause a loop is beyond me.
     useEffect(()=>{
         navigate(`/browse/${activeID}`);
-    }, [activeID, id])
+    }, [activeID])
     // Make activeID to update again if changed later
     useEffect(()=>{
         setActiveID(id || (displayPosts && displayPosts.length > 0 ? displayPosts[0].id : null))
@@ -56,14 +56,20 @@ function ShowcasePanel() {
     // Calculating activeIndex from activeID
     const activeIndex: number | null = useMemo(()=>{
         const hasPostsToDisplay = displayPosts && displayPosts.length > 0;
-        const activeIndex = hasPostsToDisplay ? displayPosts.findIndex(post => post.id === activeID) : null;
+        const newActiveIndex = hasPostsToDisplay ? displayPosts.findIndex(post => post.id === activeID) : null;
         if (hasPostsToDisplay) {
-            if (activeIndex === -1) {
-                // If the post isn't found, set to the first post
-                setActiveID(displayPosts[0].id);
-                return 0;
+            if (newActiveIndex === -1) {
+                // If the post is not found, check if it is unlisted
+                const unlistedIndex = allPosts.findIndex(post => post.id === activeID);
+                if (unlistedIndex !== -1) {
+                    // If it is unlisted, set activeIndex to null
+                    return null;
+                } else {
+                    // If it is not unlisted, set activeIndex to 0
+                    return 0;
+                }
             } else {
-                return activeIndex;
+                return newActiveIndex;
             }
         } else {
             return null;
