@@ -82,30 +82,18 @@ export function useXRCameraUpdateHelper() {
     useLayoutEffect(()=>{
         if (controlCountRef.current === 0) {
             // Only update camera if these are the first controls
-            camera.position.set(0,0,0)
+            camera.position.set(0,0,0) // Should not make a difference
             camera.rotation.set(0,0,0)
-            player.position.set(...defaultXRCameraProps.position)
-            player.rotation.set(...defaultXRCameraProps.rotation)
-        } else {
-            // // Use previous camera position if not first control
-            // player.position.set(...cameraRef.current.position)
-            // // Set rotation except for y axis
-            // player.rotation.set(
-            //     cameraRef.current.rotation.x,
-            //     0,
-            //     cameraRef.current.rotation.z
-            // )
-            // // Clear camera position
-            // cameraRef.current.position.set(0,0,0)
-            // cameraRef.current.rotation.set(0,0,0)
         }
         controlCountRef.current++
         return ()=>{
-            // Grab XR camera pose
-            // const pose = gl.xr.getCamera().matrixWorld.clone()
+            // Get XR world pose (camera) and apply back to player
+            // const pose = camera.matrixWorld.clone()
+            const pose = gl.xr.getCamera().matrixWorld.clone()
+            console.log(pose)
             player.position.set(0,0,0)
             player.rotation.set(0,0,0)
-            // cameraRef.current?.matrixWorld.copy(pose)
+            player.matrixWorld.copy(pose)
         }
     }, [])
 }

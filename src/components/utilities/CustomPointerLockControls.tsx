@@ -1,13 +1,14 @@
 import { ReactThreeFiber, useThree } from '@react-three/fiber'
+import { useXR } from '@react-three/xr'
 import * as React from 'react'
 import * as THREE from 'three'
 
 // Copied to increase angular resolution
 
-import { Camera, Euler, EventDispatcher, Vector3 } from 'three'
+import { Camera, Euler, EventDispatcher, Object3D, Vector3 } from 'three'
 
 class PointerLockControlsImpl extends EventDispatcher {
-  private camera: Camera
+  private controlObject: Object3D
   public domElement: HTMLElement
 
   public isLocked = false
@@ -27,7 +28,7 @@ class PointerLockControlsImpl extends EventDispatcher {
 
   private vec = new Vector3()
 
-  constructor(camera: Camera, domElement: HTMLElement) {
+  constructor(controlObject: Object3D, domElement: HTMLElement) {
     super()
 
     if (domElement === undefined) {
@@ -36,7 +37,7 @@ class PointerLockControlsImpl extends EventDispatcher {
     }
 
     this.domElement = domElement
-    this.camera = camera
+    this.controlObject = controlObject
 
     this.connect()
   }
@@ -47,14 +48,14 @@ class PointerLockControlsImpl extends EventDispatcher {
     const movementX = event.movementX || (event as any).mozMovementX || (event as any).webkitMovementX || 0
     const movementY = event.movementY || (event as any).mozMovementY || (event as any).webkitMovementY || 0
 
-    this.euler.setFromQuaternion(this.camera.quaternion)
+    this.euler.setFromQuaternion(this.controlObject.quaternion)
 
     this.euler.y -= movementX * 0.0005
     this.euler.x -= movementY * 0.0005
 
     this.euler.x = Math.max(this.PI_2 - this.maxPolarAngle, Math.min(this.PI_2 - this.minPolarAngle, this.euler.x))
 
-    this.camera.quaternion.setFromEuler(this.euler)
+    this.controlObject.quaternion.setFromEuler(this.euler)
 
     this.dispatchEvent(this.changeEvent)
   }
@@ -91,28 +92,28 @@ class PointerLockControlsImpl extends EventDispatcher {
     this.disconnect()
   }
 
-  private getObject = (): Camera =>
+  private getObject = (): Object3D =>
     // retaining this method for backward compatibility
-    this.camera
+    this.controlObject
 
   private direction = new Vector3(0, 0, -1)
-  public getDirection = (v: Vector3): Vector3 => v.copy(this.direction).applyQuaternion(this.camera.quaternion)
+  public getDirection = (v: Vector3): Vector3 => v.copy(this.direction).applyQuaternion(this.controlObject.quaternion)
 
   public moveForward = (distance: number): void => {
     // move forward parallel to the xz-plane
     // assumes this.camera.up is y-up
 
-    this.vec.setFromMatrixColumn(this.camera.matrix, 0)
+    this.vec.setFromMatrixColumn(this.controlObject.matrix, 0)
 
-    this.vec.crossVectors(this.camera.up, this.vec)
+    this.vec.crossVectors(this.controlObject.up, this.vec)
 
-    this.camera.position.addScaledVector(this.vec, distance)
+    this.controlObject.position.addScaledVector(this.vec, distance)
   }
 
   public moveRight = (distance: number): void => {
-    this.vec.setFromMatrixColumn(this.camera.matrix, 0)
+    this.vec.setFromMatrixColumn(this.controlObject.matrix, 0)
 
-    this.camera.position.addScaledVector(this.vec, distance)
+    this.controlObject.position.addScaledVector(this.vec, distance)
   }
 
   public lock = (): void => {
@@ -129,7 +130,7 @@ export type PointerLockControlsProps = ReactThreeFiber.Object3DNode<
   typeof PointerLockControlsImpl
 > & {
   selector?: string
-  camera?: THREE.Camera
+  controlObject?: Object3D
   onChange?: (e?: THREE.Event) => void
   onLock?: (e?: THREE.Event) => void
   onUnlock?: (e?: THREE.Event) => void
@@ -137,13 +138,14 @@ export type PointerLockControlsProps = ReactThreeFiber.Object3DNode<
 
 export const CustomPointerLockControls = React.forwardRef<PointerLockControlsImpl, PointerLockControlsProps>(
   ({ selector=".viewport-canvas", onChange, onLock, onUnlock, ...props }, ref) => {
-    const { camera, ...rest } = props
+    const { controlObject, ...rest } = props
     const gl = useThree(({ gl }) => gl)
-    const defaultCamera = useThree(({ camera }) => camera)
+    const {player} = useXR()
+    const defaultControlObject = player
     const invalidate = useThree(({ invalidate }) => invalidate)
-    const explCamera = camera || defaultCamera
+    const actualControlObject = controlObject || defaultControlObject
 
-    const [controls] = React.useState(() => new PointerLockControlsImpl(explCamera, gl.domElement))
+    const [controls] = React.useState(() => new PointerLockControlsImpl(actualControlObject, gl.domElement))
 
     React.useEffect(() => {
       const callback = (e: THREE.Event) => {
