@@ -1,4 +1,5 @@
 import { EventManager, ReactThreeFiber, useFrame, useThree } from '@react-three/fiber'
+import { useXR } from '@react-three/xr'
 import * as React from 'react'
 import { useRef } from 'react'
 import { Camera, Event, Group, MathUtils, Matrix4, Object3D, Quaternion, Raycaster, Vector3 } from 'three'
@@ -44,16 +45,18 @@ export const OrbitControls = React.forwardRef<OrbitControlsImpl, OrbitControlsPr
   ({ makeDefault, camera, regress, domElement, enableDamping = true, onChange, onStart, onEnd, doubleTapMaxDelay=300, locomotionLambda=1.5, cameraOffset=0.1, ...restProps }, ref) => {
     useCameraUpdateHelper()
     const invalidate = useThree((state) => state.invalidate)
-    const defaultCamera = useThree((state) => state.camera)
+    // const defaultCamera = useThree((state) => state.camera)
+    const {player} = useXR()
+    const raycastCamera = useThree((state) => state.camera)
     const gl = useThree((state) => state.gl)
     const scene = useThree((state) => state.scene)
     const events = useThree((state) => state.events) as EventManager<HTMLElement>
     const set = useThree((state) => state.set)
     const get = useThree((state) => state.get)
     const viewerPerformance = useThree((state) => state.performance)
-    const explCamera = camera || defaultCamera
+    const navigationCamera = camera || player
     const explDomElement = (domElement || events.connected || gl.domElement) as HTMLElement
-    const controls = React.useMemo(() => new OrbitControlsImpl(explCamera), [explCamera])
+    const controls = React.useMemo(() => new OrbitControlsImpl(navigationCamera), [navigationCamera])
 
     // Initialize objects and group
     const proxyCamera = React.useMemo(()=>new Object3D(), [])
@@ -61,8 +64,8 @@ export const OrbitControls = React.forwardRef<OrbitControlsImpl, OrbitControlsPr
     const transformGroup = React.useMemo(()=>new Group(), [])
 
     React.useEffect(()=>{
-        proxyCamera.position.copy(explCamera.position)
-        proxyCamera.rotation.copy(explCamera.rotation)
+        proxyCamera.position.copy(navigationCamera.position)
+        proxyCamera.rotation.copy(navigationCamera.rotation)
         // Set the target to be a distance forward from the proxy camera, in the direction the camera is looking
         const forward = new Vector3(0,0,1)
         forward.applyQuaternion(proxyCamera.quaternion)
@@ -79,8 +82,8 @@ export const OrbitControls = React.forwardRef<OrbitControlsImpl, OrbitControlsPr
     const worldQuatVec = React.useMemo(()=>new Quaternion(), [])
 
     useFrame((state, dt)=>{
-      explCamera.position.copy(proxyCamera.getWorldPosition(worldPosVec))
-      explCamera.quaternion.copy(proxyCamera.getWorldQuaternion(worldQuatVec))
+      navigationCamera.position.copy(proxyCamera.getWorldPosition(worldPosVec))
+      navigationCamera.quaternion.copy(proxyCamera.getWorldQuaternion(worldQuatVec))
       transformGroup.position.x = MathUtils.damp(transformGroup.position.x, groupOffsetTarget[0], locomotionLambda, dt)
       transformGroup.position.y = MathUtils.damp(transformGroup.position.y, groupOffsetTarget[1], locomotionLambda, dt)
       transformGroup.position.z = MathUtils.damp(transformGroup.position.z, groupOffsetTarget[2], locomotionLambda, dt)
@@ -97,13 +100,13 @@ export const OrbitControls = React.forwardRef<OrbitControlsImpl, OrbitControlsPr
 
     // On double-tap, move the camera to the layer 3 position by setting positionOffsetTarget
     const onDoubleTap = React.useCallback((x, y) => {
-      raycaster.setFromCamera({ x, y }, explCamera)
+      raycaster.setFromCamera({ x, y }, raycastCamera)
       const intersects = raycaster.intersectObjects(scene.children, true)
       const destination = processIntersections(intersects)
       if (destination.valid && destination.position) {
         // positionOffsetTarget.current.copy(destination.position)
         // Detect current floor by raycasting straight down (HaCkY!)
-        raycaster.set(explCamera.position, new Vector3(0, -1, 0)) // TODO: Allow specification of up vector
+        raycaster.set(navigationCamera.position, new Vector3(0, -1, 0)) // TODO: Allow specification of up vector
         const intersects = raycaster.intersectObjects(scene.children, true)
         const floor = processIntersections(intersects)
         if (floor.valid && floor.position) {
@@ -125,7 +128,7 @@ export const OrbitControls = React.forwardRef<OrbitControlsImpl, OrbitControlsPr
         }
         // console.log('Double-tap detected, moving camera to', groupOffsetTarget)
       }
-    }, [explCamera, explDomElement, groupOffsetTarget])
+    }, [navigationCamera, explDomElement, groupOffsetTarget])
 
     const lastTapTime = useRef<number | null>(null)
 
@@ -175,6 +178,6 @@ export const OrbitControls = React.forwardRef<OrbitControlsImpl, OrbitControlsPr
       }
     }, [makeDefault, controls])
 
-    return <primitive ref={ref} object={controls} target={target} controlObject={proxyCamera} enableDamping={enableDamping} {...restProps} />
+    return <primitive ref={ref} object={controls} target={target} controlObject={proxyCamera} camera={raycastCamera} enableDamping={enableDamping} panSpeed={3} zoomSpeed={0.2} {...restProps} />
   }
 )

@@ -24,7 +24,8 @@ import {
   const moduloWrapAround = (offset: number, capacity: number) => ((offset % capacity) + capacity) % capacity
   
   class OrbitControls extends EventDispatcher {
-    controlObject: Object3D
+    controlObject: Object3D // container object that moves camera
+    camera: Camera | null = null // camera itself
     domElement: HTMLElement | undefined
     // Set to false to disable this control
     enabled = true
@@ -409,26 +410,26 @@ import {
         return function pan(deltaX: number, deltaY: number) {
           const element = scope.domElement
   
-          if (element && scope.controlObject instanceof PerspectiveCamera && scope.controlObject.isPerspectiveCamera) {
+          if (element && scope.camera instanceof PerspectiveCamera && scope.camera.isPerspectiveCamera) {
             // perspective
             const position = scope.controlObject.position
             offset.copy(position).sub(scope.target.position)
             let targetDistance = offset.length()
   
             // half of the fov is center to top of screen
-            targetDistance *= Math.tan(((scope.controlObject.fov / 2) * Math.PI) / 180.0)
+            targetDistance *= Math.tan(((scope.camera.fov / 2) * Math.PI) / 180.0)
   
             // we use only clientHeight here so aspect ratio does not distort speed
             panLeft((2 * deltaX * targetDistance) / element.clientHeight, scope.controlObject.matrix)
             panUp((2 * deltaY * targetDistance) / element.clientHeight, scope.controlObject.matrix)
-          } else if (element && scope.controlObject instanceof OrthographicCamera && scope.controlObject.isOrthographicCamera) {
+          } else if (element && scope.camera instanceof OrthographicCamera && scope.camera.isOrthographicCamera) {
             // orthographic
             panLeft(
-              (deltaX * (scope.controlObject.right - scope.controlObject.left)) / scope.controlObject.zoom / element.clientWidth,
+              (deltaX * (scope.camera.right - scope.camera.left)) / scope.camera.zoom / element.clientWidth,
               scope.controlObject.matrix,
             )
             panUp(
-              (deltaY * (scope.controlObject.top - scope.controlObject.bottom)) / scope.controlObject.zoom / element.clientHeight,
+              (deltaY * (scope.camera.top - scope.camera.bottom)) / scope.camera.zoom / element.clientHeight,
               scope.controlObject.matrix,
             )
           } else {
@@ -440,11 +441,14 @@ import {
       })()
   
       function dollyOut(dollyScale: number) {
-        if (scope.controlObject instanceof PerspectiveCamera && scope.controlObject.isPerspectiveCamera) {
-          scale /= dollyScale
-        } else if (scope.controlObject instanceof OrthographicCamera && scope.controlObject.isOrthographicCamera) {
-          scope.controlObject.zoom = Math.max(scope.minZoom, Math.min(scope.maxZoom, scope.controlObject.zoom * dollyScale))
-          scope.controlObject.updateProjectionMatrix()
+        if (scope.camera instanceof PerspectiveCamera && scope.camera.isPerspectiveCamera) {
+          // scale /= dollyScale
+          scope.camera.fov /= dollyScale
+          scope.camera.updateProjectionMatrix()
+          // console.log("dollyOut", dollyScale, scale)
+        } else if (scope.camera instanceof OrthographicCamera && scope.camera.isOrthographicCamera) {
+          scope.camera.zoom = Math.max(scope.minZoom, Math.min(scope.maxZoom, scope.camera.zoom * dollyScale))
+          scope.camera.updateProjectionMatrix()
           zoomChanged = true
         } else {
           console.warn('WARNING: OrbitControls.js encountered an unknown camera type - dolly/zoom disabled.')
@@ -453,8 +457,11 @@ import {
       }
   
       function dollyIn(dollyScale: number) {
-        if (scope.controlObject instanceof PerspectiveCamera && scope.controlObject.isPerspectiveCamera) {
-          scale *= dollyScale
+        if (scope.camera instanceof PerspectiveCamera && scope.camera.isPerspectiveCamera) {
+          // scale *= dollyScale
+          scope.camera.fov *= dollyScale
+          scope.camera.updateProjectionMatrix()
+          // consol e.log("dollyIn", dollyScale, scale)
         } else if (scope.controlObject instanceof OrthographicCamera && scope.controlObject.isOrthographicCamera) {
           scope.controlObject.zoom = Math.max(scope.minZoom, Math.min(scope.maxZoom, scope.controlObject.zoom / dollyScale))
           scope.controlObject.updateProjectionMatrix()

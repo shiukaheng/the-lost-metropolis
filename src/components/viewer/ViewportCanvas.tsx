@@ -21,30 +21,91 @@ export function GenericXRCameraUpdater() {
     return null
 }
 
+// export function useCameraUpdateHelper() {
+//     const {defaultCameraProps, controlCountRef} = useContext(ViewerContext)
+//     const {camera} = useThree()
+//     useLayoutEffect(()=>{
+//         camera.position.set(...defaultCameraProps.position)
+//         camera.rotation.set(...defaultCameraProps.rotation)
+//         // console.log(camera, defaultCameraProps)
+//         if (camera instanceof PerspectiveCamera) {
+//             camera.fov = defaultCameraProps.fov
+//             camera.updateProjectionMatrix()
+//         }
+//         // console.log("Camera updated", camera.position, camera.rotation)
+//     }, [])
+// }
+
+// export function useXRCameraUpdateHelper() {
+//     const {defaultXRCameraProps, cameraRef} = useContext(ViewerContext)
+//     const gl = useThree((state) => state.gl)
+//     const {player} = useXR()
+//     useLayoutEffect(()=>{
+//         player.position.set(...defaultXRCameraProps.position)
+//         player.rotation.set(...defaultXRCameraProps.rotation)
+//         return ()=>{
+//             // Grab XR camera pose
+//             const pose = gl.xr.getCamera().matrixWorld.clone()
+//             player.position.set(0,0,0)
+//             player.rotation.set(0,0,0)
+//             cameraRef.current?.matrixWorld.copy(pose)
+//         }
+//     }, [])
+// }
+
 export function useCameraUpdateHelper() {
-    const {defaultCameraProps} = useContext(ViewerContext)
+    const {defaultCameraProps, controlCountRef} = useContext(ViewerContext)
     const {camera} = useThree()
+    const {player} = useXR()
     useLayoutEffect(()=>{
-        camera.position.set(...defaultCameraProps.position)
-        camera.rotation.set(...defaultCameraProps.rotation)
-        // console.log(camera, defaultCameraProps)
-        if (camera instanceof PerspectiveCamera) {
-            camera.fov = defaultCameraProps.fov
-            camera.updateProjectionMatrix()
+        if (controlCountRef.current === 0) {
+            // Only update camera if these are the first controls
+            camera.position.set(0,0,0)
+            camera.rotation.set(0,0,0)
+            player.position.set(...defaultCameraProps.position)
+            player.rotation.set(...defaultCameraProps.rotation)
+            // console.log(camera, defaultCameraProps)
+            if (camera instanceof PerspectiveCamera) {
+                camera.fov = defaultCameraProps.fov
+                camera.updateProjectionMatrix()
+            }
         }
-        // console.log("Camera updated", camera.position, camera.rotation)
+        controlCountRef.current++
     }, [])
 }
 
 export function useXRCameraUpdateHelper() {
-    const {defaultXRCameraProps} = useContext(ViewerContext)
+    const {defaultXRCameraProps, controlCountRef} = useContext(ViewerContext)
+    const camera = useThree((state) => state.camera)
+    const gl = useThree((state) => state.gl)
     const {player} = useXR()
     useLayoutEffect(()=>{
-        player.position.set(...defaultXRCameraProps.position)
-        player.rotation.set(...defaultXRCameraProps.rotation)
+        if (controlCountRef.current === 0) {
+            // Only update camera if these are the first controls
+            camera.position.set(0,0,0)
+            camera.rotation.set(0,0,0)
+            player.position.set(...defaultXRCameraProps.position)
+            player.rotation.set(...defaultXRCameraProps.rotation)
+        } else {
+            // // Use previous camera position if not first control
+            // player.position.set(...cameraRef.current.position)
+            // // Set rotation except for y axis
+            // player.rotation.set(
+            //     cameraRef.current.rotation.x,
+            //     0,
+            //     cameraRef.current.rotation.z
+            // )
+            // // Clear camera position
+            // cameraRef.current.position.set(0,0,0)
+            // cameraRef.current.rotation.set(0,0,0)
+        }
+        controlCountRef.current++
         return ()=>{
+            // Grab XR camera pose
+            // const pose = gl.xr.getCamera().matrixWorld.clone()
             player.position.set(0,0,0)
             player.rotation.set(0,0,0)
+            // cameraRef.current?.matrixWorld.copy(pose)
         }
     }, [])
 }

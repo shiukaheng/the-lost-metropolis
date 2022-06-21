@@ -38,7 +38,6 @@ function useThreeAudio(url: string, positional: boolean, randomizeStart: boolean
         newAudioObject.setBuffer(audioFile);
         setObject(newAudioObject);
         return ()=>{
-            // console.log(objectRef.current);
             objectRef.current?.disconnect();
         }
     }, [audioListener, positional]);

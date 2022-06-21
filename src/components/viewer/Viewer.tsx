@@ -79,6 +79,9 @@ function ViewerManager({children, defaultCameraProps}: {children: any, defaultCa
     // Navigation options
     const [flySpeed, setFlySpeed] = useState(2)
 
+    // Controls helpers
+    const controlCountRef = useRef(0)
+
     return (
         <ViewerContext.Provider value={{
             // A. Camera prop management
@@ -111,6 +114,8 @@ function ViewerManager({children, defaultCameraProps}: {children: any, defaultCa
             // H. Navigation options
             flySpeed,
             setFlySpeed,
+            // I. Controls helpers
+            controlCountRef,
         }}>
             {children}
         </ViewerContext.Provider>

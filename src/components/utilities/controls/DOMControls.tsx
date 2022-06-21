@@ -1,5 +1,6 @@
 import { PointerLockControls } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";
+import { useXR } from "@react-three/xr";
 import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useDeviceSelectors } from "react-device-detect";
 import { useMediaQuery } from "react-responsive";
@@ -37,6 +38,7 @@ export function DesktopControls({mass=1, force=10, friction=2}) {
     const up = useKeyPress(" ");
     const down = useKeyPress("Shift");
     const deltaVelocity = useMemo(() => new Vector3(0, 0, 0), []);
+    const {player} = useXR()
     useFrame(({camera}, delta) => {
         // const deltaVelocity = new Vector3(0, 0, 0);
         deltaVelocity.set(0, 0, 0);
@@ -52,11 +54,11 @@ export function DesktopControls({mass=1, force=10, friction=2}) {
         // delta v = at and a = F/m, so delta v = F/m * t
         deltaVelocity.multiplyScalar(delta / mass);
         // Transform the velocity to world coordinates
-        deltaVelocity.applyEuler(camera.rotation);
+        deltaVelocity.applyEuler(player.rotation);
         // Add the velocity to the camera's velocity
         cameraVelocityRef.current.add(deltaVelocity);
         // Apply the velocity to the camera position: s = s0 + vt
-        camera.position.add(cameraVelocityRef.current.clone().multiplyScalar(delta));
+        player.position.add(cameraVelocityRef.current.clone().multiplyScalar(delta));
         // Apply friction to the velocity
         // if (delta !== 0) { // Fix division by zero
         //     cameraVelocityRef.current.multiplyScalar(friction * delta);

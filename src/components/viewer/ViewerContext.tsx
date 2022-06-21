@@ -45,6 +45,8 @@ const defaultViewerContext: ViewerContextProps = {
     // H. Navigation options
     flySpeed: 2,
     setFlySpeed: (speed:number) => {},
+    // I. Controls helpers (keeping track of whether it is the first controls being used)
+    controlCountRef: {current: 0},
 }
 
 export type DefaultCameraPropType = {
@@ -84,6 +86,8 @@ interface ViewerContextProps {
     // H. Navigation options
     flySpeed: number,
     setFlySpeed: (speed:number) => void,
+    // I. Controls helpers (keeping track of whether it is the first controls being used)
+    controlCountRef: MutableRefObject<number>,
 }
 
 const ViewerContext = createContext(defaultViewerContext)
