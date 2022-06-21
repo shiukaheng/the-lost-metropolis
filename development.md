@@ -2,6 +2,11 @@
 
 ## Urgent
 
+FOR THIS PARTICULAR BRANCH:
+TouchControls has been modified to use player instead of camera,
+but DOM controls is still using camera.
+Also, the transition between DOM <-> XR is not yet implemented.
+
 ## Non-urgent
 
 - Make better unlisted post function
