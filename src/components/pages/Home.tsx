@@ -46,7 +46,7 @@ function Home() {
         },
         "subtitle2": {
             "zh": "元宇宙中重聚遺忘的故事",
-            "en": "virtually reincarnating lost spaces"
+            "en": "virtually resurrecting lost spaces"
         },
         "p2": {
             "zh": "《情迷香港》以沉浸式的載體，將面臨清拆的社區空間轉化為可供探索與互動的虛擬掃描複製品。場景裏更加入聲音景觀以及與該空間有關之人物採訪錄像，以豐富觀眾聽覺的感受與對人文歷史的認知。",
