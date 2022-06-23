@@ -10,6 +10,7 @@ import { BooleanType, MagicStringType, NumberType, StringType } from "../viewer/
 import { createEmptyMultilangString, useMagicString } from "../../utilities"
 import { MagicString } from "../../../api/types/MagicString"
 import infoIconURL from "../../../static/viewport/info-icon.png"
+import { TestObject } from "./TestObject"
 
 type InfoObjectProps = VaporComponentProps & {
     text?: MagicString
@@ -32,19 +33,27 @@ export const InfoObject: VaporComponent = ({text=createEmptyMultilangString(), i
 
     const displayText = useMagicString(text)
     return (
-        transitions(
-            ({opacity, scale}, item) => (
-                item 
-                ?
-                <AnimatedLabelIcon iconUrl={infoIconURL} onClick={()=>{setExpanded(!expanded)}} iconScale={scale} iconOpacity={opacity} skirtHidden={!expanded} scale={iconSize} objectID={props.objectID} position={props.position}/>
-                :
-                <Billboard>
-                    <UnifiedInteractive {...props} onClick={()=>{setExpanded(!expanded)}} parentObjectID={props.objectID}>
-                        <AnimatedText scale={scale} gpuAccelerateSDF={true} fillOpacity={opacity} text={displayText} maxWidth={wrapText ? textMaxWidth : Infinity} fontSize={fontSize} renderOrder={1} font="https://fonts.gstatic.com/s/notoseriftc/v20/XLYgIZb5bJNDGYxLBibeHZ0BhnQ.woff"/>
-                    </UnifiedInteractive>
-                </Billboard>
-            )
-        )
+        // transitions(
+        //     ({opacity, scale}, item) => (
+        //         item 
+        //         ?
+        //         <AnimatedLabelIcon iconUrl={infoIconURL} onClick={()=>{setExpanded(!expanded)}} iconScale={scale} iconOpacity={opacity} skirtHidden={!expanded} scale={iconSize} objectID={props.objectID} position={props.position}/>
+        //         :
+        //         <Billboard>
+        //             <UnifiedInteractive {...props} onClick={()=>{setExpanded(!expanded)}} parentObjectID={props.objectID}>
+        //                 <AnimatedText scale={scale} gpuAccelerateSDF={true} fillOpacity={opacity} text={displayText} maxWidth={wrapText ? textMaxWidth : Infinity} fontSize={fontSize} renderOrder={1} font="https://fonts.gstatic.com/s/notoseriftc/v20/XLYgIZb5bJNDGYxLBibeHZ0BhnQ.woff"/>
+        //             </UnifiedInteractive>
+        //         </Billboard>
+        //     )
+        // )
+
+        // Disable the interactive label for now
+        <group {...props}>
+            {/* <TestObject objectID={props.objectID}/> */}
+            <Billboard>
+                <Text scale={iconSize} gpuAccelerateSDF={true} fillOpacity={expanded ? 1 : 0} text={"test"} maxWidth={wrapText ? textMaxWidth : Infinity} fontSize={fontSize} renderOrder={1} font="https://fonts.gstatic.com/s/notoseriftc/v20/XLYgIZb5bJNDGYxLBibeHZ0BhnQ.woff"/>
+            </Billboard>
+        </group>
     );
 }
 
@@ -56,13 +65,13 @@ InfoObject.inputs = {
         type: MagicStringType,
         default: "Info",
     },
-    iconSize: {
-        type: NumberType,
-        default: 0.1
-    },
+    // iconSize: {
+    //     type: NumberType,
+    //     default: 0.1
+    // },
     fontSize: {
         type: NumberType,
-        default: 0.1
+        default: 1
     },
     textMaxWidth: {
         type: NumberType,
