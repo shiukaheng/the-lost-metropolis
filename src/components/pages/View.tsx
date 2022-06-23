@@ -82,7 +82,7 @@ function View({ ...props}) {
                             <XRButtons xrRequesterGetterRef={xrRequesterGetterRef} supportedXRModes={supportedXRModes}/>
                         </div>
                     }
-                    <ControlTips className='mt-auto max-w-[550px]'/>
+                    <ControlTips className='mt-auto max-w-[500px]'/>
                 </div>
             </Fade>
         </div>
