@@ -44,10 +44,24 @@ function ShowcasePanel() {
     // If no posts, activeID will be null
     const [activeID, setActiveID] = useState(id || (displayPosts && displayPosts.length > 0 ? displayPosts[0].id : null)
     );
-    // Making browser update if activeID / id changes. Why this would not cause a loop is beyond me.
+    // Making browser update if activeID changes.
     useEffect(()=>{
-        navigate(`/browse/${activeID}`);
+        if (id === undefined) {
+            navigate(`/browse/${activeID}`, { replace: true });
+        } else {
+            if (id !== activeID) {
+                navigate(`/browse/${activeID}`);
+            }
+        }
     }, [activeID])
+    // Redirect user back to post if they press back
+    useEffect(()=>{
+        if ((activeID !== null) && (id === undefined)) {
+            navigate(`/browse/${activeID}`, { replace: true });
+        } else if (id === undefined && displayPosts && displayPosts.length > 0) {
+            navigate(`/browse/${displayPosts[0].id}`, { replace: true });
+        }
+    }, [id])
     // Make activeID to update again if changed later
     useEffect(()=>{
         setActiveID(id || (displayPosts && displayPosts.length > 0 ? displayPosts[0].id : null))
