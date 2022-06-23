@@ -12,6 +12,7 @@ import MagicDiv from '../utilities/MagicDiv';
 import { themeSchema } from '../../../api/types/Theme';
 import MagicIcon from '../utilities/MagicIcon';
 import { AuthContext } from '../admin/AuthProvider';
+import { Keypress } from '../utilities/keyboardControls/Keypress';
 
 function ShowcaseView() {
     const posts = useFilteredPosts()
@@ -115,8 +116,25 @@ function ShowcasePanel() {
         }
     }, [activeID, activeIndex, allPosts])
 
+    const nextPost = useCallback(
+        (displayPosts && displayPosts.length > 0) ? () => {
+            const proposedIndex = (activeIndex + 1) % displayPosts.length;
+            setActiveIndex(proposedIndex);
+        } : ()=>{}
+    , [activeIndex, displayPosts, setActiveIndex])
+
+    const previousPost = useCallback(
+        (displayPosts && displayPosts.length > 0) ? () => {
+            const proposedIndex = (activeIndex - 1 + displayPosts.length) % displayPosts.length;
+            setActiveIndex(proposedIndex);
+        } : ()=>{}
+    , [activeIndex, displayPosts, setActiveIndex])
+
     return (
         <div className="w-full h-full relative">
+            {/* Keyboard shortcuts */}
+            <Keypress keyName="ArrowLeft" onDown={previousPost}/>
+            <Keypress keyName="ArrowRight" onDown={nextPost}/>
             <div className="flex flex-col h-full w-full absolute justify-between">
                 <div className="h-full w-full relative overflow-hidden">
                     {
@@ -151,14 +169,7 @@ function ShowcasePanel() {
                     unlisted ?
                     null :
                     <div className="flex-row gap-2 justify-between flex items-center px-8 pb-8 pt-4 md:px-0 md:pb-20 md:pr-20">
-                        <MagicIcon IconComponent={ArrowLeftIcon} clickable fillCurrent className="h-5" onClick={ (displayPosts && displayPosts.length > 0) ? () => {
-                            var proposedIndex = (activeIndex - 1) % displayPosts.length;
-                            if (proposedIndex < 0) {
-                                proposedIndex = displayPosts.length - 1;
-                            }
-                            // updateUrl(proposedIndex)
-                            setActiveIndex(proposedIndex);
-                        } : ()=>{} }/>
+                        <MagicIcon IconComponent={ArrowLeftIcon} clickable fillCurrent className="h-5" onClick={previousPost}/>
                         <div className="flex flex-row gap-2" style={{ color: formatRGBCSS(theme.foregroundColor), transition: `color ${theme.transitionDuration}s` }}>
                             <div className='inline md:hidden'>
                                 {swipeLabel}
@@ -169,10 +180,7 @@ function ShowcasePanel() {
                             <div className="font-serif font-bold select-none">{activeIndex !== null ? activeIndex + 1 : "- "}/{displayPosts && displayPosts.length > 0 ? displayPosts.length : " -"}</div>
                         </div>
                         {/* <button className="border-black border px-4 rounded-3xl md:hover:opacity-50 transition-opacity duration-500 font-serif font-bold text-s md:text-xl h-8 md:h-9">show all</button> */}
-                        <MagicIcon IconComponent={ArrowRightIcon} clickable fillCurrent className="h-5" onClick={ (displayPosts && displayPosts.length > 0) ? () => {
-                            const proposedIndex = (activeIndex + 1) % displayPosts.length;
-                            setActiveIndex(proposedIndex);
-                        } : ()=>{} }/>
+                        <MagicIcon IconComponent={ArrowRightIcon} clickable fillCurrent className="h-5" onClick={nextPost}/>
                     </div>
                 }
             </div>
