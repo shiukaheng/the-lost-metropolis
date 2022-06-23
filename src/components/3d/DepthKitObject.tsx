@@ -8,7 +8,7 @@ import DepthKitMaterial from "./materials/DepthKitMaterial";
 import { VaporComponent, VaporComponentProps } from "../viewer/ComponentDeclarations";
 import { genericInputs } from "../viewer/genericInputs"
 import { BooleanType, NumberType, URLType, Vector3Type } from "../viewer/ArgumentTypes";
-import { useThreeEventListener } from "../../utilities";
+import { useEventListener, useThreeEventListener } from "../../utilities";
 
 const VERTS_WIDE = 256;
 const VERTS_TALL = 256;
@@ -164,6 +164,7 @@ function AdvancedVideoTexture({
     if (videoUrl) {
       video.src = videoUrl;
       video.load();
+      // console.log(Date.now(), "Loading Video", videoUrl);
     }
   }, [video, videoUrl]);
   // Make poster url reactive
@@ -188,8 +189,14 @@ function AdvancedVideoTexture({
     }
   }, [video]);
   useThreeEventListener("audio-start", playVideo, eventDispatcher);
-  
-  // Trigger play if audio context is resumed, 
+  // Trigger play if loading is slow and audioContext has resumed, leading to no "audio-start" event being received
+  useEventListener("loadeddata", playVideo, video);
+  // useEffect(() => {
+  //   if (video && video.readyState === video.HAVE_ENOUGH_DATA && !video.paused) {
+  //     video.play();
+  //   }
+  // }, [video]);
+  // console.log(video)
   return (
     <videoTexture
       attach="videoTexture"

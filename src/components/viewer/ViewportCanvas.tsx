@@ -152,12 +152,14 @@ function AudioContextHelper() {
             resumeNumRef.current++
             if (resumeNumRef.current === 1) {
                 eventDispatcher.dispatchEvent({type: "audio-start"})
+                // console.log("Audio started")
             }
         }
         (audioListener.context as AudioContext).onstatechange = (e)=>{
             // If suspended, emit event
             if (e.target.state === "suspended") {
                 eventDispatcher.dispatchEvent({type: "audio-suspended"})
+                // console.log("Audio suspended")
             }
             // If resumed, emit event
             if (e.target.state === "running") {
@@ -165,11 +167,13 @@ function AudioContextHelper() {
                 resumeNumRef.current++
                 if (resumeNumRef.current === 1) {
                     eventDispatcher.dispatchEvent({type: "audio-start"})
+                    // console.log("Audio started")
                 }
             }
             // If ended, emit event
             if (e.target.state === "closed") {
                 eventDispatcher.dispatchEvent({type: "audio-ended"})
+                // console.log("Audio ended")
             }
         }
         // Cleanup
@@ -181,6 +185,8 @@ function AudioContextHelper() {
     useEffect(()=>{
         resume()
     }, [xrMode])
+    // Trigger resume when someone touches the screen
+    useEventListener("touchstart", resume, gl.domElement)
     // Trigger resume when pointerlock change occurs
     useEventListener("pointerlockchange", resume, document)
     return null
