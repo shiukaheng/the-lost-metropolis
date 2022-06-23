@@ -46,32 +46,34 @@ function ShowcasePanel() {
 
     // Initializing activeID state (this is the thing that actually gets read by subcomponents)
     // If no posts, activeID will be null
-    const [activeID, setActiveID] = useState(id || (displayPosts && displayPosts.length > 0 ? displayPosts[0].id : null)
-    );
-    // Making browser update if activeID changes.
+    const [activeID, setActiveID] = useState<string | null>(null)
+
+    // OK. This is the logic for the swipeable view. DON'T get confused. There are a lot of similar variables here.
+    // activeID: This is the ID of the post being displayed. All the subcomponents will use this to determine what post to display.
+    // activeIndex: This the the index of the post being displayed, and it is calculated from activeID via useMemo.
+    // id: This is the ID of the post that is being navigated to. This will be the first to be updated when the user navigates to a new post.
+
+    // TASK: We need to link these together.
+    // To prevent loops and unnecessary complexity, the only thing we will actually manipulate is the "id" variable.
+    // The other variables will be updated by the useEffect / useMemo hooks.
+
+    // Redirecting to the default post if no post is specified. Replace so user doesn't get into a loop when they backtrack.
     useEffect(()=>{
         if (id === undefined) {
-            navigate(`/browse/${activeID}`, { replace: true });
-        } else {
-            if (id !== activeID) {
-                navigate(`/browse/${activeID}`);
-            }
-        }
-    }, [activeID])
-    // Redirect user back to post if they press back
-    useEffect(()=>{
-        if ((activeID !== null) && (id === undefined)) {
-            navigate(`/browse/${activeID}`, { replace: true });
-        } else if (id === undefined && displayPosts && displayPosts.length > 0) {
-            navigate(`/browse/${displayPosts[0].id}`, { replace: true });
+            navigate('/browse/' + displayPosts[0].id, { replace: true })
         }
     }, [id])
-    // Make activeID to update again if changed later
-    useEffect(()=>{
-        setActiveID(id || (displayPosts && displayPosts.length > 0 ? displayPosts[0].id : null))
-    }, [id, displayPosts])
 
-    // Calculating activeIndex from activeID
+    // Active ID: Inferred from the URL
+    useEffect(() => {
+        if (id && allPosts.find(post => post.id === id)) {
+            setActiveID(id)
+        } else {
+            setActiveID(null)
+        }
+    }, [id])
+
+    // Inferring the activeIndex from the activeID:
     const activeIndex: number | null = useMemo(()=>{
         const hasPostsToDisplay = displayPosts && displayPosts.length > 0;
         const newActiveIndex = hasPostsToDisplay ? displayPosts.findIndex(post => post.id === activeID) : null;
@@ -94,26 +96,25 @@ function ShowcasePanel() {
         }
     }, [activeID, displayPosts])
 
-    // Create activeIndex setter by setting activeID
+    // Also, a convenience activeIndex setter, but actually uses navigate to navigate to the post.
     const setActiveIndex = useCallback((index: number) => {
-        setActiveID(displayPosts[index].id);
+        navigate(`/browse/${displayPosts[index].id}`)
     }, [setActiveID, displayPosts])
 
-    // If the requested post is not in listedPost but is in posts this means its unlisted.
-    // activeIndex will be null but activeID will be the ID of the requested post
-    // We will create a seperate state for this unlisted post. Normally it will be null, but if it is not null, we will create a standalone view for it
-    const [unlisted, setUnlisted] = useState(null);
-    useEffect(()=>{
-        if (activeIndex === null && activeID !== null) {
-            const unlistedPost = allPosts.find(post => post.id === activeID);
-            if (unlistedPost) {
-                setUnlisted(unlistedPost);
-                return
-            }
+    // Dealing with unlisted posts:
+    // When a post is unlisted the following happens:
+    // the id will be of a value not in the displayPosts array
+    // the activeID will follow
+    // but the activeIndex will be null
+    // So, to simplify rendering logic, we create a unlisted variable which is normally null, but if the activeID is not in the displayPosts array, it will be set to the post with the activeID.
+    const unlisted = useMemo(()=>{
+        if (activeID && activeIndex === null) {
+            return allPosts.find(post => post.id === activeID)
+        } else {
+            return null
         }
-        setUnlisted(null);
-    }, [activeIndex, activeID, allPosts, setUnlisted])
-    // TODO: Fix the case of potentially null activeIndex
+    }, [activeID, activeIndex, allPosts])
+
     return (
         <div className="w-full h-full relative">
             <div className="flex flex-col h-full w-full absolute justify-between">
