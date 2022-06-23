@@ -5,7 +5,7 @@ import SwipeableViews from 'react-swipeable-views';
 import { useParams } from 'react-router';
 import { useNavigate } from 'react-router-dom';
 import { defaultTheme, ThemeContext } from '../App';
-import { formatRGBCSS, mergeThemes, removeThemeTransition, useFilteredPosts, useIsLoggedIn, usePostsFilter, useTheme } from '../../utilities';
+import { formatRGBCSS, mergeThemes, removeThemeTransition, useFilteredPosts, useIsLoggedIn, useMultiLang, usePostsFilter, useTheme } from '../../utilities';
 import { ContentContext, hidePosts } from '../providers/ContentProvider';
 import LoadingScreen from '../utilities/LoadingScreen';
 import MagicDiv from '../utilities/MagicDiv';
@@ -38,6 +38,10 @@ function ShowcasePanel() {
     }, [listedPosts, allPosts]) // We don't include isLoggedIn in the dependency, because allPosts / listedPosts will update anyway. Somehow, if isLoggedIn is included, isLoggedIn updates before allPosts / listedPosts, putting us in a weird state.
     const { theme } = useContext(ThemeContext);
     const { id } = useParams();
+    const swipeLabel = useMultiLang({
+        en: 'swipe',
+        zh: '滑動'
+    })
     const navigate = useNavigate();
 
     // Initializing activeID state (this is the thing that actually gets read by subcomponents)
@@ -145,7 +149,7 @@ function ShowcasePanel() {
                 {
                     unlisted ?
                     null :
-                    <div className="flex-row gap-2 justify-between hidden md:flex items-center md:pb-20 md:pr-20">
+                    <div className="flex-row gap-2 justify-between flex items-center px-8 pb-8 pt-4 md:px-0 md:pb-20 md:pr-20">
                         <MagicIcon IconComponent={ArrowLeftIcon} clickable fillCurrent className="h-5" onClick={ (displayPosts && displayPosts.length > 0) ? () => {
                             var proposedIndex = (activeIndex - 1) % displayPosts.length;
                             if (proposedIndex < 0) {
@@ -155,6 +159,12 @@ function ShowcasePanel() {
                             setActiveIndex(proposedIndex);
                         } : ()=>{} }/>
                         <div className="flex flex-row gap-2" style={{ color: formatRGBCSS(theme.foregroundColor), transition: `color ${theme.transitionDuration}s` }}>
+                            <div className='inline md:hidden'>
+                                {swipeLabel}
+                            </div>
+                            <div className='inline md:hidden'>
+                                ——
+                            </div>
                             <div className="font-serif font-bold select-none">{activeIndex !== null ? activeIndex + 1 : "- "}/{displayPosts && displayPosts.length > 0 ? displayPosts.length : " -"}</div>
                         </div>
                         {/* <button className="border-black border px-4 rounded-3xl md:hover:opacity-50 transition-opacity duration-500 font-serif font-bold text-s md:text-xl h-8 md:h-9">show all</button> */}
