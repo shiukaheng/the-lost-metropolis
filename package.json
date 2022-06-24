@@ -14,7 +14,8 @@
     "functions-watch": "cd functions && npm run watch",
     "open-browser": "node ./scripts/open_browser.js",
     "dev": "yarn kill-ports && yarn concurrently \"yarn firebase-emu\" \"yarn start\" \"yarn functions-watch\" \"yarn open-browser\"",
-    "dev-hosting": "yarn start --mode hosting"
+    "dev-hosting": "yarn start --mode hosting",
+    "postinstall": "patch-package"
   },
   "repository": "https://github.com/shiukaheng/the-lost-metropolis-draft.git",
   "author": "Heng <31088159+shiukaheng@users.noreply.github.com>",
@@ -53,6 +54,8 @@
     "file-saver": "^2.0.5",
     "lodash": "^4.17.21",
     "open": "^8.4.0",
+    "patch-package": "^6.4.7",
+    "postinstall-postinstall": "^2.1.0",
     "potree-loader": "^1.10.4",
     "process": "^0.11.10",
     "react": "^18.1.0",
@@ -72,7 +75,7 @@
     "styled-components": "^5.3.5",
     "tailwind-merge": "^1.2.1",
     "tailwind-styled-components": "^2.1.7",
-    "three": "0.129.0",
+    "three": "^0.141.0",
     "three-loader-3dtiles": "^1.1.8",
     "three-stdlib": "^2.10.1",
     "troika-three-text": "^0.46.4",
