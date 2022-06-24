@@ -76,6 +76,13 @@ function ShowcasePanel() {
 
     // Inferring the activeIndex from the activeID:
     const activeIndex: number | null = useMemo(()=>{
+        // console.log(allPosts, displayPosts)
+        // const displayIndex = displayPosts.findIndex(post => post.id === activeID)
+        // const allIndex = allPosts.findIndex(post => post.id === activeID)
+        // console.log(activeID, displayIndex, allIndex)
+        if (activeID === null) {
+            return null
+        }
         const hasPostsToDisplay = displayPosts && displayPosts.length > 0;
         const newActiveIndex = hasPostsToDisplay ? displayPosts.findIndex(post => post.id === activeID) : null;
         if (hasPostsToDisplay) {
@@ -95,7 +102,7 @@ function ShowcasePanel() {
         } else {
             return null;
         }
-    }, [activeID, displayPosts])
+    }, [activeID, allPosts, displayPosts])
 
     // Also, a convenience activeIndex setter, but actually uses navigate to navigate to the post.
     const setActiveIndex = useCallback((index: number) => {
