@@ -71,7 +71,7 @@ const ImageMaterialImpl = shaderMaterial(
     vec2 offset = (rs < ri ? vec2((new.x - s.x) / 2.0, 0.0) : vec2(0.0, (new.y - s.y) / 2.0)) / new;
     vec2 uv = vUv * s / new + offset;
     vec2 zUv = (uv - vec2(0.5, 0.5)) / zoom + vec2(0.5, 0.5);
-    gl_FragColor = sRGBToLinear(toGrayscale(texture2D(map, zUv) * vec4(color, opacity), grayscale));
+    gl_FragColor = toGrayscale(texture2D(map, zUv) * vec4(color, opacity), grayscale);
     
     #include <tonemapping_fragment>
     #include <encodings_fragment>
