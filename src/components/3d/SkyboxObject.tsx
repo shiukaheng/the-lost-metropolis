@@ -1,5 +1,6 @@
 import { extend } from "@react-three/fiber";
 import { Suspense } from "react";
+import { LinearEncoding, sRGBEncoding } from "three";
 import { useCubeTextureSafe } from "../utilities/modifiedDrei/useCubeTextureSafe";
 import { StringType } from "../viewer/ArgumentTypes";
 import { VaporComponent, VaporComponentProps } from "../viewer/ComponentDeclarations";

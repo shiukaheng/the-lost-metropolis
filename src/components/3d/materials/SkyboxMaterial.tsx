@@ -1,9 +1,9 @@
-import { DoubleSide, RawShaderMaterial, ShaderMaterial } from "three";
+import { DoubleSide, LinearEncoding, RawShaderMaterial, ShaderMaterial, sRGBEncoding } from "three";
 import skyboxVert from "../shaders/skybox.vert?raw";
 import skyboxFrag from "../shaders/skybox.frag?raw";
 import { extend, Object3DNode } from "@react-three/fiber";
 
-export class SkyboxMaterial extends RawShaderMaterial {
+export class SkyboxMaterial extends ShaderMaterial {
     // Exposes a map property for the CubeTexture used for the skybox.
     _map: THREE.CubeTexture;
     constructor(map: THREE.CubeTexture) {
