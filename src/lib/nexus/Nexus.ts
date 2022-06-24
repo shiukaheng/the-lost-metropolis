@@ -24,7 +24,7 @@ THE SOFTWARE.
 
 import cortoWorker from './corto.em.js?worker'
 import mecoWorker from './meco.js?worker'
-import {BufferGeometry, BufferAttribute, Mesh, Vector3, Sphere, MeshLambertMaterial, MeshBasicMaterial, DataTexture, RGBFormat, VertexColors, Vector2, Box3, Ray} from "three"
+import {BufferGeometry, BufferAttribute, Mesh, Vector3, Sphere, MeshLambertMaterial, MeshBasicMaterial, DataTexture, RGBFormat, Vector2, Box3, Ray} from "three"
 
 let corto, meco
 
@@ -1392,14 +1392,14 @@ export function OldNexusObject(url, onLoad, onUpdate, renderer, material=undefin
 			if(mesh.autoMaterial) {
 				var texture = new DataTexture( new Uint8Array([1, 1, 1]), 1, 1, RGBFormat );
 				texture.needsUpdate = true;
-				mesh.material = new materialType( { vertexColors: VertexColors, map: texture } );
+				mesh.material = new materialType( { vertexColors: false, map: texture } );
 			}
 		}
 		else if(this.mesh.vertex.color) {
 			var colors = new Float32Array(4);
 			geometry.setAttribute( 'color', new BufferAttribute(colors, 4));
 			if(mesh.autoMaterial)
-				mesh.material = new materialType({ vertexColors: VertexColors });
+				mesh.material = new materialType({ vertexColors: true });
 		}
 		else if(this.mesh.vertex.texCoord) {
 			var uv = new Float32Array(2);
@@ -1459,13 +1459,13 @@ export class NexusObject extends Mesh {
                 if (this.autoMaterial) {
                     const texture = new DataTexture(new Uint8Array([1,1,1]), 1, 1, RGBFormat)
                     texture.needsUpdate = true
-                    this.material = new materialType({vertexColors: VertexColors, map: texture})
+                    this.material = new materialType({vertexColors: false, map: texture})
                 }
             } else if (this.mesh.vertex.color) {
                 const colors = new Float32Array(4)
                 geometry.setAttribute('color', new BufferAttribute(colors, 4))
                 if (this.autoMaterial) {
-                    this.material = new materialType({vertexColors: VertexColors})
+                    this.material = new materialType({vertexColors: true})
                 }
             } else if (this.mesh.vertex.texCoord) {
                 var uv = new Float32Array(2)
