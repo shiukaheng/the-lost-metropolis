@@ -1,8 +1,11 @@
 import { MeshReflectorMaterial } from "@react-three/drei";
+import { Suspense, useEffect, useRef } from "react";
 import { useTexture } from "../utilities/modifiedDrei/useTexture";
 import { BooleanType, ColorType, NumberType, StringType } from "../viewer/ArgumentTypes";
 import { VaporComponent, VaporComponentProps } from "../viewer/ComponentDeclarations";
 import { genericInputs } from "../viewer/genericInputs"
+import {useTextureSafe} from "../utilities/modifiedDrei/useTextureSafe"
+import { Material, RepeatWrapping, Texture, Vector2 } from "three";
 
 // Define react props here with regular typescript types
 type ReflectorPlaneObjectProps = VaporComponentProps & {
@@ -24,11 +27,13 @@ type ReflectorPlaneObjectProps = VaporComponentProps & {
     distortionStrength: number;
     distortionMapUrl: string;
     // wrapTexture: boolean;
-    // textureScale: number;
+    textureScale: number;
 }
 
 function DistortedReflectorPlaneObject({color, metalness, roughness, blurX, blurY, mixBlur, mixStrength, mixContrast, resolution, mirror, depthScale, minDepthThreshold, maxDepthThreshold, depthToBlurRatioBias, distortionStrength, distortionMapUrl="", /*wrapTexture, textureScale*/}) {
-    const texture = useTexture(distortionMapUrl as string);
+    // console.log("DistortedReflectorPlaneObject");
+    const texture = useTextureSafe(distortionMapUrl as string);
+    const materialRef = useRef<Material>(null)
     return (
         <mesh ref={(mesh) => {}}>
             <planeBufferGeometry attach="geometry" args={[1, 1]}/>
@@ -48,6 +53,7 @@ function DistortedReflectorPlaneObject({color, metalness, roughness, blurX, blur
             depthToBlurRatioBias={depthToBlurRatioBias}
             distortion={distortionStrength}
             distortionMap={texture}
+            ref={materialRef}
             >
             </MeshReflectorMaterial>
         </mesh>
@@ -79,45 +85,49 @@ export const ReflectorPlaneObject: VaporComponent = ({
     // textureScale=1,
     ...props
 }: ReflectorPlaneObjectProps) => {
+    // console.log(enableDistortion)
     return (
         <group {...props}>
-            {/* (enableDistortion) ?
-            <DistortedReflectorPlaneObject
-                color={color}
-                metalness={metalness}
-                roughness={roughness}
-                blurX={blurX}
-                blurY={blurY}
-                mixBlur={mixBlur}
-                mixStrength={mixStrength}
-                mixContrast={mixContrast}
-                resolution={resolution}
-                mirror={mirror} 
-                depthScale={depthScale}
-                minDepthThreshold={minDepthThreshold}
-                maxDepthThreshold={maxDepthThreshold}
-                depthToBlurRatioBias={depthToBlurRatioBias}
-                distortionStrength={distortionStrength}
-                distortionMapUrl={distortionMapUrl}
-            /> : */}
-            <mesh>
-                <planeBufferGeometry attach="geometry" args={[1, 1]}/>
-                <MeshReflectorMaterial
-                color={color}
-                metalness={metalness}
-                roughness={roughness}
-                blur={[blurX, blurY]}
-                mixBlur={mixBlur}
-                mixStrength={mixStrength}
-                mixContrast={mixContrast}
-                resolution={resolution}
-                mirror={mirror}
-                depthScale={depthScale}
-                minDepthThreshold={minDepthThreshold}
-                maxDepthThreshold={maxDepthThreshold}
-                depthToBlurRatioBias={depthToBlurRatioBias}
-                />
-            </mesh>
+            <Suspense fallback={null}>
+                {/* (enableDistortion) ?       */}
+                <DistortedReflectorPlaneObject
+                    color={color}
+                    metalness={metalness}
+                    roughness={roughness}
+                    blurX={blurX}
+                    blurY={blurY}
+                    mixBlur={mixBlur}
+                    mixStrength={mixStrength}
+                    mixContrast={mixContrast}
+                    resolution={resolution}
+                    mirror={mirror} 
+                    depthScale={depthScale}
+                    minDepthThreshold={minDepthThreshold}
+                    maxDepthThreshold={maxDepthThreshold}
+                    depthToBlurRatioBias={depthToBlurRatioBias}
+                    distortionStrength={distortionStrength}
+                    distortionMapUrl={distortionMapUrl}
+                />   
+                {/* :
+                <mesh>
+                    <planeBufferGeometry attach="geometry" args={[1, 1]}/>
+                    <MeshReflectorMaterial
+                    color={color}
+                    metalness={metalness}
+                    roughness={roughness}
+                    blur={[blurX, blurY]}
+                    mixBlur={mixBlur}
+                    mixStrength={mixStrength}
+                    mixContrast={mixContrast}
+                    resolution={resolution}
+                    mirror={mirror}
+                    depthScale={depthScale}
+                    minDepthThreshold={minDepthThreshold}
+                    maxDepthThreshold={maxDepthThreshold}
+                    depthToBlurRatioBias={depthToBlurRatioBias}
+                    />
+                </mesh> */}
+            </Suspense>
         </group>
     );
 }
