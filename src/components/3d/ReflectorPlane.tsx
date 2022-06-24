@@ -58,8 +58,8 @@ function DistortedReflectorPlaneObject({color, metalness, roughness, blurX, blur
 
 
 export const ReflectorPlaneObject: VaporComponent = ({
-    color=[0.5, 0.5, 0.5],
-    metalness=0.5,
+    color=[1, 1, 1],
+    metalness=0,
     roughness=1,
     blurX=0,
     blurY=0,
@@ -137,15 +137,7 @@ ReflectorPlaneObject.inputs = {
     ...genericInputs,
     color: {
         type: ColorType,
-        default: [0.5, 0.5, 0.5]
-    },
-    metalness: {
-        type: NumberType,
-        default: 0.5
-    },
-    roughness: {
-        type: NumberType,
-        default: 1
+        default: [1, 1, 1]
     },
     blurX: {
         type: NumberType,
