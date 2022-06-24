@@ -1,4 +1,4 @@
-import { useContextBridge } from "@react-three/drei"
+import { useContextBridge, useDepthBuffer } from "@react-three/drei"
 import { PotreeManager } from "../3d/managers/PotreeManager"
 import { Children, useCallback, useContext, useEffect, useLayoutEffect, useRef } from "react"
 import CompositeSuspense from "../3d/subcomponents/CompositeSuspense"
@@ -107,6 +107,29 @@ export function XRRequesterRefExtractor({requesterRefGetterRef}) { // This is TE
     return null
 }
 
+export function DepthBufferHelper() {
+    const {numDepthBufferDependents} = useContext(ViewerContext)
+    if (numDepthBufferDependents > 0) {
+        console.log("Depth buffer enabled")
+        return <_DepthBufferHelper/>
+    } else {
+        console.log("Depth buffer disabled")
+        return null
+    }
+}
+
+export function _DepthBufferHelper() {
+    const depthBuffer = useDepthBuffer()
+    const {_setDepthBuffer} = useContext(ViewerContext)
+    useLayoutEffect(()=>{
+        _setDepthBuffer(depthBuffer)
+        return ()=>{
+            _setDepthBuffer(undefined)
+        }
+    }, [])
+    return null
+}
+
 // Convenience component to provide common contexts to viewport children, in the future may include 3DTilesManager, NexusManager, etc which serves to manage 3DTilesObject and NexusObject on each render.
 // TODO: Register managers required and add dynamically (same with ContextBridge required contexts)
 function ViewportCanvas({children, foveation=0, className, ...props}) {
@@ -123,6 +146,7 @@ function ViewportCanvas({children, foveation=0, className, ...props}) {
                     <CameraHelper/>
                     <XRHelper/>
                     <AudioContextHelper/>
+                    {/* <DepthBufferHelper/> */}
                     <PotreeManager>
                         <InteractionManager>
                             {wrappedChildren}

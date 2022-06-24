@@ -10,6 +10,7 @@ import { LinkObject } from "../3d/LinkObject"
 import { NexusObject } from "../3d/NexusObject"
 import { PotreeObject } from "../3d/PotreeObject"
 import { ReflectorPlaneObject } from "../3d/ReflectorPlane"
+import { SpotlightObject } from "../3d/SpotlightObject"
 import { TeleporterPlane } from "../3d/TeleporterPlane"
 import { TestObject } from "../3d/TestObject"
 import { TilesObject } from "../3d/TilesObject"
@@ -61,6 +62,7 @@ export const components = [
     TeleporterPlane,
     AudioObject,
     ReflectorPlaneObject,
+    SpotlightObject
 ]
 
 export function getComponentFromTypeName(componentType): VaporComponent {

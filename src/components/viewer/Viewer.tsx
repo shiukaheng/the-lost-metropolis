@@ -1,7 +1,7 @@
 import { cloneElement, useRef, useState, useContext, useEffect } from "react"
 import { joinChildren } from "../editor/utilities"
 import { DefaultCameraPropType, ViewerContext } from "./ViewerContext"
-import { AudioListener, EventDispatcher } from "three"
+import { AudioListener, DepthTexture, EventDispatcher } from "three"
 import { useStatefulDeserialize } from "../editor/ui_elements/EditorIO"
 import Viewport from "./Viewport"
 import { Post } from "../../../api/types/Post"
@@ -79,6 +79,10 @@ function ViewerManager({children, defaultCameraProps}: {children: any, defaultCa
     // Navigation options
     const [flySpeed, setFlySpeed] = useState(2)
 
+    // Depth buffer
+    const [numDepthBufferDependents, _setNumDepthBufferDependents] = useState(0)
+    const [depthBuffer, _setDepthBuffer] = useState<DepthTexture|undefined>(undefined) // The depth buffer will be updated by Viewport
+
     return (
         <ViewerContext.Provider value={{
             // A. Camera prop management
@@ -111,6 +115,11 @@ function ViewerManager({children, defaultCameraProps}: {children: any, defaultCa
             // H. Navigation options
             flySpeed,
             setFlySpeed,
+            // I. Depth buffer
+            numDepthBufferDependents,
+            _setNumDepthBufferDependents,
+            depthBuffer,
+            _setDepthBuffer,
         }}>
             {children}
         </ViewerContext.Provider>

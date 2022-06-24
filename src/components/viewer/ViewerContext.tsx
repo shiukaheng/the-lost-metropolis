@@ -1,6 +1,6 @@
 import { Camera } from "@react-three/fiber"
 import { createContext, MutableRefObject, ReactElement, RefObject } from "react"
-import { EventDispatcher, XRSessionMode } from "three"
+import { DepthTexture, EventDispatcher, XRSessionMode } from "three"
 import { SceneChild } from "../../../api/types/SceneChild"
 import { AudioListener } from "three"
 
@@ -45,6 +45,11 @@ const defaultViewerContext: ViewerContextProps = {
     // H. Navigation options
     flySpeed: 2,
     setFlySpeed: (speed:number) => {},
+    // I. Depth buffer
+    numDepthBufferDependents: 0,
+    _setNumDepthBufferDependents: (num:number | ((number) => number)) => {},
+    depthBuffer: undefined,
+    _setDepthBuffer: (depthBuffer:DepthTexture | undefined) => {},
 }
 
 export type DefaultCameraPropType = {
@@ -84,6 +89,11 @@ interface ViewerContextProps {
     // H. Navigation options
     flySpeed: number,
     setFlySpeed: (speed:number) => void,
+    // I. Depth buffer
+    numDepthBufferDependents: number,
+    _setNumDepthBufferDependents: (num:number | ((number) => number)) => void,
+    depthBuffer: DepthTexture | undefined,
+    _setDepthBuffer: (depthBuffer:DepthTexture | undefined) => void, 
 }
 
 const ViewerContext = createContext(defaultViewerContext)

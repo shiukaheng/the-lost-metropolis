@@ -690,3 +690,15 @@ export function useIsLoggedIn() {
     }, [currentUser])
     return isLoggedIn
 }
+
+export function useViewportDepthBuffer() {
+    throw new Error("Not implemented")
+    const {_setNumDepthBufferDependents, depthBuffer} = useContext(ViewerContext)
+    useEffect(()=>{
+        _setNumDepthBufferDependents((n)=>n+1)
+        return ()=>{
+            _setNumDepthBufferDependents((n)=>n-1)
+        }
+    }, [])
+    return depthBuffer
+}
