@@ -61,7 +61,7 @@ function View({ ...props}) {
     }
     // console.log(defaultTheme)
     return (
-        <ThemeContext.Provider value={{theme: defaultTheme, setTheme: (t)=>{}}}>
+        // <ThemeContext.Provider value={{theme: defaultTheme, setTheme: (t)=>{}}}>
         <div className='absolute w-full h-full'>
             <Viewer post={post} className="absolute w-full h-full">
                 <DOMControls force={post.configuration.flySpeed} friction={2}/>
@@ -82,11 +82,11 @@ function View({ ...props}) {
                             <XRButtons xrRequesterGetterRef={xrRequesterGetterRef} supportedXRModes={supportedXRModes}/>
                         </div>
                     }
-                    <ControlTips className='mt-auto max-w-[500px]'/>
+                    <ControlTips className='mt-auto max-w-[520px]'/>
                 </div>
             </Fade>
         </div>
-        </ThemeContext.Provider>
+        // </ThemeContext.Provider>
     );
 }
 

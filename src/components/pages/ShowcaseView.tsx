@@ -5,7 +5,7 @@ import SwipeableViews from 'react-swipeable-views';
 import { useParams } from 'react-router';
 import { useNavigate } from 'react-router-dom';
 import { defaultTheme, ThemeContext } from '../App';
-import { formatRGBCSS, mergeThemes, removeThemeTransition, useFilteredPosts, useIsLoggedIn, useMultiLang, usePostsFilter, useTheme } from '../../utilities';
+import { formatRGBCSS, mergeThemes, removeThemeTransition, useFilteredPosts, useIsLoggedIn, useMagicString, useMultiLang, usePostsFilter, useTheme } from '../../utilities';
 import { ContentContext, hidePosts } from '../providers/ContentProvider';
 import LoadingScreen from '../utilities/LoadingScreen';
 import MagicDiv from '../utilities/MagicDiv';
@@ -137,6 +137,11 @@ function ShowcasePanel() {
         } : ()=>{}
     , [activeIndex, displayPosts, setActiveIndex])
 
+    const noContentLabel = useMagicString({
+        "en": "no content available",
+        "zh": "沒有內容"
+    })
+
     return (
         <div className="w-full h-full relative">
             {/* Keyboard shortcuts */}
@@ -153,7 +158,7 @@ function ShowcasePanel() {
                         ( activeIndex === null ?
                             <div className="h-full w-full flex justify-center items-center md:pb-20 md:pr-20">
                                 <MagicDiv className="text-5xl font-black">
-                                    No content available
+                                    {noContentLabel}
                                 </MagicDiv>
                             </div>
                             :
