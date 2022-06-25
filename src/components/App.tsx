@@ -34,6 +34,7 @@ import VaporAPI from '../api_client/api';
 import { Instance } from '../../api/utility_types';
 import Debug3D from './development/Debug3D';
 import { CompatabilityWrapper } from './utilities/CompatabilityWrapper';
+import { InstagramRedirect } from './pages/InstagramRedirect';
 
 function getDefaultLang(): LanguageLiteral {
     // Check if the browser has a language preference, if it is anything chinese, then use "zh", otherwise use "en"
@@ -172,7 +173,8 @@ function SiteRouter() {
                                     <Route path="/login" element={<Login />} />
                                     <Route path="/dashboard" element={<Dashboard />} />
                                     <Route path="/edit/:id" element={<EditPost/>} />
-                                    <Route path="/uploadTest" element={<UploadAssetPage/>} />
+                                    {/* <Route path="/uploadTest" element={<UploadAssetPage/>} /> */}
+                                    <Route path="/ig" element={<InstagramRedirect/>} />
                                 </AnimatedSwitch>
                             </AppContainer>
                         </div>} />
