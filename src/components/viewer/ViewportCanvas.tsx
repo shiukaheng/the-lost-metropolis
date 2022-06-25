@@ -140,7 +140,7 @@ function ViewportCanvas({children, foveation=0, className, ...props}) {
         </CompositeSuspense>
     ))
     return (
-        <Canvas flat className={twMerge(className, "viewport-canvas")} {...props}>
+        <Canvas className={twMerge(className, "viewport-canvas")} {...props}>
             <ContextBridge>
                 <XR foveation={foveation}>
                     <CameraHelper/>
