@@ -17,6 +17,7 @@ import wavesUrl from "./Home/media/waves.jpg"
 import { Image } from '../utilities/modifiedDrei/Image'
 import { useTexture } from '../utilities/modifiedDrei/useTexture'
 import { GenericCameraUpdater } from '../viewer/ViewportCanvas'
+import { TilesObject } from '../3d/TilesObject'
 
 function Home() {
     const { settings } = useContext(SettingsContext) // Somehow the settings context is not being passed down to the children if its inside of Scroll
@@ -130,7 +131,8 @@ function PotreeScene({visible=true}) {
     return <Scroll>
         <FollowMouseGroup>
             <ambientLight intensity={1} />
-            <PotreeObject objectID="homepageShowcase" pointShape={0} pointSize={1} pointSizeType={0} scale={[0.9, 0.9, 0.9]} rotation={[-.5, 0.3, 0.088]} position={[-10, -3, 12]} baseUrl={"https://static.thelostmetropolis.org/BigShotCleanV2/"} cloudName="metadata.json" visible={visible}/>
+            {/* <PotreeObject objectID="homepageShowcase" pointShape={0} pointSize={1} pointSizeType={0} scale={[0.9, 0.9, 0.9]} rotation={[-.5, 0.3, 0.088]} position={[-10, -3, 12]} baseUrl={"https://static.thelostmetropolis.org/BigShotCleanV2/"} cloudName="metadata.json" visible={visible}/> */}
+            <TilesObject objectID="homepageShowcase" url="https://storage.googleapis.com/the-lost-metropolis-production-static/StateCeiling/tileset.json" scale={[0.082, 0.082, 0.082]} rotation={[-2.5799608611984604, 0.17837260844742409, -1.826067313894937]} position={[-23, -27.4, -20.75316112315882]} visible={visible} maxDepth={2}/>
         </FollowMouseGroup>
     </Scroll>
 }
