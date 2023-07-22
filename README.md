@@ -44,6 +44,7 @@ Here is a basic overview of the key folders inside this repository and their pur
   - `lib`: Javascript libraries that are not on NPM used for this project
   - `components`: All the React components
     - `3d`: R3F-based react components
+      - `asset_adapters`: 3D components normally rely on URL for getting 3D assets. Components in `asset_adapters` can use "assets" instead, a.k.a. managed files in the backend. Not ready for use!
     - `admin`: Normally hidden react components for logged in users which are presumably all admins
     - `editor`: The 3D editor component and its internal components, used to edit archives
     - `pages`: Root components for pages
