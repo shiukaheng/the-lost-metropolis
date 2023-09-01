@@ -1,3 +1,4 @@
+import { PotreeObject } from '../3d/PotreeObject'
 import View from './View'
 
 function Exhibition() {
@@ -11,10 +12,13 @@ function Exhibition() {
         }>
             <ambientLight intensity={1} />
             {/* Red box with mesh basic shading */}
-            <mesh>
-                <boxBufferGeometry attach="geometry" args={[1, 1, 1]} />
-                <meshBasicMaterial attach="material" color="red" />
-            </mesh>
+            <PotreeObject
+                objectID='potree'
+                cloudName='metadata.json'
+                baseUrl='https://heng-mint2.local:8080/assets/hoi_kee_street/'
+                position={[-51.804087330505155,-0.4042027022090835,69.38336126263323]}
+                rotation={[-1.57079633,0,0]}
+            />  
         </View>
     )
 }
