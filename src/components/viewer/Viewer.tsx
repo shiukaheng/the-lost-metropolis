@@ -160,4 +160,4 @@ function FadeInAudio({fadeInSeconds=1}) {
     return null
 }
 
-export { ViewerManager, Viewer }
+export { ViewerManager, Viewer, ViewerProps }

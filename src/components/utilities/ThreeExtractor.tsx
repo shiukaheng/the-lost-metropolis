@@ -9,7 +9,8 @@ export function ThreeExtractor({threeRef}: {
 }) {
     const state = useThree()
     useEffect(() => {
-        threeRef.current = state
+        threeRef.current = state;
+        (window as any).three = state
     }, [state])
     return null
 }
