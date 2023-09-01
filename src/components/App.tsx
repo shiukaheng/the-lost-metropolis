@@ -1,40 +1,12 @@
-import { MainRouter } from './MainRouter';
-
 // import React from "react" // Not sure why this is required but ok
 import { BrowserRouter as Router, Route, useLocation, useParams } from "react-router-dom";
-import NavigationBar from "./utilities/NavigationBar"
-import AppContainer from "./utilities/AppContainer"
-import { useNavigate } from 'react-router-dom';
 import { useState, createContext, useLayoutEffect, useContext, MutableRefObject, useRef, useEffect, useMemo } from "react";
-import MagicDiv from "./utilities/MagicDiv";
-import Background from "./utilities/Background";
 import AnimatedSwitch from "./utilities/AnimatedSwitch";
-import { FC } from "react";
-import View from "./pages/View";
-import { formatRGBCSS, KeyPressCallback, mergeThemes, removeThemeTransition, useFilteredPosts, usePosts, useStickyState } from "../utilities";
-import Login from "./admin/Login";
-
+import { formatRGBCSS, useStickyState } from "../utilities";
 // All pages
-import Home from "./pages/Home"
-import ShowcaseView from "./pages/ShowcaseView";
-import ListView from "./pages/ListView";
-import About from "./pages/About"
-import { AuthContext, AuthProvider } from "./admin/AuthProvider";
-import Dashboard from "./admin/Dashboard";
-import { ContentContext, ContentProvider, hidePosts } from "./providers/ContentProvider";
-import { EditPost } from "./admin/EditPost";
-import LoadingScreen from "./utilities/LoadingScreen";
-import { preloadFont } from "troika-three-text";
-import UploadAssetPage from "./development/UploadAssetTest";
+import Exhibition from './pages/Exhibition';
 import { LanguageLiteral } from '../../api/types/LanguageLiteral';
 import { Theme } from '../../api/types/Theme';
-import { PointCloudOctreeGeometryNode } from '@pnext/three-loader';
-import { Post } from '../../api/types/Post';
-import VaporAPI from '../api_client/api';
-import { Instance } from '../../api/utility_types';
-import Debug3D from './development/Debug3D';
-import { CompatabilityWrapper } from './utilities/CompatabilityWrapper';
-import { InstagramRedirect } from './pages/InstagramRedirect';
 
 function getDefaultLang(): LanguageLiteral {
     // Check if the browser has a language preference, if it is anything chinese, then use "zh", otherwise use "en"
@@ -55,15 +27,6 @@ const defaultSettingsContext = {
     settings: defaultSettings,
     setSettings: (newSettings) => {},
 }
-
-// export type Theme = {
-//     backgroundColor: [number, number, number],
-//     foregroundColor: [number, number, number],
-//     backgroundVideo: string | null,
-//     backgroundImage: string | null,
-//     backgroundOpacity: number,
-//     transitionDuration: number
-// }
 
 export const defaultTheme: Theme = {
     backgroundColor: [0, 0, 0],
@@ -88,21 +51,7 @@ const defaultThemeContext: ThemeContextType = {
 }
 
 export const ThemeContext = createContext<ThemeContextType>(defaultThemeContext)
-
 export const SettingsContext = createContext(defaultSettingsContext)
-
-// const SensorDataContext = createContext(defaultSensorData)
-
-// const options = { frequency: 60, referenceFrame: 'device' };
-// const sensor = new RelativeOrientationSensor(options);
-
-preloadFont(
-    {
-        font: "https://fonts.gstatic.com/s/notoseriftc/v20/XLYgIZb5bJNDGYxLBibeHZ0BhnQ.woff"
-    },
-    () => {
-    }
-)
 
 export function App() {
     // Theme defines the background color and foreground color, as well as the background video. It is not persistent between sessions and is defined by what content the user is viewing.
@@ -126,131 +75,26 @@ export function App() {
     }, [theme.backgroundColor])
 
     return (
-        <AuthProvider>
-            <ContentProvider>
-                <SettingsContext.Provider value={{settings, setSettings}}>
-                    <ThemeContext.Provider value={{theme, setTheme, changesRef}}>
-                        <SiteRouter/>
-                        
-                    </ThemeContext.Provider>
-                </SettingsContext.Provider>
-            </ContentProvider>
-        </AuthProvider>
+        <SettingsContext.Provider value={{settings, setSettings}}>
+            <ThemeContext.Provider value={{theme, setTheme, changesRef}}>
+                <SiteRouter/>
+                
+            </ThemeContext.Provider>
+        </SettingsContext.Provider>
     )
 }
 
 function SiteRouter() {
-    const posts = useFilteredPosts()
     return <Router>
-        <ThemeSetter/>
-        <LoadingScreen ready={posts !== null}>
             <div className="absolute w-full h-full">
-                {/* <CompatabilityWrapper> */}
-                    <AnimatedSwitch pathPreprocessor={(path) => {
-                        if (path.split("/")[1] !== "view") {
-                            path = "";
-                        }
-                        return path;
-                    } }>
-                        <Route path="/view/:id" element={<View />} /> 
-                        <Route path="*" element={<div className="w-full h-full">
-                            <Background />
-                            <AppContainer>
-                                <NavigationBar />
-                                <AnimatedSwitch pathPreprocessor={
-                                    // Prevent the animation from triggering when under navigating in the browse directory, since it already has a sliding animation
-                                    (path) => {
-                                        if (path.split("/")[1] === "browse") {
-                                            path = "browse";
-                                        }
-                                        return path;
-                                    } }>
-                                    <Route path="/" element={<Home />} />
-                                    <Route path="/browse" element={<ShowcaseView/>} />
-                                    <Route path="/browse/:id" element={<ShowcaseView/>} />
-                                    <Route path="/list" element={<ListView />} />
-                                    <Route path="/about" element={<About />} />
-                                    <Route path="/login" element={<Login />} />
-                                    <Route path="/dashboard" element={<Dashboard />} />
-                                    <Route path="/edit/:id" element={<EditPost/>} />
-                                    {/* <Route path="/uploadTest" element={<UploadAssetPage/>} /> */}
-                                    <Route path="/ig" element={<InstagramRedirect/>} />
-                                </AnimatedSwitch>
-                            </AppContainer>
-                        </div>} />
-                    </AnimatedSwitch>
-                {/* </CompatabilityWrapper> */}
+                <AnimatedSwitch pathPreprocessor={(path) => {
+                    if (path.split("/")[1] !== "view") {
+                        path = "";
+                    }
+                    return path;
+                } }>
+                    <Route path="/" element={<Exhibition />} /> 
+                </AnimatedSwitch>
             </div>
-        </LoadingScreen>
     </Router>;
-}
-
-function inferTheme(postInstance: Instance<Post>) {
-    // First, we determine the URLs for possible background images / videos
-    var backgroundImage: string | null = null;
-    var backgroundVideo: string | null = null;
-    // If there is a background image url specified in the theme object, use that; otherwise, find the first asset that is a image, and marked with a "background-image" tag.
-    if (postInstance.data.theme.backgroundImage) {
-        backgroundImage = postInstance.data.theme.backgroundImage;
-    } else {
-        const asset = postInstance.data.assets.find((asset) => asset.data.metadata.tags.includes("background-image") && asset.data.metadata.targetAssetType === "Image");
-        if (asset) {
-            if (asset?.data?.data?.fileName === undefined || asset?.data?.data?.fileName === null) {
-                console.warn("Unreadable Image asset", asset);
-            } else {
-                backgroundImage = VaporAPI.resolveAsset(postInstance.id, asset.id)+asset.data.data.fileName;
-            }
-        }
-    }
-    // Same principle for background video.
-    if (postInstance.data.theme.backgroundVideo) {
-        backgroundVideo = postInstance.data.theme.backgroundVideo;
-    } else {
-        const asset = postInstance.data.assets.find((asset) => asset.data.metadata.tags.includes("background-video") && asset.data.metadata.targetAssetType === "Video"); // TODO: Create video asset
-        if (asset) {
-            if (asset?.data?.data?.fileName === undefined || asset?.data?.data?.fileName === null) {
-                console.warn("Unreadable Video asset", asset);
-            } else {
-                backgroundVideo = VaporAPI.resolveAsset(postInstance.id, asset.id)+asset.data.data.fileName;
-            }
-        }
-    }
-    return {
-        ...mergeThemes(defaultTheme, postInstance.data.theme),
-        backgroundImage,
-        backgroundVideo
-    }
-}
-
-function ThemeSetter() {
-    const { theme, setTheme, changesRef } = useContext(ThemeContext)
-    const posts = usePosts()
-
-    // Detect theme from url (perhaps better than using component logic)
-    // Whenever URL changes or post list changes, update theme
-    // Url rules: /browse/<id> : Get theme with post with id
-    //            /edit/<id> : Get theme with post with id
-    //            /view/<id> : Get theme with post with id
-    //            Anything else: Use default theme
-
-    const location = useLocation()
-    const splitPath = location.pathname.split("/")
-    useEffect(()=>{
-        const id = splitPath[2]
-        if (id && posts) {
-            // If a post is detected in the url, use that post's theme
-            const post = posts.find(p => p.id === id)
-            if (post?.data.theme) {
-                if (changesRef.current <= 1) {
-                    setTheme(removeThemeTransition(inferTheme(post)))
-                } else {
-                    setTheme(inferTheme(post))
-                }
-            }
-        } else {
-            // Otherwise, use the default theme
-            setTheme(defaultTheme)
-        }
-    }, [location.pathname, posts])
-    return null
 }

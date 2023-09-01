@@ -13,7 +13,7 @@
 }
 
 .page-margins {
-    @apply p-8 pt-0 md:p-20 md:pl-0 flex-grow;
+    @apply p-8 md:p-20 flex-grow;
 }
 
 .secondary-button {
