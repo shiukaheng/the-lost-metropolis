@@ -1,5 +1,6 @@
 // import { Potree } from '@pnext/three-loader';
-import { Potree } from "potree-loader"
+// import { Potree } from "potree-loader"
+import { Potree } from "../../../lib/potree-loader/potree"
 import { useFrame } from '@react-three/fiber';
 import { createContext, useEffect, useRef, ReactNode, useState, useContext } from 'react';
 import { ViewerContext } from '../../viewer/ViewerContext';

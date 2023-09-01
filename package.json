@@ -21,6 +21,7 @@
     "tsc-watch": "^5.0.3",
     "vite": "^2.9.9",
     "vite-plugin-glsl": "^0.1.1",
+    "vite-plugin-mkcert": "^1.16.0",
     "vite-plugin-svgr": "^2.1.0"
   },
   "dependencies": {

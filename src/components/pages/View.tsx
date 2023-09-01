@@ -18,7 +18,8 @@ import { ControlTips } from './View/ControlTips';
 
 function XRButtons({supportedXRModes, xrRequesterGetterRef}) {
     const supportAR = supportedXRModes && supportedXRModes.includes("immersive-ar")
-    const supportVR = supportedXRModes && supportedXRModes.includes("immersive-vr")
+    // const supportVR = supportedXRModes && supportedXRModes.includes("immersive-vr")
+    const supportVR = true
     return (
         <Fragment>
             {supportAR &&
@@ -65,11 +66,10 @@ function View({children, ...props}: ViewerProps) {
                     <div className="flex flex-row place-content-between gap-4">
                         <MagicDiv className='text-2xl md:text-4xl font-black'>{title}</MagicDiv>
                     </div>
-                    {!md && 
-                        <div className="flex flex-row h-12 gap-4">
-                            <XRButtons xrRequesterGetterRef={xrRequesterGetterRef} supportedXRModes={supportedXRModes}/>
-                        </div>
-                    }
+
+                    <div className="flex flex-row h-12 gap-4">
+                        <XRButtons xrRequesterGetterRef={xrRequesterGetterRef} supportedXRModes={supportedXRModes}/>
+                    </div>
                     <ControlTips className='mt-auto max-w-[520px]'/>
                 </div>
             </Fade>
