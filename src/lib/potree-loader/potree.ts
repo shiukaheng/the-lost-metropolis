@@ -38,7 +38,7 @@ export class QueueItem {
     public weight: number,
     public node: IPointCloudTreeNode,
     public parent?: IPointCloudTreeNode | null,
-  ) {}
+  ) { }
 }
 
 export class Potree implements IPotree {
@@ -69,7 +69,7 @@ export class Potree implements IPotree {
       return await loadPOC(url, getUrl, xhrRequest).then(geometry => new PointCloudOctree(this, geometry));
     } else if (url === "metadata.json") {
       // throw new Error("Not implemented")
-      return await loadOctree(url, getUrl, xhrRequest).then((geometry:OctreeGeometry) => new PointCloudOctree(this, geometry));
+      return await loadOctree(url, getUrl, xhrRequest).then((geometry: OctreeGeometry) => new PointCloudOctree(this, geometry));
     }
     throw new Error("Unsupported file type");
   }
@@ -94,7 +94,7 @@ export class Potree implements IPotree {
         continue;
       } // Basically, we only update a point cloud if it is not disposed
 
-      pointCloud.material.updateMaterial(pointCloud, pointCloud.visibleNodes, camera, renderer); 
+      pointCloud.material.updateMaterial(pointCloud, pointCloud.visibleNodes, camera, renderer);
       pointCloud.updateVisibleBounds();
       pointCloud.updateBoundingBoxes();
     }
@@ -333,70 +333,65 @@ export class Potree implements IPotree {
     return true;
   }
 
-  private updateVisibilityStructures = (() => {
-    const frustumMatrix = new Matrix4();
-    const inverseWorldMatrix = new Matrix4();
-    const cameraMatrix = new Matrix4();
+  private updateVisibilityStructures(
+    pointClouds: PointCloudOctree[],
+    camera: Camera,
+  ): {
+    frustums: Frustum[];
+    cameraPositions: Vector3[];
+    priorityQueue: BinaryHeap<QueueItem>;
+  } {
+    const frustums: Frustum[] = [];
+    const cameraPositions: Vector3[] = [];
+    const priorityQueue = new BinaryHeap<QueueItem>(x => 1 / x.weight);
 
-    return (
-      pointClouds: PointCloudOctree[],
-      camera: Camera,
-    ): {
-      frustums: Frustum[];
-      cameraPositions: Vector3[];
-      priorityQueue: BinaryHeap<QueueItem>;
-    } => {
-      const frustums: Frustum[] = [];
-      const cameraPositions: Vector3[] = [];
-      const priorityQueue = new BinaryHeap<QueueItem>(x => 1 / x.weight);
+    for (let i = 0; i < pointClouds.length; i++) {
+      const pointCloud = pointClouds[i];
 
-      for (let i = 0; i < pointClouds.length; i++) {
-        const pointCloud = pointClouds[i];
-
-        if (!pointCloud.initialized()) {
-          continue;
-        }
-
-        pointCloud.numVisiblePoints = 0;
-        pointCloud.visibleNodes = [];
-        pointCloud.visibleGeometry = [];
-
-        camera.updateMatrixWorld(false);
-
-        // Furstum in object space.
-        const inverseViewMatrix = camera.matrixWorldInverse;
-        const worldMatrix = pointCloud.matrixWorld;
-        frustumMatrix
-          .identity()
-          .multiply(camera.projectionMatrix)
-          .multiply(inverseViewMatrix)
-          .multiply(worldMatrix);
-        frustums.push(new Frustum().setFromProjectionMatrix(frustumMatrix));
-
-        // Camera position in object space
-        inverseWorldMatrix.copy(worldMatrix).invert();
-        cameraMatrix
-          .identity()
-          .multiply(inverseWorldMatrix)
-          .multiply(camera.matrixWorld);
-        cameraPositions.push(new Vector3().setFromMatrixPosition(cameraMatrix));
-
-        if (pointCloud.visible && pointCloud.root !== null) {
-          const weight = Number.MAX_VALUE;
-          priorityQueue.push(new QueueItem(i, weight, pointCloud.root));
-        }
-
-        // Hide any previously visible nodes. We will later show only the needed ones.
-        if (isTreeNode(pointCloud.root)) {
-          pointCloud.hideDescendants(pointCloud?.root?.sceneNode);
-        }
-
-        for (const boundingBoxNode of pointCloud.boundingBoxNodes) {
-          boundingBoxNode.visible = false;
-        }
+      if (!pointCloud.initialized()) {
+        continue;
       }
 
-      return { frustums, cameraPositions, priorityQueue };
-    };
-  })();
+      pointCloud.numVisiblePoints = 0;
+      pointCloud.visibleNodes = [];
+      pointCloud.visibleGeometry = [];
+
+      camera.updateMatrixWorld(false);
+
+      // Frustum in object space.
+      const inverseViewMatrix = camera.matrixWorldInverse;
+      const worldMatrix = pointCloud.matrixWorld;
+      this.frustumMatrix
+        .identity()
+        .multiply(camera.projectionMatrix)
+        .multiply(inverseViewMatrix)
+        .multiply(worldMatrix);
+      frustums.push(new Frustum().setFromProjectionMatrix(this.frustumMatrix));
+
+      // Camera position in object space
+      this.inverseWorldMatrix.copy(worldMatrix).invert();
+      this.cameraMatrix
+        .identity()
+        .multiply(this.inverseWorldMatrix)
+        .multiply(camera.matrixWorld);
+      cameraPositions.push(new Vector3().setFromMatrixPosition(this.cameraMatrix));
+
+      if (pointCloud.visible && pointCloud.root !== null) {
+        const weight = Number.MAX_VALUE;
+        priorityQueue.push(new QueueItem(i, weight, pointCloud.root));
+      }
+
+      // Hide any previously visible nodes. We will later show only the needed ones.
+      if (isTreeNode(pointCloud.root)) {
+        pointCloud.hideDescendants(pointCloud?.root?.sceneNode);
+      }
+
+      for (const boundingBoxNode of pointCloud.boundingBoxNodes) {
+        boundingBoxNode.visible = false;
+      }
+    }
+
+    return { frustums, cameraPositions, priorityQueue };
+  }
+
 }
