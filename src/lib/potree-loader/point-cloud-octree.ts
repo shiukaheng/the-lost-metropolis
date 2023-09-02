@@ -9,6 +9,9 @@ import { PointCloudTree } from './point-cloud-tree';
 import { IPointCloudTreeNode, IPotree, PickPoint, PCOGeometry } from './types';
 import { computeTransformedBoundingBox } from './utils/bounds';
 
+/**
+ * A container for a point cloud octree
+ */
 export class PointCloudOctree extends PointCloudTree {
   potree: IPotree;
   disposed: boolean = false;
@@ -22,7 +25,7 @@ export class PointCloudOctree extends PointCloudTree {
    * The minimum radius of a node's bounding sphere on the screen in order to be displayed.
    */
   minNodePixelSize: number = DEFAULT_MIN_NODE_PIXEL_SIZE;
-  root: IPointCloudTreeNode | null = null;
+  root: IPointCloudTreeNode | null = null; // The root node of the octree.
   boundingBoxNodes: Object3D[] = [];
   visibleNodes: PointCloudOctreeNode[] = [];
   visibleGeometry: PointCloudOctreeGeometryNode[] = [];
@@ -31,6 +34,9 @@ export class PointCloudOctree extends PointCloudTree {
   private visibleBounds: Box3 = new Box3();
   private picker: PointCloudOctreePicker | undefined;
 
+  /**
+   * Constructor to initializing the PointCloudOctree
+   */
   constructor(
     potree: IPotree,
     pcoGeometry: PCOGeometry,
@@ -52,8 +58,12 @@ export class PointCloudOctree extends PointCloudTree {
     this.initMaterial(this.material);
   }
 
+  /**
+   * Initializes the material of the point cloud with the bounding box of the point cloud
+   * @param material The material to initialize
+   */
   private initMaterial(material: PointCloudMaterial): void {
-    this.updateMatrixWorld(true);
+    this.updateMatrixWorld(true); // Make sure the matrix is updated.
 
     const { min, max } = computeTransformedBoundingBox(
       this.pcoGeometry.tightBoundingBox || this.getBoundingBoxWorld(),
@@ -66,10 +76,11 @@ export class PointCloudOctree extends PointCloudTree {
   }
 
   dispose(): void {
-    if (this.root) {
+    if (this.root) { // If we have a root node, dispose it.
       this.root.dispose();
     }
 
+    // Make sure descendant geometry nodes are removed from the LRU cache.
     this.pcoGeometry.root.traverse((n:IPointCloudTreeNode) => this.potree.lru.remove(n));
     this.pcoGeometry.dispose();
     this.material.dispose();

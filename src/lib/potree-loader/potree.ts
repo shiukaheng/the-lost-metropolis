@@ -45,11 +45,21 @@ export class Potree implements IPotree {
   private static picker: PointCloudOctreePicker | undefined;
   private _pointBudget: number = DEFAULT_POINT_BUDGET;
   private _rendererSize: Vector2 = new Vector2();
+  private frustumMatrix = new Matrix4();
+  private inverseWorldMatrix = new Matrix4();
+  private cameraMatrix = new Matrix4();
 
   maxNumNodesLoading: number = MAX_NUM_NODES_LOADING;
   features = FEATURES;
   lru = new LRU(this._pointBudget);
 
+  /**
+   * A versatile point cloud loader and renderer that could be integrated easily into any 3D web application.
+   * @param url The relative path to the point cloud file (e.g. cloud.js, metadata.json)
+   * @param getUrl A function to get the absolute path to the point cloud file (e.g. https://test.com/scan_1/cloud.js)
+   * @param xhrRequest A function to make a request to the server (e.g. fetch)
+   * @returns A promise that resolves to a PointCloudOctree
+   */
   async loadPointCloud(
     url: string,
     getUrl: GetUrlFn,
@@ -64,20 +74,27 @@ export class Potree implements IPotree {
     throw new Error("Unsupported file type");
   }
 
+  /**
+   * Function to update the visibility of the point clouds and load/unload geometry nodes.
+   * @param pointClouds A list of point clouds to update 
+   * @param camera Camera in which we are viewing the point clouds
+   * @param renderer The renderer used to render the point clouds 
+   * @returns An object containing the visible nodes, number of visible points, and a list of promises for the nodes that are loading 
+   */
   updatePointClouds(
     pointClouds: PointCloudOctree[],
     camera: Camera,
     renderer: WebGLRenderer,
   ): IVisibilityUpdateResult {
-    const result = this.updateVisibility(pointClouds, camera, renderer);
+    const result = this.updateVisibility(pointClouds, camera, renderer); // This is the actual step for calculating visibility
 
     for (let i = 0; i < pointClouds.length; i++) {
       const pointCloud = pointClouds[i];
       if (pointCloud.disposed) {
         continue;
-      }
+      } // Basically, we only update a point cloud if it is not disposed
 
-      pointCloud.material.updateMaterial(pointCloud, pointCloud.visibleNodes, camera, renderer);
+      pointCloud.material.updateMaterial(pointCloud, pointCloud.visibleNodes, camera, renderer); 
       pointCloud.updateVisibleBounds();
       pointCloud.updateBoundingBoxes();
     }
@@ -115,10 +132,10 @@ export class Potree implements IPotree {
     camera: Camera,
     renderer: WebGLRenderer,
   ): IVisibilityUpdateResult {
-    let numVisiblePoints = 0;
+    let numVisiblePoints = 0; // We initialize the number of visible points to 0
 
-    const visibleNodes: PointCloudOctreeNode[] = [];
-    const unloadedGeometry: PointCloudOctreeGeometryNode[] = [];
+    const visibleNodes: PointCloudOctreeNode[] = []; // We initialize the list of visible nodes to an empty list
+    const unloadedGeometry: PointCloudOctreeGeometryNode[] = []; // We initialize the list of unloaded geometry to an empty list
 
     // calculate object space frustum and cam pos and setup priority queue
     const { frustums, cameraPositions, priorityQueue } = this.updateVisibilityStructures(

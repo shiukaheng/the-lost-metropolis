@@ -18,8 +18,7 @@ import { ControlTips } from './View/ControlTips';
 
 function XRButtons({supportedXRModes, xrRequesterGetterRef}) {
     const supportAR = supportedXRModes && supportedXRModes.includes("immersive-ar")
-    // const supportVR = supportedXRModes && supportedXRModes.includes("immersive-vr")
-    const supportVR = true
+    const supportVR = supportedXRModes && supportedXRModes.includes("immersive-vr")
     return (
         <Fragment>
             {supportAR &&

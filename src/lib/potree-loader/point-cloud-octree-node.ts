@@ -2,9 +2,10 @@ import { Box3, BufferGeometry, EventDispatcher, Object3D, Points, Sphere } from 
 import { PointCloudOctreeGeometryNode } from './point-cloud-octree-geometry-node';
 import { IPointCloudTreeNode } from './types';
 
+
 export class PointCloudOctreeNode extends EventDispatcher implements IPointCloudTreeNode {
-  geometryNode: PointCloudOctreeGeometryNode;
-  sceneNode: Points;
+  geometryNode: PointCloudOctreeGeometryNode; // The geometry node this scene node represents.
+  sceneNode: Points; // The THREE.js object for this node.
   pcIndex: number | undefined = undefined;
   boundingBoxNode: Object3D | null = null;
   readonly children: (IPointCloudTreeNode | null)[];
