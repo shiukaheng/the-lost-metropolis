@@ -27,8 +27,8 @@ export class PointCloudOctree extends PointCloudTree {
   minNodePixelSize: number = DEFAULT_MIN_NODE_PIXEL_SIZE;
   root: IPointCloudTreeNode | null = null; // The root node of the octree.
   boundingBoxNodes: Object3D[] = [];
-  visibleNodes: PointCloudOctreeNode[] = [];
-  visibleGeometry: PointCloudOctreeGeometryNode[] = [];
+  visibleNodes: PointCloudOctreeNode[] = []; // List of all visible nodes.
+  visibleGeometry: PointCloudOctreeGeometryNode[] = []; // List of all visible geometry nodes.
   numVisiblePoints: number = 0;
   showBoundingBox: boolean = false;
   private visibleBounds: Box3 = new Box3();
@@ -240,4 +240,5 @@ export class PointCloudOctree extends PointCloudTree {
       ? 0
       : this.visibleNodes.length / this.visibleGeometry.length;
   }
+
 }

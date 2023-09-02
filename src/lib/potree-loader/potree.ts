@@ -148,44 +148,56 @@ export class Potree implements IPotree {
     let nodeLoadFailed = false;
     let queueItem: QueueItem | undefined;
 
-    while ((queueItem = priorityQueue.pop()) !== undefined) {
-      let node = queueItem.node;
+    while ((queueItem = priorityQueue.pop()) !== undefined) { // Get the next item in the priority queue and continue if it exists
+      let node = queueItem.node; // Get the node from the queue item (starts from the root nodes)
 
       // If we will end up with too many points, we stop right away.
       if (numVisiblePoints + node.numPoints > this.pointBudget) {
         break;
       }
 
-      const pointCloudIndex = queueItem.pointCloudIndex;
-      const pointCloud = pointClouds[pointCloudIndex];
+      const pointCloudIndex = queueItem.pointCloudIndex; // Get the point cloud index (which point cloud) from the queue item (which may contain multiple nodes from the same point cloud)
+      const pointCloud = pointClouds[pointCloudIndex]; // Get the point cloud
 
-      const maxLevel = pointCloud.maxLevel !== undefined ? pointCloud.maxLevel : Infinity;
+      const maxLevel = pointCloud.maxLevel !== undefined ? pointCloud.maxLevel : Infinity; // Get the maximum level of the point cloud, Infinity if not defined
 
       if (
-        node.level > maxLevel ||
-        !frustums[pointCloudIndex].intersectsBox(node.boundingBox) ||
-        this.shouldClip(pointCloud, node.boundingBox)
+        node.level > maxLevel || // We are at a level that is higher than the maximum level of the point cloud
+        !frustums[pointCloudIndex].intersectsBox(node.boundingBox) || // The frustum does not intersect the bounding box of the node
+        this.shouldClip(pointCloud, node.boundingBox) // The node should be clipped
+        // TODO: Probably implement here for look-away fade effect
       ) {
-        continue;
+        continue; // We skip this node
       }
 
-      numVisiblePoints += node.numPoints;
-      pointCloud.numVisiblePoints += node.numPoints;
+      // Now we assume we will load this node
 
-      const parentNode = queueItem.parent;
+      numVisiblePoints += node.numPoints; // We add in this node's visible points (not counting descendants) to the total points count
+      pointCloud.numVisiblePoints += node.numPoints; // And point cloud point count
 
+      const parentNode = queueItem.parent; // Get the parent
+
+      // If the node is a geometry node AND the parent is a tree node, or has no parent
+      // I assume geometry nodes mean its not loaded to GPU
       if (isGeometryNode(node) && (!parentNode || isTreeNode(parentNode))) {
-        if (node.loaded && loadedToGPUThisFrame < MAX_LOADS_TO_GPU) {
-          node = pointCloud.toTreeNode(node, parentNode);
+        // If the node is loaded to memory and we have not exceeded the maximum loads to GPU
+        if (node.loaded && loadedToGPUThisFrame < MAX_LOADS_TO_GPU) { 
+          /*
+           * We convert the geometry node to a tree node, which:
+           * - Creates a Points object for the geometry node (scene node)
+           * - Adds the scene to parent's scene node
+           * - Sets up disposers
+           */
+          node = pointCloud.toTreeNode(node, parentNode); 
           loadedToGPUThisFrame++;
-        } else if (!node.failed) {
+        } else if (!node.failed) {  // I assume node.failed means it failed to load (from the URL), and so it means its failed to load to GPU?
           if (node.loaded && loadedToGPUThisFrame >= MAX_LOADS_TO_GPU) {
             exceededMaxLoadsToGPU = true;
           }
-          unloadedGeometry.push(node);
-          pointCloud.visibleGeometry.push(node);
+          unloadedGeometry.push(node); // We add the node to the list of unloaded geometry
+          pointCloud.visibleGeometry.push(node); // We add the node to the list of visible geometry
         } else {
-          nodeLoadFailed = true;
+          nodeLoadFailed = true; // We set the node load failed flag to true
           continue;
         }
       }
@@ -333,52 +345,63 @@ export class Potree implements IPotree {
     return true;
   }
 
+  /**
+   * Method to get the frustums, camera positions, and priority queue needed to calculate visibility
+   * @param pointClouds An array of point clouds needing visibility calculated
+   * @param camera The camera in which we are viewing the point clouds
+   * @returns An object containing the frustums, camera positions, and priority queue
+   */
   private updateVisibilityStructures(
     pointClouds: PointCloudOctree[],
     camera: Camera,
   ): {
-    frustums: Frustum[];
-    cameraPositions: Vector3[];
-    priorityQueue: BinaryHeap<QueueItem>;
+    frustums: Frustum[]; // Array of frustums that can be used to test if a point (in local point cloud space) is visible
+    cameraPositions: Vector3[]; // Array of camera positions in local point cloud space
+    priorityQueue: BinaryHeap<QueueItem>; // An array of root nodes from each point cloud with a defaulted maximum priority
   } {
-    const frustums: Frustum[] = [];
+    const frustums: Frustum[] = []; // TODO: How do the frustums and cameraPositions arrays get matched up with the point clouds? Since the index may not match up with the point cloud index...
     const cameraPositions: Vector3[] = [];
     const priorityQueue = new BinaryHeap<QueueItem>(x => 1 / x.weight);
 
-    for (let i = 0; i < pointClouds.length; i++) {
+    for (let i = 0; i < pointClouds.length; i++) { // For each point cloud
       const pointCloud = pointClouds[i];
 
-      if (!pointCloud.initialized()) {
+      if (!pointCloud.initialized()) { // Skips if root node is not defined
         continue;
       }
 
-      pointCloud.numVisiblePoints = 0;
-      pointCloud.visibleNodes = [];
-      pointCloud.visibleGeometry = [];
+      pointCloud.numVisiblePoints = 0; // Resets the number of visible points to 0
+      pointCloud.visibleNodes = []; // Resets the list of visible nodes to an empty list
+      pointCloud.visibleGeometry = []; // Resets the list of visible geometry to an empty list
 
-      camera.updateMatrixWorld(false);
+      camera.updateMatrixWorld(false); // Turns off matrix auto update
 
       // Frustum in object space.
-      const inverseViewMatrix = camera.matrixWorldInverse;
-      const worldMatrix = pointCloud.matrixWorld;
+      const inverseViewMatrix = camera.matrixWorldInverse; // Transforms points from world space to object (camera) space / view space
+      const worldMatrix = pointCloud.matrixWorld; // Transforms points from object (point cloud) space to world space
       this.frustumMatrix
         .identity()
         .multiply(camera.projectionMatrix)
         .multiply(inverseViewMatrix)
         .multiply(worldMatrix);
+      /**
+       * - First, we transform from point cloud local space to world space
+       * - Then, we transform from world space to camera space
+       * - Finally, we transform from camera space to clip space
+       */
       frustums.push(new Frustum().setFromProjectionMatrix(this.frustumMatrix));
 
       // Camera position in object space
-      this.inverseWorldMatrix.copy(worldMatrix).invert();
+      this.inverseWorldMatrix.copy(worldMatrix).invert(); // Transforms from world space to object space
       this.cameraMatrix
         .identity()
         .multiply(this.inverseWorldMatrix)
         .multiply(camera.matrixWorld);
       cameraPositions.push(new Vector3().setFromMatrixPosition(this.cameraMatrix));
 
-      if (pointCloud.visible && pointCloud.root !== null) {
-        const weight = Number.MAX_VALUE;
-        priorityQueue.push(new QueueItem(i, weight, pointCloud.root));
+      if (pointCloud.visible && pointCloud.root !== null) { // If the point cloud is visible and the root node is defined
+        const weight = Number.MAX_VALUE; // The weight is set to the maximum value, since we equally prioritize all root nodes
+        priorityQueue.push(new QueueItem(i, weight, pointCloud.root)); // We add the root node to the priority queue
       }
 
       // Hide any previously visible nodes. We will later show only the needed ones.
