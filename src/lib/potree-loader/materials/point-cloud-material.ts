@@ -9,6 +9,7 @@ import {
   Material,
   NearestFilter,
   NoBlending,
+  NormalBlending,
   PerspectiveCamera,
   RawShaderMaterial,
   Scene,
@@ -374,6 +375,9 @@ export class PointCloudMaterial extends RawShaderMaterial {
       this.depthWrite = false;
       this.depthFunc = LessEqualDepth;
     }
+
+    this.blending = NormalBlending;
+    this.transparent = true;
 
     this.needsUpdate = true;
   }
