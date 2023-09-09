@@ -17,7 +17,7 @@ uniform float fov;
 uniform float spacing;
 
 #if defined use_clip_box
-	uniform mat4 clipBoxes[max_clip_boxes];
+    uniform mat4 clipBoxes[max_clip_boxes];
 #endif
 
 uniform float heightMin;
@@ -44,34 +44,29 @@ uniform sampler2D visibleNodes;
 uniform sampler2D depthMap;
 
 #ifdef new_format
-	in vec4 rgba;
-	out vec4 vColor;
+    in vec4 rgba;
 #else
-	in vec3 color;
-	out vec3 vColor;
+    in vec3 color;
 #endif
 
+out vec4 vColor; // Always vec4 for consistency
 out float vOpacity;
 
 #if defined(paraboloid_point_shape)
-	out vec3 vViewPosition;
-	out float vRadius;
+    out vec3 vViewPosition;
+    out float vRadius;
 #endif
-
-// out vec3 vNormal;
 
 #include lod.vert;
 #include getRGB.vert;
 #include colorConversion.vert;
-// #include snoise4d.glsl;
 #include psrddnoise2.glsl;
 
 float pointNoise1(vec3 position) {
-	return (
-		// psrddnoise(vec2(position.x * 10., position.y * 10.), vec2(0., 0.), time) * 0.1 +
-		psrddnoise(vec2(position.x * 20., position.y * 20.), vec2(0., 0.), time) * 0.05 +
-		psrddnoise(vec2(position.x * 100., position.y * 100.), vec2(0., 0.), time) * 0.025
-	);
+    return (
+        psrddnoise(vec2(position.x * 20., position.y * 20.), vec2(0., 0.), time) * 0.05 +
+        psrddnoise(vec2(position.x * 100., position.y * 100.), vec2(0., 0.), time) * 0.025
+    );
 }
 
 void main() {
@@ -166,16 +161,16 @@ void main() {
 	// ---------------------	
 
 	#ifdef new_format
-		vColor = rgba;
-	#elif defined color_type_rgb
-		vColor = getRGB();
-	#endif
+        vColor = rgba;
+    #else
+        vColor = vec4(color, 1.0); // Assign a default alpha of 1.0 for the old format
+    #endif
 
-	#if defined(output_color_encoding_sRGB) && defined(input_color_encoding_linear)
-		vColor = toLinear(vColor);
-	#endif
+    #if defined(output_color_encoding_sRGB) && defined(input_color_encoding_linear)
+        vColor = toLinear(vColor);
+    #endif
 
-	#if defined(output_color_encoding_linear) && defined(input_color_encoding_sRGB)
-		vColor = fromLinear(vColor);
-	#endif
+    #if defined(output_color_encoding_linear) && defined(input_color_encoding_sRGB)
+        vColor = fromLinear(vColor);
+    #endif
 }

@@ -18,61 +18,54 @@ out vec4 fragColor;
 in float vOpacity;
 
 #ifdef new_format
-	in vec4 vColor;
+    in vec4 vColor;
 #else
-	in vec3 vColor;
+    in vec3 vColor;
 #endif
 
 #if defined(paraboloid_point_shape)
-	in vec3 vViewPosition;
-#endif
-
-#if defined(paraboloid_point_shape)
-	in float vRadius;
+    in vec3 vViewPosition;
+    in float vRadius;  // Moved this inside the paraboloid_point_shape check to ensure proper use.
 #endif
 
 void main() {
 
-	#ifdef new_format
-		// set actualColor vec3 from vec4 vColor
-		vec3 actualColor = vColor.xyz;
-	#else
-		// set actualColor RGB from the XYZ of vColor
-		vec3 actualColor = vColor;
-	#endif
-	
-	vec3 color = actualColor;
-	float depth = gl_FragCoord.z;
+    vec3 actualColor;
 
-	#if defined(circle_point_shape) || defined(paraboloid_point_shape) || defined (weighted_splats)
+    #ifdef new_format
+        actualColor = vColor.xyz;
+    #else
+        actualColor = vColor;
+    #endif
 
-		float u = 2.0 * gl_PointCoord.x - 1.0;
-		float v = 2.0 * gl_PointCoord.y - 1.0;
+    vec3 color = actualColor;
+    float depth = gl_FragCoord.z;
 
-	#endif
-		
-	fragColor = vec4(color, vOpacity);
-	
-	#if defined paraboloid_point_shape
+    #if defined(circle_point_shape) || defined(paraboloid_point_shape) || defined(weighted_splats)
+        float u = 2.0 * gl_PointCoord.x - 1.0;
+        float v = 2.0 * gl_PointCoord.y - 1.0;
+    #endif
 
-		float wi = 0.0 - ( u*u + v*v);
-		vec4 pos = vec4(vViewPosition, 1.0);
-		pos.z += wi * vRadius;
-		float linearDepth = -pos.z;
-		pos = projectionMatrix * pos;
-		pos = pos / pos.w;
-		float expDepth = pos.z;
-		depth = (pos.z + 1.0) / 2.0;
-		gl_FragDepth = depth;
+    fragColor = vec4(color, vOpacity);
 
-		#if defined(color_type_depth)
-			gl_FragColor.r = linearDepth;
-			gl_FragColor.g = expDepth;
-		#endif
+    #if defined paraboloid_point_shape
+        float wi = 0.0 - (u*u + v*v);
+        vec4 pos = vec4(vViewPosition, 1.0);
+        pos.z += wi * vRadius;
+        float linearDepth = -pos.z;
+        pos = projectionMatrix * pos;
+        pos = pos / pos.w;
+        float expDepth = pos.z;
+        depth = (pos.z + 1.0) / 2.0;
+        gl_FragDepth = depth;
 
-		#if defined(use_edl)
-			gl_FragColor.a = log2(linearDepth);
-		#endif
+        #if defined(color_type_depth)
+            fragColor.r = linearDepth;
+            fragColor.g = expDepth;
+        #endif
 
-	#endif
+        #if defined(use_edl)
+            fragColor.a = log2(linearDepth);
+        #endif
+    #endif
 }
