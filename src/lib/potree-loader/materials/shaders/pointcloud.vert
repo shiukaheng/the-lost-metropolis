@@ -94,7 +94,7 @@ void main() {
 	float disintegrationFactor = mod(time, 10.0) / 10.0;
 
 	// DistortionModulator: [0, 1], calculates an individual point's distortion factor based on point indices, point color, noise, and disintegration factor.
-	float distortionModulator = clamp(pow(disintegrationFactor - pcIndex * 0.001, 5.0) * pow(length(vec3(rgba.x, rgba.y, rgba.z)), 3.0) , 0.0, 1.0);
+	float distortionModulator = clamp(pow(disintegrationFactor, 5.0) * pow(length(vec3(rgba.x, rgba.y, rgba.z)), 3.0) , 0.0, 1.0);
 	
 	// Calculate the new position of the point after applying distortion.
 	vec3 finalPosition = mix(position, position + distortionVector, distortionModulator);
