@@ -87,15 +87,20 @@ void main() {
 	// ---------------------
 	// EFFECT CALCULATIONS
 	// ---------------------
+
+	vec3 distortionVector = vec3(0.0, 0.0, 5.0);
 	
 	// Disintegration factor: [0, 1], controls how much the point cloud is disintegrated.
 	float disintegrationFactor = mod(time, 10.0) / 10.0;
 
 	// DistortionModulator: [0, 1], calculates an individual point's distortion factor based on point indices, point color, noise, and disintegration factor.
-	float distortionModulator = clamp(pow(disintegrationFactor - pcIndex * 0.001 + pointNoise1(position), 5.0) * pow(length(vec3(rgba.x, rgba.y, rgba.z)), 3.0) , 0.0, 1.0);
+	float distortionModulator = clamp(pow(disintegrationFactor - pcIndex * 0.001, 5.0) * pow(length(vec3(rgba.x, rgba.y, rgba.z)), 3.0) , 0.0, 1.0);
 	
 	// Calculate the new position of the point after applying distortion.
-	vec3 finalPosition = mix(position, position + vec3(0.0, 0.0, 2.0), distortionModulator);
+	vec3 finalPosition = mix(position, position + distortionVector, distortionModulator);
+
+	// Calculate fade factor on distortion
+	float fadeFactor = (1. - pow(distortionModulator, 3.0)) * (1.- (pow(disintegrationFactor, 3.0)));
 
 
 	// ---------------------
@@ -104,15 +109,10 @@ void main() {
 
 	vec4 mvPosition = modelViewMatrix * vec4(finalPosition, 1.0);
 	gl_Position = projectionMatrix * mvPosition;
+
 	#if defined(paraboloid_point_shape)
 		vViewPosition = mvPosition.xyz;
 	#endif
-
-	// vNormal = normalize(normalMatrix * normal);
-	// vLogDepth = log2(-mvPosition.z);
-	// float linearDepth = -mvPosition.z ;
-	// float expDepth = (gl_Position.z / gl_Position.w) * 0.5 + 0.5;
-	// vColor = vec3(linearDepth, expDepth, 0.0);
 
 	// ---------------------
 	// POINT SIZE
@@ -145,9 +145,9 @@ void main() {
 	// ---------------------
 
 	#ifdef attenuated_opacity
-		vOpacity = opacity * exp(-length(-mvPosition.xyz) / opacityAttenuation);
+		vOpacity = opacity * exp(-length(-mvPosition.xyz) / opacityAttenuation) * fadeFactor;
 	#else
-		vOpacity = (1. - pow(distortionModulator, 3.0)) * (1.- (pow(disintegrationFactor, 3.0)));
+		vOpacity = opacity * fadeFactor;
 	#endif
 
 	// ---------------------
