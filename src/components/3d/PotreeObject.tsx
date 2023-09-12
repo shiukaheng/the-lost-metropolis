@@ -4,7 +4,7 @@ import { VaporComponent, VaporComponentProps } from "../viewer/ComponentDeclarat
 import { genericInputs } from "../viewer/genericInputs"
 import { PotreeContext } from "./managers/PotreeManager";
 import { v4 } from "uuid"
-import { useTransitionAlpha } from "./managers/ScenesManager";
+import { useTransitionAlpha, useTransitionAlpha2 } from "./managers/ScenesManager";
 
 type PotreeObjectProps = VaporComponentProps & {
     cloudName?: string
@@ -65,7 +65,7 @@ export const PotreeObject: VaporComponent = ({cloudName="cloud.js", baseUrl, poi
             pointCloud.material.outputColorEncoding = 1
         }
     }, [pointSize, pointSizeType, pointShape, pointCloud])
-    useTransitionAlpha(sceneID, 10, (alpha) => {
+    useTransitionAlpha(sceneID, 4, 8, 0, 0, 8, 4, (alpha) => {
         if (pointCloud) {
             pointCloud.material.transitionAlpha = alpha;
         }

@@ -12,7 +12,7 @@ function Exhibition() {
             }
         }>
             <ambientLight intensity={1} />
-            <AnimatedScenesManager scenes={["A", "B"]} interval={20000}>
+            <AnimatedScenesManager scenes={["A", "B"]} interval={5000}>
                 <PotreeObject
                     objectID='potree'
                     cloudName='metadata.json'
