@@ -50,13 +50,13 @@ export interface VaporComponent extends FunctionComponent<VaporComponentProps> {
 
 export const components = [
     TestObject,
-    PotreeAssetObject,
+    // PotreeAssetObject,
     LinkObject,
     InfoObject,
     DepthKitObject,
     DebugPlane,
-    NexusObject,
-    NexusAssetObject,
+    // NexusObject,
+    // NexusAssetObject,
     AmbientLightObject,
     PotreeObject,
     TilesObject,

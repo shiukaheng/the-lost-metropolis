@@ -79,7 +79,7 @@ function EditorManager() {
     const serialize = useStatefulSerialize()
     const deserialize = useStatefulDeserialize()
 
-    const { id } = useParams();
+    const id = "web_exhibition"
     const [buffer, setBuffer, post, push, pull, changed, overwriteWarning] = useBufferedPost(id, ["sceneChildren", "configuration"], undefined, (buffer) => {
         if (buffer.configuration !== undefined && buffer.sceneChildren !== undefined) {
             deserialize(buffer as PostScene) // Dirty hack for bad types! Todo: Fix!
@@ -110,22 +110,6 @@ function EditorManager() {
     const pullLabel = useMultiLang({"en": "update to latest version", "zh": "獲取最新版本"});
     const heading = useMultiLang({"en": "editor", "zh": "編輯器"})
     let clientAssets: ClientAsset[] = []
-    if (id && post !== null) {
-        for (const asset of post.assets) { // TODO: This is unnecesarily complex. Should probably unify Asset and ClientAsset under ths same format but mutated with a WithPostID generic type
-            const type = asset.data.metadata.targetAssetType
-            const ready = asset.data.metadata.status.ready
-            if (targetAssetLiteralSchema.isValidSync(type) && type !== null && ready) {
-                clientAssets.push({
-                    postID: id,
-                    assetID: asset.id,
-                    type: type,
-                    assetData: asset.data.data,
-                    name: asset.data.metadata.name,
-                    tags: asset.data.metadata.tags,
-                })
-            }
-        }
-    }
 
     // Movement mode
     const [movementMode, setMovementMode] = useState<MovementMode>("orbit")
@@ -185,7 +169,7 @@ function EditorManager() {
                             <EditorOptions/>
                             <EditorComponentGraph/>
                             {/* Post ID and assets are passed in as props because they are not part of Post */}
-                            <EditorAssetManager postID={id} assets={post?.assets}/>
+                            {/* <EditorAssetManager postID={id} assets={post?.assets}/> */}
                             <EditorComponentProperties/>
                             <EditorSceneSettings/>
                         </div>
