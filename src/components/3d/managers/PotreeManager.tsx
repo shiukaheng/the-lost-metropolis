@@ -6,7 +6,20 @@ import { createContext, useEffect, useRef, ReactNode, useState, useContext } fro
 import { ViewerContext } from '../../viewer/ViewerContext';
 import { Object3D } from "three"
 import { PointCloudOctree } from "../../../lib/potree-loader";
-const PotreeContext = createContext(null)
+
+interface PotreeContextType {
+    potree: Potree | null;
+    pointClouds: { [key: string]: PointCloudOctree };
+    setPointClouds: React.Dispatch<React.SetStateAction<{ [key: string]: PointCloudOctree }>>;
+    setPointCloud: (cloud: PointCloudOctree, childID: string) => void;
+  }
+  
+  const PotreeContext = createContext<PotreeContextType>({
+    potree: null,
+    pointClouds: {},
+    setPointClouds: () => {},
+    setPointCloud: () => {},
+  });
 
 type PotreeManagerProps = {
     children: ReactNode

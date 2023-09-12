@@ -4,6 +4,7 @@ import { VaporComponent, VaporComponentProps } from "../viewer/ComponentDeclarat
 import { genericInputs } from "../viewer/genericInputs"
 import { PotreeContext } from "./managers/PotreeManager";
 import { v4 } from "uuid"
+import { useTransitionAlpha } from "./managers/ScenesManager";
 
 type PotreeObjectProps = VaporComponentProps & {
     cloudName?: string
@@ -12,9 +13,10 @@ type PotreeObjectProps = VaporComponentProps & {
     pointSizeType?: number
     pointShape?: number
     getUrl?: (string) => string
+    sceneID: string | null
 }
 
-export const PotreeObject: VaporComponent = ({cloudName="cloud.js", baseUrl, pointSize=1, pointSizeType=2, pointShape=2, getUrl, ...props}:PotreeObjectProps) => {
+export const PotreeObject: VaporComponent = ({cloudName="cloud.js", baseUrl, pointSize=1, pointSizeType=2, pointShape=2, getUrl, sceneID=null, ...props}:PotreeObjectProps) => {
     const {potree, setPointCloud: setManagerPointCloud} = useContext(PotreeContext)
     const [pointCloud, setPointCloud] = useState(null)
     const objectGroup = useRef(null)
@@ -30,6 +32,9 @@ export const PotreeObject: VaporComponent = ({cloudName="cloud.js", baseUrl, poi
         // Request new point with new cloudName and baseUrl asynchronously, then update pointCloud. In the asynchrnous callback, check if isValid is true. If it is, set pointCloud to the new pointCloud.
         const loadNewPointCloud = async () => {
             try {
+                if (potree === null) {
+                    throw new Error("Potree is not loaded")
+                }
                 const newPointCloud = await potree.loadPointCloud(cloudName, getUrl || defaultGetUrl)
                 if (isValid.current) {
                     // Update manager references
@@ -60,6 +65,11 @@ export const PotreeObject: VaporComponent = ({cloudName="cloud.js", baseUrl, poi
             pointCloud.material.outputColorEncoding = 1
         }
     }, [pointSize, pointSizeType, pointShape, pointCloud])
+    useTransitionAlpha(sceneID, 1, (alpha) => {
+        if (pointCloud) {
+            pointCloud.material.transitionAlpha = alpha;
+        }
+    })
     return ( 
         <group ref={objectGroup} {...props}></group>
     );

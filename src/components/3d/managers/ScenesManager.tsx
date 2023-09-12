@@ -1,5 +1,5 @@
 import { useFrame } from "@react-three/fiber";
-import { createContext, useContext, useEffect, useRef } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 
 export type ScenesContext = {
     visibleScenes: string[];
@@ -18,42 +18,113 @@ export function ScenesManager({scenes=[], children}: {scenes: string[], children
     )
 }
 
-export const useTransitionAlpha = (sceneID: string, transitionTime: number, callback: (alpha: number) => void) => {
-    const scenesContext = useContext(ScenesContext);
-    const alphaRef = useRef<number>(scenesContext && scenesContext.visibleScenes.includes(sceneID) ? 1 : 0);
-    const directionRef = useRef<number>(0); // 1 for increasing, -1 for decreasing, 0 for no change
-    const elapsedTimeRef = useRef<number>(0);
+export type TransitionState = "fade-in" | "fade-out" | "none";
 
+export const useTransitionAlpha = (sceneID: string | null, transitionTime: number, callback: (alpha: number) => void) => {
+    const scenesContext = useContext(ScenesContext);
+    const lastVisibilityRef = useRef<boolean | null>(null);
+    const alphaRef = useRef<number>(0);
+    const transitionStateRef = useRef<TransitionState>("none");
+
+    // Update transition state
     useEffect(() => {
-        if (scenesContext) {
-            if (scenesContext.visibleScenes.includes(sceneID) && alphaRef.current !== 1) {
-                directionRef.current = 1;
-                elapsedTimeRef.current = 0;
-            } else if (!scenesContext.visibleScenes.includes(sceneID) && alphaRef.current !== 0) {
-                directionRef.current = -1;
-                elapsedTimeRef.current = 0;
+        console.log("Updating transition state")
+        if (sceneID === null) {
+            console.log("Scene ID is null")
+            // Set transition state to none
+            transitionStateRef.current = "none";
+            // Set alpha to 0
+            alphaRef.current = 0;
+        } else {
+            // First, determine last visibility
+            const lastVisibility = lastVisibilityRef.current;
+            // Then, determine current visibility
+            const currentVisibility = scenesContext?.visibleScenes.includes(sceneID) ?? false;
+            // If the last visibility is null, we are in the first frame, so we set the transition state to none, and alpha to 1 if the current visibility is true, and 0 if the current visibility is false
+            if (lastVisibility === null) {
+                console.log("Last visibility is null")
+                transitionStateRef.current = "none";
+                alphaRef.current = currentVisibility ? 0 : 1;
             } else {
-                directionRef.current = 0;
+                // Otherwise, lets first determine the current transition state
+                if (lastVisibility === currentVisibility) {
+                    // If the last visibility is the same as the current visibility, we are not transitioning, so we set the transition state to none
+                    transitionStateRef.current = "none";
+                    console.log("None")
+                } else if (currentVisibility && !lastVisibility) {
+                    // Visible to invisible: fade out
+                    transitionStateRef.current = "fade-out";
+                    console.log("Fade out")
+                } else if (!currentVisibility && lastVisibility) {
+                    // Invisible to visible: fade in
+                    transitionStateRef.current = "fade-in";
+                    console.log("Fade in")
+                }
             }
+            // Finally, update last visibility
+            lastVisibilityRef.current = currentVisibility;
         }
     }, [sceneID, scenesContext]);
 
-    useFrame(({ clock }) => {
-        const deltaTime = clock.getDelta();
-
-        if (directionRef.current !== 0 && scenesContext) {
-            elapsedTimeRef.current += deltaTime;
-
-            const change = (directionRef.current * deltaTime) / transitionTime;
-
-            alphaRef.current = Math.min(1, Math.max(0, alphaRef.current + change));
-
-            if (elapsedTimeRef.current >= transitionTime) {
-                directionRef.current = 0;
-                alphaRef.current = directionRef.current === 1 ? 1 : 0;
+    // Update alpha
+    useFrame((state, delta) => {
+        // Now we animate
+        if (transitionStateRef.current === "none") {
+            // Do nothing
+        } else if (transitionStateRef.current === "fade-in") {
+            if (alphaRef.current < 0) {
+                alphaRef.current += delta / transitionTime;
+                if (alphaRef.current > 0) {
+                    alphaRef.current = 0;
+                }
+            } else if (alphaRef.current === 0) {
+                alphaRef.current = 0;
+            } else if (alphaRef.current > 0) {
+                alphaRef.current += delta / transitionTime;
+                if (alphaRef.current > 1) {
+                    alphaRef.current = -1;
+                }
             }
-
-            callback(alphaRef.current);
+        } else if (transitionStateRef.current === "fade-out") {
+            if (alphaRef.current <= 1) {
+                alphaRef.current += delta / transitionTime;
+                if (alphaRef.current > 1) {
+                    alphaRef.current = 1;
+                }
+            } else if (alphaRef.current === 1) {
+                alphaRef.current = 1;
+            }
         }
-    });
+        callback(alphaRef.current);
+    })
+
+
+    return
+}
+
+type AnimatedScenesManagerProps = {
+    scenes: string[];
+    interval: number; // N seconds in milliseconds, e.g., 5000 for 5 seconds
+    children: React.ReactNode;
+};
+
+export function AnimatedScenesManager({scenes, interval, children}: AnimatedScenesManagerProps) {
+    const [currentIndex, setCurrentIndex] = useState(0);
+
+    useEffect(() => {
+        const intervalID = setInterval(() => {
+            // console.log("Setting current index to", (currentIndex + 1) % scenes.length);
+            setCurrentIndex((currentIndex + 1) % scenes.length);
+        }, interval);
+
+        return () => {
+            clearInterval(intervalID);
+        };
+    }, [scenes, interval, currentIndex]);
+
+    return (
+        <ScenesContext.Provider value={{ visibleScenes: [scenes[currentIndex]] }}>
+            {children}
+        </ScenesContext.Provider>
+    );
 }
