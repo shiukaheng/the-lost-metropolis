@@ -90,20 +90,17 @@ void main() {
 	vec3 worldPosition = worldPosition4.xyz / worldPosition4.w;
 	vec4 modelViewPosition = modelViewMatrix * vec4(position, 1.0);
 
-	// vec3 distortionVector = vec3(0.0, 0.0, 10.0);
-	
-	// Disintegration factor: [0, 1], controls how much the point cloud is disintegrated.
-	// float disintegrationFactor = mod(time, 10.0) / 10.0;
-	float disintegrationFactor = transitionAlpha;
-
 	// DistortionModulator: [0, 1], calculates an individual point's distortion factor based on point indices, point color, noise, and disintegration factor.
-	float distortionModulator = clamp(pow(disintegrationFactor, 5.0) * pow(length(vec3(rgba.x, rgba.y, rgba.z)), 3.0) , 0.0, 1.0);
+	float distortionModulator = clamp(pow(abs(transitionAlpha), 5.0) * pow(length(vec3(rgba.x, rgba.y, rgba.z)), 3.0) , 0.0, 1.0);
 	
+	// Negative if alpha is negative, positive if alpha is positive or zero.
+	float signAlpha = sign(transitionAlpha);
+
 	// Calculate the new position of the point after applying distortion.
-	vec3 finalPosition = mix(position, position + distortionVector, distortionModulator) + pointNoise1(worldPosition) * vec3(0.0, 0.0, 5.0) * pcIndex / 1000.0;
+	vec3 finalPosition = mix(position, position + distortionVector * signAlpha, distortionModulator) + pointNoise1(worldPosition) * vec3(0.0, 0.0, 5.0) * pcIndex / 1000.0;
 
 	// Calculate fade factor on distortion
-	float fadeFactor = (1. - pow(distortionModulator, 3.0)) * (1.- (pow(disintegrationFactor, 3.0)));
+	float fadeFactor = (1. - pow(distortionModulator, 3.0)) * (1.- (pow(abs(transitionAlpha), 3.0)));
 
 
 	// ---------------------
@@ -141,7 +138,7 @@ void main() {
 		vRadius = pointSize / projFactor;
 	#endif
 
-	gl_PointSize = pointSize;
+	gl_PointSize = pointSize * fadeFactor;
 
 	// ---------------------
 	// OPACITY

@@ -95,6 +95,7 @@ export const useTransitionAlpha = (sceneID: string | null, transitionTime: numbe
                 alphaRef.current = 1;
             }
         }
+
         callback(alphaRef.current);
     })
 

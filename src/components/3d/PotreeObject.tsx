@@ -65,7 +65,7 @@ export const PotreeObject: VaporComponent = ({cloudName="cloud.js", baseUrl, poi
             pointCloud.material.outputColorEncoding = 1
         }
     }, [pointSize, pointSizeType, pointShape, pointCloud])
-    useTransitionAlpha(sceneID, 1, (alpha) => {
+    useTransitionAlpha(sceneID, 10, (alpha) => {
         if (pointCloud) {
             pointCloud.material.transitionAlpha = alpha;
         }

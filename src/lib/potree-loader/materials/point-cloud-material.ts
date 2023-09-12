@@ -377,14 +377,13 @@ export class PointCloudMaterial extends RawShaderMaterial {
     if (this.weighted) {
       this.blending = AdditiveBlending;
       this.transparent = true;
-      this.depthTest = true;
-      this.depthWrite = false;
-      this.depthFunc = LessEqualDepth;
     }
 
     this.blending = NormalBlending; // We will use normal blending for fading effects
     this.transparent = true; // And we will set transparent to true to enable fading effects
-
+    this.depthTest = true;
+    this.depthWrite = true;
+    this.depthFunc = LessEqualDepth;
     this.needsUpdate = true;
   }
 

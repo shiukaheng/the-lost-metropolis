@@ -295,8 +295,10 @@ export class Potree implements IPotree {
       }
 
       // Nodes which are larger will have priority in loading/displaying.
-      const weight = distance < radius ? Number.MAX_VALUE : screenPixelRadius + 1 / distance;
-
+      let weight = distance < radius ? Number.MAX_VALUE : screenPixelRadius + 1 / distance;
+      if ((child as PointCloudOctreeNode)?.sceneNode?.material?.transitionAlpha) {
+        weight *= 1 - Math.abs((child as PointCloudOctreeNode).sceneNode.material.transitionAlpha);
+      }
       priorityQueue.push(new QueueItem(queueItem.pointCloudIndex, weight, child, node));
     }
   }
