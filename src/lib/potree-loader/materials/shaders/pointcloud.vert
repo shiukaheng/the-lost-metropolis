@@ -31,6 +31,8 @@ uniform vec3 uColor;
 uniform float opacity;
 uniform float level;
 uniform float time;
+uniform vec3 distortionVector;
+uniform float transitionAlpha;
 
 uniform float filterByNormalThreshold;
 uniform float opacityAttenuation;
@@ -63,10 +65,11 @@ out float vOpacity;
 #include psrddnoise2.glsl;
 
 float pointNoise1(vec3 position) {
-    return (
-        psrddnoise(vec2(position.x * 20., position.y * 20.), vec2(0., 0.), time) * 0.05 +
-        psrddnoise(vec2(position.x * 100., position.y * 100.), vec2(0., 0.), time) * 0.025
-    );
+    return mix(0., (
+        pow((psrddnoise(vec2(position.x * 5. + time, position.z * 5. + time), vec2(0., 0.), time * 0.2) * 0.05 -
+		psrddnoise(vec2(position.x * 5. + time - 0.5, position.z * 5. + time - 0.5), vec2(0., 0.), time * 0.2) * 0.05) * 5., 3.0) * 0.5 +
+        psrddnoise(vec2(position.x * 500., position.z * 500.), vec2(0., 0.), time * 20.) * 0.025
+    ), 1. / level * 2.);
 }
 
 void main() {
@@ -83,16 +86,21 @@ void main() {
 	// EFFECT CALCULATIONS
 	// ---------------------
 
-	vec3 distortionVector = vec3(0.0, 0.0, 5.0);
+	vec4 worldPosition4 = modelMatrix * vec4(position, 1.0);
+	vec3 worldPosition = worldPosition4.xyz / worldPosition4.w;
+	vec4 modelViewPosition = modelViewMatrix * vec4(position, 1.0);
+
+	// vec3 distortionVector = vec3(0.0, 0.0, 10.0);
 	
 	// Disintegration factor: [0, 1], controls how much the point cloud is disintegrated.
-	float disintegrationFactor = mod(time, 10.0) / 10.0;
+	// float disintegrationFactor = mod(time, 10.0) / 10.0;
+	float disintegrationFactor = transitionAlpha;
 
 	// DistortionModulator: [0, 1], calculates an individual point's distortion factor based on point indices, point color, noise, and disintegration factor.
 	float distortionModulator = clamp(pow(disintegrationFactor, 5.0) * pow(length(vec3(rgba.x, rgba.y, rgba.z)), 3.0) , 0.0, 1.0);
 	
 	// Calculate the new position of the point after applying distortion.
-	vec3 finalPosition = mix(position, position + distortionVector, distortionModulator);
+	vec3 finalPosition = mix(position, position + distortionVector, distortionModulator) + pointNoise1(worldPosition) * vec3(0.0, 0.0, 5.0) * pcIndex / 1000.0;
 
 	// Calculate fade factor on distortion
 	float fadeFactor = (1. - pow(distortionModulator, 3.0)) * (1.- (pow(disintegrationFactor, 3.0)));

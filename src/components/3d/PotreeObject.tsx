@@ -60,7 +60,6 @@ export const PotreeObject: VaporComponent = ({cloudName="cloud.js", baseUrl, poi
             pointCloud.material.outputColorEncoding = 1
         }
     }, [pointSize, pointSizeType, pointShape, pointCloud])
-    //
     return ( 
         <group ref={objectGroup} {...props}></group>
     );

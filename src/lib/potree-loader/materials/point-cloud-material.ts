@@ -228,6 +228,9 @@ export class PointCloudMaterial extends RawShaderMaterial {
     enablePointHighlighting: makeUniform('b', true),
     highlightedPointScale: makeUniform('f', 2.0),
     time: makeUniform('f', 0),
+    disintegrationFactor: makeUniform('f', 0),
+    distortionVector: makeUniform('fv', [0, 0, -10] as [number, number, number]),
+    transitionAlpha: makeUniform('f', 0),
   };
 
   @uniform('bbSize') bbSize!: [number, number, number];
@@ -264,6 +267,9 @@ export class PointCloudMaterial extends RawShaderMaterial {
   @uniform('highlightedPointColor') highlightedPointColor!: Vector4;
   @uniform('enablePointHighlighting') enablePointHighlighting!: boolean;
   @uniform('highlightedPointScale') highlightedPointScale!: number;
+  @uniform('disintegrationFactor') disintegrationFactor!: number;
+  @uniform('distortionVector') distortionVector!: [number, number, number];
+  @uniform('transitionAlpha') transitionAlpha!: number;
 
   // Declare PointCloudMaterial attributes that need shader updates upon change, and set default values.
   @requiresShaderUpdate() useClipBox: boolean = false;
@@ -376,8 +382,8 @@ export class PointCloudMaterial extends RawShaderMaterial {
       this.depthFunc = LessEqualDepth;
     }
 
-    this.blending = NormalBlending;
-    this.transparent = true;
+    this.blending = NormalBlending; // We will use normal blending for fading effects
+    this.transparent = true; // And we will set transparent to true to enable fading effects
 
     this.needsUpdate = true;
   }
