@@ -35,6 +35,7 @@ function useThreeAudio(url: string, positional: boolean, randomizeStart: boolean
             return;
         }
         const newAudioObject = positional ? new PositionalAudio(audioListener) : new Audio(audioListener);
+        // If sceneID is defined, hijack the AudioNode, and connect it to a mixer for the specified scene. Create the mixer if it doesn't exist.
         newAudioObject.setBuffer(audioFile);
         setObject(newAudioObject);
         return ()=>{
