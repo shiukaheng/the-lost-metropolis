@@ -213,28 +213,89 @@ export function useMultiLangObject(content: MultiLangObject): {[key:string]:stri
     return mapValues(content, (value) => value[settings.lang])
 }
 
-/**
- * Hook that provides a post and a method to update it given an id and properties you want to update
- */
-export function usePost(id: string | null, whitelist?: (keyof Post)[], blacklist?: (keyof Post)[]): [Post | null, ((newPost:Partial<Post>)=>Promise<void>) | null] {
-    // Returns post and setter, setter returns null if no edit permission
-    const posts = useContext(ContentContext)
-    if (posts === null) {
-        return [null, null]
+// Helper function to get posts from local storage
+function getPostsFromLocalStorage() {
+    const posts = localStorage.getItem('posts');
+    return posts ? JSON.parse(posts) : [];
+}
+
+// Helper function to set posts to local storage
+function setPostsToLocalStorage(posts) {
+    localStorage.setItem('posts', JSON.stringify(posts));
+}
+
+// Helper function to update a post given an ID and new post data
+function updatePostInLocalStorage(id, newPost) {
+    const posts = getPostsFromLocalStorage();
+    const postIndex = posts.findIndex((p) => p.id === id);
+    
+    if (postIndex !== -1) {
+        Object.keys(newPost).forEach((key) => {
+            if (newPost[key] !== undefined) {
+                posts[postIndex][key] = newPost[key];
+            }
+        });
+        setPostsToLocalStorage(posts);
     }
+}
+
+function createPostInLocalStorage(post) {
+    const posts = getPostsFromLocalStorage();
+    post.id = `post-${Date.now()}`; // simple unique ID generation
+    posts.push(post);
+    setPostsToLocalStorage(posts);
+    return post.id;
+}
+
+export function usePost(id: string | null, whitelist?: (keyof Post)[], blacklist?: (keyof Post)[]): [Post | null, ((newPost: Partial<Post>)=>Promise<void>) | null] {
+    
     if (id === null) {
-        return [null, null]
+        return [null, null];
     }
-    const post = posts.find((p) => p.id === id)?.data || null
-    const setPost = async (newPost: Partial<Post>) => {               
-        // await updatePost(id, newPost)
-        await VaporAPI.updatePost(
-            instance(newPost, id),
-            whitelist,
-            blacklist
-        )
+
+    let posts = getPostsFromLocalStorage();
+    let post = posts.find((p) => p.id === id);
+
+    if (!post) {
+        // If the post doesn't exist, create one
+        const newPost = {
+            title: createEmptyMultilangString(),
+            description: createEmptyMultilangString(),
+            data: null,
+            viewers: [],
+            editors: [],
+            public: false,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            owner: 'currentUserId' // Since we don't have access to `auth.currentUser.uid` in this context, this is a placeholder
+        };
+        
+        id = createPostInLocalStorage(newPost);
+        post = posts.find((p) => p.id === id);
     }
-    return [post, post === null ? null : setPost]
+
+    const setPost = async (newPost: Partial<Post>) => {
+        // Filter based on whitelist and blacklist
+        if (whitelist) {
+            newPost = Object.keys(newPost).reduce((result, key) => {
+                if (whitelist.includes(key)) {
+                    result[key] = newPost[key];
+                }
+                return result;
+            }, {});
+        } else if (blacklist) {
+            newPost = Object.keys(newPost).reduce((result, key) => {
+                if (!blacklist.includes(key)) {
+                    result[key] = newPost[key];
+                }
+                return result;
+            }, {});
+        }
+
+        updatePostInLocalStorage(id, newPost);
+    };
+
+    return [post, post === null ? null : setPost];
 }
 
 export function filterProps(target:Partial<Post>|null, props:(keyof Post)[]=[]):Partial<Post>|null {

@@ -4,7 +4,7 @@ import { VaporComponent, VaporComponentProps } from "../viewer/ComponentDeclarat
 import { genericInputs } from "../viewer/genericInputs"
 import { PotreeContext } from "./managers/PotreeManager";
 import { v4 } from "uuid"
-import { useTransitionAlpha, useTransitionAlpha2 } from "./managers/ScenesManager";
+import { useTransitionAlpha } from "./managers/ScenesManager";
 
 type PotreeObjectProps = VaporComponentProps & {
     cloudName?: string

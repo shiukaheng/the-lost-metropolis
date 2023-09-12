@@ -1,5 +1,5 @@
 import { Canvas, useThree } from "@react-three/fiber"
-import ViewportCanvas from "../Viewer/ViewportCanvas"
+import ViewportCanvas from "../viewer/ViewportCanvas"
 import { OrbitControls } from '@react-three/drei'
 import { ErrorBoundary } from "react-error-boundary";
 import MagicDiv from "../utilities/MagicDiv";
