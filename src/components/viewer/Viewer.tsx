@@ -1,8 +1,12 @@
 import { cloneElement, useRef, useState, useContext, useEffect } from "react"
+import { joinChildren } from "../editor/utilities"
 import { DefaultCameraPropType, ViewerContext } from "./ViewerContext"
 import { AudioListener, DepthTexture, EventDispatcher } from "three"
+import { useStatefulDeserialize } from "../editor/ui_elements/EditorIO"
 import Viewport from "./Viewport"
 import { Post } from "../../../api/types/Post"
+import { useContextBridge } from "@react-three/drei"
+import { SettingsContext, ThemeContext } from "../App"
 import { Camera, useFrame } from "@react-three/fiber"
 import { XRControls } from "../utilities/controls/XRControls"
 import { useRefContext, useThreeEventListener } from "../../utilities"
@@ -28,6 +32,31 @@ function ViewerManager({children, defaultCameraProps}: {children: any, defaultCa
 
     const [sceneChildren, setSceneChildren] = useState([])
     // Make selectedIDs react to setSceneChildren
+
+    const updateSceneChildren = (newChildren) => {
+        setSceneChildren(sceneChildren.map(child => {
+            const newChild = newChildren.find(newChild => newChild.props.objectID === child.props.objectID)
+            if (newChild) {
+                return cloneElement(
+                    child,
+                    {
+                        ...newChild.props
+                    }
+                )
+            } else {
+                return child
+            }
+        }))
+    }
+    
+    // Create convenience functions for adding and removing children
+    const addSceneChildren = (newChildren) => {
+        // console.log(joinChildren(sceneChildren, newChildren))
+        setSceneChildren(joinChildren(sceneChildren, newChildren))
+    }
+    const removeSceneChildren = (childrenToRemove) => {
+        setSceneChildren(sceneChildren.filter(child => !childrenToRemove.includes(child)))
+    }
 
     // Create AudioListener
     const [audioListener] = useState(()=>{
@@ -72,10 +101,10 @@ function ViewerManager({children, defaultCameraProps}: {children: any, defaultCa
             audioListener, 
             // E. 3D component management
             sceneChildren, 
-            setSceneChildren: ()=>{},
-            addSceneChildren: ()=>{},
-            removeSceneChildren: ()=>{},
-            updateSceneChildren: ()=>{},
+            setSceneChildren, 
+            addSceneChildren, 
+            removeSceneChildren, 
+            updateSceneChildren, 
             // F. Potree management
             potreePointBudget, 
             setPotreePointBudget, 
@@ -100,8 +129,14 @@ function ViewerManager({children, defaultCameraProps}: {children: any, defaultCa
 /**
  * Responsible for reading sceneChildren and configuration from ViewerContext, and providing GameControls.
  */
-function ViewerUI({children, ...props}: ViewerProps) {
+function ViewerUI({post, children, ...props}: ViewerProps) {
     const {sceneChildren} = useContext(ViewerContext)
+    const deserialize = useStatefulDeserialize()
+    useEffect(()=>{
+        if (post !== null && post !== undefined) {
+            deserialize(post)
+        }
+    }, [post])
     return (    
         <Viewport {...props}>
             <XRControls/>

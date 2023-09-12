@@ -1,7 +1,7 @@
 import EditorEmbeddedWidget from "./EditorEmbeddedWidget";
 import Select from 'react-select';
 import MagicDiv from "../../utilities/MagicDiv";
-import { createElement, useState, useContext } from "react";
+import { createElement, useState, useContext, useRef } from "react";
 import { v4 as uuidv4 } from 'uuid';
 import { KeyPressCallback, formatRGBCSS, useMultiLang } from "../../../utilities";
 import { Theme, ThemeContext } from "../../App"
@@ -38,7 +38,9 @@ function generateProps(vaporComponent:VaporComponent) {
 
 function SceneChildItem({child, onClick, selected}) {
     return (
-        <div className={`px-2 cursor-pointer select-none rounded-3xl ${selected ? "bg-blue-600" : "bg-transparent"}`} onClick={onClick}>{`${child.props.name} - [${child.type.displayName}]`}</div>
+        <div className={`px-2 cursor-pointer select-none rounded-3xl ${selected ? "bg-blue-600" : "bg-transparent"}`} onClick={()=>{
+            onClick()
+        }}>{`${child.props.name} - [${child.type.displayName}]`}</div>
     )
 }
 
@@ -52,11 +54,12 @@ export default function EditorComponentGraph() {
         label: component.displayName,
         value: component
     }))
+    const widgetDOMRef = useRef<HTMLDivElement>(null)
 
     const {theme} = useContext(ThemeContext)
     const customStyles = createSelectStyles(theme)
     return (
-        <EditorEmbeddedWidget title={heading} stickyKey="compGraphExpanded">
+        <EditorEmbeddedWidget title={heading} stickyKey="compGraphExpanded" ref={widgetDOMRef}>
             <KeyPressCallback keyName="Delete" onDown={()=>{
                 setSceneChildren(sceneChildren.filter(child => !(selectedIDs.includes(child.props.objectID))))
             }}/>

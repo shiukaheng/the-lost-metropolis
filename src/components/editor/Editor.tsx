@@ -155,10 +155,8 @@ function EditorManager() {
                     <div className="border-b border-current text-2xl font-bold p-8 pb-4">
                         <div className="flex flex-row gap-4">
                             <div className='text-3xl'>{heading}</div>
-                            <Condition condition={post?.role === "owner" || post?.role === "editor"}>
-                                {overwriteWarning ? <MagicButton solid onClick={pull}>{pullLabel}</MagicButton> : null}
-                                <MagicButton disabled={!changed} onClick={push}>{updateLabel}</MagicButton>
-                            </Condition>
+                            {overwriteWarning ? <MagicButton solid onClick={pull}>{pullLabel}</MagicButton> : null}
+                            <MagicButton disabled={!changed} onClick={push}>{updateLabel}</MagicButton>
                             <div className="ml-auto cursor-pointer text-xl select-none" onClick={()=>{setEditorExpanded(!editorExpanded)}}>{editorExpanded ? "-" : "+"}</div>    
                         </div>
                         {(overwriteWarning && buffer) ? <div className="font-bold text-yellow-400 text-sm pt-2">{overwriteLabel}</div> : null}

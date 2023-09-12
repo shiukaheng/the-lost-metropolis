@@ -16,9 +16,16 @@ export function ClipboardHelper({onCopy=()=>{}, onPaste=()=>{}}: ClipboardProps)
     return (
         <Fragment>
             <Keypress keyName="c" onDown={()=>{
+                // If activeElement is not body, skip. Hacks...
+                if (document.activeElement !== document.body) {
+                    return
+                }
                 clipboard.current = onCopy();
             }} requiredKeys={["Control"]}/>
             <Keypress keyName="v" onDown={()=>{
+                if (document.activeElement !== document.body) {
+                    return
+                }
                 onPaste(clipboard.current);
             }} requiredKeys={["Control"]}/>
         </Fragment>

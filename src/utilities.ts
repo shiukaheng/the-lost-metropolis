@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useLayoutEffect, useContext, useCallback, Context, MutableRefObject, useMemo } from "react"
+import { useState, useEffect, useRef, useLayoutEffect, useContext, useCallback, Context, MutableRefObject, useMemo, RefObject } from "react"
 // import { AuthContext } from "./components/admin/AuthProvider";
 import { defaultTheme, languages, SettingsContext, ThemeContext, ThemeContextType } from "./components/App";
 // import { ContentContext, hidePosts } from "./components/providers/ContentProvider";
@@ -108,12 +108,28 @@ export function useAsyncReference(value) {
 	return [ref, updateState];
 }
 
-export function KeyPressCallback({ keyName, onDown = () => { }, onUp = () => { } }) {
+export function KeyPressCallback({ keyName, onDown = () => { }, onUp = () => { }, domRef = null }:{
+	keyName: string,
+	onDown?: () => void,
+	onUp?: () => void,
+	domRef?: RefObject<HTMLElement> | null
+}) {
 	const onDownRef = useRef(onDown)
 	const onUpRef = useRef(onUp)
 	useEffect(() => {
-		onDownRef.current = onDown
-		onUpRef.current = onUp
+		onDownRef.current = () => {
+			// If activeElement is not body, then we skip: HACK?!
+			if (document.activeElement !== document.body) {
+				return
+			}
+			onDown()
+		}
+		onUpRef.current = () => {
+			if (document.activeElement !== document.body) {
+				return
+			}
+			onUp()
+		}
 	}, [onDown, onUp])
 	useAsyncKeyPress(keyName, onDownRef, onUpRef)
 	return (null)
@@ -227,9 +243,11 @@ export function usePost(
 
 		const storedPost = localStorage.getItem(id);
 		if (storedPost) {
+			console.log("Loaded post from localStorage", id, JSON.parse(storedPost))
 			setPost(JSON.parse(storedPost));
 		} else {
 			// Create an empty post
+			console.log("Created new post", id)
 			const defaultPost = postSchema.getDefault() as Post;
 			localStorage.setItem(id, JSON.stringify(defaultPost));
 			setPost(defaultPost);
@@ -301,6 +319,7 @@ export function useBufferedPost(
 	}
 	const [overwriteWarning, setOverwriteWarning] = useState(false)
 	useEffect(() => { // Called whenever "post" updates
+		// console.log(`BufferedPost ${id} updated:`, post)
 		if (post !== null) { // Makes sure this update is not null, or else its kinda meaningless
 			if (postTriggersRef.current > 0) { // Check if this is NOT the first update. If it is the first update, just do some initializing
 				const filtered = filterProps(post, props)
@@ -313,8 +332,14 @@ export function useBufferedPost(
 					lastPostUpdateRef.current = post
 				}
 			} else {
+				console.log("First update", post)
 				// Post initial update
+				setBuffer(post)
 				lastPostUpdateRef.current = post
+				setOverwriteWarning(false)
+				onBufferChange(post)
+				onPull(post)
+				
 			}
 			postTriggersRef.current++
 		}
@@ -347,7 +372,9 @@ export function useBufferedPost(
 	}
 	// console.log(bufferChanged, postChanged)
 	// Change describes mismatch between buffer and post, OverwriteWarning indicates database has newer version than buffer
+	// console.log(buffer, initialBufferRef.current)
 	const changed = !isEqual(buffer, initialBufferRef.current)
+	// console.log(changed)
 	return [buffer, setBuffer, post, push, pull, changed, (overwriteWarning && post !== undefined)]
 }
 type GenericCallback = ((...args: any[]) => void) | ((...args: any[]) => Promise<void>)

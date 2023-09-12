@@ -2,6 +2,7 @@ import { useContextBridge, useDepthBuffer } from "@react-three/drei"
 import { PotreeManager } from "../3d/managers/PotreeManager"
 import { Children, useCallback, useContext, useEffect, useLayoutEffect, useRef } from "react"
 import CompositeSuspense from "../3d/subcomponents/CompositeSuspense"
+import { EditorContext } from "../editor/EditorContext"
 import { Camera, Canvas, useFrame, useThree } from "@react-three/fiber"
 import { ViewerContext } from "../viewer/ViewerContext"
 import { SettingsContext, ThemeContext } from "../App"
@@ -132,7 +133,7 @@ export function _DepthBufferHelper() {
 // Convenience component to provide common contexts to viewport children, in the future may include 3DTilesManager, NexusManager, etc which serves to manage 3DTilesObject and NexusObject on each render.
 // TODO: Register managers required and add dynamically (same with ContextBridge required contexts)
 function ViewportCanvas({children, foveation=0, className, ...props}) {
-    const ContextBridge = useContextBridge(ViewerContext, SettingsContext, ThemeContext)
+    const ContextBridge = useContextBridge(EditorContext, ViewerContext, SettingsContext, ThemeContext)
     const wrappedChildren = Children.map(children, (child) => (
         <CompositeSuspense>
             {child}
