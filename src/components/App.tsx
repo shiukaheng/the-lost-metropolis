@@ -7,6 +7,7 @@ import { formatRGBCSS, useStickyState } from "../utilities";
 import Exhibition from './pages/Exhibition';
 import { LanguageLiteral } from '../../api/types/LanguageLiteral';
 import { Theme } from '../../api/types/Theme';
+import ExhibitionEditor from "./pages/ExhibitionEditor";
 
 function getDefaultLang(): LanguageLiteral {
     // Check if the browser has a language preference, if it is anything chinese, then use "zh", otherwise use "en"
@@ -94,6 +95,7 @@ function SiteRouter() {
                     return path;
                 } }>
                     <Route path="/" element={<Exhibition />} /> 
+                    <Route path="/edit" element={<ExhibitionEditor />} />
                 </AnimatedSwitch>
             </div>
     </Router>;

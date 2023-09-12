@@ -1,17 +1,17 @@
 import { useState, useEffect, useRef, useLayoutEffect, useContext, useCallback, Context, MutableRefObject, useMemo } from "react"
-import { AuthContext } from "./components/admin/AuthProvider";
+// import { AuthContext } from "./components/admin/AuthProvider";
 import { defaultTheme, languages, SettingsContext, ThemeContext, ThemeContextType } from "./components/App";
-import { ContentContext, hidePosts } from "./components/providers/ContentProvider";
+// import { ContentContext, hidePosts } from "./components/providers/ContentProvider";
 import { cloneDeep, isEqual, mapValues } from "lodash"
 import { useFrame } from "@react-three/fiber";
 import { Post, postSchema } from "../api/types/Post";
-import VaporAPI from "./api_client/api";
+// import VaporAPI from "./api_client/api";
 import { uninstance, instance } from "../api/utilities";
 import { PostDocData } from "../api/implementation_types/PostDocData";
 import { Roled } from "../api/implementation_types/Role";
 import { MultiLangString } from "../api/types/MultiLangString";
 import { MultiLangObject } from "../api/types/MultiLangObject";
-import { auth } from "./firebase-config.js"
+// import { auth } from "./firebase-config.js"
 import { Theme } from "../api/types/Theme";
 import { Instance } from "../api/utility_types";
 import { Sponsor } from "../api/types/Sponsor";

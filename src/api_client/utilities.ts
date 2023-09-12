@@ -5,7 +5,7 @@ import { Role, Roled } from "../../api/implementation_types/Role";
 import { Instance } from "../../api/utility_types";
 import { instance, uninstance } from "../../api/utilities";
 import { onAuthStateChanged, User } from "firebase/auth";
-import { auth } from '../firebase-config'
+// import { auth } from '../firebase-config'
 
 export function naiveExport(post: Post): PostDocData {
     return {
