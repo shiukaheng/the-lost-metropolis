@@ -1,5 +1,5 @@
 import { useFrame } from "@react-three/fiber";
-import { createContext, useContext, useEffect, useRef, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { lerp } from "three/src/math/MathUtils";
 import { ViewerContext } from "../../viewer/ViewerContext";
 
@@ -38,15 +38,14 @@ function remapWithDelay(minValue: number, startTransition: number, endTransition
     }
 }
 
-export const useTransitionAlpha = (
+export const useGetTransitionAlpha = (
     sceneID: string | null, 
     fadeInBefore: number, 
     fadeInDuration: number,
     fadeInAfter: number,
     fadeOutBefore: number,
     fadeOutDuration: number,
-    fadeOutAfter: number,
-    callback: (alpha: number) => void
+    fadeOutAfter: number
     ) => {
 
     const scenesContext = useContext(ScenesContext);
@@ -54,7 +53,7 @@ export const useTransitionAlpha = (
     const alphaRef = useRef<number>(0);
     const transitionStateRef = useRef<TransitionState>("none");
 
-    function updateAlphaRef(delta: number) {
+    const updateAlphaRef = useCallback((delta: number) => {
         if (transitionStateRef.current === "none") {
             // Go to a stable state if we are in the none phase
             if (alphaRef.current === -1) {
@@ -100,7 +99,7 @@ export const useTransitionAlpha = (
                 }
             }
         }
-    }
+    }, [fadeInBefore, fadeInDuration, fadeInAfter, fadeOutBefore, fadeOutDuration, fadeOutAfter]);
 
     // Update transition state
     useEffect(() => {
@@ -143,9 +142,7 @@ export const useTransitionAlpha = (
         }
     }, [sceneID, scenesContext]);
 
-    // Update alpha
-    useFrame((state, delta) => {
-        // Now we animate
+    const getFinalAlpha = useCallback((delta: number) => {
         updateAlphaRef(delta);
         // Now we remap alpha values to respect delays.
         // Essentially: -1 to 0 is fade-in, 0 to 1 is fade-out. At 0, the object is fully visible, at -1 and 1, the object is fully invisible..
@@ -157,7 +154,7 @@ export const useTransitionAlpha = (
                 -1 + (fadeInBefore + fadeInDuration) / (fadeInDuration + fadeInBefore + fadeInAfter),
                 0,
                 alphaRef.current
-            )
+            );
         } else if (alphaRef.current > 0) {
             finalAlpha = remapWithDelay(
                 0,
@@ -165,10 +162,31 @@ export const useTransitionAlpha = (
                 (fadeOutBefore + fadeOutDuration) / (fadeOutDuration + fadeOutBefore + fadeOutAfter),
                 1,
                 alphaRef.current
-            )
+            );
         }
+        return finalAlpha;
+    }, [fadeInBefore, fadeInDuration, fadeInAfter, fadeOutBefore, fadeOutDuration, fadeOutAfter]);
 
-        // Call the callback with the final alph a value
+    // Update alpha
+    return getFinalAlpha;
+}
+
+export function useTransitionAlpha(
+    sceneID: string | null, 
+    fadeInBefore: number, 
+    fadeInDuration: number,
+    fadeInAfter: number,
+    fadeOutBefore: number,
+    fadeOutDuration: number,
+    fadeOutAfter: number,
+    callback: (alpha: number) => void
+    ) {
+
+    const getFinalAlpha = useGetTransitionAlpha(sceneID, fadeInBefore, fadeInDuration, fadeInAfter, fadeOutBefore, fadeOutDuration, fadeOutAfter);
+
+    // Update alpha
+    useFrame((state, delta) => {
+        const finalAlpha = getFinalAlpha(delta);
         callback(finalAlpha);
     });
 }
