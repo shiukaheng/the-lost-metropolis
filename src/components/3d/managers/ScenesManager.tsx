@@ -1,6 +1,7 @@
 import { useFrame } from "@react-three/fiber";
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { lerp } from "three/src/math/MathUtils";
+import { ViewerContext } from "../../viewer/ViewerContext";
 
 export type ScenesContext = {
     visibleScenes: string[];
@@ -53,51 +54,24 @@ export const useTransitionAlpha = (
     const alphaRef = useRef<number>(0);
     const transitionStateRef = useRef<TransitionState>("none");
 
-    // Update transition state
-    useEffect(() => {
-        // console.log("Updating transition state")
-        if (sceneID === null) {
-            // console.log("Scene ID is null")
-            // Set transition state to none
-            transitionStateRef.current = "none";
-            // Set alpha to 0
-            alphaRef.current = 0;
-        } else {
-            // First, determine last visibility
-            const lastVisibility = lastVisibilityRef.current;
-            // Then, determine current visibility
-            const currentVisibility = scenesContext?.visibleScenes.includes(sceneID) ?? false;
-            // If the last visibility is null, we are in the first frame, so we set the transition state to none, and alpha to 1 if the current visibility is true, and 0 if the current visibility is false
-            if (lastVisibility === null) {
-                // console.log("Last visibility is null")
-                transitionStateRef.current = "none";
-                alphaRef.current = currentVisibility ? 0 : 1;
-            } else {
-                // Otherwise, lets first determine the current transition state
-                if (lastVisibility === currentVisibility) {
-                    // If the last visibility is the same as the current visibility, we are not transitioning, so we set the transition state to none
-                    transitionStateRef.current = "none";
-                    // console.log("None")
-                } else if (currentVisibility && !lastVisibility) {
-                    // Visible to invisible: fade out
-                    transitionStateRef.current = "fade-out";
-                    // console.log("Fade out")
-                } else if (!currentVisibility && lastVisibility) {
-                    // Invisible to visible: fade in
-                    transitionStateRef.current = "fade-in";
-                    // console.log("Fade in")
+    function updateAlphaRef(delta: number) {
+        if (transitionStateRef.current === "none") {
+            // Go to a stable state if we are in the none phase
+            if (alphaRef.current === -1) {
+                // Do nothing
+            } else if (alphaRef.current < 0) {
+                alphaRef.current += delta / (fadeInDuration + fadeInBefore + fadeInAfter);
+                if (alphaRef.current > 0) {
+                    alphaRef.current = 0;
+                }
+            } else if (alphaRef.current === 0) {
+                // Do nothing
+            } else if (alphaRef.current > 0) {
+                alphaRef.current += delta / (fadeOutDuration + fadeOutBefore + fadeOutAfter);
+                if (alphaRef.current > 1) {
+                    alphaRef.current = -1;
                 }
             }
-            // Finally, update last visibility
-            lastVisibilityRef.current = currentVisibility;
-        }
-    }, [sceneID, scenesContext]);
-
-    // Update alpha
-    useFrame((state, delta) => {
-        // Now we animate
-        if (transitionStateRef.current === "none") {
-            // Do nothing
         } else if (transitionStateRef.current === "fade-in") { // Goal is to reach 0.
             if (alphaRef.current < 0) { // If we are in the fade-in phase, and alpha < 0. We need it to grow to 0 and stop.
                 alphaRef.current += delta / (fadeInDuration + fadeInBefore + fadeInAfter);
@@ -126,6 +100,53 @@ export const useTransitionAlpha = (
                 }
             }
         }
+    }
+
+    // Update transition state
+    useEffect(() => {
+        console.log("Updating transition state")
+        if (sceneID === null) {
+            console.log("Scene ID is null")
+            // Set transition state to none
+            transitionStateRef.current = "none";
+            // Set alpha to 0
+            alphaRef.current = 0;
+        } else {
+            // First, determine last visibility
+            const lastVisibility = lastVisibilityRef.current;
+            // Then, determine current visibility
+            const currentVisibility = scenesContext?.visibleScenes.includes(sceneID) ?? false;
+            // If the last visibility is null, we are in the first frame, so we set the transition state to none, and alpha to 1 if the current visibility is true, and 0 if the current visibility is false
+            if (lastVisibility === null) {
+                transitionStateRef.current = "none";
+                alphaRef.current = currentVisibility ? 0 : 1;
+                console.log(`First frame, alpha is ${alphaRef.current} and transition state is ${transitionStateRef.current}`)
+            } else {
+                // Otherwise, lets first determine the current transition state
+                if (lastVisibility === currentVisibility) {
+                    // If the last visibility is the same as the current visibility, we are not transitioning, so we set the transition state to none
+                    // transitionStateRef.current = "none"; // Actually we might as well just use visibility...
+                    updateAlphaRef(1/60) // Hacks
+                    console.log("None")
+                } else if (currentVisibility && !lastVisibility) {
+                    transitionStateRef.current = "fade-in";
+                    updateAlphaRef(1/60)
+                    console.log("Fade in")
+                } else if (!currentVisibility && lastVisibility) {
+                    transitionStateRef.current = "fade-out";
+                    updateAlphaRef(1/60)
+                    console.log("Fade out")
+                }
+            }
+            // Finally, update last visibility
+            lastVisibilityRef.current = currentVisibility;
+        }
+    }, [sceneID, scenesContext]);
+
+    // Update alpha
+    useFrame((state, delta) => {
+        // Now we animate
+        updateAlphaRef(delta);
         // Now we remap alpha values to respect delays.
         // Essentially: -1 to 0 is fade-in, 0 to 1 is fade-out. At 0, the object is fully visible, at -1 and 1, the object is fully invisible..
         let finalAlpha = 0;
@@ -176,4 +197,13 @@ export function AnimatedScenesManager({scenes, interval, children}: AnimatedScen
             {children}
         </ScenesContext.Provider>
     );
+}
+
+export function DebugScenesManager({children}: {children: React.ReactNode}) {
+    const {scenes} = useContext(ViewerContext);
+    return (
+        <ScenesManager scenes={scenes}>
+            {children}
+        </ScenesManager>
+    )
 }

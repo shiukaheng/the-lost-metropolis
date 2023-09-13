@@ -16,6 +16,7 @@ import { TeleporterPlane } from "../3d/TeleporterPlane"
 import { TestObject } from "../3d/TestObject"
 import { TilesObject } from "../3d/TilesObject"
 import { EditorInputType } from "./ArgumentTypes"
+import { SeamlessAudioObject } from "../3d/SeamlessAudioObject"
 
 export interface VaporComponentProps {
     position?: [number, number, number],
@@ -64,7 +65,8 @@ export const components = [
     AudioObject,
     ReflectorPlaneObject,
     SpotlightObject,
-    SkyBoxObject
+    SkyBoxObject,
+    SeamlessAudioObject
 ]
 
 export function getComponentFromTypeName(componentType): VaporComponent {

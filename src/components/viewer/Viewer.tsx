@@ -83,6 +83,9 @@ function ViewerManager({children, defaultCameraProps}: {children: any, defaultCa
     const [numDepthBufferDependents, _setNumDepthBufferDependents] = useState(0)
     const [depthBuffer, _setDepthBuffer] = useState<DepthTexture|undefined>(undefined) // The depth buffer will be updated by Viewport
 
+    // Scenes
+    const [scenes, setScenes] = useState<string[]>([])
+
     return (
         <ViewerContext.Provider value={{
             // A. Camera prop management
@@ -120,6 +123,9 @@ function ViewerManager({children, defaultCameraProps}: {children: any, defaultCa
             _setNumDepthBufferDependents,
             depthBuffer,
             _setDepthBuffer,
+            // J. Debug Scenes Manager
+            scenes,
+            setScenes
         }}>
             {children}
         </ViewerContext.Provider>

@@ -92,5 +92,9 @@ PotreeObject.inputs = {
     pointSize: {
         type: NumberType,
         default: 1
+    },
+    sceneID: {
+        type: StringType,
+        default: ""
     }
 }

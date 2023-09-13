@@ -35,7 +35,7 @@ function Editor() {
 // Todo seperate Editor UI from EditorManager
 
 function EditorManager() {
-    const {sceneChildren, setSceneChildren: _setSceneChildren, audioListener, defaultCameraProps, setDefaultCameraProps, defaultXRCameraProps, potreePointBudget, setPotreePointBudget, flySpeed} = useContext(ViewerContext)
+    const {sceneChildren, setSceneChildren: _setSceneChildren, audioListener, defaultCameraProps, setDefaultCameraProps, defaultXRCameraProps, potreePointBudget, setPotreePointBudget, flySpeed, scenes} = useContext(ViewerContext)
     // Setup state for editor
     const [selectedIDs, setSelectedIDs] = useState<string[]>([])
     const [transformMode, setTransformMode] = useState("translate")
@@ -99,7 +99,7 @@ function EditorManager() {
     useEffect(() => {
         const newBuffer = serialize()
         setBuffer(newBuffer)
-    }, [sceneChildren, defaultCameraProps, potreePointBudget, defaultXRCameraProps, flySpeed])
+    }, [sceneChildren, defaultCameraProps, potreePointBudget, defaultXRCameraProps, flySpeed, scenes])
 
     // Update internal state when buffer changes, which only happens if we change sceneChildren (handled), and pull
     const updateLabel = useMultiLang({"en": "update", "zh": "更新"})
@@ -175,7 +175,7 @@ function EditorManager() {
                     }
                 </MagicDiv>
                 <MagicDiv backgroundColorCSSProps={["backgroundColor"]} className="relative w-full h-full overflow-clip">
-                    <MagicDiv mergeTransitions foregroundColorCSSProps={["backgroundColor"]} className="w-full h-full" onClick={()=>{audioListener.context.resume()}}>
+                    <MagicDiv mergeTransitions backgroundColorCSSProps={["backgroundColor"]} className="w-full h-full" onClick={()=>{audioListener.context.resume()}}>
                         <EditorViewport className="w-full h-full">
                             <DebugPlane rotation={[Math.PI/2, 0, 0]}/>
                             <LayerHelper/>

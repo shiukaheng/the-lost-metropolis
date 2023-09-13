@@ -1,4 +1,4 @@
-import { InferType, number, object } from "yup";
+import { InferType, array, number, object, string } from "yup";
 import { cameraPropsSchema } from "./CameraProps";
 
 export const sceneConfigurationSchema = object({
@@ -6,6 +6,7 @@ export const sceneConfigurationSchema = object({
     potreePointBudget: number().required().default(1000000),
     defaultXRCameraProps: cameraPropsSchema.required(),
     flySpeed: number().required().default(2),
+    scenes: array().of(string().required()).required().default([]),
 })
 
 export type SceneConfiguration = InferType<typeof sceneConfigurationSchema>
