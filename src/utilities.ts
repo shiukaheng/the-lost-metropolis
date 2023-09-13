@@ -256,9 +256,7 @@ export function usePost(
 
 	const updatePost = useCallback(
 		async (newPost: Partial<Post>) => {
-			console.log("Updating post", id, newPost)
 			if (id) {
-				console.log("Updating post", id, newPost)
 				// Merge old post with the new updates
 				const updatedPost = { ...post, ...newPost };
 
@@ -332,7 +330,7 @@ export function useBufferedPost(
 					lastPostUpdateRef.current = post
 				}
 			} else {
-				console.log("First update", post)
+				// console.log("First update", post)
 				// Post initial update
 				setBuffer(post)
 				lastPostUpdateRef.current = post

@@ -104,7 +104,7 @@ export const useTransitionAlpha = (
 
     // Update transition state
     useEffect(() => {
-        console.log("Updating transition state")
+        // console.log("Updating transition state")
         if (sceneID === null) {
             console.log("Scene ID is null")
             // Set transition state to none
@@ -120,22 +120,22 @@ export const useTransitionAlpha = (
             if (lastVisibility === null) {
                 transitionStateRef.current = "none";
                 alphaRef.current = currentVisibility ? 0 : 1;
-                console.log(`First frame, alpha is ${alphaRef.current} and transition state is ${transitionStateRef.current}`)
+                // console.log(`First frame, alpha is ${alphaRef.current} and transition state is ${transitionStateRef.current}`)
             } else {
                 // Otherwise, lets first determine the current transition state
                 if (lastVisibility === currentVisibility) {
                     // If the last visibility is the same as the current visibility, we are not transitioning, so we set the transition state to none
                     // transitionStateRef.current = "none"; // Actually we might as well just use visibility...
                     updateAlphaRef(1/60) // Hacks
-                    console.log("None")
+                    // console.log("None")
                 } else if (currentVisibility && !lastVisibility) {
                     transitionStateRef.current = "fade-in";
                     updateAlphaRef(1/60)
-                    console.log("Fade in")
+                    // console.log("Fade in")
                 } else if (!currentVisibility && lastVisibility) {
                     transitionStateRef.current = "fade-out";
                     updateAlphaRef(1/60)
-                    console.log("Fade out")
+                    // console.log("Fade out")
                 }
             }
             // Finally, update last visibility

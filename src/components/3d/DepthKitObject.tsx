@@ -1,5 +1,5 @@
 import { extend, useLoader, useThree, Vector3 } from "@react-three/fiber";
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import * as THREE from "three";
 import { ViewerContext } from "../viewer/ViewerContext";
@@ -53,39 +53,53 @@ function _DepthKitObject({ metaUrl="", videoUrl="", posterUrl="", autoplay=true,
   }, [positionalAudio])
 
   // Load meta info
-  const metaInf = useLoader(THREE.FileLoader, metaUrl, (loader) => {
+  const metaInf: any = useLoader(THREE.FileLoader, metaUrl, (loader) => {
     loader.setResponseType("json");
   });
 
+  const cameraInfo = useMemo(() => {
+    if (metaInf.perspectives !== undefined && metaInf.perspectives.length > 0) {
+      return metaInf.perspectives[0];
+    } else {
+      return metaInf;
+    }
+  }, [metaInf]);
+
+  useEffect(()=>{
+    console.log(metaInf, cameraInfo)
+  }, [metaInf])
+
   return (
-    <mesh ref={mesh} frustumCulled={false} {...props}>
+    <points ref={mesh} frustumCulled={false} {...props}>
       <DepthGeometry />
       <depthKitMaterial
         attach="material"
         {...{
           width: metaInf.textureWidth,
           height: metaInf.textureHeight,
-          mindepth: metaInf.nearClip,
-          maxdepth: metaInf.farClip,
-          focalLength: [metaInf.depthFocalLength.x, metaInf.depthFocalLength.y],
+          mindepth: cameraInfo.nearClip,
+          // mindepth: 0.5,
+          maxdepth: cameraInfo.farClip,
+          // maxdepth: 3.06,
+          focalLength: [cameraInfo.depthFocalLength.x, cameraInfo.depthFocalLength.y],
           principalPoint: [
-            metaInf.depthPrincipalPoint.x,
-            metaInf.depthPrincipalPoint.y
+            cameraInfo.depthPrincipalPoint.x,
+            cameraInfo.depthPrincipalPoint.y
           ],
-          imageDimensions: [metaInf.depthImageSize.x, metaInf.depthImageSize.y],
+          imageDimensions: [cameraInfo.depthImageSize.x, cameraInfo.depthImageSize.y],
           crop: [
-            metaInf.crop.x,
-            metaInf.crop.y,
-            metaInf.crop.z,
-            metaInf.crop.w
+            cameraInfo?.crop?.x || 0,
+            cameraInfo?.crop?.y || 0,
+            cameraInfo?.crop?.z || 1,
+            cameraInfo?.crop?.w || 1
           ],
-          extrinsics: metaInf.extrinsics
+          extrinsics: cameraInfo.extrinsics
         }}
       >
         <AdvancedVideoTexture getPositionalAudio={setPositionalAudio} {...{videoUrl, posterUrl, autoplay, loop, muted, volume}} />
       </depthKitMaterial>
       <group ref={audioGroupRef} position={audioPositionOffset}/>
-    </mesh>
+    </points>
   );
 }
 
@@ -164,7 +178,7 @@ function AdvancedVideoTexture({
     if (videoUrl) {
       video.src = videoUrl;
       video.load();
-      // console.log(Date.now(), "Loading Video", videoUrl);
+      console.log(Date.now(), "Loading Video", videoUrl);
     }
   }, [video, videoUrl]);
   // Make poster url reactive
@@ -185,6 +199,7 @@ function AdvancedVideoTexture({
   // Make video autoplay on first interaction
   const playVideo = useCallback(() => {
     if (video) {
+      console.log(Date.now(), "Playing Video", videoUrl);
       video.play();
     }
   }, [video]);

@@ -126,4 +126,5 @@ void main() {
     worldPos.w = 1.0;
 
     gl_Position = projectionMatrix * modelViewMatrix * worldPos;
+    gl_PointSize = pointSize / gl_Position.w * z;
 }
