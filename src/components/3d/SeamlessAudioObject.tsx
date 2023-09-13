@@ -116,7 +116,6 @@ export const SeamlessAudioObject: VaporComponent = ({url, refDistance, volume, p
         if (threeAudioObject1 && threeAudioObject2 && threeAudioObject1.buffer && threeAudioObject2.buffer) {
             const audio1CurrentTime = threeAudioObject1.context.currentTime - audio1Start.current;
             const audio2CurrentTime = threeAudioObject2.context.currentTime - audio2Start.current;
-            console.log(volume)
             threeAudioObject1.setVolume(Math.max(Math.min(1, audio1CurrentTime / overlapLength, (threeAudioObject1.buffer.duration - audio1CurrentTime) / overlapLength), 0) * (volume ?? 1));
             threeAudioObject2.setVolume(Math.max(Math.min(1, audio2CurrentTime / overlapLength, (threeAudioObject2.buffer.duration - audio2CurrentTime) / overlapLength), 0) * (volume ?? 1));
         }
