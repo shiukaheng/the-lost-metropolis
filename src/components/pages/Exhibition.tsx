@@ -1,8 +1,13 @@
+import { useLoader } from '@react-three/fiber';
 import { PotreeObject } from '../3d/PotreeObject'
 import { AnimatedScenesManager } from '../3d/managers/ScenesManager'
 import View from './View'
+import { FileLoader } from 'three';
 
 function Exhibition() {
+    const post = useLoader(FileLoader, "https://192.168.0.153:8080/assets/web_exhibition.json", (loader) => {
+        loader.setResponseType("json");
+    })
     return (
         <View defaultCameraProps={
             {
@@ -10,9 +15,11 @@ function Exhibition() {
                 rotation: [0,0,0],
                 fov: 90
             }
-        }>
+        }
+        post={post}
+        >
             <ambientLight intensity={1} />
-            <AnimatedScenesManager scenes={["A", "B"]} interval={5000}>
+            {/* <AnimatedScenesManager scenes={["A", "B"]} interval={5000}>
                 <PotreeObject
                     objectID='potree'
                     cloudName='metadata.json'
@@ -29,7 +36,7 @@ function Exhibition() {
                     rotation={[-1.57079633,0,0]}
                     sceneID="B"
                 />  
-            </AnimatedScenesManager>
+            </AnimatedScenesManager> */}
         </View>
     )
 }

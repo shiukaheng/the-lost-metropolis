@@ -1,10 +1,11 @@
+highp float;
+
 uniform float mindepth;
 uniform float maxdepth;
 
 uniform float width;
 uniform float height;
 
-uniform bool isPoints;
 uniform float pointSize;
 
 uniform vec2 focalLength;
@@ -21,6 +22,8 @@ uniform sampler2D map;
 
 varying float visibility;
 varying vec2 vUv;
+
+out vec4 color;
 
 const float _DepthSaturationThreshhold = 0.5; //a given pixel whose saturation is less than half will be culled (old default was .5)
 const float _DepthBrightnessThreshold = 0.5; //a given pixel whose brightness is less than half will be culled (old default was .9)
@@ -45,7 +48,6 @@ float depthForPoint(vec2 texturePoint)
 
 void main() {
     vec4 texSize = vec4(1.0 / width, 1.0 / height, width, height);
-
     vec2 centerpix = texSize.xy * .5;
     vec2 textureStep = 1.0 / meshDensity;
     vec2 basetex = floor(position.xy * textureStep * texSize.zw) * texSize.xy;
@@ -62,64 +64,7 @@ void main() {
     //check neighbors
     //texture coords come in as [0.0 - 1.0] for this whole plane
     float depth = depthForPoint(depthTexCoord);
-
-    float neighborDepths[8];
-    neighborDepths[0] = depthForPoint(depthTexCoord + vec2(0.0,  textureStep.y));
-    neighborDepths[1] = depthForPoint(depthTexCoord + vec2(textureStep.x, 0.0));
-    neighborDepths[2] = depthForPoint(depthTexCoord + vec2(0.0, -textureStep.y));
-    neighborDepths[3] = depthForPoint(depthTexCoord + vec2(-textureStep.x, 0.0));
-    neighborDepths[4] = depthForPoint(depthTexCoord + vec2(-textureStep.x, -textureStep.y));
-    neighborDepths[5] = depthForPoint(depthTexCoord + vec2(textureStep.x,  textureStep.y));
-    neighborDepths[6] = depthForPoint(depthTexCoord + vec2(textureStep.x, -textureStep.y));
-    neighborDepths[7] = depthForPoint(depthTexCoord + vec2(-textureStep.x,  textureStep.y));
-
-    visibility = 1.0;
-    int numDudNeighbors = 0;
-    //search neighbor verts in order to see if we are near an edge
-    //if so, clamp to the surface closest to us
-    if (depth < _Epsilon || (1.0 - depth) < _Epsilon)
-    {
-        // float depthDif = 1.0;
-        float nearestDepth = 1.0;
-        for (int i = 0; i < 8; i++)
-        {
-            float depthNeighbor = neighborDepths[i];
-            if (depthNeighbor >= _Epsilon && (1.0 - depthNeighbor) > _Epsilon)
-            {
-                // float thisDif = abs(nearestDepth - depthNeighbor);
-                if (depthNeighbor < nearestDepth)
-                {
-                    // depthDif = thisDif;
-                    nearestDepth = depthNeighbor;
-                }
-            }
-            else
-            {
-                numDudNeighbors++;
-            }
-        }
-
-        depth = nearestDepth;
-        visibility = 0.8;
-
-        // blob filter
-        if (numDudNeighbors > 6)
-        {
-            visibility = 0.0;
-        }
-    }
-
-    // internal edge filter
-    float maxDisparity = 0.0;
-    for (int i = 0; i < 8; i++)
-    {
-        float depthNeighbor = neighborDepths[i];
-        if (depthNeighbor >= _Epsilon && (1.0 - depthNeighbor) > _Epsilon)
-        {
-            maxDisparity = max(maxDisparity, abs(depth - depthNeighbor));
-        }
-    }
-    visibility *= 1.0 - maxDisparity;
+    visibility = (depth == 0.) ? 0.0 : 1.0;
 
     float z = depth * (maxdepth - mindepth) + mindepth;
     vec4 worldPos = extrinsics * vec4((imageCoordinates * imageDimensions - principalPoint) * z / focalLength, z, 1.0);
@@ -127,4 +72,6 @@ void main() {
 
     gl_Position = projectionMatrix * modelViewMatrix * worldPos;
     gl_PointSize = pointSize / gl_Position.w * z;
+
+    color = texture2D(map, vUv);
 }

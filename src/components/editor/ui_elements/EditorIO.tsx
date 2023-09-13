@@ -5,13 +5,11 @@ import { createElement, useContext, useRef } from "react";
 import FileSaver from "file-saver"
 import { ViewerContext } from "../../viewer/ViewerContext";
 import { v4 as uuidv4 } from 'uuid';
-import MagicButton from "../../utilities/MagicButton";
-import { useMultiLang } from "../../../utilities";
 import { Post } from "../../../../api/types/Post";
 import { SceneChild, sceneChildSchema } from "../../../../api/types/SceneChild";
-import { CameraProps } from "../../../../api/types/CameraProps";
 import { sceneConfigurationSchema } from "../../../../api/types/SceneConfiguration";
 import { array, InferType, object, SchemaOf } from "yup";
+import { useMultiLang } from "../../../utilities";
 
 // Utilties and components for import / export
 
@@ -144,40 +142,40 @@ export function useStatefulDeserialize(): (post: PostScene) => void {
     }
 }
 
-// export function EditorIO() {
-//     const inputFile = useRef(null) 
-//     const onButtonClick = () => {
-//         // `current` points to the mounted file input element
-//        inputFile.current.click();
-//     };
-//     const serialize = useStatefulSerialize();
-//     const deserialize = useStatefulDeserialize();
-//     const heading = useMultilang({"en": "import / export", "zh": "導入 / 導出"});
-//     const importLabel = useMultilang({"en": "import", "zh": "導入"});
-//     const exportLabel = useMultilang({"en": "export", "zh": "導出"});
-//     return (
-//         <EditorEmbeddedWidget title={heading}>
-//             <div className="flex flex-row gap-2">
-//                 <input type='file' id='file' ref={inputFile} style={{display: 'none'}} onChange={(e)=>{
-//                     var reader = new FileReader();
-//                     reader.onload = (e2) => {
-//                         const json = JSON.parse(e2.target.result);
-//                         deserialize(json)
-//                     }
-//                     reader.readAsText(e.target.files[0]);
-//                 }}/>
-//                 <MagicDiv mergeTransitions className="editor-secondary-button" onClick={()=>{
-//                     onButtonClick();
-//                 }}>
-//                     {importLabel}
-//                 </MagicDiv>
-//                 <MagicDiv mergeTransitions className="editor-secondary-button" onClick={()=>{
-//                     const blob = new Blob([JSON.stringify(serialize())], {type: "text/plain;charset=utf-8"});
-//                     FileSaver.saveAs(blob, "scene.json");
-//                 }}>
-//                     {exportLabel}
-//                 </MagicDiv>
-//             </div>
-//         </EditorEmbeddedWidget>
-//     );
-// } 
+export function EditorIO() {
+    const inputFile = useRef(null) 
+    const onButtonClick = () => {
+        // `current` points to the mounted file input element
+       inputFile.current.click();
+    };
+    const serialize = useStatefulSerialize();
+    const deserialize = useStatefulDeserialize();
+    const heading = useMultiLang({"en": "import / export", "zh": "導入 / 導出"});
+    const importLabel = useMultiLang({"en": "import", "zh": "導入"});
+    const exportLabel = useMultiLang({"en": "export", "zh": "導出"});
+    return (
+        <EditorEmbeddedWidget title={heading}>
+            <div className="flex flex-row gap-2">
+                <input type='file' id='file' ref={inputFile} style={{display: 'none'}} onChange={(e)=>{
+                    var reader = new FileReader();
+                    reader.onload = (e2) => {
+                        const json = JSON.parse(e2.target.result);
+                        deserialize(json)
+                    }
+                    reader.readAsText(e.target.files[0]);
+                }}/>
+                <MagicDiv mergeTransitions className="editor-secondary-button" onClick={()=>{
+                    onButtonClick();
+                }}>
+                    {importLabel}
+                </MagicDiv>
+                <MagicDiv mergeTransitions className="editor-secondary-button" onClick={()=>{
+                    const blob = new Blob([JSON.stringify(serialize())], {type: "text/plain;charset=utf-8"});
+                    FileSaver.saveAs(blob, "scene.json");
+                }}>
+                    {exportLabel}
+                </MagicDiv>
+            </div>
+        </EditorEmbeddedWidget>
+    );
+} 

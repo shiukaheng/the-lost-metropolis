@@ -5,7 +5,7 @@ import MagicDiv from '../utilities/MagicDiv';
 import { Viewer, ViewerProps } from '../viewer/Viewer';
 import {Fade} from 'react-reveal';
 import DOMControls from '../utilities/controls/DOMControls';
-import { RootState } from "@react-three/fiber";
+import { RootState, useLoader } from "@react-three/fiber";
 import { Fragment, useRef } from 'react';
 import { ThreeExtractor } from '../utilities/ThreeExtractor';
 import { useSupportedXRModes } from '../utilities/useRequestXR';

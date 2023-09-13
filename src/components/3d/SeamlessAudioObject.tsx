@@ -45,8 +45,8 @@ function useSeamlessThreeAudio<T extends (Audio | PositionalAudio | null)>(url: 
         setObject1(newAudioObject);
         setObject2(newAudioObject2);
         return ()=>{
-            object1Ref.current?.disconnect();
-            object2Ref.current?.disconnect();
+            // object1Ref.current?.disconnect();
+            // object2Ref.current?.disconnect();
         }
     }, [audioListener, positional]);
     const play1 = useCallback(()=>{

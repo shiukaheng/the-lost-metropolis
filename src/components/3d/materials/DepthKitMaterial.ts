@@ -62,7 +62,7 @@ class DepthKitMaterial extends THREE.ShaderMaterial {
                 },
                 "pointSize": {
                     type: "f",
-                    value: 6.0
+                    value: 5.0
                 }
             },
             vertexShader: rgbdVert,
