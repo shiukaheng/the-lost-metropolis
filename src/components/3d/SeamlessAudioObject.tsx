@@ -45,8 +45,8 @@ function useSeamlessThreeAudio<T extends (Audio | PositionalAudio | null)>(url: 
         setObject1(newAudioObject);
         setObject2(newAudioObject2);
         return ()=>{
-            // object1Ref.current?.disconnect();
-            // object2Ref.current?.disconnect();
+            object1Ref.current?.disconnect();
+            object2Ref.current?.disconnect();
         }
     }, [audioListener, positional]);
     const play1 = useCallback(()=>{
@@ -92,10 +92,10 @@ export const SeamlessAudioObject: VaporComponent = ({url, refDistance, volume, p
             threeAudioObject1.setLoop(false)
             threeAudioObject2.setLoop(false)
             if (threeAudioObject1 instanceof PositionalAudio) {
-                threeAudioObject1.setRefDistance(refDistance || 1);
+                threeAudioObject1.setRefDistance(refDistance ?? 1);
             }
             if (threeAudioObject2 instanceof PositionalAudio) {
-                threeAudioObject2.setRefDistance(refDistance || 1);
+                threeAudioObject2.setRefDistance(refDistance ?? 1);
             }
         }
     }, [threeAudioObject1, threeAudioObject2, refDistance, volume])
@@ -116,8 +116,9 @@ export const SeamlessAudioObject: VaporComponent = ({url, refDistance, volume, p
         if (threeAudioObject1 && threeAudioObject2 && threeAudioObject1.buffer && threeAudioObject2.buffer) {
             const audio1CurrentTime = threeAudioObject1.context.currentTime - audio1Start.current;
             const audio2CurrentTime = threeAudioObject2.context.currentTime - audio2Start.current;
-            threeAudioObject1.setVolume(Math.max(Math.min(1, audio1CurrentTime / overlapLength, (threeAudioObject1.buffer.duration - audio1CurrentTime) / overlapLength), 0) * (volume || 1));
-            threeAudioObject2.setVolume(Math.max(Math.min(1, audio2CurrentTime / overlapLength, (threeAudioObject2.buffer.duration - audio2CurrentTime) / overlapLength), 0) * (volume || 1));
+            console.log(volume)
+            threeAudioObject1.setVolume(Math.max(Math.min(1, audio1CurrentTime / overlapLength, (threeAudioObject1.buffer.duration - audio1CurrentTime) / overlapLength), 0) * (volume ?? 1));
+            threeAudioObject2.setVolume(Math.max(Math.min(1, audio2CurrentTime / overlapLength, (threeAudioObject2.buffer.duration - audio2CurrentTime) / overlapLength), 0) * (volume ?? 1));
         }
     })
     return (

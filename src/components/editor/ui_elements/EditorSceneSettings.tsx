@@ -23,8 +23,8 @@ function EditorSceneSettings() {
     return (
         <EditorEmbeddedWidget title={heading} stickyKey="sceneSettingsExpanded">
             <div className="flex flex-col gap-2">
-                <EditorInput propName={sceneIDsLabel} typeName="string" value={scenes.join(",")} setValue={(scenesString: string) => {
-                    setScenes(scenesString.split(",").filter((sceneID) => sceneID !== ""));
+                <EditorInput propName={sceneIDsLabel} typeName="string" value={scenes ?? []} setValue={(scenesString: string) => {
+                    setScenes(scenesString.split(","));
                 }}/>
                 <EditorInput propName={pointBudgetLabel} typeName="number" value={potreePointBudget} setValue={setPotreePointBudget}/>
                 <EditorInput propName={flySpeedLabel} typeName="number" value={flySpeed} setValue={setFlySpeed}/>

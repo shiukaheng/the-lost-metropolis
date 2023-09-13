@@ -68,7 +68,7 @@ export const AudioObject: VaporComponent = ({url, autoplay, loop, refDistance, v
     const groupRef = useRef<Group>(null);
     useEffect(()=>{
         if (threeAudioObject) {
-            threeAudioObject.setVolume(volume || 1)
+            threeAudioObject.setVolume(volume ?? 1)
             threeAudioObject.setLoop(loop || false)
             threeAudioObject.autoplay = autoplay || false;
             if (threeAudioObject instanceof PositionalAudio) {
