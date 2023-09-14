@@ -2,10 +2,11 @@ import { useFrame, useLoader } from "@react-three/fiber";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { Audio, AudioLoader, Group, PositionalAudio } from "three";
 import { useRefState, useThreeEventListener } from "../../utilities";
-import { BooleanType, NumberType, URLType } from "../viewer/ArgumentTypes";
+import { BooleanType, NumberType, StringType, URLType } from "../viewer/ArgumentTypes";
 import { VaporComponent, VaporComponentProps } from "../viewer/ComponentDeclarations";
 import { genericInputs } from "../viewer/genericInputs"
 import { ViewerContext } from "../viewer/ViewerContext";
+import { useGetTransitionAlpha } from "./managers/ScenesManager";
 
 type AudioObjectProps = VaporComponentProps & {
     url: string;
@@ -16,6 +17,7 @@ type AudioObjectProps = VaporComponentProps & {
     positional?: boolean;
     randomizeStart?: boolean;
     overlapLength: number;
+    sceneID: string | null;
 }
 
 function useAudioFile(url) {
@@ -45,8 +47,12 @@ function useSeamlessThreeAudio<T extends (Audio | PositionalAudio | null)>(url: 
         setObject1(newAudioObject);
         setObject2(newAudioObject2);
         return ()=>{
-            object1Ref.current?.disconnect();
-            object2Ref.current?.disconnect();
+            try {   
+                object1Ref.current?.disconnect();
+                object2Ref.current?.disconnect();
+            } catch (e) {
+                console.warn("Error disconnecting audio object", e);
+            }
         }
     }, [audioListener, positional]);
     const play1 = useCallback(()=>{
@@ -81,10 +87,15 @@ function useSeamlessThreeAudio<T extends (Audio | PositionalAudio | null)>(url: 
     ]
 }
 
-export const SeamlessAudioObject: VaporComponent = ({url, refDistance, volume, positional, overlapLength, ...props}: AudioObjectProps) => {
+export const SeamlessAudioObject: VaporComponent = ({url, refDistance, volume, positional, overlapLength, sceneID, ...props}: AudioObjectProps) => {
     const [threeAudioObject1, threeAudioObject2, audio1Start, audio2Start, play1, play2] = useSeamlessThreeAudio(url, positional || false);
     const activeIndexRef = useRef(0);
     const groupRef = useRef<Group>(null);
+    const getTransitionAlpha = useGetTransitionAlpha(
+        sceneID,
+        4, 8, 0,
+        0, 8, 4
+    )
     useEffect(()=>{
         if (threeAudioObject1 && threeAudioObject2) {
             threeAudioObject1.setVolume(1)
@@ -112,12 +123,13 @@ export const SeamlessAudioObject: VaporComponent = ({url, refDistance, volume, p
                 // console.log("Switching to 1")
             }
         }
+        const transitionAlpha = 1 - Math.abs(getTransitionAlpha(delta))
         // Calculate volume for each audio object to crossfade
         if (threeAudioObject1 && threeAudioObject2 && threeAudioObject1.buffer && threeAudioObject2.buffer) {
             const audio1CurrentTime = threeAudioObject1.context.currentTime - audio1Start.current;
             const audio2CurrentTime = threeAudioObject2.context.currentTime - audio2Start.current;
-            threeAudioObject1.setVolume(Math.max(Math.min(1, audio1CurrentTime / overlapLength, (threeAudioObject1.buffer.duration - audio1CurrentTime) / overlapLength), 0) * (volume ?? 1));
-            threeAudioObject2.setVolume(Math.max(Math.min(1, audio2CurrentTime / overlapLength, (threeAudioObject2.buffer.duration - audio2CurrentTime) / overlapLength), 0) * (volume ?? 1));
+            threeAudioObject1.setVolume(Math.max(Math.min(1, audio1CurrentTime / overlapLength, (threeAudioObject1.buffer.duration - audio1CurrentTime) / overlapLength), 0) * (volume ?? 1) * transitionAlpha);
+            threeAudioObject2.setVolume(Math.max(Math.min(1, audio2CurrentTime / overlapLength, (threeAudioObject2.buffer.duration - audio2CurrentTime) / overlapLength), 0) * (volume ?? 1) * transitionAlpha);
         }
     })
     return (
@@ -151,5 +163,9 @@ SeamlessAudioObject.inputs = {
     overlapLength: {
         type: NumberType,
         default: 1,
+    },
+    sceneID: {
+        type: StringType,
+        default: null,
     }
 };

@@ -7,8 +7,9 @@ import ErrorObject from "./subcomponents/ErrorObject";
 import DepthKitMaterial from "./materials/DepthKitMaterial";
 import { VaporComponent, VaporComponentProps } from "../viewer/ComponentDeclarations";
 import { genericInputs } from "../viewer/genericInputs"
-import { BooleanType, NumberType, URLType, Vector3Type } from "../viewer/ArgumentTypes";
+import { BooleanType, NumberType, StringType, URLType, Vector3Type } from "../viewer/ArgumentTypes";
 import { useEventListener, useThreeEventListener } from "../../utilities";
+import { useTransitionAlpha } from "./managers/ScenesManager";
 
 const VERTS_WIDE = 256;
 const VERTS_TALL = 256;
@@ -24,6 +25,7 @@ type DepthKitObjectProps = VaporComponentProps & {
 	muted?: boolean;
 	audioPositionOffset?: Vector3;
 	volume?: number;
+	sceneID?: string | null;
 }
 
 export const DepthKitObject: VaporComponent = (props: DepthKitObjectProps) => {
@@ -35,7 +37,7 @@ export const DepthKitObject: VaporComponent = (props: DepthKitObjectProps) => {
 		</ErrorBoundary>);
 }
 
-function _DepthKitObject({ metaUrl = "", videoUrl = "", posterUrl = "", autoplay = true, loop = true, muted = false, audioPositionOffset = [0, 0, 0], volume = 1, ...props }: DepthKitObjectProps) {
+function _DepthKitObject({ metaUrl = "", videoUrl = "", posterUrl = "", autoplay = true, loop = true, muted = false, audioPositionOffset = [0, 0, 0], volume = 1, sceneID = null, ...props }: DepthKitObjectProps) {
 	const mesh = useRef(null);
 	const audioGroupRef = useRef(null)
 	const [positionalAudio, setPositionalAudio] = useState(null);
@@ -69,11 +71,20 @@ function _DepthKitObject({ metaUrl = "", videoUrl = "", posterUrl = "", autoplay
 		console.log(metaInf, cameraInfo)
 	}, [metaInf])
 
+	const materialRef = useRef(null);
+
+	useTransitionAlpha(sceneID, 4, 8, 0, 0, 8, 4, (alpha)=>{
+		if (materialRef.current) {
+			materialRef.current.transitionAlpha = alpha;
+		}
+	})
+
 	return (
 		<points ref={mesh} frustumCulled={false} {...props}>
 			<DepthGeometry />
 			<depthKitMaterial
 				attach="material"
+				ref={materialRef}
 				{...{
 					width: metaInf.textureWidth,
 					height: metaInf.textureHeight,
@@ -305,6 +316,10 @@ DepthKitObject.inputs = {
 	audioPositionOffset: {
 		type: Vector3Type,
 		default: [0, 0, 0]
+	},
+	sceneID: {
+		type: StringType,
+		default: null
 	}
 }
 

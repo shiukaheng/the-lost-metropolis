@@ -63,6 +63,10 @@ class DepthKitMaterial extends THREE.ShaderMaterial {
                 "pointSize": {
                     type: "f",
                     value: 5.0
+                },
+                "transitionAlpha": {
+                    type: "f",
+                    value: 0.0
                 }
             },
             vertexShader: rgbdVert,
@@ -134,6 +138,12 @@ class DepthKitMaterial extends THREE.ShaderMaterial {
     }
     set isPoints(isPoints) {
         this.uniforms.isPoints.value = isPoints
+    }
+    get transitionAlpha() {
+        return this.uniforms.transitionAlpha.value
+    }
+    set transitionAlpha(transitionAlpha) {
+        this.uniforms.transitionAlpha.value = transitionAlpha
     }
     // expose extrinsics, but get / set as an object that represents a THREE.Matrix4 using keys "e<column><row>"
     get extrinsics() {

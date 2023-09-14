@@ -40,7 +40,11 @@ function useThreeAudio(url: string, positional: boolean, randomizeStart: boolean
         setObject(newAudioObject);
         return ()=>{
             // console.log(objectRef.current);
-            objectRef.current?.disconnect();
+            try {
+                objectRef.current?.disconnect();
+            } catch (e) {
+                console.warn("Error disconnecting audio object", e);
+            }
         }
     }, [audioListener, positional]);
     const play = useCallback(()=>{
