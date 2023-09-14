@@ -8,17 +8,21 @@ import { VaporComponent, VaporComponentProps } from "../viewer/ComponentDeclarat
 import { genericInputs } from "../viewer/genericInputs"
 import UnifiedInteractive from "./subcomponents/UnifiedInteractive";
 import { Mesh } from "three";
+import { ViewerContext } from "../viewer/ViewerContext";
 
 type TestObjectProps = VaporComponentProps & {sceneID: string, enabled: boolean}
 
 export const SceneTriggerObject: VaporComponent = ({sceneID, enabled, position, rotation, scale, ...props}: TestObjectProps) => {
     const meshRef = useRef<Mesh>(null)
+    const { setScenes } = useContext(ViewerContext)
+    const previouslyInRef = useRef<boolean>(false)
     useEffect(()=>{
         if (meshRef.current) {
             meshRef.current.geometry.computeBoundingBox()
         }
     }, [])
     useFrame((state, delta) => {
+        let currentlyIn = false
         if (meshRef.current && meshRef.current.geometry.boundingBox !== null) {
             // Check if camera is inside bounding box
             const cameraPosition = state.camera.position
@@ -27,8 +31,12 @@ export const SceneTriggerObject: VaporComponent = ({sceneID, enabled, position, 
             boundingBox.applyMatrix4(meshRef.current.matrixWorld)
             // Check if camera is inside bounding box
             if (boundingBox.containsPoint(cameraPosition)) {
-                // Do something
+                currentlyIn = true
             }
+        }
+        if (currentlyIn && !previouslyInRef.current) {
+            // Transition to new scene
+            setScenes([sceneID])
         }
     })
     return (

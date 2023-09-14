@@ -38,7 +38,7 @@ export const DepthKitObject: VaporComponent = (props: DepthKitObjectProps) => {
 }
 
 function _DepthKitObject({ metaUrl = "", videoUrl = "", posterUrl = "", autoplay = true, loop = true, muted = false, audioPositionOffset = [0, 0, 0], volume = 1, sceneID = null, ...props }: DepthKitObjectProps) {
-	const mesh = useRef(null);
+	const mesh = useRef<THREE.Mesh>(null);
 	const audioGroupRef = useRef<THREE.Group>(null);
 	const [positionalAudio, setPositionalAudio] = useState<THREE.PositionalAudio | null>(null);
 
@@ -73,7 +73,7 @@ function _DepthKitObject({ metaUrl = "", videoUrl = "", posterUrl = "", autoplay
 
 	const materialRef = useRef(null);
 
-	useTransitionAlpha(sceneID, 4, 8, 0, 0, 8, 4, (alpha)=>{
+	useTransitionAlpha(sceneID, 0.5, 8, 0, 0, 8, 0.5, (alpha)=>{
 		if (materialRef.current) {
 			materialRef.current.transitionAlpha = alpha;
 		}
@@ -82,6 +82,9 @@ function _DepthKitObject({ metaUrl = "", videoUrl = "", posterUrl = "", autoplay
 			if (audio && audio.length > 0) {
 				(audio[0] as THREE.PositionalAudio).setVolume((1 - Math.abs(alpha)) * volume);
 			}
+		}
+		if (mesh.current) {
+			mesh.current.visible = (alpha !== -1) && (alpha !== 1);
 		}
 	})
 

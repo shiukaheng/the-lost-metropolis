@@ -93,8 +93,8 @@ export const SeamlessAudioObject: VaporComponent = ({url, refDistance, volume, p
     const groupRef = useRef<Group>(null);
     const getTransitionAlpha = useGetTransitionAlpha(
         sceneID,
-        4, 8, 0,
-        0, 8, 4
+        0.5, 8, 0,
+        0, 8, 0.5
     )
     useEffect(()=>{
         if (threeAudioObject1 && threeAudioObject2) {

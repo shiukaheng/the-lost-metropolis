@@ -104,7 +104,7 @@ export const useGetTransitionAlpha = (
     // Update transition state
     useEffect(() => {
         // console.log("Updating transition state")
-        if (sceneID === null) {
+        if (sceneID === null || scenesContext?.visibleScenes === null) {
             console.log("Scene ID is null")
             // Set transition state to none
             transitionStateRef.current = "none";
@@ -218,7 +218,10 @@ export function AnimatedScenesManager({scenes, interval, children}: AnimatedScen
 }
 
 export function DebugScenesManager({children}: {children: React.ReactNode}) {
-    const {scenes} = useContext(ViewerContext);
+    const {scenes, setScenes, defaultScenes} = useContext(ViewerContext);
+    useEffect(()=>{
+        setScenes(defaultScenes);
+    }, [])
     return (
         <ScenesManager scenes={scenes}>
             {children}

@@ -230,6 +230,7 @@ export function useMultiLangObject(content: MultiLangObject): { [key: string]: s
 }
 export function usePost(
 	id: string | null,
+	autoCreate: boolean = true,
 	whitelist?: (keyof Post)[],
 	blacklist?: (keyof Post)[]
 ): [Post | null, ((newPost: Partial<Post>) => Promise<void>) | null] {
@@ -245,12 +246,14 @@ export function usePost(
 		if (storedPost) {
 			console.log("Loaded post from localStorage", id, JSON.parse(storedPost))
 			setPost(JSON.parse(storedPost));
-		} else {
+		} else if (autoCreate) {
 			// Create an empty post
 			console.log("Created new post", id)
 			const defaultPost = postSchema.getDefault() as Post;
 			localStorage.setItem(id, JSON.stringify(defaultPost));
 			setPost(defaultPost);
+		} else {
+			setPost(null);
 		}
 	}, [id]);
 

@@ -52,7 +52,9 @@ const defaultViewerContext: ViewerContextProps = {
     _setDepthBuffer: (depthBuffer:DepthTexture | undefined) => {},
     // J. Debug Scenes Manager
     scenes: [],
-    setScenes: (scenes: string[]) => { }
+    setScenes: (scenes: string[]) => { },
+    defaultScenes: [],
+    setDefaultScenes: (scenes: string[]) => { }
 }
 
 export type DefaultCameraPropType = {
@@ -100,6 +102,8 @@ interface ViewerContextProps {
     // J. Debug Scenes Manager
     scenes: string[],
     setScenes: (scenes:string[] | ((scenes:string[]) => string[])) => void,
+    defaultScenes: string[]
+    setDefaultScenes: (scenes:string[] | ((scenes:string[]) => string[])) => void
 }
 
 const ViewerContext = createContext(defaultViewerContext)

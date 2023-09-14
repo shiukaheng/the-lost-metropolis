@@ -7,7 +7,7 @@ import EditorEmbeddedWidget from "./EditorEmbeddedWidget";
 import EditorInput from "./EditorInput";
 
 function EditorSceneSettings() {    
-    const {defaultCameraProps, setDefaultCameraProps, defaultXRCameraProps, setDefaultXRCameraProps, cameraRef, potreePointBudget, setPotreePointBudget, flySpeed, setFlySpeed, scenes, setScenes} = useContext(ViewerContext);
+    const {defaultCameraProps, setDefaultCameraProps, defaultXRCameraProps, setDefaultXRCameraProps, cameraRef, potreePointBudget, setPotreePointBudget, flySpeed, setFlySpeed, defaultScenes, setDefaultScenes} = useContext(ViewerContext);
     const heading = useMultiLang({"en": "scene Settings", "zh":"場景設定"});
     const pointBudgetLabel = useMultiLang({"en": "point budget", "zh": "點限制"});
     const defaultCameraPosLabel = useMultiLang({"en": "default camera position", "zh": "預設攝影機位置"});
@@ -19,12 +19,12 @@ function EditorSceneSettings() {
     const defaultXRCameraFOVLabel = useMultiLang({"en": "default XR camera FOV", "zh": "預設XR攝影機 FOV"});
     const setXRToCurrentPoseLabel = useMultiLang({"en": "set XR to current pose", "zh": "設定XR為當前姿態"});
     const flySpeedLabel = useMultiLang({"en": "fly speed", "zh": "飛行速度"});
-    const sceneIDsLabel = useMultiLang({"en": "scene IDs", "zh": "場景ID"});
+    const sceneIDsLabel = useMultiLang({"en": "default scene IDs", "zh": "預設場景ID"});
     return (
         <EditorEmbeddedWidget title={heading} stickyKey="sceneSettingsExpanded">
             <div className="flex flex-col gap-2">
-                <EditorInput propName={sceneIDsLabel} typeName="string" value={scenes ?? []} setValue={(scenesString: string) => {
-                    setScenes(scenesString.split(","));
+                <EditorInput propName={sceneIDsLabel} typeName="string" value={defaultScenes ?? []} setValue={(scenesString: string) => {
+                    setDefaultScenes(scenesString.split(","));
                 }}/>
                 <EditorInput propName={pointBudgetLabel} typeName="number" value={potreePointBudget} setValue={setPotreePointBudget}/>
                 <EditorInput propName={flySpeedLabel} typeName="number" value={flySpeed} setValue={setFlySpeed}/>
