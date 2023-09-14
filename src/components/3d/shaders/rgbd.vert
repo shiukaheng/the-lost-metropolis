@@ -50,6 +50,7 @@ float depthForPoint(vec2 texturePoint)
 void main() {
     if (transitionAlpha == -1.) {
         color = vec4(0., 0., 0., 0.);
+        // Put point outside of view
         gl_Position = vec4(0., 0., 0., 0.);
         gl_PointSize = 0.;
         return;
