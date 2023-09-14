@@ -375,6 +375,7 @@ export function useBufferedPost(
 	// Change describes mismatch between buffer and post, OverwriteWarning indicates database has newer version than buffer
 	// console.log(buffer, initialBufferRef.current)
 	const changed = !isEqual(buffer, initialBufferRef.current)
+	console.log(buffer, initialBufferRef.current)
 	// console.log(changed)
 	return [buffer, setBuffer, post, push, pull, changed, (overwriteWarning && post !== undefined)]
 }

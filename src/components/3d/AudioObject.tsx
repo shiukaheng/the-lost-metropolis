@@ -7,6 +7,7 @@ import { VaporComponent, VaporComponentProps } from "../viewer/ComponentDeclarat
 import { genericInputs } from "../viewer/genericInputs"
 import { ViewerContext } from "../viewer/ViewerContext";
 import { TestObject } from "./TestObject";
+import { useTransitionAlpha } from "./managers/ScenesManager";
 
 type AudioObjectProps = VaporComponentProps & {
     url: string;
@@ -16,6 +17,7 @@ type AudioObjectProps = VaporComponentProps & {
     volume?: number;
     positional?: boolean;
     randomizeStart?: boolean;
+    sceneID: string | null;
 }
 
 function useAudioFile(url) {
@@ -67,12 +69,13 @@ function useThreeAudio(url: string, positional: boolean, randomizeStart: boolean
     return object;
 }
 
-export const AudioObject: VaporComponent = ({url, autoplay, loop, refDistance, volume, positional, randomizeStart=false, ...props}: AudioObjectProps) => {
+export const AudioObject: VaporComponent = ({url, autoplay, loop, refDistance, volume, positional, randomizeStart=false, sceneID=null, ...props}: AudioObjectProps) => {
     const threeAudioObject = useThreeAudio(url, positional || false, randomizeStart);
     const groupRef = useRef<Group>(null);
     useEffect(()=>{
         if (threeAudioObject) {
-            threeAudioObject.setVolume(volume ?? 1)
+            // threeAudioObject.setVolume(volume ?? 1)
+            threeAudioObject.setVolume(0)
             threeAudioObject.setLoop(loop || false)
             threeAudioObject.autoplay = autoplay || false;
             if (threeAudioObject instanceof PositionalAudio) {
@@ -80,7 +83,12 @@ export const AudioObject: VaporComponent = ({url, autoplay, loop, refDistance, v
             }
         }
         // console.log(groupRef.current?.children)
-    }, [threeAudioObject, loop, refDistance, volume])
+    }, [threeAudioObject, loop, refDistance])
+    useTransitionAlpha(sceneID, 0.5, 8, 0, 0, 8, 0.5, (alpha) => {
+        if (threeAudioObject) {
+            threeAudioObject.setVolume((volume ?? 1) * (1 - Math.abs(alpha)));  
+        }
+    })
     return (
         <group {...props} ref={groupRef}>
             {threeAudioObject ? <primitive object={threeAudioObject}/> : null}

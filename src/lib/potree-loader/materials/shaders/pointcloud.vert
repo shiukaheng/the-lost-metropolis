@@ -178,4 +178,7 @@ void main() {
     #if defined(output_color_encoding_linear) && defined(input_color_encoding_sRGB)
         vColor = fromLinear(vColor);
     #endif
+
+	// float lod = getLOD();
+	// vColor = vec4(lod/10., 1.-lod/10., 1.-lod/10., 1.);
 }
