@@ -36,7 +36,11 @@ export const SceneTriggerObject: VaporComponent = ({sceneID, enabled, position, 
         }
         if (currentlyIn && !previouslyInRef.current) {
             // Transition to new scene
+            // console.log("Transitioning to scene", sceneID)
             setScenes([sceneID])
+            previouslyInRef.current = true
+        } else if (!currentlyIn && previouslyInRef.current) {
+            previouslyInRef.current = false
         }
     })
     return (

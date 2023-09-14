@@ -26,6 +26,8 @@ type DepthKitObjectProps = VaporComponentProps & {
 	audioPositionOffset?: Vector3;
 	volume?: number;
 	sceneID?: string | null;
+	vertsWide?: number;
+	vertsTall?: number;
 }
 
 export const DepthKitObject: VaporComponent = (props: DepthKitObjectProps) => {
@@ -37,7 +39,7 @@ export const DepthKitObject: VaporComponent = (props: DepthKitObjectProps) => {
 		</ErrorBoundary>);
 }
 
-function _DepthKitObject({ metaUrl = "", videoUrl = "", posterUrl = "", autoplay = true, loop = true, muted = false, audioPositionOffset = [0, 0, 0], volume = 1, sceneID = null, ...props }: DepthKitObjectProps) {
+function _DepthKitObject({ metaUrl = "", videoUrl = "", posterUrl = "", autoplay = true, loop = true, muted = false, audioPositionOffset = [0, 0, 0], volume = 1, sceneID = null, vertsTall = 256, vertsWide = 256, ...props }: DepthKitObjectProps) {
 	const mesh = useRef<THREE.Mesh>(null);
 	const audioGroupRef = useRef<THREE.Group>(null);
 	const [positionalAudio, setPositionalAudio] = useState<THREE.PositionalAudio | null>(null);
@@ -90,7 +92,7 @@ function _DepthKitObject({ metaUrl = "", videoUrl = "", posterUrl = "", autoplay
 
 	return (
 		<points ref={mesh} frustumCulled={false} {...props}>
-			<DepthGeometry />
+			<DepthGeometry verts_tall={vertsTall} verts_wide={vertsWide}/>
 			<depthKitMaterial
 				attach="material"
 				ref={materialRef}
@@ -113,7 +115,8 @@ function _DepthKitObject({ metaUrl = "", videoUrl = "", posterUrl = "", autoplay
 						cameraInfo?.crop?.z || 1,
 						cameraInfo?.crop?.w || 1
 					],
-					extrinsics: cameraInfo.extrinsics
+					extrinsics: cameraInfo.extrinsics,
+					meshDensity: [vertsWide, vertsTall]
 				}}
 			>
 				<AdvancedVideoTexture getPositionalAudio={setPositionalAudio} {...{ videoUrl, posterUrl, autoplay, loop, muted, volume }} />
@@ -245,9 +248,11 @@ function AdvancedVideoTexture({
 }
 
 // Wrapper for just the geo
-function DepthGeometry() {
-	const [geometry] = useState(() => buildGeometry());
-
+function DepthGeometry({
+	verts_wide = VERTS_WIDE,
+	verts_tall = VERTS_TALL
+}) {
+	const geometry = useMemo(() => buildGeometry(verts_wide, verts_tall), [verts_wide, verts_tall]);
 	return <primitive object={geometry} attach="geometry" />;
 }
 
@@ -329,6 +334,14 @@ DepthKitObject.inputs = {
 	sceneID: {
 		type: StringType,
 		default: null
+	},
+	vertsWide: {
+		type: NumberType,
+		default: VERTS_WIDE
+	},
+	vertsTall: {
+		type: NumberType,
+		default: VERTS_TALL
 	}
 }
 

@@ -145,6 +145,12 @@ class DepthKitMaterial extends THREE.ShaderMaterial {
     set transitionAlpha(transitionAlpha) {
         this.uniforms.transitionAlpha.value = transitionAlpha
     }
+    get meshDensity() {
+        return this.uniforms.meshDensity.value
+    }
+    set meshDensity(meshDensity) {
+        this.uniforms.meshDensity.value = meshDensity
+    }
     // expose extrinsics, but get / set as an object that represents a THREE.Matrix4 using keys "e<column><row>"
     get extrinsics() {
         return {
