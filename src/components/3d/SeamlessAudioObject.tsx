@@ -166,6 +166,6 @@ SeamlessAudioObject.inputs = {
     },
     sceneID: {
         type: StringType,
-        default: null,
+        default: "",
     }
 };
