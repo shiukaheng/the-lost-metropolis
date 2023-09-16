@@ -507,6 +507,14 @@ export class PointCloudMaterial extends RawShaderMaterial {
     ) {
       this.updateVisibilityTextureData(visibleNodes);
     }
+
+    // Update size
+    // Get object world space scale
+    const scale = PointCloudMaterial.helperVec3.setFromMatrixScale(octree.matrixWorld);
+    // Get average
+    const scaleAvg = (scale.x + scale.y + scale.z) / 3;
+    // Calculate point size
+    this.size = scaleAvg;
   }
 
   private updateVisibilityTextureData(nodes: PointCloudOctreeNode[]) {
