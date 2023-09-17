@@ -119,7 +119,7 @@ function _DepthKitObject({ metaUrl = "", videoUrl = "", posterUrl = "", autoplay
 					meshDensity: [vertsWide, vertsTall]
 				}}
 			>
-				<AdvancedVideoTexture getPositionalAudio={setPositionalAudio} {...{ videoUrl, posterUrl, autoplay, loop, muted, volume }} />
+				<AdvancedVideoTexture getPositionalAudio={setPositionalAudio} {...{ videoUrl, posterUrl, autoplay, loop, muted }} />
 			</depthKitMaterial>
 			<group ref={audioGroupRef} position={audioPositionOffset} />
 		</points>
@@ -333,7 +333,7 @@ DepthKitObject.inputs = {
 	},
 	sceneID: {
 		type: StringType,
-		default: null
+		default: ""
 	},
 	vertsWide: {
 		type: NumberType,
