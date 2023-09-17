@@ -43,9 +43,8 @@ function XRButtons({supportedXRModes, xrRequesterGetterRef}) {
 
 
 function View({children, ...props}: ViewerProps) {
-    const { id } = useParams();
-    const navigate = useNavigate();
-    const title = "Reimagines Heritage"
+    // const { id } = useParams();
+    // const navigate = useNavigate();
     const threeStateRef = useRef<null | RootState>(null) 
     const xrRequesterGetterRef = useRef<null | XRRequesterGetter>(null)
     const supportedXRModes = useSupportedXRModes()
@@ -60,18 +59,6 @@ function View({children, ...props}: ViewerProps) {
                 <XRRequesterRefExtractor requesterRefGetterRef={xrRequesterGetterRef}/>
                 {children}
             </Viewer>
-            <Fade>
-                <div className="absolute w-full h-full p-8 md:p-20 pointer-events-none flex flex-col gap-4">
-                    <div className="flex flex-row place-content-between gap-4">
-                        <MagicDiv className='text-2xl md:text-4xl font-black'>{title}</MagicDiv>
-                    </div>
-
-                    <div className="flex flex-row h-12 gap-4">
-                        <XRButtons xrRequesterGetterRef={xrRequesterGetterRef} supportedXRModes={supportedXRModes}/>
-                    </div>
-                    <ControlTips className='mt-auto max-w-[520px]'/>
-                </div>
-            </Fade>
         </div>
         // </ThemeContext.Provider>
     );

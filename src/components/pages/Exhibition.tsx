@@ -6,7 +6,6 @@ import { FileLoader } from 'three';
 import { usePost } from '../../utilities';
 
 function Exhibition() {
-    console.log("Exhibition")
     const [localPost, _] = usePost("web_exhibition", false)
     const post = useLoader(FileLoader, "https://192.168.0.153:8080/assets/web_exhibition.json", (loader) => {
         loader.setResponseType("json");
