@@ -12,6 +12,7 @@ import { createSelectStyles } from "../utilities";
 import { Keypress } from "../../utilities/keyboardControls/Keypress";
 import {cloneDeep} from "lodash"
 import { ClipboardHelper } from "../../utilities/keyboardControls/Clipboard";
+import { Vector3 } from "three";
 
 function getDefaultInputs(inputObject:VaporInputsType) {
     var defaultInputs = {}
@@ -46,7 +47,7 @@ function SceneChildItem({child, onClick, selected}) {
 
 // Component for selecting scene or deleting scene components, stays in sync with the editor viewport
 export default function EditorComponentGraph() {
-    const {sceneChildren, addSceneChildren} = useContext(ViewerContext)
+    const {sceneChildren, addSceneChildren, cameraRef} = useContext(ViewerContext)
     const {selectedIDs, setSelectedIDs, addSelectedIDs, removeSelectedIDs, shiftPressed, setSceneChildren} = useContext(EditorContext)
     const [addChildrenType, setAddChildrenType] = useState<null|VaporComponent>(null)
     const heading = useMultiLang({"en": "components", "zh": "組件"})
@@ -92,6 +93,13 @@ export default function EditorComponentGraph() {
                 <Select className="flex-grow" options={componentOptions} styles={customStyles} onChange={(value, _)=>setAddChildrenType(() => value.value)}/>
                 <MagicDiv mergeTransitions className={`editor-secondary-button ${(addChildrenType===null) ? "disabled" : ""}`} onClick={()=>{
                     const generatedProps = generateProps(addChildrenType)
+                    // @ts-ignore HAHA STOP ME
+
+
+                    // Add object in front of camera (1 unit away)
+                    const cameraPos = cameraRef.current?.getWorldPosition(new Vector3());
+                    generatedProps["position"] = cameraPos.add(cameraRef.current?.getWorldDirection(new Vector3).multiplyScalar(3)).toArray()
+                    
                     setSceneChildren(
                         sceneChildren.concat(
                             [
