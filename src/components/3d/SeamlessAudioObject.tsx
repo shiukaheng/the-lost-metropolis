@@ -44,10 +44,15 @@ function useSeamlessThreeAudio<T extends (Audio | PositionalAudio | null)>(url: 
         const newAudioObject = positional ? new PositionalAudio(audioListener) : new Audio(audioListener);
         const newAudioObject2 = positional ? new PositionalAudio(audioListener) : new Audio(audioListener);
         // If sceneID is defined, hijack the AudioNode, and connect it to a mixer for the specified scene. Create the mixer if it doesn't exist.
-        newAudioObject.setBuffer(audioFile);
-        newAudioObject2.setBuffer(audioFile);
-        setObject1(newAudioObject);
-        setObject2(newAudioObject2);
+        try {
+            newAudioObject.setBuffer(audioFile);
+            newAudioObject2.setBuffer(audioFile);
+            setObject1(newAudioObject);
+            setObject2(newAudioObject2);
+        } catch (e) {
+            console.warn("Error setting audio buffer", e);
+        }
+        
         return ()=>{
             try {   
                 object1Ref.current?.disconnect();
