@@ -14,6 +14,8 @@ import {
   RawShaderMaterial,
   Scene,
   Texture,
+  UniformsLib,
+  UniformsUtils,
   Vector3,
   Vector4,
   WebGLRenderer,
@@ -162,7 +164,7 @@ export class PointCloudMaterial extends RawShaderMaterial {
   private static helperVec3 = new Vector3();
 
   lights = false;
-  fog = false;
+  // fog = true;
   numClipBoxes: number = 0;
   clipBoxes: IClipBox[] = [];
   visibleNodesTexture: Texture | undefined;
@@ -178,7 +180,7 @@ export class PointCloudMaterial extends RawShaderMaterial {
 
   glslVersion = GLSL3;
 
-  uniforms: IPointCloudMaterialUniforms & Record<string, IUniform<any>> = {
+  uniforms: IPointCloudMaterialUniforms & Record<string, IUniform<any>> = UniformsUtils.merge([{
     bbSize: makeUniform('fv', [0, 0, 0] as [number, number, number]),
     blendDepthSupplement: makeUniform('f', 0.0),
     blendHardness: makeUniform('f', 2.0),
@@ -231,7 +233,7 @@ export class PointCloudMaterial extends RawShaderMaterial {
     disintegrationFactor: makeUniform('f', 0),
     distortionVector: makeUniform('fv', [0, 0, -10] as [number, number, number]),
     transitionAlpha: makeUniform('f', 0),
-  };
+  }, UniformsLib['fog']]) as any;
 
   @uniform('bbSize') bbSize!: [number, number, number];
   @uniform('depthMap') depthMap!: Texture | undefined;

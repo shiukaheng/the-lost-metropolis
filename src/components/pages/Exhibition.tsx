@@ -22,6 +22,8 @@ function Exhibition() {
         }
         post={localPost || post}
         >
+                <fog attach="fog" args={['red', 5, 10]} />
+
         </View>
     )
 }

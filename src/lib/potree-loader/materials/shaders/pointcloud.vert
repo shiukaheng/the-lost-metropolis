@@ -66,10 +66,16 @@ out float vOpacity;
 
 float pointNoise1(vec3 position) {
     return mix(0., (
-        pow((psrddnoise(vec2(position.x * 5. + time, position.z * 5. + time), vec2(0., 0.), time * 0.2) * 0.05 -
-		psrddnoise(vec2(position.x * 5. + time - 0.5, position.z * 5. + time - 0.5), vec2(0., 0.), time * 0.2) * 0.05) * 5., 3.0) * 0.5 +
+        pow((psrddnoise(vec2(position.x * 5. + time * 5., position.z * 5. + time * 5.), vec2(0., 0.), time * 10.) * 0.05 -
+		psrddnoise(vec2(position.x * 5. + time * 5. - 0.5, position.z * 5. + time * 5. - 0.5), vec2(0., 0.), time * 10.) * 0.05) * 5., 3.0) * 0.5 +
         psrddnoise(vec2(position.x * 500., position.z * 500.), vec2(0., 0.), time * 20.) * 0.025
     ), 1. / level * 2.);
+}
+
+float pointNoise2(vec3 position) {
+	return mix(0., (
+		pow((psrddnoise(vec2(position.x * 0.001 + time, position.z * 0.001 + time), vec2(0., 0.), time * 0.2) * 0.05), 2.0)
+	), 1. / level * 2.);
 }
 
 void main() {
@@ -91,13 +97,27 @@ void main() {
 	vec4 modelViewPosition = modelViewMatrix * vec4(position, 1.0);
 
 	// DistortionModulator: [0, 1], calculates an individual point's distortion factor based on point indices, point color, noise, and disintegration factor.
-	float distortionModulator = clamp(pow(abs(transitionAlpha), 5.0) * pow(length(vec3(rgba.x, rgba.y, rgba.z)), 3.0) , 0.0, 1.0);
+	float distortionModulator = clamp(pow(abs(transitionAlpha), 5.0) * pow(length(rgba.xyz), 3.0) , 0.0, 1.0);
 	
 	// Negative if alpha is negative, positive if alpha is positive or zero.
 	float signAlpha = sign(transitionAlpha);
 
 	// Calculate the new position of the point after applying distortion.
-	vec3 finalPosition = mix(position, position + distortionVector * signAlpha, distortionModulator) + pointNoise1(worldPosition) * vec3(0.0, 0.0, 5.0) * pcIndex / 1000.0;
+	vec3 distortedPosition = position + distortionVector * signAlpha;
+	vec3 rawAdditiveNoise = (
+		pointNoise1(worldPosition) * 
+		vec3(0.0, 0.0, 5.0) 
+		/ level 
+		* 10. 
+		* (pointNoise2(worldPosition)+ 0.1) 
+		* 5.
+	);
+	float forcefieldRadius = 2.;
+	float forcefieldSlopeLength = 5.;
+	float ambient = 0.05;
+	float peacefulnessForcefieldMultiplier = clamp(length(modelViewPosition.xyz) - forcefieldRadius, 0.0, forcefieldSlopeLength) / forcefieldSlopeLength + ambient;
+	vec3 additiveNoise = rawAdditiveNoise * peacefulnessForcefieldMultiplier;
+	vec3 finalPosition = mix(position, distortedPosition, distortionModulator) + additiveNoise;
 
 	// Calculate fade factor on distortion
 	float fadeFactor = (1. - pow(distortionModulator, 3.0)) * (1.- (pow(abs(transitionAlpha), 3.0)));
@@ -122,14 +142,16 @@ void main() {
 	float slope = tan(fov / 2.0);
 	float projFactor =  -0.5 * screenHeight / (slope * mvPosition.z);
 
-	#if defined fixed_point_size
-		pointSize = size;
-	#elif defined attenuated_point_size
-		pointSize = size * spacing * projFactor;
-	#elif defined adaptive_point_size
-		float worldSpaceSize = 2.0 * size * spacing / getPointSizeAttenuation();
-		pointSize = worldSpaceSize * projFactor;
-	#endif
+	// #if defined fixed_point_size
+	// 	pointSize = size;
+	// #elif defined attenuated_point_size
+	// 	pointSize = size * spacing * projFactor;
+	// #elif defined adaptive_point_size
+	// 	float worldSpaceSize = 2.0 * size * spacing / getPointSizeAttenuation();
+	// 	pointSize = worldSpaceSize * projFactor;
+	// #endif
+
+	pointSize = size * spacing * projFactor * 0.05;
 
 	pointSize = max(minSize, pointSize);
 	pointSize = min(maxSize, pointSize);
@@ -179,6 +201,8 @@ void main() {
         vColor = fromLinear(vColor);
     #endif
 
-	// float lod = getLOD();
-	// vColor = vec4(lod/10., 1.-lod/10., 1.-lod/10., 1.);
+	float fogDensity = 0.05;
+	float fogFactor = 1.0 - exp( - fogDensity * fogDensity * mvPosition.z * mvPosition.z );
+
+	vColor = mix(vColor, vec4(0., 0., 0., 0.), fogFactor);
 }
