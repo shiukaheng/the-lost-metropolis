@@ -7,6 +7,8 @@ import { VaporComponent, VaporComponentProps } from "../viewer/ComponentDeclarat
 import { genericInputs } from "../viewer/genericInputs"
 import { ViewerContext } from "../viewer/ViewerContext";
 import { useGetTransitionAlpha } from "./managers/ScenesManager";
+import ErrorObject from "./subcomponents/ErrorObject";
+import { ErrorBoundary } from "react-error-boundary";
 
 type AudioObjectProps = VaporComponentProps & {
     url: string;
@@ -87,7 +89,7 @@ function useSeamlessThreeAudio<T extends (Audio | PositionalAudio | null)>(url: 
     ]
 }
 
-export const SeamlessAudioObject: VaporComponent = ({url, refDistance, volume, positional, overlapLength, sceneID, ...props}: AudioObjectProps) => {
+const _SeamlessAudioObject = ({url, refDistance, volume, positional, overlapLength, sceneID, ...props}: AudioObjectProps) => {
     const [threeAudioObject1, threeAudioObject2, audio1Start, audio2Start, play1, play2] = useSeamlessThreeAudio(url, positional || false);
     const activeIndexRef = useRef(0);
     const groupRef = useRef<Group>(null);
@@ -138,6 +140,15 @@ export const SeamlessAudioObject: VaporComponent = ({url, refDistance, volume, p
             {threeAudioObject2 ? <primitive object={threeAudioObject2}/> : null}
         </group>
     );
+}
+
+export const SeamlessAudioObject: VaporComponent = (props: AudioObjectProps) => {
+	return (
+		<ErrorBoundary fallbackRender={({ error, resetErrorBoundary }) => (
+			<ErrorObject error={error} position={props.position} scale={props.scale} onClick={resetErrorBoundary} objectID={props.objectID} />
+		)}>
+			<_SeamlessAudioObject {...props} />
+		</ErrorBoundary>);
 }
 
 SeamlessAudioObject.displayName = "Seamless Audio Object";
