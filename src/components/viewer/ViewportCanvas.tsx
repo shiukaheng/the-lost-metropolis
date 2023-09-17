@@ -1,6 +1,6 @@
 import { useContextBridge, useDepthBuffer } from "@react-three/drei"
 import { PotreeManager } from "../3d/managers/PotreeManager"
-import { Children, useCallback, useContext, useEffect, useLayoutEffect, useRef } from "react"
+import { Children, isValidElement, useCallback, useContext, useEffect, useLayoutEffect, useRef } from "react"
 import CompositeSuspense from "../3d/subcomponents/CompositeSuspense"
 import { EditorContext } from "../editor/EditorContext"
 import { Camera, Canvas, useFrame, useThree } from "@react-three/fiber"
@@ -11,6 +11,8 @@ import { twMerge } from "tailwind-merge"
 import { useEventListener } from "../../utilities"
 import { PerspectiveCamera } from "three"
 import { DebugScenesManager, ScenesManager } from "../3d/managers/ScenesManager"
+import { ErrorBoundary } from "react-error-boundary"
+import ErrorObject from "../3d/subcomponents/ErrorObject"
 
 export function GenericCameraUpdater() {
     useCameraUpdateHelper()
@@ -135,11 +137,20 @@ export function _DepthBufferHelper() {
 // TODO: Register managers required and add dynamically (same with ContextBridge required contexts)
 function ViewportCanvas({children, foveation=0, className, ...props}) {
     const ContextBridge = useContextBridge(EditorContext, ViewerContext, SettingsContext, ThemeContext)
-    const wrappedChildren = Children.map(children, (child) => (
-        <CompositeSuspense>
-            {child}
-        </CompositeSuspense>
-    ))
+    const wrappedChildren = Children.map(children, (child) => {
+        if (!isValidElement(child)) {
+            return child
+        } else {
+            return (<CompositeSuspense>
+                <ErrorBoundary fallbackRender={({ error, resetErrorBoundary }) => (
+                    // @ts-ignore - More risky hacks <3
+                    <ErrorObject error={error} position={child.props.children.props.position} scale={child.props.children.props.scale} onClick={resetErrorBoundary} objectID={child.props.children.props.objectID} />
+                )}>
+                    {[child]}
+                </ErrorBoundary>;
+            </CompositeSuspense>)
+        }
+    })
     return (
         <Canvas className={twMerge(className, "viewport-canvas")} {...props}>
             <ContextBridge>

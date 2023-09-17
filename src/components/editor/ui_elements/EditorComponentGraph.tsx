@@ -1,7 +1,7 @@
 import EditorEmbeddedWidget from "./EditorEmbeddedWidget";
 import Select from 'react-select';
 import MagicDiv from "../../utilities/MagicDiv";
-import { createElement, useState, useContext, useRef } from "react";
+import { createElement, useState, useContext, useRef, Ref, MutableRefObject } from "react";
 import { v4 as uuidv4 } from 'uuid';
 import { KeyPressCallback, formatRGBCSS, useMultiLang } from "../../../utilities";
 import { Theme, ThemeContext } from "../../App"
@@ -12,7 +12,7 @@ import { createSelectStyles } from "../utilities";
 import { Keypress } from "../../utilities/keyboardControls/Keypress";
 import {cloneDeep} from "lodash"
 import { ClipboardHelper } from "../../utilities/keyboardControls/Clipboard";
-import { Vector3 } from "three";
+import { Camera, Vector3 } from "three";
 
 function getDefaultInputs(inputObject:VaporInputsType) {
     var defaultInputs = {}
@@ -45,6 +45,15 @@ function SceneChildItem({child, onClick, selected}) {
     )
 }
 
+function getPositionInFrontOfCamera(cameraRef: MutableRefObject<Camera>, distance:number) {
+    if (cameraRef === null || cameraRef?.current === null) {
+        return [0, 0, 0]
+    } else {
+        const cameraPos = cameraRef.current.getWorldPosition(new Vector3());
+        return cameraPos.add(cameraRef.current?.getWorldDirection(new Vector3).multiplyScalar(distance)).toArray()
+    }
+}
+
 // Component for selecting scene or deleting scene components, stays in sync with the editor viewport
 export default function EditorComponentGraph() {
     const {sceneChildren, addSceneChildren, cameraRef} = useContext(ViewerContext)
@@ -70,7 +79,7 @@ export default function EditorComponentGraph() {
                     const clonedChildren = sceneChildren.filter(child => selectedIDs.includes(child.props.objectID)).map(child => cloneDeep(child))
                     return clonedChildren
                 }}
-                onPaste={(content)=>{
+                onPaste={(content, inFrontOfCamera)=>{
                     // create new IDs for each child
                     const newComponents = content.map(child => {
                         const newID = uuidv4()
@@ -79,7 +88,9 @@ export default function EditorComponentGraph() {
                             key: newID,
                             props: {
                                 ...child.props,
-                                objectID: newID
+                                objectID: newID,
+                                // add in front of camera if inFrontOfCamera is true
+                                position: inFrontOfCamera ? getPositionInFrontOfCamera(cameraRef, 1) : child.props.position
                             }
                         }
                     })
@@ -93,13 +104,10 @@ export default function EditorComponentGraph() {
                 <Select className="flex-grow" options={componentOptions} styles={customStyles} onChange={(value, _)=>setAddChildrenType(() => value.value)}/>
                 <MagicDiv mergeTransitions className={`editor-secondary-button ${(addChildrenType===null) ? "disabled" : ""}`} onClick={()=>{
                     const generatedProps = generateProps(addChildrenType)
-                    // @ts-ignore HAHA STOP ME
-
-
                     // Add object in front of camera (1 unit away)
                     const cameraPos = cameraRef.current?.getWorldPosition(new Vector3());
-                    generatedProps["position"] = cameraPos.add(cameraRef.current?.getWorldDirection(new Vector3).multiplyScalar(3)).toArray()
-                    
+                    // @ts-ignore HAHA STOP ME
+                    generatedProps["position"] = getPositionInFrontOfCamera(cameraRef, 1)
                     setSceneChildren(
                         sceneChildren.concat(
                             [

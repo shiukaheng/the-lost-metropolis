@@ -18,7 +18,7 @@ export default function UnifiedInteractive({children, onClick=()=>{}, onHover=()
     return (
         interactionsSuported ? (
         <Interactive onSelect={wrappedOnClick} onHover={wrappedOnHover} onBlur={wrappedOnBlur}>
-            { wrappedChildren}
+            {wrappedChildren}
         </Interactive>
         ) : (
          wrappedChildren

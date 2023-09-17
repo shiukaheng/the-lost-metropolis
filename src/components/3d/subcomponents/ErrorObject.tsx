@@ -1,6 +1,7 @@
 import LabelIconObject from "./LabelIconObject";
 import { Text } from "@react-three/drei"
 import errorIconUrl from "../../../../static/viewport/error-icon.png"
+import { TestObject } from "../TestObject";
 
 export default function ErrorObject({error, resetErrorBoundary=()=>{}, position, scale, objectID, onClick=()=>{}}) {
     return (

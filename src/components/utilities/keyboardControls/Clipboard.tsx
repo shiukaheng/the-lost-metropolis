@@ -7,7 +7,7 @@ type ClipboardContent = any
 
 interface ClipboardProps {
     onCopy?: () => ClipboardContent
-    onPaste?: (content: ClipboardContent) => void   
+    onPaste?: (content: ClipboardContent, inPlace: boolean) => void   
     // systemClipboard?: boolean
 }
 
@@ -26,8 +26,15 @@ export function ClipboardHelper({onCopy=()=>{}, onPaste=()=>{}}: ClipboardProps)
                 if (document.activeElement !== document.body) {
                     return
                 }
-                onPaste(clipboard.current);
+                onPaste(clipboard.current, false);
             }} requiredKeys={["Control"]}/>
+            {/* Special case of '`' + 'v', for pasting in front of camera */}
+            <Keypress keyName="v" onDown={()=>{
+                if (document.activeElement !== document.body) {
+                    return
+                }
+                onPaste(clipboard.current, true);
+            }} requiredKeys={["`"]}/>
         </Fragment>
     )
 }
