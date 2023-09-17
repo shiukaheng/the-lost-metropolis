@@ -30,6 +30,7 @@ import { IPointCloudTreeNode, IPotree, IVisibilityUpdateResult, PickPoint } from
 import { BinaryHeap } from './utils/binary-heap';
 import { Box3Helper } from './utils/box3-helper';
 import { LRU } from './utils/lru';
+import dist from 'vite-plugin-glsl';
 
 
 export class QueueItem {
@@ -295,7 +296,11 @@ export class Potree implements IPotree {
       }
 
       // Nodes which are larger will have priority in loading/displaying.
-      let weight = distance < radius ? Number.MAX_VALUE : screenPixelRadius + 1 / distance;
+      // let weight = distance < radius ? Number.MAX_VALUE : screenPixelRadius * 0.5 + 1 / distance;
+      let weight = distance < radius ? Number.MAX_VALUE : 
+      (distance < 10 && child.level < 5) ? Number.MAX_VALUE : 1 / distance;
+
+
       if ((child as PointCloudOctreeNode)?.sceneNode?.material?.transitionAlpha) {
         weight *= 1 - Math.abs((child as PointCloudOctreeNode).sceneNode.material.transitionAlpha);
       }
