@@ -105,7 +105,7 @@ export const useGetTransitionAlpha = (
     useEffect(() => {
         // console.log("Updating transition state")
         if (sceneID === null || scenesContext?.visibleScenes === null || sceneID === "") {
-            console.log("Scene ID is null")
+            // console.log("Scene ID is null")
             // Set transition state to none
             transitionStateRef.current = "none";
             // Set alpha to 0
