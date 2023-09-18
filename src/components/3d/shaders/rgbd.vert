@@ -82,21 +82,21 @@ void main() {
 	// EFFECT CALCULATIONS
 	// ---------------------
 
-	// DistortionModulator: [0, 1], calculates an individual point's distortion factor based on point indices, point color, noise, and disintegration factor.
-	float distortionModulator = clamp(pow(abs(transitionAlpha), 5.0) * pow(length(color.xyz), 3.0) , 0.0, 1.0);
+	// // DistortionModulator: [0, 1], calculates an individual point's distortion factor based on point indices, point color, noise, and disintegration factor.
+	// float distortionModulator = clamp(pow(abs(transitionAlpha), 5.0) * pow(length(color.xyz), 3.0) , 0.0, 1.0);
 	
-	// Negative if alpha is negative, positive if alpha is positive or zero.
-	float signAlpha = sign(transitionAlpha);
+	// // Negative if alpha is negative, positive if alpha is positive or zero.
+	// float signAlpha = sign(transitionAlpha);
 
-    // Model corrected for its own transforms
-    vec4 modelPos = modelMatrix * worldPos;
+    // // Model corrected for its own transforms
+    // vec4 modelPos = modelMatrix * worldPos;
 
-	// Calculate the new position of the point after applying distortion.
-	vec4 finalModelPos = mix(modelPos, modelPos + vec4(0., -10., 0., 0.) * signAlpha, distortionModulator);
+	// // Calculate the new position of the point after applying distortion.
+	// vec4 finalModelPos = mix(modelPos, modelPos + vec4(0., 10., 0., 0.) * signAlpha, distortionModulator);
 
-	// Calculate fade factor on distortion
-	float fadeFactor = (1. - pow(distortionModulator, 3.0)) * (1.- (pow(abs(transitionAlpha), 3.0)));
+    vec4 finalModelPos = modelMatrix * worldPos;
 
+	float fadeFactor = clamp(1.-abs(transitionAlpha), 0.0, 1.0);
     color.a *= fadeFactor;
 
     gl_Position = projectionMatrix * viewMatrix * finalModelPos;

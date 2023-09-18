@@ -6,11 +6,12 @@ import { FileLoader } from 'three';
 import { usePost } from '../../utilities';
 
 function Exhibition() {
-    const [localPost, _] = usePost("web_exhibition", false)
-    const post = useLoader(FileLoader, "https://192.168.0.153:8080/assets/web_exhibition.json", (loader) => {
+    const [localPost, _] = usePost("web_exhibition", false) // Check if there is a local override
+    // @ts-ignore - It works lol
+    const post = useLoader(FileLoader, "assets/web_exhibition.json", (loader) => {
+        // @ts-ignore - Bad types! If I don't use this, it doesn't work
         loader.setResponseType("json");
     })
-    console.log(localPost || post)
     return (
         <View defaultCameraProps={
             {

@@ -10,9 +10,9 @@ import UnifiedInteractive from "./subcomponents/UnifiedInteractive";
 import { Mesh } from "three";
 import { ViewerContext } from "../viewer/ViewerContext";
 
-type TestObjectProps = VaporComponentProps & {sceneID: string, enabled: boolean}
+type SceneTriggerObjectProps = VaporComponentProps & {sceneID: string, enabled: boolean, removeOnExit: boolean}
 
-export const SceneTriggerObject: VaporComponent = ({sceneID, enabled, position, rotation, scale, ...props}: TestObjectProps) => {
+export const SceneTriggerObject: VaporComponent = ({sceneID, enabled, position, rotation, scale, removeOnExit, ...props}: SceneTriggerObjectProps) => {
     const meshRef = useRef<Mesh>(null)
     const { setScenes } = useContext(ViewerContext)
     const previouslyInRef = useRef<boolean>(false)
@@ -41,6 +41,9 @@ export const SceneTriggerObject: VaporComponent = ({sceneID, enabled, position, 
             previouslyInRef.current = true
         } else if (!currentlyIn && previouslyInRef.current) {
             previouslyInRef.current = false
+            if (removeOnExit) {
+                setScenes([])
+            }
         }
     })
     return (
@@ -62,5 +65,9 @@ SceneTriggerObject.inputs = {
     "enabled": {
         "type": BooleanType,
         "default": false
+    },
+    "removeOnExit": {
+        "type": BooleanType,
+        "default": true
     }
 }
