@@ -15,6 +15,7 @@ dependencies = [
     "websockets>=11.0.3",
     "cryptography>=41.0.3",
     "serial>=0.0.97",
+    "pygame>=2.5.2",
 ]
 requires-python = ">=3.11"
 license = {text = "MIT"}
