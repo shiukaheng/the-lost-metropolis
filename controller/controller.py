@@ -26,6 +26,8 @@ class Controller(BaseController):
         self.scene_man = scenes
         self.broadcaster = ThreadedStateBroadcaster()
 
+        self.dings = 0
+
     def update_sound_sensitive_float_dmx(self):
         self.value *= self.envelope_decay
         self.draft_dmx_values = np.random.rand(512) ** 10 * 0.1
@@ -39,6 +41,7 @@ class Controller(BaseController):
     def get_audio_reactive_state(self):
         return {
             "ding_envelope": self.value,
+            "ding_count": self.dings,
         }
     
     def get_state(self):
@@ -52,11 +55,12 @@ class Controller(BaseController):
         if self.bell_detector.detect_bell(audio_data):
             self.value = 80
             self.scene_man.bell_trigger()
+            self.dings += 1
             print("Ding!")
         self.update_sound_sensitive_float_dmx()
         self.functional_light_source_mod()
         self.dmx_values = float_to_uint8(self.sound_sensitive_float_dmx)
-        self.scene_man.update(time_info['input_buffer_adc_time'])   
+        self.scene_man.update(1 / self.rate * self.chunk_size)
         state = self.get_state()
         self.broadcaster.broadcast(state)
         return self.dmx_values

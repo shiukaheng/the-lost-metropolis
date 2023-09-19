@@ -1,55 +1,123 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 
-export function useLogWebsockets(endpoint: string) {
-    const [status, setStatus] = useState<'disconnected' | 'connected' | 'error'>('disconnected');
-    const [lastMessage, setLastMessage] = useState<any>(null);
-  
-    // Construct the WebSocket URL dynamically based on current location
-    const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const wsHost = window.location.hostname;
-    const wsPort = window.location.port ? `:${window.location.port}` : '';
-    const wsUrl = `${wsProtocol}//${wsHost}${wsPort}${endpoint}`;
-  
-    useEffect(() => {
-      const ws = new WebSocket(wsUrl);
-  
-      ws.onopen = () => {
-        setStatus('connected');
-        console.log('WebSocket connection opened:', wsUrl);
-      };
-  
-      ws.onmessage = (event) => {
-        setLastMessage(event.data);
-        console.log('WebSocket received:', event.data);
-      };
-  
-      ws.onerror = (error) => {
-        setStatus('error');
-        console.error('WebSocket error:', error);
-      };
-  
-      ws.onclose = () => {
-        setStatus('disconnected');
-        console.log('WebSocket connection closed:', wsUrl);
-      };
-  
-      // Cleanup
-      return () => {
-        ws.close();
-      };
-    }, [wsUrl]); // Reconnect if wsUrl changes
-  
-    return { status, lastMessage };
+type Status = 'disconnected' | 'connected' | 'error';
+type DataProcessor<T> = (data: any) => T;
+type ShouldUpdatePredicate<T> = (previousData: T, newData: T) => boolean;
+
+interface WebsocketCallbackOptions<T> {
+  predicate?: ShouldUpdatePredicate<T>;
+  dataProcessor?: DataProcessor<T>;
+  subscriber?: (data: T) => void;
+}
+
+declare global {
+  interface Window {
+    websocketCache: Record<string, WebSocket>;
   }
+}
+
+function useWebsocketCallback<T>(
+  endpoint: string,
+  options: WebsocketCallbackOptions<T> = {}
+): Status {
+  const [status, setStatus] = useState<Status>('disconnected');
+  // const [lastMessage, setLastMessage] = useState<T | null>(null);
+  const lastMessageRef = useRef<T | null>(null);
+
+  const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+  const wsHost = window.location.hostname;
+  const wsPort = window.location.port ? `:${window.location.port}` : '';
+  const wsUrl = `${wsProtocol}//${wsHost}${wsPort}${endpoint}`;
+
+  if (!window.websocketCache) {
+    window.websocketCache = {};
+  }
+
+  const handleMessage = useCallback(
+    (data: any) => {
+      let parsedData: T;
+
+      try {
+        parsedData = JSON.parse(data);
+        if (options.dataProcessor) {
+          parsedData = options.dataProcessor(parsedData);
+        }
+      } catch (err) {
+        console.warn('Failed to parse WebSocket message:', data);
+        return;
+      }
+
+      if (
+        !options.predicate || lastMessageRef.current === null ||
+        options.predicate(lastMessageRef.current, parsedData)
+      ) {
+        lastMessageRef.current = parsedData;
+
+        if (options.subscriber) {
+          options.subscriber(parsedData);
+        }
+      }
+    },
+    [options]
+  );
+
+  useEffect(() => {
+    let ws: WebSocket;
+
+    if (window.websocketCache[wsUrl]) {
+      ws = window.websocketCache[wsUrl];
+    } else {
+      ws = new WebSocket(wsUrl);
+      window.websocketCache[wsUrl] = ws;
+    }
+
+    ws.onopen = () => {
+      setStatus('connected');
+      console.log('WebSocket connection opened:', wsUrl);
+    };
+
+    ws.onmessage = (event) => {
+      handleMessage(event.data);
+      // console.log('WebSocket received:', event.data);
+    };
+
+    ws.onerror = (error) => {
+      setStatus('error');
+      console.error('WebSocket error:', error);
+    };
+
+    ws.onclose = () => {
+      setStatus('disconnected');
+      console.log('WebSocket connection closed:', wsUrl);
+    };
+
+    return () => {
+      if (!ws.OPEN) {
+        ws.close();
+      }
+    };
+  }, [wsUrl, handleMessage]);
+
+  return status;
+}
+
+export default useWebsocketCallback;
+
 
 
 export function TestPage() {
-    const { status, lastMessage } = useLogWebsockets("/sync");
-    return (
-        <div className="p-16">
-            <h1 className="text-4xl text-white">Test for websockets!</h1>
-            <p className="text-white">Status: {status}</p>
-            <p className="text-white">Last message: {lastMessage}</p>
-        </div>
-    )
+  // const { status, lastMessage } = useLogWebsockets("/sync");
+  useWebsocketCallback("/sync", {
+    subscriber: (data) => {
+      console.log(data);
+    },
+    predicate: (previousData, newData) => {
+      return previousData?.scenes?.current_scene !== newData?.scenes?.current_scene;
+    }
+  });
+  return (
+    <div className="p-16">
+      <h1 className="text-4xl text-white">Test for websockets!</h1>
+    </div>
+  )
 }

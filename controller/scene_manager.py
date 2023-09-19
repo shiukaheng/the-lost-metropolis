@@ -15,9 +15,10 @@ class SceneManager():
         self.remaining_scene_time = 0
         self.current_scene_order = []
     def update(self, dt):
-        if self.idle:
+        if not self.idle:
             self.remaining_scene_time -= dt
             if self.remaining_scene_time <= 0:
+                self.remaining_scene_time = 0
                 self.idle = True
     def bell_trigger(self):
         # If current scene order is empty, fill it with a random permutation of scene
@@ -26,6 +27,7 @@ class SceneManager():
         # Pop the first scene from the current scene order
         self.current_scene = self.current_scene_order.pop(0)
         self.idle = False
+        self.remaining_scene_time = self.current_scene.duration
     def get_scene_state(self):
         if self.current_scene is None:
             return {
