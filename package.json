@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "source": "./src/index.html",
   "scripts": {
-    "start": "vite --host 0.0.0.0",
+    "start": "concurrently \"pdm run ./controller/wss_server.py\" \"vite --host 0.0.0.0\"",
     "build": "vite build",
     "postinstall": "patch-package"
   },
