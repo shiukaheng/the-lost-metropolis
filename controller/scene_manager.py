@@ -35,7 +35,7 @@ class SceneManager():
                 "elapsed_scene_time": 0,
             }
         return {
-            "current_scene": self.current_scene,
+            "current_scene": self.current_scene.id,
             "idle": self.idle,
             "remaining_scene_time": self.remaining_scene_time,
             "elapsed_scene_time": self.current_scene.duration - self.remaining_scene_time,

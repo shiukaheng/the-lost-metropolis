@@ -32,6 +32,7 @@ class BellDetector:
         residual_spectrum = spectrum - filtered_spectrum
         
         bell_amplitude = np.mean(filtered_spectrum) / np.mean(residual_spectrum)
+        # print(bell_amplitude)
         sound_conditions = (bell_amplitude > self.last_amplitude * self.relative_amplitude_growth_threshold) and (bell_amplitude > self.absolute_amplitude_threshold)
         time_conditions = (self.time_since_last_trigger > self.cooldown_time)
         if sound_conditions and time_conditions:
