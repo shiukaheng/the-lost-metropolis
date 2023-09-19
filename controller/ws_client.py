@@ -3,6 +3,8 @@
 import asyncio
 import websockets
 
+print("Starting ws client...")
+
 async def time_client():
     uri = "ws://localhost:5678"
     async with websockets.connect(uri) as websocket:

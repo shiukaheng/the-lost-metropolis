@@ -4,6 +4,8 @@ import asyncio
 import websockets
 import datetime
 
+print("Starting ws server...")
+
 async def time_server(websocket, path):
     while True:
         now = datetime.datetime.utcnow().isoformat() + 'Z'

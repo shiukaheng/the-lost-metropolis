@@ -5,6 +5,8 @@ import datetime
 import websockets
 import ssl
 
+print("Starting wss server...")
+
 async def time_sender(websocket, path):
     while True:
         now = datetime.datetime.utcnow().isoformat() + 'Z'

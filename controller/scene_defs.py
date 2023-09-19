@@ -1,0 +1,44 @@
+from scene_manager import Scene, SceneManager
+scenes = SceneManager()
+scenes.add_scenes(
+    Scene(
+        "ckl_int_night",
+        120
+    ),
+    Scene(
+        "ckl_st_night",
+        120
+    ),
+    Scene(
+        "duk_kee",
+        360
+    ),
+    Scene(
+        "chan_hung",
+        120
+    ),
+    Scene(
+        "sophie",
+        360
+    ),
+    Scene(
+        "ho",
+        240
+    ),
+    Scene(
+        "state_mall",
+        240
+    ),
+    Scene(
+        "jumbo",
+        120
+    ),
+    Scene(
+        "bo_kee",
+        360
+    ),
+    Scene(
+        "star_cafe",
+        360
+    ),
+)
