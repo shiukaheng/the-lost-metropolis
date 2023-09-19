@@ -43,4 +43,4 @@ def generate_self_signed_cert(cert_path, key_path, validity_days=365):
         ))
 
 # Call the function to generate certificate and key
-generate_self_signed_cert("certificate.pem", "private_key.pem")
+generate_self_signed_cert("../certs/certificate.pem", "../certs/private_key.pem")
