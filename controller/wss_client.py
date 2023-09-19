@@ -15,6 +15,6 @@ async def time_receiver():
     async with websockets.connect(uri, ssl=ssl_context) as websocket:
         while True:
             time_received = await websocket.recv()
-            print(f"Time Received: {time_received}")
+            print(f"Received: {time_received}")
 
 asyncio.get_event_loop().run_until_complete(time_receiver())

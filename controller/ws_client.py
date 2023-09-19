@@ -10,6 +10,6 @@ async def time_client():
     async with websockets.connect(uri) as websocket:
         while True:
             time_message = await websocket.recv()
-            print(f"Received time: {time_message}")
+            print(f"Received: {time_message}")
 
 asyncio.get_event_loop().run_until_complete(time_client())
