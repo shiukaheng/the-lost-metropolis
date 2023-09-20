@@ -62,11 +62,9 @@ class ThreadedStateBroadcaster():
         self.server_thread.start()
 
     def stop(self):
-        if self.server:
-            self.loop.call_soon_threadsafe(self.server.shutdown)
-        if self.server_thread:
-            self.server_thread.join()
-
+        if self.loop is not None:
+            self.loop.call_soon_threadsafe(self.loop.stop)
+            
     def _run(self):
         self.loop = asyncio.new_event_loop()
         asyncio.set_event_loop(self.loop)
