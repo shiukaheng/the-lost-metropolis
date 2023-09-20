@@ -1,4 +1,4 @@
-import { array, boolean, InferType, object, string } from "yup";
+import { array, boolean, InferType, lazy, number, object, string } from "yup";
 import {  assetSchema } from "./Asset";
 import { makeRequiredMultiLangStringSchema } from "./MultiLangString";
 // import { permissionsSchema } from "./Permissions";
@@ -7,6 +7,7 @@ import { sceneConfigurationSchema } from "./SceneConfiguration";
 import { sponsorSchema } from "./Sponsor";
 import { themeSchema } from "./Theme";
 import { userIDSchema } from "./UserID"
+import { mapValues } from "lodash";
 
 // TODO: Just unify Post shape with PostDocData shape, but allow different types. Easier to think about.
 
