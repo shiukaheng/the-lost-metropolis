@@ -87,6 +87,9 @@ function ViewerManager({children, defaultCameraProps}: {children: any, defaultCa
     const [scenes, setScenes] = useState<string[]|null>(null)
     const [defaultScenes, setDefaultScenes] = useState<string[]>([])
 
+    // Projector Views
+    const [projectorViews, setProjectorViews] = useState<{[key:string]: DefaultCameraPropType}>({})
+
     return (
         <ViewerContext.Provider value={{
             // A. Camera prop management
@@ -127,8 +130,12 @@ function ViewerManager({children, defaultCameraProps}: {children: any, defaultCa
             // J. Debug Scenes Manager
             scenes,
             setScenes,
+            // K. Scenes
             defaultScenes,
-            setDefaultScenes
+            setDefaultScenes,
+            // L. Projector Views
+            projectorViews,
+            setProjectorViews
         }}>
             {children}
         </ViewerContext.Provider>

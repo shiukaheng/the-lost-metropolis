@@ -54,7 +54,10 @@ const defaultViewerContext: ViewerContextProps = {
     scenes: [],
     setScenes: (scenes: string[]) => { },
     defaultScenes: [],
-    setDefaultScenes: (scenes: string[]) => { }
+    setDefaultScenes: (scenes: string[]) => { },
+    // Projectors
+    projectorViews: {},
+    setProjectorViews: (views: {[key:string]: DefaultCameraPropType}) => {}
 }
 
 export type DefaultCameraPropType = {
@@ -104,6 +107,10 @@ interface ViewerContextProps {
     setScenes: (scenes:string[] | ((scenes:string[]) => string[])) => void,
     defaultScenes: string[]
     setDefaultScenes: (scenes:string[] | ((scenes:string[]) => string[])) => void
+    projectorViews: {
+        [key:string]: DefaultCameraPropType
+    }
+    setProjectorViews: (views: {[key:string]: DefaultCameraPropType}) => void
 }
 
 const ViewerContext = createContext(defaultViewerContext)

@@ -112,7 +112,7 @@ export type PostScene = InferType<typeof postSceneSchema>
  * @returns serialization function
  */
 export function useStatefulSerialize(): ()=>PostScene {
-    const {sceneChildren, defaultCameraProps, defaultXRCameraProps, potreePointBudget, flySpeed, defaultScenes} = useContext(ViewerContext)
+    const {sceneChildren, defaultCameraProps, defaultXRCameraProps, potreePointBudget, flySpeed, defaultScenes, projectorViews} = useContext(ViewerContext)
     return () => ({
         sceneChildren: exportChildren(sceneChildren),
         configuration: {
@@ -120,7 +120,8 @@ export function useStatefulSerialize(): ()=>PostScene {
             potreePointBudget: potreePointBudget,
             defaultXRCameraProps: defaultXRCameraProps,
             flySpeed: flySpeed,
-            scenes: defaultScenes 
+            scenes: defaultScenes,
+            projectorViews: projectorViews
         }
     })
 }
@@ -130,7 +131,7 @@ export function useStatefulSerialize(): ()=>PostScene {
  * @returns function that deserializes a {@link PostScene} object to the scene in {@link ViewerContext}
  */
 export function useStatefulDeserialize(): (post: PostScene) => void { 
-    const {setSceneChildren, setDefaultCameraProps, setDefaultXRCameraProps, setPotreePointBudget, setFlySpeed, setDefaultScenes} = useContext(ViewerContext)
+    const {setSceneChildren, setDefaultCameraProps, setDefaultXRCameraProps, setPotreePointBudget, setFlySpeed, setDefaultScenes, setProjectorViews} = useContext(ViewerContext)
     return (post: PostScene) => {
         // console.log(post)
         setSceneChildren(deserializeChildren(post.sceneChildren));
@@ -140,6 +141,8 @@ export function useStatefulDeserialize(): (post: PostScene) => void {
         setPotreePointBudget(post.configuration.potreePointBudget);
         setFlySpeed(post.configuration.flySpeed);
         setDefaultScenes(post.configuration.scenes);
+        // @ts-ignore - number[] vs [number, number, number]
+        setProjectorViews(post.configuration.projectorViews);
     }
 }
 
