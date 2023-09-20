@@ -12,6 +12,8 @@ export type OrbitControlsProps = Omit<
   ReactThreeFiber.Overwrite<
     ReactThreeFiber.Object3DNode<OrbitControlsImpl, typeof OrbitControlsImpl>,
     {
+      projectorID?: string
+      isProjector?: boolean
       camera?: Camera
       domElement?: HTMLElement
       enableDamping?: boolean
@@ -41,7 +43,7 @@ export type OrbitControlsProps = Omit<
 
 
 export const OrbitControls = React.forwardRef<OrbitControlsImpl, OrbitControlsProps>(
-  ({ makeDefault, camera, regress, domElement, enableDamping = true, onChange, onStart, onEnd, doubleTapMaxDelay=300, locomotionLambda=1.5, cameraOffset=0.1, ...restProps }, ref) => {
+  ({ isProjector, projectorID, makeDefault, camera, regress, domElement, enableDamping = true, onChange, onStart, onEnd, doubleTapMaxDelay=300, locomotionLambda=1.5, cameraOffset=0.1, ...restProps }, ref) => {
     useCameraUpdateHelper()
     const invalidate = useThree((state) => state.invalidate)
     const defaultCamera = useThree((state) => state.camera)

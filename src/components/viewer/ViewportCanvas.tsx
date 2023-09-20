@@ -1,6 +1,6 @@
 import { useContextBridge, useDepthBuffer } from "@react-three/drei"
 import { PotreeManager } from "../3d/managers/PotreeManager"
-import { Children, useCallback, useContext, useEffect, useLayoutEffect, useRef } from "react"
+import { Children, createContext, useCallback, useContext, useEffect, useLayoutEffect, useRef } from "react"
 import CompositeSuspense from "../3d/subcomponents/CompositeSuspense"
 import { EditorContext } from "../editor/EditorContext"
 import { Camera, Canvas, useFrame, useThree } from "@react-three/fiber"
@@ -11,6 +11,7 @@ import { twMerge } from "tailwind-merge"
 import { useEventListener } from "../../utilities"
 import { PerspectiveCamera } from "three"
 import { DebugScenesManager, RemoteScenesManager, ScenesManager } from "../3d/managers/ScenesManager"
+import { matchPath, useLocation, useParams } from "react-router-dom"
 
 export function GenericCameraUpdater() {
     useCameraUpdateHelper()
@@ -20,6 +21,19 @@ export function GenericCameraUpdater() {
 export function GenericXRCameraUpdater() {
     useXRCameraUpdateHelper()
     return null
+}
+
+export function useProjectorInfo(): [boolean, string | undefined] {
+    const location = useLocation();
+    const isProjector = !!matchPath(
+        {
+            path: "/projector/:id",
+        },
+        location.pathname
+    );
+    const projectorID = useParams<{id: string}>().id;
+    // console.log(isProjector, projectorID)
+    return [isProjector, projectorID];
 }
 
 export function useCameraUpdateHelper() {
@@ -33,7 +47,6 @@ export function useCameraUpdateHelper() {
             camera.fov = defaultCameraProps.fov
             camera.updateProjectionMatrix()
         }
-        // console.log("Camera updated", camera.position, camera.rotation)
     }, [])
 }
 
@@ -55,8 +68,9 @@ export function useXRCameraUpdateHelper() {
  * @returns 
  */
 function CameraHelper() {
-    const {cameraRef, audioListener} = useContext(ViewerContext)
+    const {cameraRef, audioListener, projectorViews} = useContext(ViewerContext)
     const { camera, gl } = useThree()
+    const warningRef = useRef<boolean>(false)
     // Keep camera reference in ViewerContext up to date
     useLayoutEffect(()=>{
         cameraRef.current = camera
@@ -70,6 +84,18 @@ function CameraHelper() {
             audioListener.removeFromParent()
         }
     }, [camera])
+    useFrame(()=>{
+        if (window.projectorID) {
+            if (projectorViews[window.projectorID]) {
+                camera.position.set(...projectorViews[window.projectorID].position)
+                camera.rotation.set(...projectorViews[window.projectorID].rotation)
+            } else if (warningRef.current === false) {
+                console.warn("Can't find projector ID")
+                warningRef.current = true
+            }
+            
+        }
+    })
     return null
 }
 
@@ -131,6 +157,18 @@ export function _DepthBufferHelper() {
     return null
 }
 
+export const defaultProjectorInfoContext = {
+    isProjector: false,
+    projectorID: undefined
+}
+
+export type ProjectorInfoContextProps = {
+    isProjector: boolean,
+    projectorID: string | undefined
+}
+
+export const ProjectorInfoContext = createContext<ProjectorInfoContextProps>(defaultProjectorInfoContext)
+
 // Convenience component to provide common contexts to viewport children, in the future may include 3DTilesManager, NexusManager, etc which serves to manage 3DTilesObject and NexusObject on each render.
 // TODO: Register managers required and add dynamically (same with ContextBridge required contexts)
 function ViewportCanvas({children, foveation=0, className, ...props}) {
@@ -140,6 +178,11 @@ function ViewportCanvas({children, foveation=0, className, ...props}) {
             {child}
         </CompositeSuspense>
     ))
+    const [isProjector, projectorID] = useProjectorInfo()
+    useEffect(()=>{
+        // Emit DOM event on isProjector, projectorID change
+        window.dispatchEvent(new CustomEvent("projectorInfoChange", {detail: {isProjector, projectorID}}))
+    }, [isProjector, projectorID])
     return (
         <Canvas className={twMerge(className, "viewport-canvas")} {...props}>
             <ContextBridge>

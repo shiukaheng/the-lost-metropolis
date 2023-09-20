@@ -113,17 +113,20 @@ export type PostScene = InferType<typeof postSceneSchema>
  */
 export function useStatefulSerialize(): ()=>PostScene {
     const {sceneChildren, defaultCameraProps, defaultXRCameraProps, potreePointBudget, flySpeed, defaultScenes, projectorViews} = useContext(ViewerContext)
-    return () => ({
-        sceneChildren: exportChildren(sceneChildren),
-        configuration: {
-            defaultCameraProps: defaultCameraProps,
-            potreePointBudget: potreePointBudget,
-            defaultXRCameraProps: defaultXRCameraProps,
-            flySpeed: flySpeed,
-            scenes: defaultScenes,
-            projectorViews: projectorViews
+    return () => {
+        // console.log(projectorViews)
+        return {
+            sceneChildren: exportChildren(sceneChildren),
+            configuration: {
+                defaultCameraProps: defaultCameraProps,
+                potreePointBudget: potreePointBudget,
+                defaultXRCameraProps: defaultXRCameraProps,
+                flySpeed: flySpeed,
+                scenes: defaultScenes,
+                projectorViews: projectorViews
+            }
         }
-    })
+    }
 }
 
 /**
@@ -142,7 +145,7 @@ export function useStatefulDeserialize(): (post: PostScene) => void {
         setFlySpeed(post.configuration.flySpeed);
         setDefaultScenes(post.configuration.scenes);
         // @ts-ignore - number[] vs [number, number, number]
-        setProjectorViews(post.configuration.projectorViews);
+        setProjectorViews(post.configuration.projectorViews ?? {});
     }
 }
 

@@ -8,10 +8,15 @@ import { usePost } from '../../utilities';
 function Exhibition() {
     const [localPost, _] = usePost("web_exhibition", false) // Check if there is a local override
     // @ts-ignore - It works lol
-    const post = useLoader(FileLoader, "assets/web_exhibition.json", (loader) => {
-        // @ts-ignore - Bad types! If I don't use this, it doesn't work
-        loader.setResponseType("json");
-    })
+    let post = undefined
+    try {
+        post = useLoader(FileLoader, "assets/web_exhibition.json", (loader) => {
+            // @ts-ignore - Bad types! If I don't use this, it doesn't work
+            loader.setResponseType("json");
+        })
+    } catch (e) {
+        console.warn("Could not load exhibition file")
+    }
     return (
         <View defaultCameraProps={
             {
@@ -22,7 +27,7 @@ function Exhibition() {
         }
         post={localPost || post}
         >
-                <fog attach="fog" args={['red', 5, 10]} />
+                {/* <fog attach="fog" args={['red', 5, 10]} /> */}
 
         </View>
     )

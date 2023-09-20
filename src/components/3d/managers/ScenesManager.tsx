@@ -247,7 +247,7 @@ export function RemoteScenesManager({children}: {children: React.ReactNode}) {
     const [scene, status] = useWebSocketState<RemoteState>("/sync", {
         predicate: (p, n) => (p as any)?.scenes?.current_scene !== (n as any)?.scenes?.current_scene || (p as any)?.scenes?.idle !== (n as any)?.scenes?.idle
     })
-    console.log(scene)
+    // console.log(scene)
     return (
         <ScenesManager scenes={[(
             scene?.scenes.idle ? "idle" : (scene?.scenes.current_scene || "idle")

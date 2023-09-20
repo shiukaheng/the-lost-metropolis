@@ -9,6 +9,7 @@ import { LanguageLiteral } from '../../api/types/LanguageLiteral';
 import { Theme } from '../../api/types/Theme';
 import ExhibitionEditor from "./pages/ExhibitionEditor";
 import { TestPage } from "./pages/Test";
+import ExhibitionProjectorView from "./pages/ExhibitionProjectorView";
 
 function getDefaultLang(): LanguageLiteral {
     // Check if the browser has a language preference, if it is anything chinese, then use "zh", otherwise use "en"
@@ -95,9 +96,10 @@ function SiteRouter() {
                     }
                     return path;
                 } }>
-                    {/* <Route path="/" element={<Exhibition />} />  */}
-                    <Route path="/" element={<TestPage/>} />
+                    <Route path="/" element={<Exhibition />} /> 
+                    <Route path="/test" element={<TestPage/>} />
                     <Route path="/edit" element={<ExhibitionEditor />} />
+                    <Route path="/projector/:id" element={<ExhibitionProjectorView/>}/>
                 </AnimatedSwitch>
             </div>
     </Router>;

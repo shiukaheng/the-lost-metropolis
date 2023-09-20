@@ -23,6 +23,7 @@ import { ClientAsset } from '../../api_client/types/ClientAsset';
 import { targetAssetLiteralSchema } from '../../../api/types/AssetLiteral';
 import { languageLiteral, LanguageLiteral } from '../../../api/types/LanguageLiteral';
 import { useThree } from '@react-three/fiber';
+import EditorProjectorViews from './ui_elements/EditorProjectorViews';
 
 function Editor() {
     return (
@@ -35,7 +36,7 @@ function Editor() {
 // Todo seperate Editor UI from EditorManager
 
 function EditorManager() {
-    const {sceneChildren, setSceneChildren: _setSceneChildren, audioListener, defaultCameraProps, setDefaultCameraProps, defaultXRCameraProps, potreePointBudget, setPotreePointBudget, flySpeed, scenes} = useContext(ViewerContext)
+    const {sceneChildren, setSceneChildren: _setSceneChildren, audioListener, defaultCameraProps, setDefaultCameraProps, defaultXRCameraProps, potreePointBudget, setPotreePointBudget, flySpeed, scenes, projectorViews} = useContext(ViewerContext)
     // Setup state for editor
     const [selectedIDs, setSelectedIDs] = useState<string[]>([])
     const [transformMode, setTransformMode] = useState("translate")
@@ -99,7 +100,7 @@ function EditorManager() {
     useEffect(() => {
         const newBuffer = serialize()
         setBuffer(newBuffer)
-    }, [sceneChildren, defaultCameraProps, potreePointBudget, defaultXRCameraProps, flySpeed, scenes])
+    }, [sceneChildren, defaultCameraProps, potreePointBudget, defaultXRCameraProps, flySpeed, scenes, projectorViews])
 
     // Update internal state when buffer changes, which only happens if we change sceneChildren (handled), and pull
     const updateLabel = useMultiLang({"en": "update", "zh": "更新"})
@@ -171,6 +172,7 @@ function EditorManager() {
                             <EditorComponentProperties/>
                             <EditorSceneSettings/>
                             <EditorIO/>
+                            <EditorProjectorViews/>
                         </div>
                         : null
                     }
