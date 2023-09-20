@@ -63,12 +63,27 @@ export function useXRCameraUpdateHelper() {
     }, [])
 }
 
+const projectorViews = {
+    "projectorView0": {
+        "position": [-0.12227108430276316, 12.811089238122625, 0.178938880228],
+        "rotation": [
+            -1.5707970467378032, 6.940332926697603e-7, 2.3745163787485755
+          ],
+          "fov": 90
+    },
+    "projectorView1": {
+        "position": [1.0594172326423055, 0.49530256601636335, 1.2035429942049787],
+        "rotation": [0.2611557714321338, 0.9116829381620861, -0.20821601030867076],
+        "fov": 90
+    }
+}
+
 /**
  * Helper component that helps ViewerManager set camera position during mount, and keep audio listener with camera.
  * @returns 
  */
 function CameraHelper() {
-    const {cameraRef, audioListener, projectorViews} = useContext(ViewerContext)
+    const {cameraRef, audioListener} = useContext(ViewerContext)
     const { camera, gl } = useThree()
     const warningRef = useRef<boolean>(false)
     // Keep camera reference in ViewerContext up to date
@@ -86,9 +101,14 @@ function CameraHelper() {
     }, [camera])
     useFrame(()=>{
         if (window.projectorID) {
-            if (projectorViews[window.projectorID]) {
-                camera.position.set(...projectorViews[window.projectorID].position)
-                camera.rotation.set(...projectorViews[window.projectorID].rotation)
+            if (projectorViews[window.projectorID] && camera instanceof PerspectiveCamera) {
+                // console.log(camera)
+                const settings = projectorViews[window.projectorID]
+                if (settings !== undefined || settings !== null) {
+                    camera.position.set(settings.position[0], settings.position[1], settings.position[2])
+                    camera.rotation.set(settings.rotation[0], settings.rotation[1], settings.rotation[2])
+                    camera.fov = settings.fov
+                }
             } else if (warningRef.current === false) {
                 console.warn("Can't find projector ID")
                 warningRef.current = true

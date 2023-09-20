@@ -28,6 +28,7 @@ class SceneManager():
         self.current_scene = self.current_scene_order.pop(0)
         self.idle = False
         self.remaining_scene_time = self.current_scene.duration
+        print(f"Triggered scene {self.current_scene.id} for {self.current_scene.duration} seconds")
     def get_scene_state(self):
         if self.current_scene is None:
             return {

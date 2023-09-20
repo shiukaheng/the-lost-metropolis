@@ -101,6 +101,7 @@ export const SeamlessAudioObject: VaporComponent = ({url, refDistance, volume, p
         0.5, 8, 0,
         0, 8, 0.5
     )
+    // console.log(sceneID)
     useEffect(()=>{
         if (threeAudioObject1 && threeAudioObject2) {
             threeAudioObject1.setVolume(1)
@@ -135,6 +136,7 @@ export const SeamlessAudioObject: VaporComponent = ({url, refDistance, volume, p
             const audio2CurrentTime = threeAudioObject2.context.currentTime - audio2Start.current;
             threeAudioObject1.setVolume(Math.max(Math.min(1, audio1CurrentTime / overlapLength, (threeAudioObject1.buffer.duration - audio1CurrentTime) / overlapLength), 0) * (volume ?? 1) * transitionAlpha);
             threeAudioObject2.setVolume(Math.max(Math.min(1, audio2CurrentTime / overlapLength, (threeAudioObject2.buffer.duration - audio2CurrentTime) / overlapLength), 0) * (volume ?? 1) * transitionAlpha);
+            // console.log(audio1CurrentTime / overlapLength, (threeAudioObject1.buffer.duration - audio1CurrentTime) / overlapLength)
         }
     })
     return (

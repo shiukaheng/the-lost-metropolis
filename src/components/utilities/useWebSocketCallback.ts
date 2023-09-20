@@ -109,6 +109,7 @@ export function useWebSocketState<T>(
   const status = useWebsocketCallback<T>(endpoint, {
     ...options,
     subscriber: (newData) => {
+      console.log(newData)
       setData(newData);
     },
   });

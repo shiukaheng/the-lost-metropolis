@@ -54,12 +54,20 @@ function View({children, ...props}: ViewerProps) {
     return (
         // <ThemeContext.Provider value={{theme: defaultTheme, setTheme: (t)=>{}}}>
         <div className='absolute w-full h-full'>
+            <MagicButton className="w-full" onClick={()=>{
+                if (md) {
+                    requestXR(xrRequesterGetterRef, "immersive-vr")
+                }
+            }}>
+                Start VR experience
+            </MagicButton>
             <Viewer className="absolute w-full h-full" {...props}>
                 <DOMControls force={10} friction={2}/>
                 <ThreeExtractor threeRef={threeStateRef}/>
                 <XRRequesterRefExtractor requesterRefGetterRef={xrRequesterGetterRef}/>
                 {children}
             </Viewer>
+
         </div>
         // </ThemeContext.Provider>
     );

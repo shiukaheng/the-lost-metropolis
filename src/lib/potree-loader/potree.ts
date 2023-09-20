@@ -296,8 +296,8 @@ export class Potree implements IPotree {
       }
 
       // Nodes which are larger will have priority in loading/displaying.
-      // let weight = distance < radius ? Number.MAX_VALUE : screenPixelRadius * 0.5 + 1 / distance;
-      let weight = distance < radius ? Number.MAX_VALUE :
+      let weight = distance < radius ? Number.MAX_VALUE : screenPixelRadius * 0.5 + 1 / distance;
+      // let weight = distance < radius ? Number.MAX_VALUE :
       (distance < 10 && child.level < 7) ? 1 / distance * 10 :
       (distance < 15 && child.level < 5) ? 1 / distance * 7.5 :
       (distance < 30 && child.level < 2) ? 1 / distance * 5 :

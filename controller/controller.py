@@ -11,7 +11,7 @@ class Controller(BaseController):
        
         super().__init__(dmx_port=dmx_port, rate=rate, chunk_size=chunk_size, dmx_refresh_rate=dmx_refresh_rate, input_device_index=input_device_index)
         self.value = 0
-        self.envelope_decay = 0.98
+        self.envelope_decay = 0.993
         self.random_light_decay = 0.95
 
         # Float array [0, 1]
@@ -20,17 +20,21 @@ class Controller(BaseController):
         self.sound_sensitive_float_dmx = np.zeros(512, dtype=np.float32)
         self.functional_light_source_mask = np.zeros(512, dtype=np.float32)
         self.functional_light_source_mask[1] = 1
-        self.bell_detector = BellDetector(rate=rate, chunk=chunk_size, target_freq=2600, relative_amplitude_growth_threshold=2, absolute_amplitude_threshold=0.5)
-
+        self.functional_light_source_mask[10] = 1
+        self.bell_detector = BellDetector(rate=rate, chunk=chunk_size, target_freq=2600, relative_amplitude_growth_threshold=1.2, absolute_amplitude_threshold=0.5, cooldown_time=5)
+        # Initialize modulator as array of 1
+        self.ambient_light_modulator = np.zeros(512, dtype=np.float32)
+        self.ambient_light_level = 0.4
         # Scene management
         self.scene_man = scenes
         self.broadcaster = ThreadedStateBroadcaster()
 
         self.dings = 0
+        self.time = time.time()
 
     def update_sound_sensitive_float_dmx(self):
         self.value *= self.envelope_decay
-        self.draft_dmx_values = np.random.rand(512) ** 10 * 0.1
+        self.draft_dmx_values = np.random.rand(512) ** 6 * 0.1
         # Update max values with draft values if draft values are greater
         self.max_dmx_values = np.maximum(self.max_dmx_values, self.draft_dmx_values)
         # Decay max values
@@ -52,8 +56,9 @@ class Controller(BaseController):
         }
 
     def animation_loop(self, audio_data, frame_count, time_info):
+        self.time = time.time()
         if self.bell_detector.detect_bell(audio_data):
-            self.value = 80
+            self.value = 4
             self.scene_man.bell_trigger()
             self.dings += 1
             print("Ding!")
@@ -67,7 +72,7 @@ class Controller(BaseController):
 
     def functional_light_source_mod(self):
         # Scale values by 0.75, then inverse [0, 1] to [1, 0] for indices in functional_light_source_mask
-        self.sound_sensitive_float_dmx[self.functional_light_source_mask == 1] = 1 - self.sound_sensitive_float_dmx[self.functional_light_source_mask == 1]
+        self.sound_sensitive_float_dmx[self.functional_light_source_mask == 1] = (1 - self.sound_sensitive_float_dmx[self.functional_light_source_mask == 1]) * 0.25
 
     def start(self):
         self.broadcaster.start()

@@ -3,7 +3,7 @@ import { AudioLoader, Audio } from "three";
 import { NumberType, URLType } from "../viewer/ArgumentTypes";
 import { VaporComponent, VaporComponentProps } from "../viewer/ComponentDeclarations";
 import { genericInputs } from "../viewer/genericInputs";
-import { useContext, useEffect, useRef } from "react";
+import { useCallback, useContext, useEffect, useRef } from "react";
 import { ViewerContext } from "../viewer/ViewerContext";
 
 type TransitionAudioObjectProps = VaporComponentProps & {
@@ -16,11 +16,11 @@ function useAudioFile(url) {
 }
 
 function useSpawnAudio(url: string, volume: number = 1) {
-    const audioRef = useRef<Audio | null>(null);
     const audioBuffer = useAudioFile(url) as AudioBuffer;
     const { audioListener } = useContext(ViewerContext);
+    const activeAudios = useRef<Audio[]>([]);  // store all active audio instances
 
-    useEffect(() => {
+    const spawnAudio = useCallback(() => {
         if (!audioBuffer || !audioListener) return;
 
         const audio = new Audio(audioListener);
@@ -32,22 +32,33 @@ function useSpawnAudio(url: string, volume: number = 1) {
         audio.setLoop(true);
         audio.play();
 
-        audioRef.current = audio;
+        activeAudios.current.push(audio); // store this audio in the activeAudios ref
 
-        return () => {
-            audio.stop();
-            audioRef.current = null;
-        };
+        // audio.onended = () => {
+        //     activeAudios.current = activeAudios.current.filter(a => a !== audio);
+        // };
+
+        return audio;
     }, [audioBuffer, audioListener, volume]);
 
-    return audioRef;
+    useEffect(() => {
+        return () => {
+            // Cleanup all active audio instances when the component is unmounted
+            activeAudios.current.forEach(audio => {
+                audio.stop();
+            });
+        };
+    }, []);
+
+    return spawnAudio;
 }
 
 function useWatchScenesChange(callback) {
     const { scenes } = useContext(ViewerContext);
-    const previousScenesRef = useRef<string[]>([]);  // Use a ref to store the previous state
+    const previousScenesRef = useRef<string[]>([]);
 
     useEffect(()=>{
+        if (scenes === null) return;
         const currentScenes = scenes.filter(scene => scene !== "");
         const previousScenes = previousScenesRef.current.filter(scene => scene !== "");
 
@@ -63,16 +74,13 @@ function useWatchScenesChange(callback) {
 }
 
 export const TransitionAudioObject: VaporComponent = ({ url, volume, ...props }: TransitionAudioObjectProps) => {
-    const audioRef = useSpawnAudio(url, volume);
+    const spawnAudio = useSpawnAudio(url, volume);
 
     useWatchScenesChange(() => {
-        if (audioRef.current) {
-            audioRef.current.stop();
-            audioRef.current.play();
-        }
+        spawnAudio(); // Spawn a new audio every time the scene changes
     });
 
-    return null;
+    return null
 }
 
 TransitionAudioObject.displayName = "Transition audio object";

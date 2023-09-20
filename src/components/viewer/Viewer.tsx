@@ -155,7 +155,7 @@ function ViewerUI({post, children, ...props}: ViewerProps) {
     }, [post])
     return (    
         <Viewport {...props}>
-            <XRControls/>
+            {/* <XRControls/> */}
             {sceneChildren}
             {children}
         </Viewport>

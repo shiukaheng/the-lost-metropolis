@@ -10,6 +10,7 @@ import { Theme } from '../../api/types/Theme';
 import ExhibitionEditor from "./pages/ExhibitionEditor";
 import { TestPage } from "./pages/Test";
 import ExhibitionProjectorView from "./pages/ExhibitionProjectorView";
+import EnvironmentalSoundPlayer from "./pages/EnvironmentalSoundPlayer";
 
 function getDefaultLang(): LanguageLiteral {
     // Check if the browser has a language preference, if it is anything chinese, then use "zh", otherwise use "en"
@@ -99,7 +100,9 @@ function SiteRouter() {
                     <Route path="/" element={<Exhibition />} /> 
                     <Route path="/test" element={<TestPage/>} />
                     <Route path="/edit" element={<ExhibitionEditor />} />
+                    <Route path="/sound" element={<EnvironmentalSoundPlayer/>}/>
                     <Route path="/:id" element={<ExhibitionProjectorView/>}/>
+                    
                 </AnimatedSwitch>
             </div>
     </Router>;
