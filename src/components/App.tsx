@@ -99,7 +99,7 @@ function SiteRouter() {
                     <Route path="/" element={<Exhibition />} /> 
                     <Route path="/test" element={<TestPage/>} />
                     <Route path="/edit" element={<ExhibitionEditor />} />
-                    <Route path="/projector/:id" element={<ExhibitionProjectorView/>}/>
+                    <Route path="/:id" element={<ExhibitionProjectorView/>}/>
                 </AnimatedSwitch>
             </div>
     </Router>;
