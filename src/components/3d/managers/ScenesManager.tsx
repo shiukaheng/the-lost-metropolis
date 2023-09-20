@@ -2,6 +2,7 @@ import { useFrame } from "@react-three/fiber";
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { lerp } from "three/src/math/MathUtils";
 import { ViewerContext } from "../../viewer/ViewerContext";
+import { useWebSocketState } from "../../utilities/useWebSocketCallback";
 
 export type ScenesContext = {
     visibleScenes: string[];
@@ -224,6 +225,30 @@ export function DebugScenesManager({children}: {children: React.ReactNode}) {
     }, [])
     return (
         <ScenesManager scenes={scenes}>
+            {children}
+        </ScenesManager>
+    )
+}
+
+type RemoteState = {
+    scenes: {
+        current_scene: string | null;
+        idle: boolean;
+        remaining_scene_time: number;
+        elapsed_scene_time: number;
+    },
+    audio_reactive: {
+        ding_envelope: number;
+        ding_count: number;
+    }
+}
+
+export function RemoteScenesManager({children}: {children: React.ReactNode}) {
+    const [scene, status] = useWebSocketState<RemoteState>("/sync", {
+        predicate: (p, n) => (p as any)?.scenes?.current_scene !== (n as any)?.scenes?.current_scene || (p as any)?.scenes?.idle !== (n as any)?.scenes?.idle
+    })
+    return (
+        <ScenesManager scenes={[scene?.scenes?.current_scene ?? ""]}>
             {children}
         </ScenesManager>
     )
