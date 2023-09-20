@@ -10,7 +10,7 @@ import { InteractionManager, useXR, XR } from "@react-three/xr"
 import { twMerge } from "tailwind-merge"
 import { useEventListener } from "../../utilities"
 import { PerspectiveCamera } from "three"
-import { DebugScenesManager, ScenesManager } from "../3d/managers/ScenesManager"
+import { DebugScenesManager, RemoteScenesManager, ScenesManager } from "../3d/managers/ScenesManager"
 
 export function GenericCameraUpdater() {
     useCameraUpdateHelper()
@@ -148,13 +148,15 @@ function ViewportCanvas({children, foveation=0, className, ...props}) {
                     <XRHelper/>
                     <AudioContextHelper/>
                     {/* <DepthBufferHelper/> */}
-                    <DebugScenesManager>
+                    {/* <DebugScenesManager> */}
+                    <RemoteScenesManager>
                         <PotreeManager>
                             <InteractionManager>
                                 {wrappedChildren}
                             </InteractionManager>
                         </PotreeManager>
-                    </DebugScenesManager>
+                    </RemoteScenesManager>
+                    {/* </DebugScenesManager> */}
                 </XR>
             </ContextBridge>
         </Canvas>
