@@ -4,7 +4,7 @@
   "source": "./src/index.html",
   "scripts": {
     "start": "concurrently \"yarn asset_server\" \"pdm run ./controller/controller.py\" \"vite --host 0.0.0.0\"",
-    "asset_server": "http-server -c-1 --cors -S -C ./certs/certificate.pem -K ./certs/private_key.pem ./public",
+    "asset_server": "http-server -c-1 --cors -S -C ./certs/certificate.pem -K ./certs/private_key.pem ./public -p 8081 -s",
     "build": "vite build",
     "postinstall": "concurrently \"patch-package\" \"pdm install\""
   },

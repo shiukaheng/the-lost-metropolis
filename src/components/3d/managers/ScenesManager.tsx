@@ -172,6 +172,26 @@ export const useGetTransitionAlpha = (
     return getFinalAlpha;
 }
 
+// export function useTransitionAlpha(
+//     sceneID: string | null, 
+//     fadeInBefore: number, 
+//     fadeInDuration: number,
+//     fadeInAfter: number,
+//     fadeOutBefore: number,
+//     fadeOutDuration: number,
+//     fadeOutAfter: number,
+//     callback: (alpha: number) => void
+//     ) {
+
+//     const getFinalAlpha = useGetTransitionAlpha(sceneID, fadeInBefore, fadeInDuration, fadeInAfter, fadeOutBefore, fadeOutDuration, fadeOutAfter);
+
+//     // Update alpha
+//     useFrame((state, delta) => {
+//         const finalAlpha = getFinalAlpha(delta);
+//         callback(finalAlpha);
+//     });
+// }
+
 export function useTransitionAlpha(
     sceneID: string | null, 
     fadeInBefore: number, 
@@ -180,16 +200,31 @@ export function useTransitionAlpha(
     fadeOutBefore: number,
     fadeOutDuration: number,
     fadeOutAfter: number,
-    callback: (alpha: number) => void
-    ) {
+    callback: (alpha: number) => void,
+    framerate: number = 30
+) {
 
     const getFinalAlpha = useGetTransitionAlpha(sceneID, fadeInBefore, fadeInDuration, fadeInAfter, fadeOutBefore, fadeOutDuration, fadeOutAfter);
+    
+    const previousTimeRef = useRef<number | null>(null);
 
-    // Update alpha
-    useFrame((state, delta) => {
-        const finalAlpha = getFinalAlpha(delta);
-        callback(finalAlpha);
-    });
+    useEffect(() => {
+        const interval = 1000 / framerate; // calculate time for each frame based on framerate
+
+        const timer = setInterval(() => {
+            const currentTime = performance.now();
+            const delta = previousTimeRef.current !== null ? (currentTime - previousTimeRef.current) / 1000 : 0; // calculate time difference in seconds
+            previousTimeRef.current = currentTime;
+
+            const finalAlpha = getFinalAlpha(delta);
+            callback(finalAlpha);
+        }, interval);
+
+        // Cleanup on unmount
+        return () => {
+            clearInterval(timer);
+        };
+    }, [sceneID, fadeInBefore, fadeInDuration, fadeInAfter, fadeOutBefore, fadeOutDuration, fadeOutAfter, callback, framerate]);
 }
 
 type AnimatedScenesManagerProps = {

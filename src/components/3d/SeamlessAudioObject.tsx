@@ -6,7 +6,7 @@ import { BooleanType, NumberType, StringType, URLType } from "../viewer/Argument
 import { VaporComponent, VaporComponentProps } from "../viewer/ComponentDeclarations";
 import { genericInputs } from "../viewer/genericInputs"
 import { ViewerContext } from "../viewer/ViewerContext";
-import { useGetTransitionAlpha } from "./managers/ScenesManager";
+import { useGetTransitionAlpha, useTransitionAlpha } from "./managers/ScenesManager";
 
 type AudioObjectProps = VaporComponentProps & {
     url: string;
@@ -96,11 +96,11 @@ export const SeamlessAudioObject: VaporComponent = ({url, refDistance, volume, p
     const [threeAudioObject1, threeAudioObject2, audio1Start, audio2Start, play1, play2] = useSeamlessThreeAudio(url, positional || false);
     const activeIndexRef = useRef(0);
     const groupRef = useRef<Group>(null);
-    const getTransitionAlpha = useGetTransitionAlpha(
-        sceneID,
-        0.5, 8, 0,
-        0, 8, 0.5
-    )
+    // const getTransitionAlpha = useGetTransitionAlpha(
+    //     sceneID,
+    //     0.5, 8, 0,
+    //     0, 8, 0.5
+    // )
     // console.log(sceneID)
     useEffect(()=>{
         if (threeAudioObject1 && threeAudioObject2) {
@@ -116,8 +116,31 @@ export const SeamlessAudioObject: VaporComponent = ({url, refDistance, volume, p
             }
         }
     }, [threeAudioObject1, threeAudioObject2, refDistance, volume])
-    useFrame((state, delta)=>{
-        if (threeAudioObject1 && threeAudioObject2 && threeAudioObject1.buffer && threeAudioObject2.buffer) {
+    // useFrame((state, delta)=>{
+    //     if (threeAudioObject1 && threeAudioObject2 && threeAudioObject1.buffer && threeAudioObject2.buffer) {
+    //         if ((threeAudioObject1?.context.currentTime - audio1Start.current) > (threeAudioObject1.buffer.duration - overlapLength) && activeIndexRef.current === 0) {
+    //             play2();
+    //             activeIndexRef.current = 1;
+    //             // console.log("Switching to 2")
+    //         }
+    //         if ((threeAudioObject2?.context.currentTime - audio2Start.current) > (threeAudioObject2.buffer.duration - overlapLength) && activeIndexRef.current === 1) {
+    //             play1();
+    //             activeIndexRef.current = 0;
+    //             // console.log("Switching to 1")
+    //         }
+    //     }
+    //     const transitionAlpha = 1 - Math.abs(getTransitionAlpha(delta))
+    //     // Calculate volume for each audio object to crossfade
+    //     if (threeAudioObject1 && threeAudioObject2 && threeAudioObject1.buffer && threeAudioObject2.buffer) {
+    //         const audio1CurrentTime = threeAudioObject1.context.currentTime - audio1Start.current;
+    //         const audio2CurrentTime = threeAudioObject2.context.currentTime - audio2Start.current;
+    //         threeAudioObject1.setVolume(Math.max(Math.min(1, audio1CurrentTime / overlapLength, (threeAudioObject1.buffer.duration - audio1CurrentTime) / overlapLength), 0) * (volume ?? 1) * transitionAlpha);
+    //         threeAudioObject2.setVolume(Math.max(Math.min(1, audio2CurrentTime / overlapLength, (threeAudioObject2.buffer.duration - audio2CurrentTime) / overlapLength), 0) * (volume ?? 1) * transitionAlpha);
+    //         // console.log(audio1CurrentTime / overlapLength, (threeAudioObject1.buffer.duration - audio1CurrentTime) / overlapLength)
+    //     }
+    // })
+    useTransitionAlpha(sceneID, 0.5, 8, 0, 0, 8, 0.5, (alpha) => {
+                if (threeAudioObject1 && threeAudioObject2 && threeAudioObject1.buffer && threeAudioObject2.buffer) {
             if ((threeAudioObject1?.context.currentTime - audio1Start.current) > (threeAudioObject1.buffer.duration - overlapLength) && activeIndexRef.current === 0) {
                 play2();
                 activeIndexRef.current = 1;
@@ -129,7 +152,7 @@ export const SeamlessAudioObject: VaporComponent = ({url, refDistance, volume, p
                 // console.log("Switching to 1")
             }
         }
-        const transitionAlpha = 1 - Math.abs(getTransitionAlpha(delta))
+        const transitionAlpha = 1 - Math.abs(alpha)
         // Calculate volume for each audio object to crossfade
         if (threeAudioObject1 && threeAudioObject2 && threeAudioObject1.buffer && threeAudioObject2.buffer) {
             const audio1CurrentTime = threeAudioObject1.context.currentTime - audio1Start.current;
@@ -138,7 +161,7 @@ export const SeamlessAudioObject: VaporComponent = ({url, refDistance, volume, p
             threeAudioObject2.setVolume(Math.max(Math.min(1, audio2CurrentTime / overlapLength, (threeAudioObject2.buffer.duration - audio2CurrentTime) / overlapLength), 0) * (volume ?? 1) * transitionAlpha);
             // console.log(audio1CurrentTime / overlapLength, (threeAudioObject1.buffer.duration - audio1CurrentTime) / overlapLength)
         }
-    })
+    }, 30)
     return (
         <group {...props} ref={groupRef}>
             {threeAudioObject1 ? <primitive object={threeAudioObject1}/> : null}
