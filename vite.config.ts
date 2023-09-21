@@ -14,7 +14,7 @@ export default defineConfig({
     },
     proxy: {
       '/assets': {
-        target: 'https://192.168.1.163:8081/',
+        target: 'https://localhost:8081/',
         changeOrigin: true,
         secure: false,
         ws: true
