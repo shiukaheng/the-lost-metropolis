@@ -30,3 +30,5 @@ yarn-error.log*
 .vscode/settings.json
 ui-debug.log
 .vscode/settings.json
+
+/assets
