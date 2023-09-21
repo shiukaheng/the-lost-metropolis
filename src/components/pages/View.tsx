@@ -52,24 +52,30 @@ function View({children, ...props}: ViewerProps) {
     const md = useMediaQuery({ query: '(min-width: 768px)' })
     // console.log(defaultTheme)
     return (
-        // <ThemeContext.Provider value={{theme: defaultTheme, setTheme: (t)=>{}}}>
         <div className='absolute w-full h-full'>
-            <MagicButton className="w-full" onClick={()=>{
-                if (md) {
-                    requestXR(xrRequesterGetterRef, "immersive-vr")
-                }
-            }}>
-                Start VR experience
-            </MagicButton>
-            <Viewer className="absolute w-full h-full" {...props}>
-                <DOMControls force={10} friction={2}/>
+            <Viewer className="absolute w-full h-full">
+                <DOMControls/>
                 <ThreeExtractor threeRef={threeStateRef}/>
                 <XRRequesterRefExtractor requesterRefGetterRef={xrRequesterGetterRef}/>
                 {children}
             </Viewer>
-
+            <Fade>
+                <div className="absolute w-full h-full p-8 md:p-20 pointer-events-none flex flex-col gap-4">
+                    <div className="flex flex-row place-content-between gap-4">
+                        <div className="ml-auto flex flex-row gap-4">
+                            {md && <XRButtons xrRequesterGetterRef={xrRequesterGetterRef} supportedXRModes={supportedXRModes}/>}
+                            {/* <MagicButton className='pointer-events-auto' onClick={(e)=>{e.stopPropagation(); navigate(`/browse/${id}`);}} languageSpecificChildren={{"en": "back", "zh": "返回"}}/> */}
+                        </div>
+                    </div>
+                    {!md && 
+                        <div className="flex flex-row h-12 gap-4">
+                            <XRButtons xrRequesterGetterRef={xrRequesterGetterRef} supportedXRModes={supportedXRModes}/>
+                        </div>
+                    }
+                    <ControlTips className='mt-auto max-w-[520px]'/>
+                </div>
+            </Fade>
         </div>
-        // </ThemeContext.Provider>
     );
 }
 
