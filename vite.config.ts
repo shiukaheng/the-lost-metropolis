@@ -14,14 +14,14 @@ export default defineConfig({
     },
     proxy: {
       '/assets': {
-        target: 'https://localhost:8081/',
+        target: 'https://127.0.0.1:8081',
         changeOrigin: true,
         secure: false,
         ws: true
       },
       // Forward 8765 websocket
       '/sync': {
-        target: 'https://localhost:8765',
+        target: 'https://127.0.0.1:8765',
         changeOrigin: true,
         secure: false,
         ws: true
