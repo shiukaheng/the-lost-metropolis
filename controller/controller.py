@@ -38,9 +38,6 @@ class Controller(BaseController):
         self.functional_light_source_mask[1] = 1
         self.functional_light_source_mask[10] = 1
         self.bell_detector = BellDetector(rate=rate, chunk=chunk_size, target_freq=2600, relative_amplitude_growth_threshold=1.3, absolute_amplitude_threshold=0.3, cooldown_time=5)
-        # Initialize modulator as array of 1
-        self.ambient_light_modulator = np.zeros(512, dtype=np.float32)
-        self.ambient_light_level = 0.4
         # Scene management
         self.scene_man = scenes
         self.broadcaster = ThreadedStateBroadcaster()
@@ -49,6 +46,9 @@ class Controller(BaseController):
         self.time = time.time()
 
         self.last_state = None
+
+        self.idle = 1
+        self.dampened_idle = 1
 
     def update_sound_sensitive_float_dmx(self):
         self.value *= self.envelope_decay
@@ -86,11 +86,21 @@ class Controller(BaseController):
         self.scene_man.update(1 / self.rate * self.chunk_size)
         state = self.get_state()
         self.broadcast_if_changed(state)
+        if self.idle == 1:
+            self.dampened_idle += 0.05
+            self.dampened_idle = min(self.dampened_idle, 1)
+        else:
+            self.dampened_idle -= 0.05
+            self.dampened_idle = max(self.dampened_idle, 0)
         return self.dmx_values
     
     def broadcast_if_changed(self, state):
         # Get scene from state and last_state
         scene = get_scene(state)
+        if scene == "idle":
+            self.idle = 1
+        else:
+            self.idle = 0
         last_scene = get_scene(self.last_state)
         # If scene has changed, broadcast
         if scene != last_scene:
