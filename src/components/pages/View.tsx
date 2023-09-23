@@ -22,30 +22,17 @@ function XRButtons({supportedXRModes, xrRequesterGetterRef}) {
     const supportVR = supportedXRModes && supportedXRModes.includes("immersive-vr")
     return (
         <Fragment>
-            {supportAR &&
-                <MagicButton solid className='pointer-events-auto' onClick={(e)=>{
-                    e.stopPropagation()
-                    requestXR(xrRequesterGetterRef, "immersive-ar")
-                }}>
-                    <MagicIcon fillCurrent invertColors IconComponent={AR}/>
-                </MagicButton>
-            }
-            {supportVR &&
-                <MagicButton solid className='pointer-events-auto' onClick={(e)=>{
-                    e.stopPropagation()
-                    requestXR(xrRequesterGetterRef, "immersive-vr")
-                }}>
-                    <MagicIcon fillCurrent invertColors IconComponent={VR}/>
-                </MagicButton>
-            }
+            <MagicButton solid className='pointer-events-auto' onClick={(e)=>{
+                e.stopPropagation()
+                requestXR(xrRequesterGetterRef, "immersive-ar")
+            }}>
+                Click here to start VR experience
+            </MagicButton>
         </Fragment>
     )
 }
 
-
 function View({children, ...props}: ViewerProps) {
-    // const { id } = useParams();
-    // const navigate = useNavigate();
     const threeStateRef = useRef<null | RootState>(null) 
     const xrRequesterGetterRef = useRef<null | XRRequesterGetter>(null)
     const supportedXRModes = useSupportedXRModes()
@@ -61,18 +48,30 @@ function View({children, ...props}: ViewerProps) {
             </Viewer>
             <Fade>
                 <div className="absolute w-full h-full p-8 md:p-20 pointer-events-none flex flex-col gap-4">
-                    <div className="flex flex-row place-content-between gap-4">
-                        <div className="ml-auto flex flex-row gap-4">
-                            {md && <XRButtons xrRequesterGetterRef={xrRequesterGetterRef} supportedXRModes={supportedXRModes}/>}
-                            {/* <MagicButton className='pointer-events-auto' onClick={(e)=>{e.stopPropagation(); navigate(`/browse/${id}`);}} languageSpecificChildren={{"en": "back", "zh": "返回"}}/> */}
-                        </div>
-                    </div>
-                    {!md && 
-                        <div className="flex flex-row h-12 gap-4">
-                            <XRButtons xrRequesterGetterRef={xrRequesterGetterRef} supportedXRModes={supportedXRModes}/>
-                        </div>
-                    }
                     <ControlTips className='mt-auto max-w-[520px]'/>
+                </div>
+            </Fade>
+        </div>
+    );
+}
+
+export function VRView({children, ...props}: ViewerProps) {
+    const threeStateRef = useRef<null | RootState>(null) 
+    const xrRequesterGetterRef = useRef<null | XRRequesterGetter>(null)
+    const supportedXRModes = useSupportedXRModes()
+    const md = useMediaQuery({ query: '(min-width: 768px)' })
+    // console.log(defaultTheme)
+    return (
+        <div className='absolute w-full h-full'>
+            <Viewer className="absolute w-full h-full">
+                <DOMControls/>
+                <ThreeExtractor threeRef={threeStateRef}/>
+                <XRRequesterRefExtractor requesterRefGetterRef={xrRequesterGetterRef}/>
+                {children}
+            </Viewer>
+            <Fade>
+                <div className="absolute w-full h-full p-8 pointer-events-none">
+                    <XRButtons xrRequesterGetterRef={xrRequesterGetterRef} supportedXRModes={["immersive-ar"]}/>
                 </div>
             </Fade>
         </div>

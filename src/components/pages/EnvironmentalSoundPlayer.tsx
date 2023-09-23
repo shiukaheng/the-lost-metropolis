@@ -6,11 +6,11 @@ import { FileLoader } from 'three';
 import { usePost } from '../../utilities';
 import { AudioObject } from '../3d/AudioObject';
 import { SeamlessAudioObject } from '../3d/SeamlessAudioObject';
-import { TransitionAudioObject } from '../3d/TransitionAudioObject';
+import { Fragment } from 'react';
 
-function EnvironmentalSoundPlayer() {
+export function EnvironmentalSound() {
     return (
-        <View>
+        <Fragment>
             <SeamlessAudioObject overlapLength={5} objectID='1' positional={false} sceneID="ho" url="assets/projector_sounds/ho.ogg"/>
             <SeamlessAudioObject overlapLength={5} objectID='2' positional={false} sceneID="state_roof" url="assets/projector_sounds/state_roof.ogg"/>
             <SeamlessAudioObject overlapLength={5} objectID='3' volume={2} positional={false} sceneID="state_writing_shop" url="assets/projector_sounds/state_writing_shop.ogg"/>
@@ -23,6 +23,14 @@ function EnvironmentalSoundPlayer() {
             <SeamlessAudioObject overlapLength={5} objectID='10' positional={false} sceneID="ckl_int_night" url="assets/projector_sounds/ckl_int_night.ogg"/>
             {/* <TransitionAudioObject url="assets/projector_sounds/transition.ogg" objectID="11"/> */}
             <SeamlessAudioObject volume={0.4} overlapLength={5} objectID='12' positional={false} sceneID="idle" url="assets/projector_sounds/ambient.ogg"/>
+        </Fragment>
+    )
+}
+
+function EnvironmentalSoundPlayer() {
+    return (
+        <View>
+            <EnvironmentalSound/>
         </View>
     )
 }
