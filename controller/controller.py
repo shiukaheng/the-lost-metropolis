@@ -36,7 +36,7 @@ class Controller(BaseController):
         self.sound_sensitive_float_dmx = np.zeros(512, dtype=np.float32)
         self.functional_light_source_mask = np.zeros(512, dtype=np.float32)
         self.functional_light_source_mask[1] = 1
-        self.functional_light_source_mask[10] = 1
+        self.functional_light_source_mask[9] = 1
         self.bell_detector = BellDetector(rate=rate, chunk=chunk_size, target_freq=2600, relative_amplitude_growth_threshold=1.3, absolute_amplitude_threshold=0.3, cooldown_time=5)
         # Initialize modulator as array of 1
         self.ambient_light_modulator = np.zeros(512, dtype=np.float32)
@@ -44,11 +44,11 @@ class Controller(BaseController):
         # Scene management
         self.scene_man = scenes
         self.broadcaster = ThreadedStateBroadcaster()
-
         self.dings = 0
         self.time = time.time()
 
         self.last_state = None
+        self._num_updates = 0
 
     def update_sound_sensitive_float_dmx(self):
         self.value *= self.envelope_decay
@@ -85,6 +85,12 @@ class Controller(BaseController):
         self.dmx_values = float_to_uint8(self.sound_sensitive_float_dmx)
         self.scene_man.update(1 / self.rate * self.chunk_size)
         state = self.get_state()
+        # Add to num_updates, mod by 30, if 0, broadcast
+        self._num_updates += 1
+        if self._num_updates % 30 == 0:
+            # Reset num_updates
+            self._num_updates = 0
+            self.broadcaster.broadcast(state)
         self.broadcast_if_changed(state)
         return self.dmx_values
     
