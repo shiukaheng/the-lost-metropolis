@@ -10,7 +10,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/assets': {
-        target: 'https://127.0.0.1:8080',
+        target: 'https://reimagine-heritage.s3.ap-east-1.amazonaws.com/',
         changeOrigin: true,
         secure: false,
         ws: true
