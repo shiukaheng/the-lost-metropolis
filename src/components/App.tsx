@@ -4,7 +4,7 @@ import { useState, createContext, useLayoutEffect, useContext, MutableRefObject,
 import AnimatedSwitch from "./utilities/AnimatedSwitch";
 import { formatRGBCSS, useStickyState } from "../utilities";
 // All pages
-import Exhibition from './pages/Exhibition';
+import Exhibition, { VRExhibition } from './pages/Exhibition';
 import { LanguageLiteral } from '../../api/types/LanguageLiteral';
 import { Theme } from '../../api/types/Theme';
 import ExhibitionEditor from "./pages/ExhibitionEditor";
@@ -98,6 +98,7 @@ function SiteRouter() {
                     return path;
                 } }>
                     <Route path="/" element={<Exhibition />} /> 
+                    <Route path="/vr" element={<VRExhibition />} /> 
                     <Route path="/test" element={<TestPage/>} />
                     <Route path="/edit" element={<ExhibitionEditor />} />
                     <Route path="/sound" element={<EnvironmentalSoundPlayer/>}/>

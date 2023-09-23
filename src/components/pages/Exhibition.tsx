@@ -1,20 +1,15 @@
 import { useLoader } from "@react-three/fiber";
 import { PotreeObject } from "../3d/PotreeObject";
 import { AnimatedScenesManager } from "../3d/managers/ScenesManager";
-import View from "./View";
+import View, { VRView } from "./View";
 import { FileLoader } from "three";
 import { usePost } from "../../utilities";
+import { Fragment } from "react";
+import { EnvironmentalSound } from "./EnvironmentalSoundPlayer";
 
-function Exhibition() {
+export function ExhibitionScene() {
   return (
-    <View
-      defaultCameraProps={{
-        position: [0, 0, 0],
-        rotation: [0, 0, 0],
-        fov: 90,
-      }}
-      // post={localPost || post}
-    >
+    <Fragment>
       <PotreeObject
         objectID="79752374-e900-4a14-901b-e29df467853c"
         name="Ho Fuk Wo OK"
@@ -133,8 +128,37 @@ function Exhibition() {
         pointSize={1}
         sceneID="ckl_int_night"
       />
+    </Fragment>
+  )
+}
+
+function Exhibition() {
+  return (
+    <View
+      defaultCameraProps={{
+        position: [0, 0, 0],
+        rotation: [0, 0, 0],
+        fov: 90,
+      }}
+    >
+      <ExhibitionScene/>
     </View>
   );
+}
+
+export function VRExhibition() {
+  return (
+    <VRView
+      defaultCameraProps={{
+        position: [0, 0, 0],
+        rotation: [0, 0, 0],
+        fov: 90,
+      }}
+    >
+      <ExhibitionScene/>
+      <EnvironmentalSound/>
+    </VRView>
+  )
 }
 
 export default Exhibition;
