@@ -10,7 +10,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/assets': {
-        target: 'https://localhost:8080',
+        target: 'http://microwavefest.net/reimaginesheritage/the_lost_metropolis/',
         changeOrigin: true,
         secure: false,
         ws: true

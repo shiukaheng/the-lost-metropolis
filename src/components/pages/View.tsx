@@ -59,6 +59,11 @@ function View({children, ...props}: ViewerProps) {
                 <XRRequesterRefExtractor requesterRefGetterRef={xrRequesterGetterRef}/>
                 {children}
             </Viewer>
+            <Fade>
+                <div className="absolute w-full h-full p-8 md:p-20 pointer-events-none flex flex-col gap-4">
+                    <ControlTips className='mt-auto max-w-[520px]'/>
+                </div>
+            </Fade>
         </div>
         // </ThemeContext.Provider>
     );
